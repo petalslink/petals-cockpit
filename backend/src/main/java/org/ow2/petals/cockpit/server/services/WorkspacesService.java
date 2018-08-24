@@ -156,8 +156,8 @@ public class WorkspacesService {
         private final Map<Long, Future<?>> importsInProgress = new HashMap<>();
 
         public WorkspaceService(long id) {
-            this.wId = id;
-            this.broadcaster.add(new BroadcasterListener<OutboundEvent>() {
+            wId = id;
+            broadcaster.add(new BroadcasterListener<OutboundEvent>() {
                 @Override
                 public void onException(ChunkedOutput<OutboundEvent> chunkedOutput, Exception exception) {
                     if (exception instanceof EofException) {
@@ -230,7 +230,7 @@ public class WorkspacesService {
                 f.cancel(true);
             }
 
-            this.importsInProgress.clear();
+            importsInProgress.clear();
 
             WorkspaceDeleted wd = new WorkspaceDeleted(wId);
 
@@ -323,7 +323,7 @@ public class WorkspacesService {
                     WorkspaceContent result = b.build();
 
                     // TODO create a specific class to be cleaner
-                    final Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>, 
+                    final Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>,
                                     ImmutableMap<String, InterfaceFull>> workspaceServices = getWorkspaceServices();
                     result.services = workspaceServices._1();
                     result.endpoints = workspaceServices._2();
@@ -684,12 +684,14 @@ public class WorkspacesService {
             broadcast(WorkspaceEvent.servicesUpdated(res));
         }
 
-        public Tuple3<ImmutableMap<String, ServiceFull>, 
-                        ImmutableMap<String, EndpointFull>, 
+        public Tuple3<ImmutableMap<String, ServiceFull>,
+                        ImmutableMap<String, EndpointFull>,
                         ImmutableMap<String, InterfaceFull>> getWorkspaceServices() {
             DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
-                    .where(BUSES.WORKSPACE_ID.eq(wId)).fetchStream()
-                    .forEach(containerRecord -> {
+                    .where(BUSES.WORKSPACE_ID.eq(wId))
+                    // We only look for containers with at least one component because containers without component don't have services
+                    .and(CONTAINERS.ID.in(DSL.using(jooq).select(COMPONENTS.CONTAINER_ID).from(COMPONENTS)))
+                    .fetchStream().forEach(containerRecord -> {
                         updateContainerServices(containerRecord.value1());
                     });
             return new Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>, ImmutableMap<String, InterfaceFull>>(
