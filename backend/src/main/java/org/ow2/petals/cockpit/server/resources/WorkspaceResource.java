@@ -129,7 +129,7 @@ public class WorkspaceResource {
         this.jooq = jooq;
         this.httpServer = httpServer;
         this.workspaceDb = workspaceDb;
-        this.workspace = workspaces.get(wsId, profile.getId());
+        workspace = workspaces.get(wsId, profile.getId());
     }
 
     private WorkspacesRecord get(Configuration conf) {
@@ -217,6 +217,7 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public BusInProgress addBus(@NotNull @Valid BusImport nb) {
+
         return workspace.importBus(nb);
     }
 
@@ -553,7 +554,7 @@ public class WorkspaceResource {
             this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
-            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
+            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
         }
 
         @JsonCreator
@@ -717,7 +718,7 @@ public class WorkspaceResource {
         public boolean mayChangeServicesCommingFrom(ServiceAssemblyMin.State previousState) {
             // SA starts proposing services when started
             // SA may stop proposing services when unloaded, so we check for shutdown and unknown as well
-            switch (this.state) {
+            switch (state) {
                 case Unloaded:
                     switch (previousState) {
                         case Started:
@@ -778,7 +779,7 @@ public class WorkspaceResource {
             // Component starts proposing services when started
             // Components stops proposing services when uninstalled(shutdown),
             // so we check for unloaded and unknown as well
-            switch (this.state) {
+            switch (state) {
                 case Unloaded:
                 case Loaded:
                     switch (previousState) {
@@ -880,18 +881,18 @@ public class WorkspaceResource {
             this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
-            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
+            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
             this.content = content;
         }
 
         @JsonCreator
         private WorkspaceFullContent() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this.users = ImmutableMap.of();
-            this.content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+            users = ImmutableMap.of();
+            content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of());
-            this.workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
+            workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
         }
     }
 

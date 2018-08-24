@@ -177,6 +177,36 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     }
 
     @Test
+    public void importSameBusTwiceError() {
+        long busId;
+        try (EventInput eventInput = resource.sse(1)) {
+
+            expectWorkspaceContent(eventInput);
+
+            BusInProgress post = resource.target("/workspaces/1/buses").request()
+                    .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
+
+            expectImportBusEvent(eventInput, post);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_OK");
+            });
+
+            BusInProgress post2 = resource.target("/workspaces/1/buses").request()
+                    .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),
+                            container.getJmxPassword(), "phrase")), BusInProgress.class);
+
+            expectImportBusEvent(eventInput, post2);
+
+            expectEvent(eventInput, (e, a) -> {
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
+            });
+
+        }
+    }
+
+    @Test
     public void importBusForbidden() {
 
         resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
