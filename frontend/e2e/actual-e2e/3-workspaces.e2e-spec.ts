@@ -17,6 +17,7 @@
 
 import { $, browser, ExpectedConditions as EC } from 'protractor';
 
+import { waitAndCheck } from '../utils';
 import { page, waitTimeout } from './../common';
 
 describe(`Workspaces`, () => {
@@ -47,9 +48,11 @@ describe(`Workspaces`, () => {
       .mouseMove(workspaces.component.$('mat-card-subtitle span.dotted'))
       .perform();
 
-    expect($('mat-tooltip-component').getText()).toEqual(
+    waitAndCheck(
+      $(`mat-tooltip-component`),
       'Administrator, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
     );
+
     expect(workspaces.workspacesInfos.getText()).toEqual([
       `Workspace 1\nShared with you and 4 others.`,
     ]);

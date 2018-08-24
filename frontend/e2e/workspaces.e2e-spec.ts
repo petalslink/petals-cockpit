@@ -18,6 +18,7 @@
 import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { page, waitTimeout } from './common';
+import { waitAndCheck } from './utils';
 
 describe(`Workspaces`, () => {
   it('should clear the dialog upon logout', () => {
@@ -47,9 +48,11 @@ describe(`Workspaces`, () => {
       .mouseMove(workspaces.component.$('mat-card-subtitle span.dotted'))
       .perform();
 
-    expect($('mat-tooltip-component').getText()).toEqual(
+    waitAndCheck(
+      $(`mat-tooltip-component`),
       'Administrator, Administrator LDAP, Bertrand ESCUDIE, Maxime ROBERT, Christophe CHEVALIER'
     );
+
     expect(workspaces.workspacesInfos.getText()).toEqual([
       `Workspace 1\nShared with you and 5 others.`,
     ]);

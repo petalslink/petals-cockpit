@@ -18,6 +18,7 @@
 import { $, browser } from 'protractor';
 
 import { page } from './common';
+import { waitAndCheck } from './utils';
 
 describe(`Login`, () => {
   it(`should display the current username`, () => {
@@ -28,6 +29,7 @@ describe(`Login`, () => {
       .actions()
       .mouseMove($('app-generate-icon.btn-avatar-user'))
       .perform();
-    expect($('mat-tooltip-component').getText()).toEqual('Administrator');
+
+    waitAndCheck($(`mat-tooltip-component`), 'Administrator');
   });
 });
