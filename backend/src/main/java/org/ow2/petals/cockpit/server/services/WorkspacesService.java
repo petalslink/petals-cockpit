@@ -699,8 +699,10 @@ public class WorkspacesService {
                         ImmutableMap<String, EndpointFull>,
                         ImmutableMap<String, InterfaceFull>> getWorkspaceServices() {
             DSL.using(jooq).select(CONTAINERS.ID).from(CONTAINERS).join(BUSES).onKey(FK_CONTAINERS_BUSES_ID)
-                    .where(BUSES.WORKSPACE_ID.eq(wId)).fetchStream()
-                    .forEach(containerRecord -> {
+                    .where(BUSES.WORKSPACE_ID.eq(wId))
+                    // We only look for containers with at least one component because containers without component don't have services
+                    .and(CONTAINERS.ID.in(DSL.using(jooq).select(COMPONENTS.CONTAINER_ID).from(COMPONENTS)))
+                    .fetchStream().forEach(containerRecord -> {
                         updateContainerServices(containerRecord.value1());
                     });
             return new Tuple3<ImmutableMap<String, ServiceFull>, ImmutableMap<String, EndpointFull>, ImmutableMap<String, InterfaceFull>>(
