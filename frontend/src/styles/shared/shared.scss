@@ -62,6 +62,10 @@ div > .mat-dialog-container {
 
 .wrapper-content {
   height: 100%;
+  overflow: auto;
+  background-image: url(./assets/img/gray_jean.png);
+  background-size: auto;
+  background-repeat: repeat;
   .central-content {
     width: 90%;
     max-width: 1000px;
@@ -75,11 +79,6 @@ div > .mat-dialog-container {
   }
   .content {
     @extend .padding-x2;
-    background-image: url(./assets/img/gray_jean.png);
-    background-size: auto;
-    background-repeat: repeat;
-    height: 100%;
-
     &.content-max-width {
       margin: auto;
     }

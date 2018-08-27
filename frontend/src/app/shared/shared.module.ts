@@ -23,6 +23,7 @@ import { ModuleWithProviders, NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ScrollDispatchModule } from '@angular/cdk/scrolling';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -85,6 +86,7 @@ export const MaterialModules = [
   MatAutocompleteModule,
   ObserversModule,
   PlatformModule,
+  ScrollDispatchModule,
 ];
 
 // used by the components in declarations below
