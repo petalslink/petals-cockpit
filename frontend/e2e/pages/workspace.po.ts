@@ -182,7 +182,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
   public readonly description = this.component.$(
-    `mat-card-content.workspace-description > span`
+    `mat-card-content.workspace-description > div > div.description > span`
   );
   public readonly editButton = this.component.$(
     `.workspace-description button`

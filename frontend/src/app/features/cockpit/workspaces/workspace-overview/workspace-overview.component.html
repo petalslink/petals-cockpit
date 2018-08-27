@@ -31,48 +31,62 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxFlex class="content content-max-width">
     <div class="central-content">
       <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
+
         <mat-card fxFlex [ngClass.gt-md]="'card-auto-size'">
           <mat-card-title fxLayout="row" *ngIf="!isEditingDescription">
             <span fxFlex class="text-upper">Whiteboard</span>
           </mat-card-title>
 
-
-          <mat-card-content fxLayout="row" fxLayoutAlign="center center" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
-            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
-            <button class="btn-edit" color="primary" mat-icon-button (click)="editDescription()" matTooltip="Edit" matTooltipPosition="below">
-              <mat-icon>edit</mat-icon>
-            </button>
+          <mat-card-content fxLayout="column" *ngIf="!isEditingDescription; else descriptionEdit" class="workspace-description">
+            <div fxFill>
+              <div fxLayout="row" fxFlex class="description">
+                <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
+    
+                <button class="btn-edit" color="primary" mat-icon-button (click)="editDescription()" matTooltip="Edit" matTooltipPosition="below">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>           
+            </div>
           </mat-card-content>
 
-          <mat-card-content>
+          <mat-card-content fxLayout="column">
 
             <ng-template #descriptionEdit>
-              <div fxLayout="column" *ngIf="description !== null" class="workspace-description-edit">
-                <p>
+              <div fxFill *ngIf="description !== null" class="workspace-description-edit">
+
+                <div fxLayout="column" fxFlex>
                   <mat-form-field fxFlex>
-                    <textarea matInput class="description-wks" matTextareaAutosize [disabled]="isSettingDescription" [(ngModel)]="description"></textarea>
+                    <textarea 
+                      matInput 
+                      class="description-wks" 
+                      matTextareaAutosize 
+                      [disabled]="isSettingDescription" 
+                      [(ngModel)]="description"
+                    ></textarea>
                   </mat-form-field>
-                </p>
-                <mat-card-subtitle>
+                </div>
+
+                <mat-card-subtitle fxLayout="row">
                   <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
                 </mat-card-subtitle>
               </div>
 
-              <div align="end">
+              <div fxLayoutAlign="end">
                 <button
+                  mat-button
                   type="button"
-                  class="workspace-description-edit-cancel text-upper"
                   color="primary"
-                  mat-button
+                  class="workspace-description-edit-cancel text-upper margin-right-x1"
                   [disabled]="isSettingDescription"
-                (click)="cancelDescription()">Cancel</button>
+                  (click)="cancelDescription()">Cancel</button>
                 <button
-                  type="submit"
-                  class="workspace-description-edit-submit text-upper"
                   mat-button
+                  type="submit"
+                  color="accent" 
+                  class="workspace-description-edit-submit text-upper"
                   [disabled]="isSettingDescription"
                   (click)="validateDescription()"
-                  color="accent" mat-raised-button>Submit</button>
+                  mat-raised-button>Submit</button>
               </div>
             </ng-template>
 

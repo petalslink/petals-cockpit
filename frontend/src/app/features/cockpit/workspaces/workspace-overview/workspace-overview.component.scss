@@ -28,8 +28,16 @@
   resize: none;
   border: none;
   overflow: auto;
+  word-break: break-word;
+  white-space: pre-line;
 }
 
 .mat-card-title {
   font-size: 16px;
+}
+
+.description,
+.workspace-description-edit {
+  word-break: break-word;
+  white-space: pre-line;
 }
