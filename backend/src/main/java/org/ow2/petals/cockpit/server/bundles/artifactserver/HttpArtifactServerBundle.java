@@ -32,6 +32,7 @@ import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.cache.CacheBuilderSpec;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.InetAddresses;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.ConfiguredBundle;
@@ -87,14 +88,14 @@ public abstract class HttpArtifactServerBundle<C extends Configuration> implemen
         environment.jersey().register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new HttpArtifactServer(getArtifactsBaseUrl(environment), artifactsTemporaryDir))
+                bind(new HttpArtifactServer(getArtifactsBaseUrl(environment, conf), artifactsTemporaryDir))
                         .to(ArtifactServer.class);
             }
         });
     }
 
     @SuppressWarnings("resource")
-    private static URL getArtifactsBaseUrl(Environment environment) {
+    private static URL getArtifactsBaseUrl(Environment environment, HttpArtifactServerConfiguration conf) {
         MutableServletContextHandler appContext = environment.getApplicationContext();
         String context = appContext.getContextPath();
         Connector[] connectors = appContext.getServer().getConnectors();
@@ -104,9 +105,17 @@ public abstract class HttpArtifactServerBundle<C extends Configuration> implemen
                 .filter(c -> "application".equals(c.getName())).findFirst().orElse(connectors[0]);
 
         try {
-            String host = connector.getHost();
-            return new URL("http", host != null ? host : InetAddress.getLocalHost().getHostAddress(),
-                    connector.getLocalPort(),
+
+            String host = null;
+            // If set in the configuration, we override the host send to petals
+            if (conf.isExternalHostValid()) {
+                host = conf.getExternalHost();
+            } else {
+                final String connectorHost = connector.getHost();
+                host = connectorHost != null ? connectorHost : InetAddress.getLocalHost().getHostAddress();
+            }
+
+            return new URL("http", host, connector.getLocalPort(),
                     (context.endsWith("/") ? context : (context + "/")) + ARTIFACTS_HTTP_SUBPATH + "/");
         } catch (MalformedURLException | UnknownHostException e) {
             throw new AssertionError("impossible", e);
@@ -115,6 +124,9 @@ public abstract class HttpArtifactServerBundle<C extends Configuration> implemen
 
     public static class HttpArtifactServerConfiguration {
 
+        @JsonProperty
+        public String externalHost = "";
+
         @NotEmpty
         @JsonProperty
         private String temporaryPath = System.getProperty("java.io.tmpdir") + "/petals-cockpit-artifacts";
@@ -122,6 +134,15 @@ public abstract class HttpArtifactServerBundle<C extends Configuration> implemen
         @JsonProperty
         public String getTemporaryPath() {
             return temporaryPath;
+        }
+
+        @JsonProperty
+        public String getExternalHost() {
+            return externalHost;
+        }
+
+        public boolean isExternalHostValid() {
+            return InetAddresses.isInetAddress(externalHost);
         }
     }
 }
