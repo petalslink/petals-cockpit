@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 import org.ow2.petals.admin.api.ArtifactAdministration;
 import org.ow2.petals.admin.api.ContainerAdministration;
@@ -61,7 +63,7 @@ public class PetalsAdmin {
 
     @Inject
     public PetalsAdmin() {
-        this.adminFactory = PetalsAdministrationFactory.getInstance();
+        adminFactory = PetalsAdministrationFactory.getInstance();
     }
 
     public Domain getTopology(String ip, int port, String username, String password, String passphrase) {
@@ -133,6 +135,15 @@ public class PetalsAdmin {
             return (ServiceAssembly) p.petals.newArtifactAdministration().getArtifactInfo(ServiceAssembly.TYPE, saName,
                     null);
         } catch (ArtifactAdministrationException e) {
+
+            // The error cannot be detected cleanly at this point, this is a workaround to return a clearer
+            // message for this possibly common mistake (deploy on an component in wrong state)
+            if (e.getMessage().contains("org.ow2.petals.basisapi.exception.PetalsException: You are trying to deploy a SU")) {
+                String message = e.getMessage().substring(
+                        e.getMessage().indexOf("You are trying to deploy a SU"),
+                        e.getMessage().indexOf(" is started or stopped") + 22);
+                throw new WebApplicationException(message, e, Status.CONFLICT);
+            }
             throw new PetalsAdminException(e);
         }
     }
@@ -277,7 +288,7 @@ public class PetalsAdmin {
         private final String name;
 
         public PAC(String ip, int port, String username, String password) {
-            this.name = ip + ":" + port;
+            name = ip + ":" + port;
             PetalsAdministration p = adminFactory.newPetalsAdministrationAPI();
             assert p != null;
             petals = p;
