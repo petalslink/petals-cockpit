@@ -13,32 +13,39 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card>
-  <h3 class="color-primary">Add your first user</h3>
-  <form [formGroup]="form" (ngSubmit)="onSubmit(form)" fxLayout="column" autocomplete="off">
+<mat-card *ngIf="(isLdapStatus$ | async) as status; else loadingSetup">
+  <h3 class="color-primary">Add your first administrator</h3>
+  <form [formGroup]="setupForm" (ngSubmit)="onSubmit(setupForm)" fxLayout="column" autocomplete="off">
 
     <mat-form-field class="margin-top-x1">
       <input matInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" placeholder="Token" formControlName="token" required>
     </mat-form-field>
 
     <mat-form-field class="margin-top-x1">
-      <input matInput [appFocusInputIfLargeScreen]="focusUsernameInput" type="text" placeholder="Username" formControlName="username" required>
+      <input 
+        matInput 
+        [appFocusInputIfLargeScreen]="focusUsernameInput" 
+        type="text" 
+        placeholder="Username" 
+        formControlName="username"
+        required
+      >
     </mat-form-field>
 
-    <mat-form-field class="margin-top-x1">
+    <mat-form-field class="margin-top-x1" *ngIf="!status.isLdapMode">
       <input matInput type="password" placeholder="Password" formControlName="password" required>
     </mat-form-field>
 
-    <mat-form-field class="margin-top-x1">
+    <mat-form-field class="margin-top-x1" *ngIf="!status.isLdapMode">
       <input matInput type="text" placeholder="Name" formControlName="name" required>
     </mat-form-field>
 
     <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="setupFailed">
       <mat-icon color="warn">error</mat-icon>
-      <p>{{setupFailed}}</p>
+      <p>{{ setupFailed }}</p>
     </div>
 
-    <button mat-raised-button color="primary" class="margin-top-x1" [disabled]="form.invalid || settingUp">
+    <button mat-raised-button color="primary" class="margin-top-x1" [disabled]="setupForm.invalid || settingUp">
       <span *ngIf="!settingUp && !setupSucceeded">
         Add
       </span>
@@ -53,3 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </button>
   </form>
 </mat-card>
+
+<ng-template #loadingSetup>
+  <div fxLayout="column" fxLayoutAlign="center center" >
+    <mat-spinner [diameter]="64" [strokeWidth]="4" color="accent"></mat-spinner>
+  </div>
+</ng-template>

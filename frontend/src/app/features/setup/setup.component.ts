@@ -19,10 +19,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, Subject } from 'rxjs';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 
 import { getErrorMessage } from '@shared/helpers/shared.helper';
+import { ILdapStatus, LdapService } from '@shared/services/ldap.service';
 import { IUserSetup, UsersService } from '@shared/services/users.service';
 
 @Component({
@@ -33,10 +34,12 @@ import { IUserSetup, UsersService } from '@shared/services/users.service';
 export class SetupComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  isLdapStatus$: Observable<ILdapStatus>;
+
   focusUsernameInput = false;
   focusTokenInput = false;
 
-  form: FormGroup;
+  setupForm: FormGroup;
   settingUp = false;
   setupFailed: string;
   setupSucceeded = false;
@@ -44,6 +47,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private users: UsersService,
+    private ldap: LdapService,
     private route: ActivatedRoute,
     private fb: FormBuilder
   ) {}
@@ -51,23 +55,42 @@ export class SetupComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const token = this.route.snapshot.queryParamMap.get('token');
 
-    this.form = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
-      token: [token || '', Validators.required],
-      name: ['', Validators.required],
-    });
-
     if (!token) {
       this.focusTokenInput = true;
     } else {
       this.focusUsernameInput = true;
     }
+    this.isLdapStatus$ = this.ldap.getLdapStatus().pipe(
+      takeUntil(this.onDestroy$),
+      tap(isLdapStatus => {
+        this.buildForm(isLdapStatus.isLdapMode, token);
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this.setupFailed = getErrorMessage(err);
+        return of();
+      })
+    );
   }
 
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
+
+  buildForm(isLdapMode: boolean, token: string) {
+    if (isLdapMode) {
+      this.setupForm = this.fb.group({
+        token: [token || '', Validators.required],
+        username: ['', Validators.required],
+      });
+    } else {
+      this.setupForm = this.fb.group({
+        username: ['', Validators.required],
+        password: ['', Validators.required],
+        token: [token || '', Validators.required],
+        name: ['', Validators.required],
+      });
+    }
   }
 
   onSubmit({ value }: { value: IUserSetup }) {
@@ -80,7 +103,7 @@ export class SetupComponent implements OnInit, OnDestroy {
         .setupUser(value)
         .pipe(
           takeUntil(this.onDestroy$),
-          map(res => {
+          map(_ => {
             this.setupSucceeded = true;
             this.settingUp = false;
           }),

@@ -19,7 +19,12 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
-import { CORRECT_SETUP_TOKEN, GONE_SETUP_TOKEN } from '@mocks/backend-mock';
+import {
+  BAD_SETUP_USER,
+  CORRECT_SETUP_TOKEN,
+  CORRECT_SETUP_USER,
+  GONE_SETUP_TOKEN,
+} from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
 import * as helper from '@shared/helpers/mock.helper';
 import { ICurrentUser } from '@shared/state/users.interface';
@@ -73,12 +78,24 @@ export class UsersServiceMock extends UsersService {
   }
 
   setupUser(value: IUserSetup) {
-    if (value.token === CORRECT_SETUP_TOKEN) {
+    if (
+      environment.mock.ldapMode &&
+      value.token === CORRECT_SETUP_TOKEN &&
+      value.username === CORRECT_SETUP_USER
+    ) {
+      return helper.response(204);
+    }
+
+    if (!environment.mock.ldapMode && value.token === CORRECT_SETUP_TOKEN) {
       return helper.response(204);
     }
 
     if (value.token === GONE_SETUP_TOKEN) {
       return helper.errorBackend('Petals Cockpit is already setup', 404);
+    }
+
+    if (environment.mock.ldapMode && value.username === BAD_SETUP_USER) {
+      return helper.errorBackend('Conflict', 409);
     }
 
     return helper.errorBackend('Invalid token', 403);
