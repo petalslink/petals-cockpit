@@ -1,17 +1,18 @@
-# configuration for dropwizard
+## Configuration for dropwizard
 ---
 server:
-  # the backend will be served via /api on 8484
-  # note: this is relative to applicationContextPath
+##  The backend will be served via /api on 8484
+  ## Note: this is relative to applicationContextPath
   rootPath: /api
-  # the frontend will be served via / on 8484
+  ## the frontend will be served via / on 8484
   applicationContextPath: /
   applicationConnectors:
     - type: http
       port: 8484
-  # the admin console will be served via / on 8082
+#      bindHost: The hostname to bind to. (default 127.0.0.1)
+  ## The admin console will be served via / on 8082
   adminContextPath: /
-  # but we disable it by default
+  ## But we disable it by default
   adminConnectors: []
   requestLog:
     appenders:
@@ -19,28 +20,33 @@ server:
         currentLogFilename: ./logs/cockpit-access.log
         archivedLogFilenamePattern: ./logs/cockpit-access-%d.log.gz
 
+#artifactServer:
+#  temporaryPath: Local file location while served. (Default "{java.io.tmpdir}/petals-cockpit-artifacts")
+#  externalHost: Optionnal, host used in constructed URL for served artifacts. 
+  ## Default external host is server.applicationConnectors.bindHost 
+
 database:
   driverClass: org.h2.Driver
   user: petals
   password: petals
   url: jdbc:h2:./db/cockpit
-  # see http://stackoverflow.com/a/3670000
+  ## See http://stackoverflow.com/a/3670000
   validationQuery: "/* Health Check */ SELECT 1"
 
 logging:
-#Global logging setting
+  ## Global logging setting
   level: INFO
 
-#Specific cockpit loggers settings
-#(will bypass the console threshold & filter)
+## Specific cockpit loggers settings
+## (will bypass the console threshold & filter)
   loggers:
     "org.ow2.petals.cockpit.server":
       level: INFO
       appenders: 
         - type: console
 
-#File logging uses global setting, console filters out global cockpit output
-#(to avoid duplicates from previous specific logger)
+## File logging uses global setting, console filters out global cockpit output
+## (to avoid duplicates from previous specific logger)
   appenders:
     - type: file
       currentLogFilename: ./logs/cockpit.log
@@ -51,7 +57,7 @@ logging:
       filterFactories:
       - type: cockpit-server-filter-factory
 
-# Uncomment and fill this section to use LDAP authentication
+## Uncomment and fill this section to use LDAP authentication
 #ldapConfig:
 #  url: ldap://X.X.X.X:Y
 #  usersDn: ou=personnes,dc=my-domain,dc=com
