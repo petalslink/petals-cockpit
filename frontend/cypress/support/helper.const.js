@@ -30,3 +30,11 @@ export const expectedEndpointsTreeWks0 = [
   `edpt-89p82661-test-31o4-l391-03`,
   `edpt-89p82661-test-31o4-l391-04`,
 ];
+
+export const correctSetupToken = 'CORRECT_SETUP_TOKEN';
+
+export const goneSetupToken = 'GONE_SETUP_TOKEN';
+
+export const correctSetupUser = 'CORRECT_SETUP_USER';
+
+export const badSetupUser = 'BAD_SETUP_USER';
