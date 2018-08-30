@@ -4,13 +4,12 @@ import { environment as prod } from './environment.prod';
 
 export const environment: IEnvironment = {
   ...prod,
-  hashLocationStrategy: true,
-  debug: true,
+  strictCoherence: true,
   services: dev.services,
   mock: {
-    httpDelay: 500,
-    sseDelay: 500,
+    httpDelay: 0,
+    sseDelay: 0,
     alreadyConnected: false,
-    ldapMode: false,
+    ldapMode: true,
   },
 };

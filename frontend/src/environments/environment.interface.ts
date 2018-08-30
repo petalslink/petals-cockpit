@@ -5,6 +5,7 @@ import { ComponentsService } from '@shared/services/components.service';
 import { ContainersService } from '@shared/services/containers.service';
 import { EndpointsService } from '@shared/services/endpoints.service';
 import { InterfacesService } from '@shared/services/interfaces.service';
+import { LdapService } from '@shared/services/ldap.service';
 import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
 import { ServiceUnitsService } from '@shared/services/service-units.service';
 import { ServicesService } from '@shared/services/services.service';
@@ -60,7 +61,6 @@ export interface IEnvironment {
      * variable with .delay to simulate a network latency
      */
     httpDelay: number;
-
     /**
      * when using mocked data, you can use that
      * variable with .delay to simulate a network latency
@@ -72,6 +72,11 @@ export interface IEnvironment {
      * that the user's already logged or not
      */
     alreadyConnected: boolean;
+
+    /**
+     * used for setup page mocks
+     */
+    ldapMode: boolean;
   };
 }
 
@@ -98,6 +103,10 @@ export type IMockableServices = [
   },
   {
     provide: typeof InterfacesService;
+    useClass: Type<any>;
+  },
+  {
+    provide: typeof LdapService;
     useClass: Type<any>;
   },
   {
