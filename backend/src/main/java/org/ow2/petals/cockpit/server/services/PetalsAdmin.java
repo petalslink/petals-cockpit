@@ -138,6 +138,7 @@ public class PetalsAdmin {
 
             // The error cannot be detected cleanly at this point, this is a workaround to return a clearer
             // message for this possibly common mistake (deploy on an component in wrong state)
+            // TODO: there may be a cleaner way relying on PetalsAdminExceptionMapper ?
             if (e.getMessage().contains("org.ow2.petals.basisapi.exception.PetalsException: You are trying to deploy a SU")) {
                 String message = e.getMessage().substring(
                         e.getMessage().indexOf("You are trying to deploy a SU"),
