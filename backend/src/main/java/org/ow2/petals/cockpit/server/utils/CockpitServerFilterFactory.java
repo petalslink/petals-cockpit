@@ -17,8 +17,12 @@
 package org.ow2.petals.cockpit.server.utils;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
@@ -26,13 +30,40 @@ import io.dropwizard.logging.filter.FilterFactory;
 
 @JsonTypeName("cockpit-server-filter-factory")
 public class CockpitServerFilterFactory implements FilterFactory<ILoggingEvent> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CockpitServerFilterFactory.class);
+
     @Override
     public Filter<ILoggingEvent> build() {
         return new Filter<ILoggingEvent>() {
             @Override
             public FilterReply decide(ILoggingEvent event) {
-                if (event.getLoggerName().startsWith("org.ow2.petals.cockpit.server")) {
+                // While waiting for this to be resolved : https://github.com/eclipse-ee4j/jersey/issues/3507
+                if (event.getLoggerName().startsWith("org.glassfish.jersey.internal.Errors")
+                        && event.getLevel() == Level.WARN) {
+
+                    String newMessage = null;
+                    final String message = event.getMessage();
+                    if (message.contains("HTTP 404 Not Found") && message.contains("For input string: ")) {
+                        final int culpritIndex = message.indexOf("For input string:");
+                        newMessage = "HTTP 404 Not Found, f"
+                                + message.substring(culpritIndex + 1, message.indexOf('"', culpritIndex + 19) + 1);
+                    } else if (message.contains("HTTP 403 Forbidden")) {
+                        newMessage = "HTTP 403 Forbidden";
+                    } else if (message.contains("HTTP 401 Unauthorized")) {
+                        newMessage = "HTTP 401 Unauthorized";
+                    }
+
+                    if (newMessage != null && !newMessage.isEmpty()) {
+                        LOG.info("{} (event filtered from {})", newMessage, event.getLoggerName());
+                        return FilterReply.DENY;
+                    }
+                    return FilterReply.NEUTRAL;
+                }
+
+                else if (event.getLoggerName().startsWith("org.ow2.petals.cockpit.server")) {
                     return FilterReply.DENY;
+
                 } else {
                     return FilterReply.NEUTRAL;
                 }
