@@ -62,9 +62,9 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
         Pac4jFactory pac4jConf = new Pac4jFactory();
 
         // /user/session url is handled by callbacks, logout, etc filters
-        // /setup is not concerned by this
+        // /setup and /ldap/status are not concerned by this
         pac4jConf.setMatchers(ImmutableMap.of(PAC4J_EXCLUDE_MATCHER,
-                new PathMatcher().excludePath("/user/session").excludePath("/setup")));
+                new PathMatcher().excludePath("/user/session").excludePath("/setup").excludePath("/ldap/status")));
 
         // this protects the whole application with all the declared clients
         JaxRsSecurityFilterConfiguration f = new JaxRsSecurityFilterConfiguration();

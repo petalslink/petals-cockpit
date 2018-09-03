@@ -194,9 +194,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(InterfacesResource.class);
         environment.jersey().register(SetupResource.class);
         environment.jersey().register(UsersResource.class);
-        if (ldapc != null) {
-            environment.jersey().register(LdapResource.class);
-        }
+        environment.jersey().register(LdapResource.class);
 
         if (!DSL.using(jooqConf).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {

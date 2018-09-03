@@ -26,7 +26,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -39,7 +41,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 @Path("/ldap")
-@Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
 public class LdapResource {
 
     private LdapService ldapService;
@@ -49,11 +50,26 @@ public class LdapResource {
         this.ldapService = ldapService;
     }
 
+    /**
+     * Note: No authentication is needed for this method, see {@link CockpitSecurityBundle}
+     */
+    @GET
+    @Path("/status")
+    @Produces(MediaType.APPLICATION_JSON)
+    public LdapStatus getStatus() {
+        return new LdapStatus(ldapService.isLdapMode());
+    }
+
     @GET
     @Path("/users")
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
     @Produces(MediaType.APPLICATION_JSON)
     public List<LdapResource.LdapUser> getUsersByNameOrUsername(@NotNull @NotEmpty @Pattern(regexp="^[^()=*]+$") @QueryParam("name") String name)
             throws LdapException {
+        if (!ldapService.isLdapMode()) {
+            throw new WebApplicationException(Status.NOT_FOUND);
+        }
+
         return ldapService.getUsersByNameOrUsername(name);
     }
 
@@ -90,6 +106,15 @@ public class LdapResource {
             if (!username.equals(other.username))
                 return false;
             return true;
+        }
+    }
+
+    public static class LdapStatus {
+        @JsonProperty
+        public boolean isLdapMode;
+
+        public LdapStatus(@JsonProperty("isLdapMode") boolean isLdapMode) {
+            this.isLdapMode = isLdapMode;
         }
     }
 }

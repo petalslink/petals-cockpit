@@ -33,16 +33,19 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ldaptive.LdapException;
 import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
+import org.ow2.petals.cockpit.server.services.LdapService;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -56,16 +59,15 @@ public class SetupResource {
 
     private final String adminConsoleToken;
 
-    private final CockpitConfiguration config;
+    private final LdapService ldapService;
 
     private final AtomicBoolean userCreated = new AtomicBoolean(false);
 
     @Inject
-    public SetupResource(Configuration jooq, @Named(ADMIN_TOKEN) String adminConsoleToken,
-            CockpitConfiguration config) {
+    public SetupResource(Configuration jooq, @Named(ADMIN_TOKEN) String adminConsoleToken, LdapService ldapService) {
         this.jooq = jooq;
         this.adminConsoleToken = adminConsoleToken;
-        this.config = config;
+        this.ldapService = ldapService;
     }
 
     @POST
@@ -81,17 +83,28 @@ public class SetupResource {
             throw new NotFoundException("Petals Cockpit is already setup");
         }
 
-        final boolean isLdapMode = config.getLdapConfigFactory() != null;
+        if (ldapService.isLdapMode()) {
+            try {
+                LdapUser ldapUser = ldapService.getUserByUsername(setup.username);
 
+                insertUserInDb(ldapUser.username, LdapConfigFactory.LDAP_PASSWORD, ldapUser.name, true);
+            } catch (LdapException e) {
+
+            }
+        } else {
+            final String password = setup.password;
+            assert password != null;
+            final String name = setup.name;
+            assert name != null;
+
+            insertUserInDb(setup.username, CockpitAuthenticator.passwordEncoder.encode(password), name, false);
+        }
+    }
+
+    private void insertUserInDb(String username, String encodedPassword, String name, boolean isFromLdap) {
         try {
             DSL.using(jooq).transaction(c -> {
-                final String password = setup.password;
-                assert password != null;
-                DSL.using(c)
-                        .executeInsert(new UsersRecord(setup.username,
-                                isLdapMode ? LdapConfigFactory.LDAP_PASSWORD
-                                        : CockpitAuthenticator.passwordEncoder.encode(password),
-                                setup.name, null, true, isLdapMode));
+                DSL.using(c).executeInsert(new UsersRecord(username, encodedPassword, name, null, true, isFromLdap));
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert
@@ -100,7 +113,7 @@ public class SetupResource {
             });
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
-                throw new WebApplicationException("User already exists", Status.CONFLICT);
+                throw new WebApplicationException(String.format("User %s already exists", username), Status.CONFLICT);
             } else {
                 throw e;
             }
@@ -114,7 +127,7 @@ public class SetupResource {
         public final String token;
 
         public UserSetup(@JsonProperty("token") String token, @JsonProperty("username") String username,
-                @JsonProperty("password") String password, @JsonProperty("name") String name) {
+                @Nullable @JsonProperty("password") String password, @Nullable @JsonProperty("name") String name) {
             super(username, password, name);
             this.token = token;
         }

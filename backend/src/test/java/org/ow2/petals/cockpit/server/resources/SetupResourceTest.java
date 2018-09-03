@@ -23,13 +23,14 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import org.junit.Test;
+import org.ow2.petals.cockpit.server.resources.LdapResource.LdapStatus;
 import org.ow2.petals.cockpit.server.resources.SetupResource.UserSetup;
 import org.ow2.petals.cockpit.server.rules.CockpitResourceRule;
 
 public class SetupResourceTest extends AbstractCockpitResourceTest {
 
     public SetupResourceTest() {
-        super(SetupResource.class);
+        super(SetupResource.class, LdapResource.class);
     }
 
     @Test
@@ -92,5 +93,12 @@ public class SetupResourceTest extends AbstractCockpitResourceTest {
     public void enabledWithUser() {
         addUser("a-user", false);
         successAndGone();
+    }
+
+    @Test
+    public void isLdapMode() {
+        LdapStatus status = resource.target("/ldap/status").request().get(LdapStatus.class);
+
+        assertThat(status.isLdapMode).isFalse();
     }
 }

@@ -118,7 +118,7 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
     @Test
     public void userCanNotGetLdapUserList() {
         addUser("user1");
-        can(USER, "/ldap/users?name=user", HttpMethod.GET, null, 404);
+        can(USER, "/ldap/users?name=user", HttpMethod.GET, null, 403);
     }
 
 }

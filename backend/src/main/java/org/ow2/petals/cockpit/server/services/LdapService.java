@@ -63,6 +63,10 @@ public class LdapService {
         }
     }
 
+    public boolean isLdapMode() {
+        return ldapConf != null;
+    }
+
     public List<LdapResource.LdapUser> getUsersByNameOrUsername(String searchParam) throws LdapException {
         assert searchParam != null && !searchParam.isEmpty() && !searchParam.matches("[()=*]");
         String usernameAttr = getLdapConf().getUsernameAttribute();
@@ -122,7 +126,7 @@ public class LdapService {
                 ldapUsers.add(new LdapResource.LdapUser(username, name));
             }
             else {
-                LOG.error("A LDAP entry is unprocessable: {} is {}, {} is {}.", 
+                LOG.error("A LDAP entry is unprocessable: {} is {}, {} is {}.",
                         usernameAttr, ldapUsername != null ? ldapUsername.getStringValue() : "empty",
                         nameAttr, ldapName != null ? ldapName.getStringValue() : "empty");
             }
