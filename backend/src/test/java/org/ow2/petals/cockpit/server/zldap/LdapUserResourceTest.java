@@ -32,6 +32,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.mocks.MockLdapServer;
 import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
@@ -41,9 +42,15 @@ import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 
 public class LdapUserResourceTest extends AbstractLdapTest {
 
+    @Before
+    public void setUpDb() {
+        addUser(ADMIN_LDAP_DB, true);
+        addUser(USER_NOLDAP_DB, false);
+        login(ADMIN_LDAP_DB);
+    }
+
     @Test
     public void ldapGetUsersOneResult() {
-        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=bonjour").request()
                 .get(new GenericType<List<LdapUser>>() {
                 });
@@ -55,7 +62,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapGetUsersMultipleResults() {
-        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=user").request().get(new GenericType<List<LdapUser>>() {
         });
 
@@ -66,7 +72,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapGetUsersNoResult() {
-        login(ADMIN_LDAP_DB);
         List<LdapUser> users = appLdap.target("/ldap/users?name=alexandre").request()
                 .get(new GenericType<List<LdapUser>>() {
                 });
@@ -77,21 +82,18 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapGetUsersNoParameter() {
-        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users").request().get();
         assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
 
     @Test
     public void ldapGetUsersEmptyName() {
-        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users?name=").request().get();
         assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
 
     @Test
     public void ldapGetUsersInjection() {
-        login(ADMIN_LDAP_DB);
         Response get = appLdap.target("/ldap/users?name=)(cn=").request().get();
         assertThat(get.getStatus()).isEqualTo(400); // Bad request
     }
@@ -106,7 +108,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapAddUser() {
-        login(ADMIN_LDAP_DB);
         final String username = USER_LDAP_NODB.username;
 
         Response post = appLdap.target("/users").request().post(Entity.json(USER_LDAP_NODB));
@@ -122,7 +123,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapAddUserUsernameOnly() {
-        login(ADMIN_LDAP_DB);
         final String username = USER_LDAP_NODB.username;
 
         Response post = appLdap.target("/users").request().post(Entity.json(new NewUser(username, null, null)));
@@ -138,8 +138,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapAddUserNotLdap() {
-        login(ADMIN_LDAP_DB);
-
         Response post = appLdap.target("/users").request().post(Entity.json(USER_NOLDAP_NODB));
         assertThat(post.getStatus()).isEqualTo(409); // Conflict
 
@@ -148,8 +146,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapAddUserAlreadyInDb() {
-        login(ADMIN_LDAP_DB);
-
         Response post = appLdap.target("/users").request().post(Entity.json(ADMIN_LDAP_DB));
         assertThat(post.getStatus()).isEqualTo(409); // Conflict
     }
@@ -168,7 +164,6 @@ public class LdapUserResourceTest extends AbstractLdapTest {
     @Test
     public void ldapChangeUserForbidden() {
         addUser(USER_LDAP_NODB, false);
-        login(ADMIN_LDAP_DB);
 
         final String username = USER_LDAP_NODB.username;
         final String name = USER_LDAP_NODB.name;

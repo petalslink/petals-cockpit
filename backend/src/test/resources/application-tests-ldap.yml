@@ -18,6 +18,10 @@ logging:
   loggers:
     org.pac4j: DEBUG
     org.ow2.petals.cockpit: DEBUG
+  appenders:
+    - type: console
+      filterFactories:
+      - type: cockpit-server-filter-test
 
 ldapConfig:
   usersDn: ou=people,dc=example,dc=com

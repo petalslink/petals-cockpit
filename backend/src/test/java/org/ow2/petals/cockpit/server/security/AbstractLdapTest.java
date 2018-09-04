@@ -29,7 +29,6 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.jooq.Record;
 import org.jooq.TableField;
 import org.jooq.conf.ParamType;
-import org.junit.Before;
 import org.junit.Rule;
 import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
@@ -58,14 +57,6 @@ public class AbstractLdapTest extends AbstractTest {
 
     @Rule
     public CockpitLdapApplicationRule appLdap = new CockpitLdapApplicationRule();
-
-
-    @Before
-    public void setUpDb() {
-        addUser(ADMIN_LDAP_DB, true);
-        addUser(USER_NOLDAP_DB, false);
-    }
-
 
     protected Response login(@Nullable String username, @Nullable String password) {
         assert username != null && password != null;

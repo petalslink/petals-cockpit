@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.ws.rs.core.Response;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
@@ -41,6 +42,12 @@ import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
  * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
  */
 public class LdapUserSessionTest extends AbstractLdapTest {
+
+    @Before
+    public void setUpDb() {
+        addUser(ADMIN_LDAP_DB, true);
+        addUser(USER_NOLDAP_DB, false);
+    }
 
     @Test
     public void ldapProtectedUserSucceedAfterLogin() {
