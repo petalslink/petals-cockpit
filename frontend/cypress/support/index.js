@@ -17,6 +17,7 @@
 import './component.commands';
 import './helper.commands';
 import './import-bus.commands';
+import './setup.commands';
 import './login.commands';
 import './petals-cockpit.commands';
 import './petals.commands';

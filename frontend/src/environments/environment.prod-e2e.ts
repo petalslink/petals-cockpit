@@ -10,5 +10,6 @@ export const environment: IEnvironment = {
     httpDelay: 0,
     sseDelay: 0,
     alreadyConnected: false,
+    ldapMode: false,
   },
 };

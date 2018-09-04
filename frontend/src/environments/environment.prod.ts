@@ -15,6 +15,7 @@ import {
   InterfacesService,
   InterfacesServiceImpl,
 } from '@shared/services/interfaces.service';
+import { LdapService, LdapServiceImpl } from '@shared/services/ldap.service';
 import {
   ServiceAssembliesService,
   ServiceAssembliesServiceImpl,
@@ -54,6 +55,7 @@ export const environment: IEnvironment = {
     { provide: ComponentsService, useClass: ComponentsServiceImpl },
     { provide: EndpointsService, useClass: EndpointsServiceImpl },
     { provide: InterfacesService, useClass: InterfacesServiceImpl },
+    { provide: LdapService, useClass: LdapServiceImpl },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceImpl,

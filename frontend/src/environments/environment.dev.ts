@@ -9,6 +9,8 @@ import { EndpointsService } from '@shared/services/endpoints.service';
 import { EndpointsServiceMock } from '@shared/services/endpoints.service.mock';
 import { InterfacesService } from '@shared/services/interfaces.service';
 import { InterfacesServiceMock } from '@shared/services/interfaces.service.mock';
+import { LdapService } from '@shared/services/ldap.service';
+import { LdapServiceMock } from '@shared/services/ldap.service.mock';
 import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
 import { ServiceAssembliesServiceMock } from '@shared/services/service-assemblies.service.mock';
 import { ServiceUnitsService } from '@shared/services/service-units.service';
@@ -37,6 +39,7 @@ export const environment: IEnvironment = {
     { provide: ComponentsService, useClass: ComponentsServiceMock },
     { provide: EndpointsService, useClass: EndpointsServiceMock },
     { provide: InterfacesService, useClass: InterfacesServiceMock },
+    { provide: LdapService, useClass: LdapServiceMock },
     {
       provide: ServiceAssembliesService,
       useClass: ServiceAssembliesServiceMock,
@@ -47,5 +50,10 @@ export const environment: IEnvironment = {
     { provide: WorkspacesService, useClass: WorkspacesServiceMock },
     { provide: UsersService, useClass: UsersServiceMock },
   ],
-  mock: { httpDelay: 500, sseDelay: 500, alreadyConnected: true },
+  mock: {
+    httpDelay: 500,
+    sseDelay: 500,
+    alreadyConnected: true,
+    ldapMode: true,
+  },
 };

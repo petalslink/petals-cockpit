@@ -7,5 +7,5 @@ export const environment: IEnvironment = {
   // This is a temporary fix to use 'ng serve -c dev-e2e' cmd and run the e2e tests.
   // See https://gitlab.com/linagora/petals-cockpit/merge_requests/545
   services: dev.services,
-  mock: { httpDelay: 0, sseDelay: 0, alreadyConnected: false },
+  mock: { httpDelay: 0, sseDelay: 0, alreadyConnected: false, ldapMode: false },
 };
