@@ -52,11 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </span>
         </mat-card-content>
 
-        <mat-card-content fxLayout="column" *ngIf="component.updateError" class="error">
-          <div class="bold margin-bottom-x1">An error occurred:</div>
-          <span class="italic">{{ component.updateError }}</span>
-        </mat-card-content>
-
         <app-message class="error-change-state" type="error" [msg]="component.updateError"></app-message>
 
         <mat-card-subtitle class="margin-top-x1 component-parameters-title" fxLayoutAlign="start center">

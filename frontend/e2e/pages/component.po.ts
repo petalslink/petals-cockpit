@@ -146,7 +146,6 @@ export class ComponentOperationPage extends ComponentPage {
   public readonly unloadButton = this.lifecycleInfo.element(
     by.cssContainingText(`button`, `Unload`)
   );
-  public readonly changeStateError = this.lifecycleInfo.$(`.error .italic`);
   public readonly setParametersButton = this.lifecycleInfo.element(
     by.cssContainingText(`button`, `Set`)
   );
