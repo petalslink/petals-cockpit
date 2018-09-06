@@ -88,8 +88,9 @@ public class SetupResource {
                 LdapUser ldapUser = ldapService.getUserByUsername(setup.username);
 
                 insertUserInDb(ldapUser.username, LdapConfigFactory.LDAP_PASSWORD, ldapUser.name, true);
-            } catch (LdapException e) {
 
+            } catch (LdapException e) {
+                throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
             }
         } else {
             final String password = setup.password;
