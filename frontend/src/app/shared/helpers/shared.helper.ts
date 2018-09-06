@@ -95,6 +95,11 @@ function isBackendError(
 export function getErrorMessage(err: HttpErrorResponse) {
   if (isBackendError(err.error)) {
     return err.error.message;
+  }
+  if (err.status === 0) {
+    return `Server may be down, please try again later. (${err.status}: ${
+      err.statusText
+    })`;
   } else {
     return `${err.status}: ${err.statusText}`;
   }
