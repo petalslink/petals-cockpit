@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.ow2.petals</groupId>
     <artifactId>petals-cockpit-parent</artifactId>
-    <version>0.27.0-SNAPSHOT</version>
+    <version>0.27.0</version>
   </parent>
 
   <artifactId>petals-cockpit</artifactId>

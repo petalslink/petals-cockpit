@@ -1,3 +1,26 @@
+<a name="0.27.0"></a>
+# [0.27.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.26.0...v0.27.0) (2018-09-07)
+
+
+### Bug Fixes
+
+* **frontend** ldap search user autocomplete panel scroll ([5f819ae2](https://gitlab.com/linagora/petals-cockpit/commit/5f819ae2)), closes [#502](https://gitlab.com/linagora/petals-cockpit/issues/502)
+* **frontend**  improved error message when backend is down ([b53326d9](https://gitlab.com/linagora/petals-cockpit/commit/b53326d9)), closes [#423](https://gitlab.com/linagora/petals-cockpit/issues/423)
+* **frontend**  workspace description markdown edit ([7a870905](https://gitlab.com/linagora/petals-cockpit/commit/7a870905)), closes [#508](https://gitlab.com/linagora/petals-cockpit/issues/508)
+* **backend:** change add-user parameters check ([34f1947](https://gitlab.com/linagora/petals-cockpit/commit/34f1947)), closes [#503](https://gitlab.com/linagora/petals-cockpit/issues/503)
+* **backend:** duplicate bus import is now forbidden ([13e83d8](https://gitlab.com/linagora/petals-cockpit/commit/13e83d8)), closes [#463](https://gitlab.com/linagora/petals-cockpit/issues/463)
+* **backend:** http server external host can be configured ([acb2ef8](https://gitlab.com/linagora/petals-cockpit/commit/acb2ef8)), closes [#511](https://gitlab.com/linagora/petals-cockpit/issues/511)
+* **backend:** import bus with unreachable container in topology ([ce0ce41](https://gitlab.com/linagora/petals-cockpit/commit/ce0ce41)), closes [#500](https://gitlab.com/linagora/petals-cockpit/issues/500)
+* **backend:** improved error message when deploying a sa/su on a component in the wrong state ([62367ad](https://gitlab.com/linagora/petals-cockpit/commit/62367ad)), closes [#458](https://gitlab.com/linagora/petals-cockpit/issues/458)
+
+
+### Features
+
+* **product:** ldap setup page ([785b18b2](https://gitlab.com/linagora/petals-cockpit/commit/785b18b2)), closes [#506](https://gitlab.com/linagora/petals-cockpit/issues/506)
+
+
+
+
 <a name="0.26.0"></a>
 # [0.26.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.25.0...v0.26.0) (2018-08-17)
 
