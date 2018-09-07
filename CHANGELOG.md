@@ -1,3 +1,7 @@
+<a name="1.00.0"></a>
+
+* **product:** Released **beta version 1.00.0** Based of version 0.27.0
+
 <a name="0.27.0"></a>
 # [0.27.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.26.0...v0.27.0) (2018-09-07)
 
