@@ -23,7 +23,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { debounceTime, map, tap } from 'rxjs/operators';
 
@@ -76,8 +76,8 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.store$
-      .select(state => state.workspaces.searchPetals)
       .pipe(
+        select(state => state.workspaces.searchPetals),
         tap(searchPetals => {
           this.searchForm.get('search').setValue(searchPetals, {
             emitEvent: false,

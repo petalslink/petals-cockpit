@@ -22,8 +22,8 @@ import {
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { Actions } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
+import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
@@ -82,9 +82,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.store$.dispatch(new Users.FetchAll());
 
-    this.appUsers$ = this.store$
-      .select(getUsersNotInCurrentWorkspace)
-      .pipe(map(us => us.map(u => u.id).sort()));
+    this.appUsers$ = this.store$.pipe(
+      select(getUsersNotInCurrentWorkspace),
+      map(us => us.map(u => u.id).sort())
+    );
 
     this.addUserFormGroup = this.fb.group({
       userSearchCtrl: [
@@ -99,23 +100,22 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       map(user => user.id)
     );
 
-    this.workspace$ = this.store$
-      .select(getCurrentWorkspace)
-      .pipe(
-        tap(
-          wk =>
-            wk.isAddingUserToWorkspace
-              ? this.addUserFormGroup.get('userSearchCtrl').disable()
-              : this.addUserFormGroup.get('userSearchCtrl').enable()
-        )
-      );
+    this.workspace$ = this.store$.pipe(
+      select(getCurrentWorkspace),
+      tap(
+        wk =>
+          wk.isAddingUserToWorkspace
+            ? this.addUserFormGroup.get('userSearchCtrl').disable()
+            : this.addUserFormGroup.get('userSearchCtrl').enable()
+      )
+    );
 
     this.users$ = this.store$.pipe(getCurrentWorkspaceUsers);
 
     this.store$
-      // when we change workspace
-      .select(state => state.workspaces.selectedWorkspaceId)
       .pipe(
+        // when we change workspace
+        select(state => state.workspaces.selectedWorkspaceId),
         takeUntil(this.onDestroy$),
         tap(id => {
           // we reinit these in case one change workspace while editing
@@ -148,8 +148,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     // when a user is added to the workspace
     this.actions$
-      .ofType(Workspaces.AddUserSuccessType)
       .pipe(
+        ofType(Workspaces.AddUserSuccessType),
         takeUntil(this.onDestroy$),
         // reset the form
         tap(_ => this.addUserFormGroup.reset())

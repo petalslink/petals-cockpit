@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, map, tap, withLatestFrom } from 'rxjs/operators';
@@ -39,20 +39,18 @@ export class UiEffects {
   ) {}
 
   @Effect()
-  closeSidenavOnSmallScreen$: Observable<Action> = this.actions$
-    .ofType(Ui.CloseSidenavOnSmallScreenType)
-    .pipe(
-      withLatestFrom(this.store$.pipe(isSmallScreen)),
-      filter(([_, ss]) => ss),
-      map(_ => new Ui.CloseSidenav())
-    );
+  closeSidenavOnSmallScreen$: Observable<Action> = this.actions$.pipe(
+    ofType(Ui.CloseSidenavOnSmallScreenType),
+    withLatestFrom(this.store$.pipe(isSmallScreen)),
+    filter(([_, ss]) => ss),
+    map(_ => new Ui.CloseSidenav())
+  );
 
   @Effect({ dispatch: false })
-  changeTheme$: Observable<Action> = this.actions$
-    .ofType(Ui.ChangeThemeType)
-    .pipe(
-      tap((action: Ui.ChangeTheme) =>
-        this.localStorageService.store(SETTINGS_THEME_KEY, action.payload.theme)
-      )
-    );
+  changeTheme$: Observable<Action> = this.actions$.pipe(
+    ofType(Ui.ChangeThemeType),
+    tap((action: Ui.ChangeTheme) =>
+      this.localStorageService.store(SETTINGS_THEME_KEY, action.payload.theme)
+    )
+  );
 }

@@ -18,7 +18,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 
 // TODO Fix Lint error: all imports on this line are unused.
 // tslint:disable: no-unused-variable
@@ -75,30 +75,33 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     // TODO: investigate observable unsubscription
     // See https://gitlab.com/linagora/petals-cockpit/issues/445
 
-    this.workspace$ = this.store$.select(getCurrentWorkspace);
-    this.busesInProgress$ = this.store$.select(getBusesInProgress);
+    this.workspace$ = this.store$.pipe(select(getCurrentWorkspace));
+    this.busesInProgress$ = this.store$.pipe(select(getBusesInProgress));
 
-    this.interfaces$ = this.store$
-      .select(getAllInterfaces)
-      .pipe(takeUntil(this.onDestroy$));
+    this.interfaces$ = this.store$.pipe(
+      select(getAllInterfaces),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.services$ = this.store$
-      .select(getAllServices)
-      .pipe(takeUntil(this.onDestroy$));
+    this.services$ = this.store$.pipe(
+      select(getAllServices),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.endpoints$ = this.store$
-      .select(getAllEndpoints)
-      .pipe(takeUntil(this.onDestroy$));
+    this.endpoints$ = this.store$.pipe(
+      select(getAllEndpoints),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.tree$ = this.store$.select(getCurrentWorkspaceTree);
+    this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTree));
 
     this.retrievedSelectedIndex = this.storage.retrieve(
       'left-menu-selected-index'
     );
 
     // sidenav
-    this.sidenavVisible$ = this.store$.select(
-      state => state.ui.isSidenavVisible
+    this.sidenavVisible$ = this.store$.pipe(
+      select(state => state.ui.isSidenavVisible)
     );
     this.sidenavMode$ = this.store$.pipe(
       isSmallScreen,
@@ -107,8 +110,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
     // open deleted warning if the workspace has been deleted
     this.store$
-      .select(state => state.workspaces.isSelectedWorkspaceDeleted)
       .pipe(
+        select(state => state.workspaces.isSelectedWorkspaceDeleted),
         filter(d => d),
         takeUntil(this.onDestroy$),
         switchMap(() =>

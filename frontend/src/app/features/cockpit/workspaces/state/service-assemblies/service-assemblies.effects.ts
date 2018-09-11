@@ -17,7 +17,7 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { EMPTY, Observable, of } from 'rxjs';
@@ -52,124 +52,119 @@ export class ServiceAssembliesEffects {
   ) {}
 
   @Effect()
-  watchDeployed$: Observable<Action> = this.actions$
-    .ofType<SseActions.SaDeployed>(SseActions.SaDeployedType)
-    .pipe(
-      map(action => {
-        const data = action.payload;
-        const serviceAssemblies = toJsTable(data.serviceAssemblies);
-        const serviceUnits = toJsTable(data.serviceUnits);
+  watchDeployed$: Observable<Action> = this.actions$.pipe(
+    ofType<SseActions.SaDeployed>(SseActions.SaDeployedType),
+    map(action => {
+      const data = action.payload;
+      const serviceAssemblies = toJsTable(data.serviceAssemblies);
+      const serviceUnits = toJsTable(data.serviceUnits);
+      return batchActions([
+        new ServiceAssemblies.Added(serviceAssemblies),
+        new ServiceUnits.Added(serviceUnits),
+      ]);
+    })
+  );
+
+  @Effect()
+  watchStateChanged$: Observable<Action> = this.actions$.pipe(
+    ofType<SseActions.SaStateChange>(SseActions.SaStateChangeType),
+    withLatestFrom(this.store$),
+    map(([action, store]) => {
+      const data = action.payload;
+
+      const sa = store.serviceAssemblies.byId[data.id];
+
+      if (data.state === EServiceAssemblyState.Unloaded) {
+        this.notifications.success(
+          'Service assembly unloaded',
+          `'${sa.name}' has been unloaded`
+        );
+
         return batchActions([
-          new ServiceAssemblies.Added(serviceAssemblies),
-          new ServiceUnits.Added(serviceUnits),
+          new ServiceAssemblies.Removed(sa),
+          ...sa.serviceUnits.map(
+            id => new ServiceUnits.Removed(store.serviceUnits.byId[id])
+          ),
         ]);
-      })
-    );
+      } else {
+        return new ServiceAssemblies.ChangeStateSuccess({
+          id: sa.id,
+          state: data.state,
+        });
+      }
+    })
+  );
 
   @Effect()
-  watchStateChanged$: Observable<Action> = this.actions$
-    .ofType<SseActions.SaStateChange>(SseActions.SaStateChangeType)
-    .pipe(
-      withLatestFrom(this.store$),
-      map(([action, store]) => {
-        const data = action.payload;
-
-        const sa = store.serviceAssemblies.byId[data.id];
-
-        if (data.state === EServiceAssemblyState.Unloaded) {
-          this.notifications.success(
-            'Service assembly unloaded',
-            `'${sa.name}' has been unloaded`
-          );
-
-          return batchActions([
-            new ServiceAssemblies.Removed(sa),
-            ...sa.serviceUnits.map(
-              id => new ServiceUnits.Removed(store.serviceUnits.byId[id])
-            ),
-          ]);
-        } else {
-          return new ServiceAssemblies.ChangeStateSuccess({
-            id: sa.id,
-            state: data.state,
-          });
-        }
-      })
-    );
-
-  @Effect()
-  fetchServiceAssemblyDetails$: Observable<Action> = this.actions$
-    .ofType<ServiceAssemblies.FetchDetails>(ServiceAssemblies.FetchDetailsType)
-    .pipe(
-      switchMap(action =>
-        this.serviceAssembliesService
-          .getDetailsServiceAssembly(action.payload.id)
-          .pipe(
-            map(
-              res =>
-                new ServiceAssemblies.FetchDetailsSuccess({
-                  id: action.payload.id,
-                  data: res,
-                })
-            ),
-            catchError((err: HttpErrorResponse) => {
-              if (environment.debug) {
-                console.group();
-                console.warn(
-                  'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FetchDetails)'
-                );
-                console.error(err);
-                console.groupEnd();
-              }
-
-              return of(
-                new ServiceAssemblies.FetchDetailsError(action.payload)
+  fetchServiceAssemblyDetails$: Observable<Action> = this.actions$.pipe(
+    ofType<ServiceAssemblies.FetchDetails>(ServiceAssemblies.FetchDetailsType),
+    switchMap(action =>
+      this.serviceAssembliesService
+        .getDetailsServiceAssembly(action.payload.id)
+        .pipe(
+          map(
+            res =>
+              new ServiceAssemblies.FetchDetailsSuccess({
+                id: action.payload.id,
+                data: res,
+              })
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.FetchDetails)'
               );
-            })
-          )
-      )
-    );
+              console.error(err);
+              console.groupEnd();
+            }
 
-  @Effect()
-  changeState$: Observable<Action> = this.actions$
-    .ofType<ServiceAssemblies.ChangeState>(ServiceAssemblies.ChangeStateType)
-    .pipe(
-      withLatestFrom(this.store$),
-      switchMap(([action, store]) => {
-        return this.serviceAssembliesService
-          .putState(
-            store.workspaces.selectedWorkspaceId,
-            action.payload.id,
-            action.payload.state
-          )
-          .pipe(
-            // response will be handled by sse
-            mergeMap(_ => EMPTY),
-            catchError((err: HttpErrorResponse) => {
-              if (environment.debug) {
-                console.group();
-                console.warn(
-                  'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.ChangeState)'
-                );
-                console.error(err);
-                console.groupEnd();
-              }
-
-              return of(
-                new ServiceAssemblies.ChangeStateError({
-                  id: action.payload.id,
-                  errorChangeState: getErrorMessage(err),
-                })
-              );
-            })
-          );
-      })
-    );
-
-  @Effect()
-  changeStateSuccess$: Observable<Action> = this.actions$
-    .ofType<ServiceAssemblies.ChangeStateSuccess>(
-      ServiceAssemblies.ChangeStateSuccessType
+            return of(new ServiceAssemblies.FetchDetailsError(action.payload));
+          })
+        )
     )
-    .pipe(map(action => new ServiceAssemblies.FetchDetails(action.payload)));
+  );
+
+  @Effect()
+  changeState$: Observable<Action> = this.actions$.pipe(
+    ofType<ServiceAssemblies.ChangeState>(ServiceAssemblies.ChangeStateType),
+    withLatestFrom(this.store$),
+    switchMap(([action, store]) => {
+      return this.serviceAssembliesService
+        .putState(
+          store.workspaces.selectedWorkspaceId,
+          action.payload.id,
+          action.payload.state
+        )
+        .pipe(
+          // response will be handled by sse
+          mergeMap(_ => EMPTY),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error caught in service-assemblies.effects: ofType(ServiceAssemblies.ChangeState)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            return of(
+              new ServiceAssemblies.ChangeStateError({
+                id: action.payload.id,
+                errorChangeState: getErrorMessage(err),
+              })
+            );
+          })
+        );
+    })
+  );
+
+  @Effect()
+  changeStateSuccess$: Observable<Action> = this.actions$.pipe(
+    ofType<ServiceAssemblies.ChangeStateSuccess>(
+      ServiceAssemblies.ChangeStateSuccessType
+    ),
+    map(action => new ServiceAssemblies.FetchDetails(action.payload))
+  );
 }

@@ -21,7 +21,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { stateToLedColor } from '@shared/helpers/shared.helper';
@@ -45,8 +45,8 @@ export class PetalsServiceAssemblyOverviewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
   }
 

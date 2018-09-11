@@ -16,7 +16,7 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
@@ -43,14 +43,14 @@ export class CockpitComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
     this.user$ = this.store$.pipe(getCurrentUser);
-    this.isDisconnecting$ = this.store$.select(
-      state => state.users.isDisconnecting
+    this.isDisconnecting$ = this.store$.pipe(
+      select(state => state.users.isDisconnecting)
     );
 
-    this.isOnWorkspace$ = this.store$.select(
-      state => !!state.workspaces.selectedWorkspaceId
+    this.isOnWorkspace$ = this.store$.pipe(
+      select(state => !!state.workspaces.selectedWorkspaceId)
     );
-    this.ui$ = this.store$.select(state => state.ui);
+    this.ui$ = this.store$.pipe(select(state => state.ui));
   }
 
   ngOnDestroy() {

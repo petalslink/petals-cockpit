@@ -19,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, of, Subject } from 'rxjs';
+import { EMPTY, Observable, of, Subject } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 
 import { getErrorMessage } from '@shared/helpers/shared.helper';
@@ -67,7 +67,7 @@ export class SetupComponent implements OnInit, OnDestroy {
       }),
       catchError((err: HttpErrorResponse) => {
         this.setupFailed = getErrorMessage(err);
-        return of();
+        return EMPTY;
       })
     );
   }

@@ -22,7 +22,7 @@ import {
   OnInit,
 } from '@angular/core';
 
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { IStore } from '@shared/state/store.interface';
 import { IServiceOverview } from '@wks/state/services/services.selectors';
 import { Observable } from 'rxjs';
@@ -42,8 +42,8 @@ export class ServicesServiceOverviewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
   }
 }

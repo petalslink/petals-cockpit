@@ -22,7 +22,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -69,20 +69,23 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.searchForm = this.fb.group({ search: '' });
 
-    this.interfacesTree$ = this.store$
-      .select(getCurrentInterfaceTree)
-      .pipe(takeUntil(this.onDestroy$));
+    this.interfacesTree$ = this.store$.pipe(
+      select(getCurrentInterfaceTree),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.servicesTree$ = this.store$
-      .select(getCurrentServiceTree)
-      .pipe(takeUntil(this.onDestroy$));
+    this.servicesTree$ = this.store$.pipe(
+      select(getCurrentServiceTree),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.endpointsTree$ = this.store$
-      .select(getCurrentEndpointTree)
-      .pipe(takeUntil(this.onDestroy$));
+    this.endpointsTree$ = this.store$.pipe(
+      select(getCurrentEndpointTree),
+      takeUntil(this.onDestroy$)
+    );
 
-    this.isFetchingServices$ = this.store$.select(
-      state => state.workspaces.isFetchingServices
+    this.isFetchingServices$ = this.store$.pipe(
+      select(state => state.workspaces.isFetchingServices)
     );
 
     this.searchForm.valueChanges
@@ -96,8 +99,8 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.store$
-      .select(state => state.workspaces.searchServices)
       .pipe(
+        select(state => state.workspaces.searchServices),
         tap(searchServices => {
           this.searchForm.get('search').setValue(searchServices, {
             emitEvent: false,

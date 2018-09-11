@@ -23,7 +23,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
 
@@ -64,14 +64,15 @@ export class AdministrationComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.users$ = this.store$
-      .select(getAllUsers)
-      .pipe(map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id))));
+    this.users$ = this.store$.pipe(
+      select(getAllUsers),
+      map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id)))
+    );
 
     this.user$ = this.store$.pipe(getCurrentUser);
 
-    this.isFetchingUsers$ = this.store$.select(
-      state => state.users.isFetchingUsers
+    this.isFetchingUsers$ = this.store$.pipe(
+      select(state => state.users.isFetchingUsers)
     );
 
     this.user$

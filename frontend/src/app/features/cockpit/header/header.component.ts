@@ -22,7 +22,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
@@ -49,8 +49,8 @@ export class HeaderComponent implements OnInit {
   constructor(private store$: Store<IStore>, private matDialog: MatDialog) {}
 
   ngOnInit() {
-    this.logoDisabled$ = this.store$.select(
-      state => state.ui.isPopupListWorkspacesVisible
+    this.logoDisabled$ = this.store$.pipe(
+      select(state => state.ui.isPopupListWorkspacesVisible)
     );
   }
 

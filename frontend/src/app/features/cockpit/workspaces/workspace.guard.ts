@@ -17,7 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
-import { Actions } from '@ngrx/effects';
+import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
@@ -38,21 +38,20 @@ export class WorkspaceGuard implements CanActivate {
 
     this.store$.dispatch(new Workspaces.Fetch({ id }));
 
-    return this.actions$
-      .ofType<Workspaces.FetchSuccess | Workspaces.FetchError>(
+    return this.actions$.pipe(
+      ofType<Workspaces.FetchSuccess | Workspaces.FetchError>(
         Workspaces.FetchSuccessType,
         Workspaces.FetchErrorType
-      )
-      .pipe(
-        first(),
-        map(action => {
-          if (action instanceof Workspaces.FetchError) {
-            this.router.navigate(['/workspaces']);
-            return false;
-          } else {
-            return true;
-          }
-        })
-      );
+      ),
+      first(),
+      map(action => {
+        if (action instanceof Workspaces.FetchError) {
+          this.router.navigate(['/workspaces']);
+          return false;
+        } else {
+          return true;
+        }
+      })
+    );
   }
 }

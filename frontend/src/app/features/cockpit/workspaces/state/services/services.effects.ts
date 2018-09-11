@@ -17,7 +17,7 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -34,31 +34,30 @@ export class ServicesEffects {
   ) {}
 
   @Effect()
-  fetchServiceDetails$: Observable<Action> = this.actions$
-    .ofType<Services.FetchDetails>(Services.FetchDetailsType)
-    .pipe(
-      switchMap(action =>
-        this.servicesService.getDetailsService(action.payload.id).pipe(
-          map(
-            res =>
-              new Services.FetchDetailsSuccess({
-                id: action.payload.id,
-                data: res,
-              })
-          ),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in services.effects: ofType(Services.FetchDetails)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
+  fetchServiceDetails$: Observable<Action> = this.actions$.pipe(
+    ofType<Services.FetchDetails>(Services.FetchDetailsType),
+    switchMap(action =>
+      this.servicesService.getDetailsService(action.payload.id).pipe(
+        map(
+          res =>
+            new Services.FetchDetailsSuccess({
+              id: action.payload.id,
+              data: res,
+            })
+        ),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in services.effects: ofType(Services.FetchDetails)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
 
-            return of(new Services.FetchDetailsError(action.payload));
-          })
-        )
+          return of(new Services.FetchDetailsError(action.payload));
+        })
       )
-    );
+    )
+  );
 }

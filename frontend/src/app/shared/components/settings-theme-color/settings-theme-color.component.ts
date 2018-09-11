@@ -17,7 +17,7 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
@@ -55,8 +55,8 @@ export class SettingsThemeColorComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store$
-      .select(state => state.ui.settings)
       .pipe(
+        select(state => state.ui.settings),
         takeUntil(this.onDestroy$),
         tap(settings => {
           this.settings = settings;

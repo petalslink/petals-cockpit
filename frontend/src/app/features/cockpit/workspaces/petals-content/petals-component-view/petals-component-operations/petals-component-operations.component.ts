@@ -26,7 +26,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Actions } from '@ngrx/effects';
+import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
@@ -125,8 +125,8 @@ export class PetalsComponentOperationsComponent
     const correlationId = uuid();
 
     this.actions$
-      .ofType<HttpProgress>(HttpProgressType)
       .pipe(
+        ofType<HttpProgress>(HttpProgressType),
         takeUntil(this.onDestroy$),
         filter(action => action.payload.correlationId === correlationId),
         // we want 1 or 0 (first wants exactly one) because of takeUntil

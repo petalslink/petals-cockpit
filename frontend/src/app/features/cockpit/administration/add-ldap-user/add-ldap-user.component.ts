@@ -25,8 +25,8 @@ import {
   Output,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Actions } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
+import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subject } from 'rxjs';
 import {
   debounceTime,
@@ -93,8 +93,8 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
       userSearchCtrl: ['', Validators.required],
     });
 
-    this.isFetchingLdapUsers$ = this.store$.select(
-      state => state.users.isFetchingLdapUsers
+    this.isFetchingLdapUsers$ = this.store$.pipe(
+      select(state => state.users.isFetchingLdapUsers)
     );
 
     this.addLdapUserForm
@@ -119,8 +119,8 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.filteredUsers$ = combineLatest(
-      this.store$.select(state => state.users.ldapSearchList),
-      this.store$.select(state => state.users.byId)
+      this.store$.pipe(select(state => state.users.ldapSearchList)),
+      this.store$.pipe(select(state => state.users.byId))
     ).pipe(
       map(([ldapSearchList, localUsers]) =>
         ldapSearchList.filter(ldapItem => !localUsers[ldapItem.username])
@@ -128,8 +128,8 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     );
 
     this.actions$
-      .ofType(Users.AddSuccessType)
       .pipe(
+        ofType(Users.AddSuccessType),
         takeUntil(this.onDestroy$),
         tap(_ => {
           this.addLdapUserForm.reset(),

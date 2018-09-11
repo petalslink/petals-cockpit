@@ -16,7 +16,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
@@ -45,10 +45,10 @@ export class PetalsComponentViewComponent implements OnInit {
       })
     );
 
-    this.component$ = this.store$.select(getCurrentComponent);
+    this.component$ = this.store$.pipe(select(getCurrentComponent));
 
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
   }
 }
