@@ -242,7 +242,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'app-workspace-deletion-dialog',
   template: `
-    <div fxLayout="column" class="content content-max-width">
+    <div fxLayout="column" class="content">
       <div class="central-content">
         <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">

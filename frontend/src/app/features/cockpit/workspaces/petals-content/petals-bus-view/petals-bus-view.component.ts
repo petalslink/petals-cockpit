@@ -79,7 +79,7 @@ export class PetalsBusViewComponent implements OnInit {
 @Component({
   selector: 'app-bus-deletion-dialog',
   template: `
-    <div fxLayout="column" class="content content-max-width">
+    <div fxLayout="column" class="content">
       <div class="central-content">
         <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">

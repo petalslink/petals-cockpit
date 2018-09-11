@@ -149,7 +149,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 @Component({
   selector: 'app-workspace-deleted-dialog',
   template: `
-    <div fxLayout="column" class="content content-max-width">
+    <div fxLayout="column" class="content">
       <div class="central-content">
         <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">
