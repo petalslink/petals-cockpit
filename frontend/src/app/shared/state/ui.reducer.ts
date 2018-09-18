@@ -61,6 +61,7 @@ export namespace UiReducer {
         return {
           ...uiFactory(),
           screenSize: table.screenSize,
+          settings: table.settings,
         };
       }
       default:
