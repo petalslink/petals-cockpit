@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 
@@ -28,9 +28,11 @@ const _isLargeScreen = (ss: ScreenSize) =>
 const getScreenSize = (state: IStore) => state.ui.screenSize;
 
 export const isLargeScreen = (store$: Store<IStore>): Observable<boolean> => {
-  return store$
-    .select(getScreenSize)
-    .pipe(map(_isLargeScreen), distinctUntilChanged());
+  return store$.pipe(
+    select(getScreenSize),
+    map(_isLargeScreen),
+    distinctUntilChanged()
+  );
 };
 
 export const isSmallScreen = (store$: Store<IStore>): Observable<boolean> => {

@@ -24,7 +24,7 @@ import {
 } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { finalize, first, takeUntil, tap } from 'rxjs/operators';
 
@@ -65,8 +65,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
 
     // open workspace dialog when needed
     this.store$
-      .select(state => state.ui.isPopupListWorkspacesVisible)
       .pipe(
+        select(state => state.ui.isPopupListWorkspacesVisible),
         takeUntil(this.onDestroy$),
         tap(isPopupListWorkspacesVisible => {
           if (isPopupListWorkspacesVisible) {
@@ -101,8 +101,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Workspaces.FetchAll());
 
     this.store$
-      .select(state => !state.workspaces.selectedWorkspaceId)
       .pipe(
+        select(state => !state.workspaces.selectedWorkspaceId),
         first(),
         tap(noWorkspace =>
           // until https://github.com/angular/angular/issues/15634 is fixed
@@ -129,8 +129,8 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
     this.workspacesDialog = null;
     if (selected) {
       this.store$
-        .select(state => state.workspaces.selectedWorkspaceId)
         .pipe(
+          select(state => state.workspaces.selectedWorkspaceId),
           first(),
           tap(wsId => {
             if (wsId !== selected.id) {

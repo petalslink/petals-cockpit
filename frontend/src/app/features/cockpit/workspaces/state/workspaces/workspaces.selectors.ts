@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, withLatestFrom } from 'rxjs/operators';
@@ -44,8 +44,9 @@ export function getSelectedWorkspaceId(state: IStore) {
 }
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
-  return store$.select(state => state.workspaces).pipe(
-    withLatestFrom(store$.select(getUsersById)),
+  return store$.pipe(
+    select(state => state.workspaces),
+    withLatestFrom(store$.pipe(select(getUsersById))),
     map(([workspaces, usersById]) => {
       return {
         ...workspaces,
@@ -76,7 +77,7 @@ const getCurrentWorkspaceUsersById = createSelector(
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
 ): Observable<IUserRow[]> {
-  return store$.select(getCurrentWorkspaceUsersById);
+  return store$.pipe(select(getCurrentWorkspaceUsersById));
 }
 
 export function getServicesSearch(state: IStore): string {

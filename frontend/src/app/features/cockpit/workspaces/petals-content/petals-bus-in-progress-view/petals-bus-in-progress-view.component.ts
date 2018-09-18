@@ -18,7 +18,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
@@ -78,8 +78,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     );
 
     this.store$
-      .select(state => state.busesInProgress)
       .pipe(
+        select(state => state.busesInProgress),
         takeUntil(this.onDestroy$),
         tap(bip => {
           if (!bip.selectedBusInProgressId) {
@@ -95,8 +95,8 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
     this.createFormImportBus();
 
     this.store$
-      .select(getCurrentBusInProgress)
       .pipe(
+        select(getCurrentBusInProgress),
         deletable,
         takeUntil(this.onDestroy$),
         tap(busInProgress => {

@@ -21,7 +21,7 @@ import {
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter, first, switchMap, tap } from 'rxjs/operators';
 
@@ -49,11 +49,11 @@ export class PetalsBusViewComponent implements OnInit {
       new Ui.SetTitles({ titleMainPart1: 'Petals', titleMainPart2: 'Bus' })
     );
 
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
 
-    this.bus$ = this.store$.select(getCurrentBus);
+    this.bus$ = this.store$.pipe(select(getCurrentBus));
   }
 
   openDeletionDialog() {
@@ -79,7 +79,7 @@ export class PetalsBusViewComponent implements OnInit {
 @Component({
   selector: 'app-bus-deletion-dialog',
   template: `
-    <div fxLayout="column" class="content content-max-width">
+    <div fxLayout="column" class="content">
       <div class="central-content">
         <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
           <span fxLayoutAlign="start center">

@@ -16,7 +16,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
@@ -57,20 +57,20 @@ export class PetalsContainerViewComponent implements OnInit {
       })
     );
 
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
 
-    this.container$ = this.store$.select(getCurrentContainer);
+    this.container$ = this.store$.pipe(select(getCurrentContainer));
 
-    this.componentsOfCurrentContainerByName$ = this.store$.select(
-      componentsOfCurrentContainerByName
+    this.componentsOfCurrentContainerByName$ = this.store$.pipe(
+      select(componentsOfCurrentContainerByName)
     );
-    this.sharedLibrariesOfCurrentContainerByNameAndVersion$ = this.store$.select(
-      sharedLibrariesOfCurrentContainerByNameAndVersion
+    this.sharedLibrariesOfCurrentContainerByNameAndVersion$ = this.store$.pipe(
+      select(sharedLibrariesOfCurrentContainerByNameAndVersion)
     );
-    this.serviceAssembliesOfCurrentContainerByName$ = this.store$.select(
-      serviceAssembliesOfCurrentContainerByName
+    this.serviceAssembliesOfCurrentContainerByName$ = this.store$.pipe(
+      select(serviceAssembliesOfCurrentContainerByName)
     );
   }
 }

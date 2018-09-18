@@ -23,7 +23,7 @@ import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 import { MediaChange, ObservableMedia } from '@angular/flex-layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 
@@ -72,8 +72,10 @@ export class AppComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.store$
-      .select(state => state.ui.settings || { theme: '' })
-      .pipe(takeUntil(this.onDestroy$))
+      .pipe(
+        select(state => state.ui.settings || { theme: '' }),
+        takeUntil(this.onDestroy$)
+      )
       .subscribe(settings => {
         const effectiveTheme = settings.theme.toLowerCase();
         this.componentCssClass = effectiveTheme;

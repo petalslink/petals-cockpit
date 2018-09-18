@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -49,5 +49,5 @@ export const getAllUsers = createSelector(
 export const getCurrentUser = (
   store$: Store<IStore>
 ): Observable<ICurrentUser> => {
-  return store$.select(getConnectedUser).pipe(filter(isNot(null)));
+  return store$.pipe(select(getConnectedUser), filter(isNot(null)));
 };

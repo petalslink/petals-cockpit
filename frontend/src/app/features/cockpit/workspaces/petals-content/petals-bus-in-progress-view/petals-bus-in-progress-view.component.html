@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     This import has been removed
   </div>
 
-  <div fxFlex="100%" fxFlexFill fxLayout="column" class="content content-max-width">
+  <div fxFlex="100%" fxFlexFill fxLayout="column" class="content">
     <div class="central-content">
       <ngx-hover-opacity [isHoverVisible]="isSelectedBus() && isSelectedBusDeleted()">
         <form class="bus-import-form" formnovalidate [formGroup]="busImportForm" (ngSubmit)="onSubmit(busImportForm) && busImportForm.reset()">

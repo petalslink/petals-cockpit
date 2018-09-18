@@ -62,7 +62,8 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "progress": false
             },
             "dev-e2e": {
               "fileReplacements": [
@@ -112,7 +113,8 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "progress": false
             },
             "prod-e2e-ldap": {
               "fileReplacements": [
@@ -129,7 +131,8 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "progress": false
             },
             "gitlab-pages": {
               "fileReplacements": [
@@ -146,7 +149,8 @@
               "aot": true,
               "extractLicenses": true,
               "vendorChunk": false,
-              "buildOptimizer": true
+              "buildOptimizer": true,
+              "progress": false
             }
           }
         },
@@ -160,6 +164,11 @@
             "styles": [],
             "scripts": [],
             "assets": []
+          },
+          "configurations": {
+            "ci": {
+              "progress": false
+            }
           }
         },
         "serve": {
@@ -169,11 +178,15 @@
             "production": {
               "browserTarget": "petals-cockpit:build:production"
             },
-            "dev-e2e": { "browserTarget": "petals-cockpit:build:dev-e2e" },
+            "dev-e2e": {
+              "browserTarget": "petals-cockpit:build:dev-e2e"
+            },
             "dev-nomock": {
               "browserTarget": "petals-cockpit:build:dev-nomock"
             },
-            "prod-e2e": { "browserTarget": "petals-cockpit:build:prod-e2e" },
+            "prod-e2e": {
+              "browserTarget": "petals-cockpit:build:prod-e2e"
+            },
             "prod-e2e-ldap": {
               "browserTarget": "petals-cockpit:build:prod-e2e-ldap"
             },

@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </button>
   </mat-toolbar>
 
-  <div fxFlex class="content content-max-width">
+  <div fxFlex class="content">
     <div class="central-content">
       <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px">
 
@@ -64,11 +64,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                       [(ngModel)]="description"
                     ></textarea>
                   </mat-form-field>
+                  
+                  <mat-card-subtitle fxLayout="row">
+                    <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
+                  </mat-card-subtitle>
                 </div>
 
-                <mat-card-subtitle fxLayout="row">
-                  <span fxFlex class="workspace-description-preview" [innerHTML]="description | MarkdownToHtml"></span>
-                </mat-card-subtitle>
               </div>
 
               <div fxLayoutAlign="end">

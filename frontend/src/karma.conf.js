@@ -52,9 +52,9 @@ module.exports = function(config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromiumHeadlessNoSandbox'],
+    browsers: ['ChromiumHeadlessCI'],
     customLaunchers: {
-      ChromiumHeadlessNoSandbox: {
+      ChromiumHeadlessCI: {
         base: 'ChromiumHeadless',
         flags: ['--no-sandbox', '--disable-gpu'],
       },

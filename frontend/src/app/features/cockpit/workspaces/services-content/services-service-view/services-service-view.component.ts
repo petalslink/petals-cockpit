@@ -16,7 +16,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
@@ -38,7 +38,9 @@ export class ServicesServiceViewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.service$ = this.store$.select(getCurrentServiceInterfacesEndpoints);
+    this.service$ = this.store$.pipe(
+      select(getCurrentServiceInterfacesEndpoints)
+    );
 
     this.store$.dispatch(
       new Ui.SetTitles({
@@ -47,8 +49,8 @@ export class ServicesServiceViewComponent implements OnInit {
       })
     );
 
-    this.workspaceId$ = this.store$.select(
-      state => state.workspaces.selectedWorkspaceId
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
     );
   }
 }

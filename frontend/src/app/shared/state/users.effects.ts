@@ -18,7 +18,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Actions, Effect } from '@ngrx/effects';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable, of } from 'rxjs';
@@ -46,209 +46,196 @@ export class UsersEffects {
   ) {}
 
   @Effect()
-  fetchAll$: Observable<Action> = this.actions$
-    .ofType<Users.FetchAll>(Users.FetchAllType)
-    .pipe(
-      switchMap(action => this.usersService.getAll()),
-      map(
-        user =>
-          new Users.Fetched(
-            toJsTable(user.reduce((p, c) => ({ ...p, [c.id]: c }), {}))
-          )
-      ),
-      catchError((err: HttpErrorResponse) => {
-        if (environment.debug) {
-          console.group();
-          console.warn(
-            'Error caught in users.effects.ts: ofType(Users.FetchAll)'
-          );
-          console.error(err);
-          console.groupEnd();
-        }
-
-        return of(new Users.FetchAllError());
-      })
-    );
-
-  @Effect()
-  fetchLdapUsers$: Observable<Action> = this.actions$
-    .ofType<Users.FetchLdapUsers>(Users.FetchLdapUsersType)
-    .pipe(
-      switchMap(action => this.usersService.getLdapUsers(action.payload)),
-      map(ldapSearchList => new Users.FetchedLdapUsers(ldapSearchList)),
-      catchError((err: HttpErrorResponse) => {
-        if (environment.debug) {
-          console.group();
-          console.warn(
-            'Error caught in users.effects.ts: ofType(Users.FetchLdapUsers)'
-          );
-          console.error(err);
-          console.groupEnd();
-        }
-
-        return of(new Users.FetchLdapUsersError());
-      })
-    );
-
-  @Effect()
-  add$: Observable<Action> = this.actions$
-    .ofType<Users.Add>(Users.AddType)
-    .pipe(
-      flatMap(action =>
-        this.usersService.add(action.payload).pipe(
-          map(
-            () =>
-              new Users.AddSuccess({
-                id: action.payload.username,
-                name: action.payload.name,
-              })
-          ),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in users.effects.ts: ofType(Users.Add)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
-
-            return of(new Users.AddError({ id: action.payload.username }));
-          })
+  fetchAll$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.FetchAll>(Users.FetchAllType),
+    switchMap(action => this.usersService.getAll()),
+    map(
+      user =>
+        new Users.Fetched(
+          toJsTable(user.reduce((p, c) => ({ ...p, [c.id]: c }), {}))
         )
-      )
-    );
+    ),
+    catchError((err: HttpErrorResponse) => {
+      if (environment.debug) {
+        console.group();
+        console.warn(
+          'Error caught in users.effects.ts: ofType(Users.FetchAll)'
+        );
+        console.error(err);
+        console.groupEnd();
+      }
+
+      return of(new Users.FetchAllError());
+    })
+  );
 
   @Effect()
-  delete$: Observable<Action> = this.actions$
-    .ofType<Users.Delete>(Users.DeleteType)
-    .pipe(
-      flatMap(action =>
-        this.usersService.delete(action.payload.id).pipe(
-          map(() => new Users.DeleteSuccess({ id: action.payload.id })),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in users.effects.ts: ofType(Users.Delete)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
+  fetchLdapUsers$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.FetchLdapUsers>(Users.FetchLdapUsersType),
+    switchMap(action => this.usersService.getLdapUsers(action.payload)),
+    map(ldapSearchList => new Users.FetchedLdapUsers(ldapSearchList)),
+    catchError((err: HttpErrorResponse) => {
+      if (environment.debug) {
+        console.group();
+        console.warn(
+          'Error caught in users.effects.ts: ofType(Users.FetchLdapUsers)'
+        );
+        console.error(err);
+        console.groupEnd();
+      }
 
-            return of(new Users.DeleteError(action.payload));
-          })
-        )
-      )
-    );
+      return of(new Users.FetchLdapUsersError());
+    })
+  );
 
   @Effect()
-  modify$: Observable<Action> = this.actions$
-    .ofType<Users.Modify>(Users.ModifyType)
-    .pipe(
-      flatMap(action =>
-        this.usersService
-          .modify(action.payload.id, action.payload.changes)
-          .pipe(
-            map(() => new Users.ModifySuccess(action.payload)),
-            catchError((err: HttpErrorResponse) => {
-              if (environment.debug) {
-                console.group();
-                console.warn(
-                  'Error caught in users.effects.ts: ofType(Users.Modify)'
-                );
-                console.error(err);
-                console.groupEnd();
-              }
-
-              return of(new Users.ModifyError(action.payload));
+  add$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Add>(Users.AddType),
+    flatMap(action =>
+      this.usersService.add(action.payload).pipe(
+        map(
+          () =>
+            new Users.AddSuccess({
+              id: action.payload.username,
+              name: action.payload.name,
             })
-          )
+        ),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn('Error caught in users.effects.ts: ofType(Users.Add)');
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return of(new Users.AddError({ id: action.payload.username }));
+        })
       )
-    );
+    )
+  );
 
   @Effect()
-  connectUser$: Observable<Action> = this.actions$
-    .ofType<Users.Connect>(Users.ConnectType)
-    .pipe(
-      switchMap(action =>
-        this.usersService.connectUser(action.payload.user).pipe(
-          map(
-            user =>
-              new Users.ConnectSuccess({
-                user,
-                navigate: true,
-                previousUrl: action.payload.previousUrl,
-              })
-          ),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in users.effects.ts: ofType(Users.Connect)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
+  delete$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Delete>(Users.DeleteType),
+    flatMap(action =>
+      this.usersService.delete(action.payload.id).pipe(
+        map(() => new Users.DeleteSuccess({ id: action.payload.id })),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.Delete)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
 
-            return of(new Users.ConnectError());
-          })
-        )
+          return of(new Users.DeleteError(action.payload));
+        })
       )
-    );
-
-  @Effect({ dispatch: false })
-  connectUserSuccess$: Observable<void> = this.actions$
-    .ofType<Users.ConnectSuccess>(Users.ConnectSuccessType)
-    .pipe(
-      filter(action => action.payload.navigate),
-      map((action: Users.ConnectSuccess) => {
-        if (action.payload.previousUrl) {
-          this.router.navigate([action.payload.previousUrl]);
-        } else if (action.payload.user.lastWorkspace) {
-          this.router.navigate([
-            '/workspaces',
-            action.payload.user.lastWorkspace,
-          ]);
-        } else {
-          this.router.navigate(['/workspaces']);
-        }
-      })
-    );
+    )
+  );
 
   @Effect()
-  disconnectUser$: Observable<Action> = this.actions$
-    .ofType<Users.Disconnect>(Users.DisconnectType)
-    .pipe(
-      switchMap(() =>
-        this.usersService.disconnectUser().pipe(
-          map(() => {
-            this.router.navigate(['/login']);
-            this.notification.remove();
-            return new Users.DisconnectSuccess();
-          }),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in users.effects.ts: ofType(Users.Disconnect)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
+  modify$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Modify>(Users.ModifyType),
+    flatMap(action =>
+      this.usersService.modify(action.payload.id, action.payload.changes).pipe(
+        map(() => new Users.ModifySuccess(action.payload)),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.Modify)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
 
-            return of(new Users.DisconnectError());
-          })
-        )
+          return of(new Users.ModifyError(action.payload));
+        })
       )
-    );
+    )
+  );
+
+  @Effect()
+  connectUser$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Connect>(Users.ConnectType),
+    switchMap(action =>
+      this.usersService.connectUser(action.payload.user).pipe(
+        map(
+          user =>
+            new Users.ConnectSuccess({
+              user,
+              navigate: true,
+              previousUrl: action.payload.previousUrl,
+            })
+        ),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.Connect)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return of(new Users.ConnectError());
+        })
+      )
+    )
+  );
 
   @Effect({ dispatch: false })
-  disconnectUserSuccess$: Observable<Action> = this.actions$
-    .ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType)
-    .pipe(
-      tap(() =>
-        this.notification.success('Log out !', `You're now disconnected.`)
+  connectUserSuccess$: Observable<void> = this.actions$.pipe(
+    ofType<Users.ConnectSuccess>(Users.ConnectSuccessType),
+    filter(action => action.payload.navigate),
+    map((action: Users.ConnectSuccess) => {
+      if (action.payload.previousUrl) {
+        this.router.navigate([action.payload.previousUrl]);
+      } else if (action.payload.user.lastWorkspace) {
+        this.router.navigate([
+          '/workspaces',
+          action.payload.user.lastWorkspace,
+        ]);
+      } else {
+        this.router.navigate(['/workspaces']);
+      }
+    })
+  );
+
+  @Effect()
+  disconnectUser$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Disconnect>(Users.DisconnectType),
+    switchMap(() =>
+      this.usersService.disconnectUser().pipe(
+        map(() => {
+          this.router.navigate(['/login']);
+          this.notification.remove();
+          return new Users.DisconnectSuccess();
+        }),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.Disconnect)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return of(new Users.DisconnectError());
+        })
       )
-    );
+    )
+  );
+
+  @Effect({ dispatch: false })
+  disconnectUserSuccess$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType),
+    tap(() =>
+      this.notification.success('Log out !', `You're now disconnected.`)
+    )
+  );
 }

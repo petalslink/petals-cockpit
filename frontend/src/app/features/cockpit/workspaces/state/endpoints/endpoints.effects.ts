@@ -17,7 +17,7 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Actions, Effect } from '@ngrx/effects';
+import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
@@ -34,31 +34,30 @@ export class EndpointsEffects {
   ) {}
 
   @Effect()
-  fetchEndpointDetails$: Observable<Action> = this.actions$
-    .ofType<Endpoints.FetchDetails>(Endpoints.FetchDetailsType)
-    .pipe(
-      switchMap(action =>
-        this.endpointsService.getDetailsEndpoint(action.payload.id).pipe(
-          map(
-            res =>
-              new Endpoints.FetchDetailsSuccess({
-                id: action.payload.id,
-                data: res,
-              })
-          ),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                'Error caught in endpoints.effects: ofType(Endpoints.FetchDetails)'
-              );
-              console.error(err);
-              console.groupEnd();
-            }
+  fetchEndpointDetails$: Observable<Action> = this.actions$.pipe(
+    ofType<Endpoints.FetchDetails>(Endpoints.FetchDetailsType),
+    switchMap(action =>
+      this.endpointsService.getDetailsEndpoint(action.payload.id).pipe(
+        map(
+          res =>
+            new Endpoints.FetchDetailsSuccess({
+              id: action.payload.id,
+              data: res,
+            })
+        ),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in endpoints.effects: ofType(Endpoints.FetchDetails)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
 
-            return of(new Endpoints.FetchDetailsError(action.payload));
-          })
-        )
+          return of(new Endpoints.FetchDetailsError(action.payload));
+        })
       )
-    );
+    )
+  );
 }

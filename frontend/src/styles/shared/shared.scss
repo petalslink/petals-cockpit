@@ -79,9 +79,6 @@ div > .mat-dialog-container {
   }
   .content {
     @extend .padding-x2;
-    &.content-max-width {
-      margin: auto;
-    }
   }
   @media screen and (max-width: 640px) {
     .content {
@@ -265,7 +262,11 @@ app-buses-in-progress
   > .nav-list-imports-in-progress
   > .item-list
   > .mat-list-item,
-app-material-tree > .nav-list-tree > .item-list > .mat-list-item {
+app-material-tree > .nav-list-tree > .item-list > .mat-list-item,
+app-material-tree
+  > .nav-list-tree
+  > .item-list
+  > .mat-list-item.mat-list-item-with-avatar {
   height: 24px;
 
   .item-content > .item-name {

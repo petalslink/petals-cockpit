@@ -37,7 +37,7 @@ import {
 } from '@angular/forms';
 
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Actions } from '@ngrx/effects';
+import { Actions, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { EMPTY, Subject } from 'rxjs';
@@ -380,8 +380,8 @@ export class PetalsContainerOperationsComponent
     }
 
     this.actions$
-      .ofType<HttpProgress>(HttpProgressType)
       .pipe(
+        ofType<HttpProgress>(HttpProgressType),
         takeUntil(this.onDestroy$),
         filter(action => action.payload.correlationId === correlationId),
         // we want 1 or 0 (first wants exactly one) because of takeUntil
