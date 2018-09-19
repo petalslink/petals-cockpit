@@ -44,7 +44,17 @@
               "node_modules/js-md5/build/md5.min.js",
               "node_modules/swiper/dist/js/swiper.min.js"
             ],
-            "polyfills": "src/polyfills.ts"
+            "polyfills": "src/polyfills.ts",
+            "optimization": false,
+            "outputHashing": "all",
+            "sourceMap": false,
+            "extractCss": true,
+            "namedChunks": false,
+            "aot": false,
+            "extractLicenses": false,
+            "vendorChunk": false,
+            "buildOptimizer": false,
+            "progress": true
           },
           "configurations": {
             "production": {
@@ -55,15 +65,10 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
               "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "progress": false
+              "vendorChunk": true,
+              "buildOptimizer": true
             },
             "dev-e2e": {
               "fileReplacements": [
@@ -71,16 +76,7 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.dev-e2e.ts"
                 }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true
+              ]
             },
             "dev-nomock": {
               "fileReplacements": [
@@ -88,15 +84,7 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.dev-nomock.ts"
                 }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false
+              ]
             },
             "prod-e2e": {
               "fileReplacements": [
@@ -104,17 +92,7 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod-e2e.ts"
                 }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "progress": false
+              ]
             },
             "prod-e2e-ldap": {
               "fileReplacements": [
@@ -122,17 +100,7 @@
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.prod-e2e-ldap.ts"
                 }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "progress": false
+              ]
             },
             "gitlab-pages": {
               "fileReplacements": [
@@ -142,15 +110,9 @@
                 }
               ],
               "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
               "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "progress": false
+              "vendorChunk": true,
+              "buildOptimizer": true
             }
           }
         },
@@ -164,11 +126,6 @@
             "styles": [],
             "scripts": [],
             "assets": []
-          },
-          "configurations": {
-            "ci": {
-              "progress": false
-            }
           }
         },
         "serve": {
@@ -186,6 +143,10 @@
             },
             "prod-e2e": {
               "browserTarget": "petals-cockpit:build:prod-e2e"
+            },
+            "prod-e2e-ci": {
+              "browserTarget": "petals-cockpit:build:prod-e2e",
+              "progress": false
             },
             "prod-e2e-ldap": {
               "browserTarget": "petals-cockpit:build:prod-e2e-ldap"
@@ -225,6 +186,9 @@
             },
             "prod-e2e": {
               "devServerTarget": "petals-cockpit:serve:prod-e2e"
+            },
+            "prod-e2e-ci": {
+              "devServerTarget": "petals-cockpit:serve:prod-e2e-ci"
             },
             "prod-e2e-ldap": {
               "devServerTarget": "petals-cockpit:serve:prod-e2e-ldap"
