@@ -270,7 +270,7 @@ chromium-cypress:
   allow_failure: true
   script:
     - cd frontend
-    - ng build --prod -c prod-e2e
+    - yarn run build:ldap:ci
     - nohup http-server --push-state --silent -p 4200 dist &
     - echo $! > pid-nohup.txt
     - sleep 5
