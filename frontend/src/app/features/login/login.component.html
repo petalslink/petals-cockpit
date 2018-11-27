@@ -13,46 +13,60 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card *ngIf="users$ | async as users">
+<mat-card *ngIf="users$ | async as users" fxLayout="column" class="mat-typography">
+  <div fxLayout="column" fxLayoutAlign="center center">
+    <div class="logo-petals"></div>
+    <h1>Sign In</h1>
+  </div>
+
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)" fxLayout="column">
-    <mat-form-field class="margin-top-x1">
-      <span matPrefix>
-          <mat-icon color="primary">person</mat-icon>
-        </span>
-      <input matInput appFocusInputIfLargeScreen type="text" placeholder="Username" formControlName="username" [errorStateMatcher]="matcher" required>
-      <mat-error>Required!</mat-error>
-    </mat-form-field>
-
-    <mat-form-field class="margin-top-x1">
-      <span matPrefix>
-          <mat-icon color="primary">vpn_key</mat-icon>
-        </span>
-      <input matInput type="password" placeholder="Password" formControlName="password" [errorStateMatcher]="matcher" required>
-      <mat-error>Required!</mat-error>
-    </mat-form-field>
-
-    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="users.connectionFailed">
-      <mat-icon color="warn">error</mat-icon>
-      <p>Username and password do not match</p>
+    <div fxFlex class="margin-top-x1">
+      <mat-form-field appearance="outline" fxFill>
+        <mat-label>Username</mat-label>
+        <input matInput appFocusInputIfLargeScreen type="text" formControlName="username" [errorStateMatcher]="matcher" required>
+        <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="user-astronaut"></fa-icon></mat-icon></span>
+        <mat-error>Required!</mat-error>
+      </mat-form-field>
+    </div>
+    <div fxFlex>
+      <mat-form-field appearance="outline" fxFill>
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" [errorStateMatcher]="matcher" required >
+        <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
+        <mat-error>Required!</mat-error>
+      </mat-form-field>
     </div>
 
-    <button
-      mat-raised-button color="primary"
-      class="margin-top-x1"
-      [disabled]="loginForm.invalid || users.isConnecting || users.connectedUser"
+    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error margin-bottom-x2" *ngIf="users.connectionFailed">
+      <mat-icon color="warn">error</mat-icon>
+      <span>Username and password do not match</span>
+    </div>
+    
+    <div fxLayout="column" fxLayoutAlign="start end">
+      <button
+        mat-raised-button 
+        color="primary"
+        [disabled]="loginForm.invalid || users.isConnecting || users.connectedUser"
       >
-      <span
-        *ngIf="users.isConnecting || users.connectedUser; else logInTxtTpl"
-        fxLayout="row"
-        fxLayoutAlign="center center"
-        >
-        Logging in
-        <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
-      </span>
+        <span fxLayout="row" fxLayoutAlign="center center">
+          <mat-icon fxLayoutAlign="center end" class="icon-x2 margin-right-x1"><fa-icon icon="sign-in-alt"></fa-icon></mat-icon>
+          <span
+            *ngIf="users.isConnecting || users.connectedUser; else logInTxtTpl"
+            class="text-upper"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+          >
+            Logging in
+            <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
+          </span>
 
-      <ng-template #logInTxtTpl>
-        Log in
-      </ng-template>
-    </button>
+          <ng-template #logInTxtTpl>
+            <span class="text-upper">Log in</span>
+          </ng-template>
+        </span>
+      </button>
+
+    </div>
+
   </form>
 </mat-card>

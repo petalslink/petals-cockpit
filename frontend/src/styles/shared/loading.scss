@@ -16,34 +16,62 @@
  */
 
 .loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.loading .spinner {
+  height: 200px;
+  width: 200px;
+  animation: rotate 2s linear infinite;
+  transform-origin: center center;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   margin: auto;
-  height: 65px;
-  width: 120px;
-  background-image: url(./assets/img/logo-petals-cockpit.png);
-  background-size: contain;
-  background-repeat: no-repeat;
-  -webkit-animation: sk-scaleout 2s infinite ease-in-out;
-  animation: sk-scaleout 2s infinite ease-in-out;
 }
 
-@-webkit-keyframes sk-scaleout {
-  0% {
-    -webkit-transform: scale(0);
-  }
+.loading .spinner .path {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation: dash 1.5s ease-in-out infinite;
+  stroke-linecap: round;
+  stroke: #ddd;
+}
+
+@keyframes rotate {
   100% {
-    -webkit-transform: scale(1);
-    opacity: 0;
+    transform: rotate(360deg);
   }
 }
 
-@keyframes sk-scaleout {
+@keyframes dash {
   0% {
-    -webkit-transform: scale(0);
-    transform: scale(0);
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
   }
   100% {
-    -webkit-transform: scale(1);
-    transform: scale(1);
-    opacity: 0;
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+
+.loading {
+  .logo {
+    width: 100px;
+    height: 100px;
+    background: url(./assets/img/logo-petals.png) center center no-repeat;
+    background-size: cover;
+    margin: auto;
   }
 }
