@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   users$: Observable<IUsersTable>;
   matcher = new FormErrorStateMatcher();
+  show: boolean;
 
   constructor(
     private store$: Store<IStore>,
@@ -48,6 +49,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.show = false;
     this.users$ = this.store$.pipe(select(getUsers));
 
     this.loginForm = this.fb.group({
@@ -83,5 +85,9 @@ export class LoginComponent implements OnInit, OnDestroy {
         previousUrl: this.route.snapshot.queryParamMap.get('previousUrl'),
       })
     );
+  }
+
+  togglePassword() {
+    this.show = !this.show;
   }
 }

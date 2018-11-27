@@ -94,12 +94,13 @@ export const MaterialModules = [
 
 import {
   faEye,
+  faEyeSlash,
   faKey,
   faSignInAlt,
   faUserAstronaut,
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faEye, faKey, faSignInAlt, faUserAstronaut);
+library.add(faEye, faEyeSlash, faKey, faSignInAlt, faUserAstronaut);
 
 // used by the components in declarations below
 export const imports = [
