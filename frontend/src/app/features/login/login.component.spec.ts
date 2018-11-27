@@ -51,7 +51,9 @@ describe(`Login component`, () => {
       return getElementBySelector<HTMLButtonElement>(fixture, 'form button');
     },
     get errorTxt() {
-      return elementText(getElementBySelector(fixture, 'form .form-error p'));
+      return elementText(
+        getElementBySelector(fixture, 'form .form-error span')
+      );
     },
   };
 
@@ -145,7 +147,7 @@ describe(`Login component`, () => {
     fixture.detectChanges();
     expect(DOM.loginButton.disabled).toBe(false);
     expect(DOM.loginButton.textContent.toLowerCase()).toContain(`log in`);
-    expect(DOM.errorTxt).toEqual(`Username and password do not match`);
+    expect(DOM.errorTxt).toEqual(`Incorrect username or password.`);
   });
 });
 
