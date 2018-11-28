@@ -1,5 +1,9 @@
 {
   "name": "Petals Cockpit",
+  "short_name": "Petals",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "./assets/icons/android-chrome-192x192.png",
@@ -13,8 +17,6 @@
     }
   ],
   "theme_color": "#ffffff",
-  "background_color": "#5e35b1",
-  "display": "standalone",
-  "orientation": "portrait",
-  "start_url": "./?utm_source=web_app_manifest"
+  "background_color": "#bcbcbc",
+  "orientation": "portrait"
 }
