@@ -64,6 +64,9 @@ import { FocusInputIfLargeScreenDirective } from './directives/focus-input-based
 import { FocusInputDirective } from './directives/focus-input.directive';
 import { TruncateStringPipe } from './helpers/truncate-string.pipe';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+
 export const MaterialModules = [
   MatButtonModule,
   MatCardModule,
@@ -89,6 +92,16 @@ export const MaterialModules = [
   ScrollDispatchModule,
 ];
 
+import {
+  faEye,
+  faEyeSlash,
+  faKey,
+  faSignInAlt,
+  faUserAstronaut,
+} from '@fortawesome/free-solid-svg-icons';
+
+library.add(faEye, faEyeSlash, faKey, faSignInAlt, faUserAstronaut);
+
 // used by the components in declarations below
 export const imports = [
   ...MaterialModules,
@@ -99,6 +112,7 @@ export const imports = [
   NgPipesModule,
   RouterModule,
   ReactiveFormsModule,
+  FontAwesomeModule,
 ];
 
 export const declarations = [
@@ -123,6 +137,7 @@ export const exportss = [
   RouterModule,
   StoreModule,
   SimpleNotificationsModule,
+  FontAwesomeModule,
   ...imports,
   ...MaterialModules,
   ...declarations,

@@ -18,8 +18,11 @@
 @mixin custom-body-theme($theme) {
   $primary: map-get($theme, primary);
 
+  // The login and setup page depend of this background.
+  // Please consider that the background will not change according to the theme at the moment.
+  // This can change in a future refactor.
   app-login,
   app-setup {
-    background-color: mat-color($primary, 700);
+    background-color: mat-color($mat-grey, 400);
   }
 }

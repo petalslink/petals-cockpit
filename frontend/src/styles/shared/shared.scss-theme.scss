@@ -19,12 +19,6 @@
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
 
-  html,
-  body,
-  app-root {
-    background-color: mat-color($primary, 700);
-  }
-
   .icon-primary {
     color: mat-color($primary, 600);
   }
