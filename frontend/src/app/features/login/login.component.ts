@@ -63,9 +63,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         tap(users => {
           if (users.isConnecting || users.connectedUser) {
             this.loginForm.disable();
-            this.loginForm.disable();
           } else {
-            this.loginForm.enable();
             this.loginForm.enable();
           }
         })
