@@ -18,13 +18,19 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { EMPTY, Observable, of, Subject } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import { EMPTY, Observable, Subject } from 'rxjs';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 
+import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
 import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { ILdapStatus, LdapService } from '@shared/services/ldap.service';
-import { IUserSetup, UsersService } from '@shared/services/users.service';
+import { IUserSetup } from '@shared/services/users.service';
+import { IStore } from '@shared/state/store.interface';
+import { Users } from '@shared/state/users.actions';
+import { IUsersTable } from '@shared/state/users.interface';
+import { getUsers } from '@shared/state/users.selectors';
 
 @Component({
   selector: 'app-setup',
@@ -35,18 +41,17 @@ export class SetupComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   isLdapStatus$: Observable<ILdapStatus>;
+  users$: Observable<IUsersTable>;
 
   focusUsernameInput = false;
   focusTokenInput = false;
 
+  matcher = new FormErrorStateMatcher();
   setupForm: FormGroup;
-  settingUp = false;
-  setupFailed: string;
-  setupSucceeded = false;
+  show: boolean;
 
   constructor(
-    private router: Router,
-    private users: UsersService,
+    private store$: Store<IStore>,
     private ldap: LdapService,
     private route: ActivatedRoute,
     private fb: FormBuilder
@@ -54,6 +59,7 @@ export class SetupComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const token = this.route.snapshot.queryParamMap.get('token');
+    this.users$ = this.store$.pipe(select(getUsers));
 
     if (!token) {
       this.focusTokenInput = true;
@@ -66,7 +72,7 @@ export class SetupComponent implements OnInit, OnDestroy {
         this.buildForm(isLdapStatus.isLdapMode, token);
       }),
       catchError((err: HttpErrorResponse) => {
-        this.setupFailed = getErrorMessage(err);
+        getErrorMessage(err);
         return EMPTY;
       })
     );
@@ -85,35 +91,24 @@ export class SetupComponent implements OnInit, OnDestroy {
       });
     } else {
       this.setupForm = this.fb.group({
+        token: [token || '', Validators.required],
         username: ['', Validators.required],
         password: ['', Validators.required],
-        token: [token || '', Validators.required],
         name: ['', Validators.required],
       });
+      this.show = false;
     }
   }
 
-  onSubmit({ value }: { value: IUserSetup }) {
-    if (this.setupSucceeded) {
-      this.router.navigate(['/login']);
-    } else {
-      this.setupFailed = null;
-      this.settingUp = true;
-      this.users
-        .setupUser(value)
-        .pipe(
-          takeUntil(this.onDestroy$),
-          map(_ => {
-            this.setupSucceeded = true;
-            this.settingUp = false;
-          }),
-          catchError((err: HttpErrorResponse) => {
-            this.setupFailed = getErrorMessage(err);
-            this.settingUp = false;
-            return of();
-          })
-        )
-        .subscribe();
-    }
+  onSubmit(value: IUserSetup) {
+    this.store$.dispatch(
+      new Users.Setup({
+        value: value,
+      })
+    );
+  }
+
+  togglePassword() {
+    this.show = !this.show;
   }
 }

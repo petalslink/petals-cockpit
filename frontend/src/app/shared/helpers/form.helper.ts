@@ -47,6 +47,9 @@ interface IValidationMessages {
   userSearchCtrl?: {
     required: string;
   };
+  token?: {
+    required: string;
+  };
 }
 
 const validationMessages: IValidationMessages = {
@@ -71,7 +74,10 @@ const validationMessages: IValidationMessages = {
     required: 'Required!',
   },
   userSearchCtrl: {
-    required: 'Required',
+    required: 'Required!',
+  },
+  token: {
+    required: 'Required!',
   },
 };
 

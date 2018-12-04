@@ -33,6 +33,7 @@ import {
 
 import { environment } from '@env/environment';
 import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { UsersService } from '@shared/services/users.service';
 import { Users } from './users.actions';
 
@@ -48,7 +49,7 @@ export class UsersEffects {
   @Effect()
   fetchAll$: Observable<Action> = this.actions$.pipe(
     ofType<Users.FetchAll>(Users.FetchAllType),
-    switchMap(action => this.usersService.getAll()),
+    switchMap(() => this.usersService.getAll()),
     map(
       user =>
         new Users.Fetched(
@@ -237,5 +238,52 @@ export class UsersEffects {
     tap(() =>
       this.notification.success('Log out !', `You're now disconnected.`)
     )
+  );
+
+  @Effect()
+  setupUser$: Observable<Action> = this.actions$.pipe(
+    ofType<Users.Setup>(Users.SetupType),
+    switchMap(action =>
+      this.usersService.setupUser(action.payload.value).pipe(
+        map(() => {
+          const data = action.payload;
+          return new Users.SetupSuccess({
+            value: {
+              token: data.value.token,
+              username: data.value.username,
+              name: data.value.name,
+              password: data.value.password,
+            },
+            validSetupUser: 'User has been added successfully.',
+          });
+        }),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error caught in users.effects.ts: ofType(Users.Setup)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return of(
+            new Users.SetupError({ errorSetupUser: getErrorMessage(err) })
+          );
+        })
+      )
+    )
+  );
+
+  @Effect({ dispatch: false })
+  setupUserSuccess$: Observable<void> = this.actions$.pipe(
+    ofType<Users.SetupSuccess>(Users.SetupSuccessType),
+    map((action: Users.SetupSuccess) => {
+      if (action.payload.value) {
+        this.router.navigate(['/login']);
+      } else {
+        this.router.navigate(['/setup']);
+      }
+    })
   );
 }

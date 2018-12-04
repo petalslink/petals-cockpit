@@ -26,6 +26,7 @@ import {
   ICurrentUserBackend,
   IUserBackend,
   IUserNew,
+  IUserSetup,
 } from '@shared/services/users.service';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { Users } from './users.actions';
@@ -55,6 +56,9 @@ export namespace UsersReducer {
     | Users.Modify
     | Users.ModifySuccess
     | Users.ModifyError
+    | Users.Setup
+    | Users.SetupError
+    | Users.SetupSuccess
     | Users.Connect
     | Users.ConnectError
     | Users.ConnectSuccess
@@ -117,6 +121,15 @@ export namespace UsersReducer {
       }
       case Users.ModifyErrorType: {
         return modifyError(table, action.payload);
+      }
+      case Users.SetupType: {
+        return setup(table);
+      }
+      case Users.SetupErrorType: {
+        return setupError(table, action.payload);
+      }
+      case Users.SetupSuccessType: {
+        return setupSuccess(table, action.payload);
       }
       case Users.ConnectType: {
         return connect(table);
@@ -230,6 +243,45 @@ export namespace UsersReducer {
 
   function modifyError(table: IUsersTable, payload: { id: string }) {
     return updateById(table, payload.id, { isModifying: false });
+  }
+
+  function setup(table: IUsersTable) {
+    return {
+      ...table,
+      isSettingUp: true,
+    };
+  }
+
+  function setupSuccess(
+    table: IUsersTable,
+    payload: { value: IUserSetup; validSetupUser: string }
+  ): IUsersTable {
+    return Object.assign({}, table, {
+      ...table,
+      value: {
+        token: payload.value.token,
+        id: payload.value.username,
+        password: payload.value.password,
+        name: payload.value.name,
+      },
+      isSettingUp: false,
+      validSetupUser: payload.validSetupUser,
+    });
+  }
+
+  function setupError(
+    table: IUsersTable,
+    payload: { errorSetupUser: string }
+  ): IUsersTable {
+    if (table.isSettingUp) {
+      return {
+        ...table,
+        isSettingUp: false,
+        errorSetupUser: payload.errorSetupUser,
+      };
+    } else {
+      return table;
+    }
   }
 
   function connect(table: IUsersTable): IUsersTable {

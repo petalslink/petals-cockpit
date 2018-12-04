@@ -37,9 +37,10 @@ import { getUsers } from '@shared/state/users.selectors';
 export class LoginComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  loginForm: FormGroup;
   users$: Observable<IUsersTable>;
+
   matcher = new FormErrorStateMatcher();
+  loginForm: FormGroup;
   show: boolean;
 
   constructor(
