@@ -1,13 +1,13 @@
-import { COMPONENT_DOM } from '../support/component.dom';
-import { SERVICES_TREE_DOM, SERVICES_DOM } from '../support/services.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
-import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
-import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
+import { COMPONENT_DOM } from '../../support/component.dom';
+import { SERVICES_TREE_DOM, SERVICES_DOM } from '../../support/services.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
+import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
 import {
   expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
   expectedEndpointsTreeWks0,
-} from '../support/helper.const';
+} from '../../support/helper.const';
 
 describe(`Services`, () => {
   beforeEach(() => {

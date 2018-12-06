@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://localhost:4200",
+  "video": false,
+  "pluginsFile": "./cypress/plugins/index.js",
+  "integrationFolder": "./cypress/integration/no-ldap"
+}

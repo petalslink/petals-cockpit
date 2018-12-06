@@ -4,13 +4,15 @@ const bs = `app-login`;
 export const LOGIN_DOM = {
   inputs: {
     username: `${bs} input[formcontrolname=username]`,
-    hiddenPassword: `${bs} input[formcontrolname=password][type=password]`,
-    shownPassword: `${bs} input[formcontrolname=password][type=text]`,
+    password: `${bs} input[formcontrolname=password]`,
   },
   buttons: {
     submit: `${bs} button`,
   },
   messages: {
+    valid: {
+      setupSucceeded: `${bs} .msg-add-setup-user`,
+    },
     error: {
       loginFailed: `${bs} .form-error`,
     },

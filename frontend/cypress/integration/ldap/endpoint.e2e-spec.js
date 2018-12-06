@@ -1,6 +1,6 @@
-import { ENDPOINT_OVERVIEW_DOM } from '../support/endpoint.dom';
-import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
+import { ENDPOINT_OVERVIEW_DOM } from '../../support/endpoint.dom';
+import { SERVICE_OVERVIEW_DOM } from '../../support/service.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
 
 describe(`Endpoint`, () => {
   beforeEach(() => {

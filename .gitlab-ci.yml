@@ -2,8 +2,8 @@
 # Branch front/* will run test-frontend
 # Branch back/* will run build-backend
 # Branch product/* will run build-backend, build-frontend, package-product
-# Branch full/* will run build-backend, test-frontend, build-frontend, e2e-product, package-product, electron-cypress, chromium-cypress
-# Branch master will run build-backend, test-frontend, build-frontend, build-frontend-pages, package-product-master, pages, e2e-product, electron-cypress, chromium-cypress
+# Branch full/* will run build-backend, test-frontend, build-frontend, e2e-product, package-product, chromium-cypress
+# Branch master will run build-backend, test-frontend, build-frontend, build-frontend-pages, package-product-master, pages, e2e-product, chromium-cypress
 # Other branches will run build-backend, test-frontend, build-frontend, e2e-product, package-product
 # Tags will run build-backend, build-frontend, release-product
 
@@ -120,14 +120,24 @@ test-frontend:
     # e2e
     # tests protractor
     - time yarn run e2e:ci --port 4200 --webdriver-update false
-    # build the frontend
+    # build the frontend ldap mode
     - time yarn run build:ldap:ci
     # serve the frontend
     - nohup http-server --push-state --silent -p 4200 dist &
     # save the PID as we run it in background
     - echo $! > pid-nohup.txt
     - sleep 5
-    - time yarn run cypress:chromium
+    - time yarn cypress:e2e-ldap
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
+    # build the frontend no ldap mode
+    - time yarn run build:no-ldap:ci
+    # serve the frontend
+    - nohup http-server --push-state --silent -p 4200 dist &
+    # save the PID as we run it in background
+    - echo $! > pid-nohup.txt
+    - sleep 5
+    - time yarn cypress:e2e-no-ldap
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
   # Protractor tests are unstable and may fail unexpectedly
@@ -236,30 +246,6 @@ package-product:
       - petals-cockpit-*
   tags:
     - docker
-
-
-#electron tests always fail for now
-#see: https://github.com/cypress-io/cypress/issues/1242
-.electron-cypress:
-  <<: *node-java-yarn
-  stage: integration
-  only:
-    - master
-    - /^full\/.*$/
-  allow_failure: true
-  script:
-    - cd frontend
-    - ng build --prod -c prod-e2e
-    - nohup http-server --push-state --silent -p 4200 dist &
-    - echo $! > pid-nohup.txt
-    - sleep 5
-    - time yarn run cypress:electron
-  after_script:
-    - kill -9 $(cat pid-nohup.txt)
-    - rm pid-nohup.txt
-  tags:
-    - docker
-
 
 chromium-cypress:
   <<: *node-java-yarn

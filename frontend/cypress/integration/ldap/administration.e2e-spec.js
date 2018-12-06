@@ -2,10 +2,10 @@ import {
   ADMINISTRATION_DOM,
   ADD_LDAP_USER_DOM,
   ADD_EDIT_USER_DOM,
-} from '../support/administration.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
-import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
-import { MESSAGE_DOM } from '../support/message.dom';
+} from '../../support/administration.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { MESSAGE_DOM } from '../../support/message.dom';
 
 describe(`Administration`, () => {
   beforeEach(() => {

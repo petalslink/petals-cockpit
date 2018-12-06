@@ -1,12 +1,12 @@
-import { SETUP_DOM } from '../support/setup.dom';
+import { LOGIN_DOM } from '../../support/login.dom';
+import { SETUP_DOM } from '../../support/setup.dom';
 import {
   correctSetupToken,
-  correctSetupUser,
   goneSetupToken,
   badSetupUser,
-} from '../support/helper.const';
+} from '../../support/helper.const';
 
-describe(`Setup Ldap Mode`, () => {
+describe(`Setup`, () => {
   beforeEach(() => {
     cy.visit(`/setup`);
   });
@@ -18,17 +18,6 @@ describe(`Setup Ldap Mode`, () => {
 
     cy.get(SETUP_DOM.inputs.token).expectFocused();
   });
-
-  // TODO: test inconsistently failing
-  // see https://gitlab.com/linagora/petals-cockpit/issues/439
-  // it.only(`shouldn't select the setup input of the setup form on mobile`, () => {
-  //   cy.viewport(412, 732);
-  //   cy.visit(`/setup`);
-
-  //   cy
-  //     .get(SETUP_DOM.inputs.token)
-  //     .then(input => expect(input.hasFocus()).to.eq(false));
-  // });
 
   it(`should pre-fill the token field`, () => {
     cy.visit(`/setup?token=${correctSetupToken}`);
@@ -52,26 +41,23 @@ describe(`Setup Ldap Mode`, () => {
 
     cy
       .get(SETUP_DOM.inputs.username)
-      .type(correctSetupUser)
-      .should('have.value', correctSetupUser);
+      .type('cpaul')
+      .should('have.value', 'cpaul');
 
     cy
       .get(SETUP_DOM.buttons.submit)
       .should('be.enabled')
       .contains('Add')
-      // first click to add ldap user
       .click();
 
     cy.get(SETUP_DOM.messages.error.setupFailed).should('not.be.visible');
 
-    cy
-      .get(SETUP_DOM.buttons.submit)
-      .should('be.enabled')
-      .contains(`User added: click to login!`)
-      // second click to confirm you want to log with the user well added
-      .click();
-
     cy.expectLocationToBe('/login');
+
+    cy
+      .get(LOGIN_DOM.messages.valid.setupSucceeded)
+      .contains('User has been added successfully.')
+      .should('be.visible');
   });
 
   it(`should be gone once it has been setup`, () => {
@@ -136,5 +122,40 @@ describe(`Setup Ldap Mode`, () => {
       .get(SETUP_DOM.inputs.token)
       .clear()
       .should('be.empty');
+  });
+
+  it(`should have a required error when inputs are cleared`, () => {
+    cy
+      .get(SETUP_DOM.formFields.usernameFormField)
+      .find(`mat-error`)
+      .should('not.be.visible');
+    cy
+      .get(SETUP_DOM.formFields.tokenFormField)
+      .find(`mat-error`)
+      .should('not.be.visible');
+
+    cy
+      .get(SETUP_DOM.inputs.token)
+      .type('t')
+      .clear();
+
+    cy
+      .get(SETUP_DOM.formFields.tokenFormField)
+      .find(`mat-error`)
+      .first()
+      .contains('Required!')
+      .should('be.visible');
+
+    cy
+      .get(SETUP_DOM.inputs.username)
+      .type('u')
+      .clear();
+
+    cy
+      .get(SETUP_DOM.formFields.usernameFormField)
+      .find(`mat-error`)
+      .last()
+      .contains('Required!')
+      .should('be.visible');
   });
 });

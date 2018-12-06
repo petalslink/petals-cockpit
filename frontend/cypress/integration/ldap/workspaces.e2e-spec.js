@@ -1,16 +1,16 @@
-import { IMPORT_BUS_DOM } from '../support/import-bus.dom';
-import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
-import { PETALS_DOM, BIP_DOM } from '../support/petals.dom';
-import { MESSAGE_DOM } from '../support/message.dom';
+import { IMPORT_BUS_DOM } from '../../support/import-bus.dom';
+import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { PETALS_DOM, BIP_DOM } from '../../support/petals.dom';
+import { MESSAGE_DOM } from '../../support/message.dom';
 import {
   WORKSPACE_DOM,
   WORKSPACE_OVERVIEW_DOM,
-} from '../support/workspace.dom';
+} from '../../support/workspace.dom';
 import {
   WORKSPACES_LIST_DOM,
   WORKSPACE_DELETION_DIALOG_DOM,
   WORKSPACE_DELETED_DIALOG_DOM,
-} from '../support/workspaces.dom';
+} from '../../support/workspaces.dom';
 
 describe(`Workspaces`, () => {
   beforeEach(() => {
