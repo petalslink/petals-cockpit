@@ -26,7 +26,6 @@ import {
 import { Matcher, textToMatchInElement, waitAndClick } from '../utils';
 import { AdminPage } from './administration.po';
 import { LoginPage } from './login.po';
-import { SetupPage } from './setup.po';
 import { WorkspacePage } from './workspace.po';
 import { WorkspacesPage } from './workspaces.po';
 
@@ -40,15 +39,6 @@ export class PetalsCockpitPage {
 
   goTo(to = '/') {
     return browser.get(to);
-  }
-
-  goToSetup(token?: string): SetupPage {
-    if (!token) {
-      this.goTo('/setup');
-    } else {
-      this.goTo(`/setup?token=${token}`);
-    }
-    return SetupPage.waitAndGet();
   }
 
   goToViaLogin(to = '/'): LoginPage {
