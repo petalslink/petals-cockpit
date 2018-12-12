@@ -3,9 +3,6 @@
 # ------------------------------------
 #              GLOBAL
 # ------------------------------------
-npm-debug.log
-node_modules/
-data-mongodb
 
 # IDEs and editors
 .idea
@@ -54,8 +51,7 @@ e2e/logs/*.log
 
 # e2e
 /frontend/e2e/*.map
-/frontend/cypress/integration/example_spec.js
-/frontend/cypress/support/commands.js
+/frontend/cypress/screenshots
 
 #System Files
 /frontend/.DS_Store

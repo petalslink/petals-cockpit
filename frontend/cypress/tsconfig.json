@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../node_modules",
+    "target": "es6",
+    "module": "commonjs",
+    "types": ["cypress"]
+  },
+  "include": ["integration/**/*.ts", "support/*.ts", "../node_modules/cypress"]
+}

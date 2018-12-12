@@ -9,7 +9,8 @@ const sourceFolders = [
   './src/app',
   './src/styles',
   './src/mocks',
-  './e2e'
+  './e2e',
+  './cypress'
 ];
 
 // individual files
