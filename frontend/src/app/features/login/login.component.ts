@@ -37,9 +37,10 @@ import { getUsers } from '@shared/state/users.selectors';
 export class LoginComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  loginForm: FormGroup;
   users$: Observable<IUsersTable>;
+
   matcher = new FormErrorStateMatcher();
+  loginForm: FormGroup;
   show: boolean;
 
   constructor(
@@ -63,9 +64,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         tap(users => {
           if (users.isConnecting || users.connectedUser) {
             this.loginForm.disable();
-            this.loginForm.disable();
           } else {
-            this.loginForm.enable();
             this.loginForm.enable();
           }
         })

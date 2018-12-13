@@ -35,6 +35,4 @@ export const correctSetupToken = 'CORRECT_SETUP_TOKEN';
 
 export const goneSetupToken = 'GONE_SETUP_TOKEN';
 
-export const correctSetupUser = 'CORRECT_SETUP_USER';
-
 export const badSetupUser = 'BAD_SETUP_USER';

@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div fxLayout="column" fxLayoutAlign="center center">
         <div mat-card-image class="logo-petals"></div>
         <h1>Sign In</h1>
+        <h3 *ngIf="users.validSetupUser" class="msg-add-setup-user">{{ users.validSetupUser }}</h3>
       </div>
   
       <div fxFlex class="margin-top-x1">
@@ -37,11 +38,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <input matInput [type]="show ? 'text' : 'password'" formControlName="password" [errorStateMatcher]="matcher" required >
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
           <span matSuffix>
-            <mat-icon 
+            <mat-icon
               *ngIf="!(users.isConnecting || users.connectedUser)"
               class="icon-x1 cursor-pointer icon-toggle-pwd" 
               (click)="togglePassword()" 
               [color]="show ? 'primary' : ''"
+              matTooltip="Toggle Visibility"
             >
               <fa-icon [icon]="show ? 'eye' : 'eye-slash'"></fa-icon>
             </mat-icon>

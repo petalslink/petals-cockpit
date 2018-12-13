@@ -14,6 +14,7 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
+// LDAP
 import './component.commands';
 import './helper.commands';
 import './import-bus.commands';
@@ -28,6 +29,9 @@ import './services.commands';
 import './workspace.commands';
 import './workspaces.commands';
 import './administration.commands';
+
+// NO LDAP
+import './setup-no-ldap.commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

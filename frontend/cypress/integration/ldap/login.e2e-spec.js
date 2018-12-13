@@ -1,4 +1,4 @@
-import { LOGIN_DOM } from '../support/login.dom';
+import { LOGIN_DOM } from '../../support/login.dom';
 
 describe(`Login`, () => {
   beforeEach(() => {
@@ -48,6 +48,7 @@ describe(`Login`, () => {
       .get(LOGIN_DOM.formFields.usernameFormField)
       .find(`mat-error`)
       .should('not.be.visible');
+
     cy
       .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`mat-error`)
@@ -61,17 +62,17 @@ describe(`Login`, () => {
     cy
       .get(LOGIN_DOM.formFields.usernameFormField)
       .find(`mat-error`)
-      .first()
+      .last()
       .contains('Required!')
       .should('be.visible');
 
     cy
-      .get(LOGIN_DOM.inputs.hiddenPassword)
+      .get(LOGIN_DOM.inputs.password)
       .type('p')
       .clear();
 
     cy
-      .get(LOGIN_DOM.formFields.usernameFormField)
+      .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`mat-error`)
       .last()
       .contains('Required!')
@@ -79,18 +80,19 @@ describe(`Login`, () => {
   });
 
   it(`should toggle icon visibility of password and show pwd text in clear`, () => {
-    cy.get(LOGIN_DOM.inputs.shownPassword).should('not.be.visible');
-
     cy
-      .get(LOGIN_DOM.inputs.hiddenPassword)
+      .get(LOGIN_DOM.inputs.password)
       .should('be.empty')
       .and('be.visible')
+      .and('not.have.attr', 'type', 'text')
+      .and('have.attr', 'type', 'password')
       .type('test');
 
     cy
       .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`fa-icon svg[data-icon=eye-slash]`)
       .should('be.visible');
+
     cy
       .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`fa-icon svg[data-icon=eye]`)
@@ -102,25 +104,17 @@ describe(`Login`, () => {
       .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`fa-icon svg[data-icon=eye-slash]`)
       .should('not.be.visible');
+
     cy
       .get(LOGIN_DOM.formFields.pwdFormField)
       .find(`fa-icon svg[data-icon=eye]`)
       .should('be.visible');
 
-    cy.get(LOGIN_DOM.inputs.hiddenPassword).should('not.be.visible');
-
     cy
-      .get(LOGIN_DOM.inputs.shownPassword)
-      .should('have.value', 'test')
+      .get(LOGIN_DOM.inputs.password)
+      .should('not.have.attr', 'type', 'password')
+      .and('have.attr', 'type', 'text')
+      .and('have.value', 'test')
       .and('be.visible');
   });
-
-  // TODO: test inconsistently failing
-  // see https://gitlab.com/linagora/petals-cockpit/issues/439
-  // it(`shouldn't select the first input of the login form on mobile`, () => {
-  //   cy.viewport(412, 732);
-  //   cy.visit(`/login`);
-
-  //   cy.document().then(document => expect(document.hasFocus()).to.eq(false));
-  // });
 });

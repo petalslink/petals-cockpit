@@ -1,6 +1,6 @@
-import { SERVICE_OVERVIEW_DOM } from '../support/service.dom';
-import { INTERFACE_OVERVIEW_DOM } from '../support/interface.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
+import { SERVICE_OVERVIEW_DOM } from '../../support/service.dom';
+import { INTERFACE_OVERVIEW_DOM } from '../../support/interface.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
 
 describe(`Service`, () => {
   beforeEach(() => {

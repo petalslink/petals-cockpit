@@ -52,6 +52,10 @@ interface IUsersCommon {
   isFetchingLdapUsers: boolean;
 
   ldapSearchList: IUserLDAP[];
+
+  isSettingUp: boolean;
+  errorSetupUser: string;
+  validSetupUser: string;
 }
 
 export interface IUsersTable extends IUsersCommon, JsTable<IUserRow> {}
@@ -76,6 +80,9 @@ export function usersTableFactory(): IUsersTable {
     isConnecting: false,
     isDisconnecting: false,
     connectionFailed: false,
+    isSettingUp: false,
+    errorSetupUser: '',
+    validSetupUser: '',
 
     isFetchingUsers: false,
     isFetchingLdapUsers: false,

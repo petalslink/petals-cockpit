@@ -22,7 +22,6 @@ import { environment } from '@env/environment';
 import {
   BAD_SETUP_USER,
   CORRECT_SETUP_TOKEN,
-  CORRECT_SETUP_USER,
   GONE_SETUP_TOKEN,
 } from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
@@ -78,27 +77,19 @@ export class UsersServiceMock extends UsersService {
   }
 
   setupUser(value: IUserSetup) {
-    if (
-      environment.mock.ldapMode &&
-      value.token === CORRECT_SETUP_TOKEN &&
-      value.username === CORRECT_SETUP_USER
-    ) {
-      return helper.response(204);
-    }
-
-    if (!environment.mock.ldapMode && value.token === CORRECT_SETUP_TOKEN) {
-      return helper.response(204);
-    }
-
     if (value.token === GONE_SETUP_TOKEN) {
       return helper.errorBackend('Petals Cockpit is already setup', 404);
     }
 
-    if (environment.mock.ldapMode && value.username === BAD_SETUP_USER) {
+    if (value.token !== CORRECT_SETUP_TOKEN) {
+      return helper.errorBackend('Invalid token', 403);
+    }
+
+    if (value.username === BAD_SETUP_USER) {
       return helper.errorBackend('Conflict', 409);
     }
 
-    return helper.errorBackend('Invalid token', 403);
+    return helper.response(204);
   }
 
   private responseAdmin<T>(res: Observable<T>) {

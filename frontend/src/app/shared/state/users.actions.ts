@@ -23,6 +23,7 @@ import {
   IUserBackend,
   IUserLogin,
   IUserNew,
+  IUserSetup,
 } from '@shared/services/users.service';
 import { IUserLDAP } from '@shared/state/users.interface';
 
@@ -187,5 +188,25 @@ export namespace Users {
   export class Disconnected implements Action {
     readonly type = DisconnectedType;
     constructor() {}
+  }
+
+  export const SetupType = '[Users] Setup';
+  export class Setup implements Action {
+    readonly type = SetupType;
+    constructor(public readonly payload: { value: IUserSetup }) {}
+  }
+
+  export const SetupErrorType = '[Users] Setup error';
+  export class SetupError implements Action {
+    readonly type = SetupErrorType;
+    constructor(public readonly payload: { errorSetupUser: string }) {}
+  }
+
+  export const SetupSuccessType = '[Users] Setup success';
+  export class SetupSuccess implements Action {
+    readonly type = SetupSuccessType;
+    constructor(
+      public readonly payload: { value: IUserSetup; validSetupUser: string }
+    ) {}
   }
 }

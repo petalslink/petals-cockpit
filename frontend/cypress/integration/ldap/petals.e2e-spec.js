@@ -1,8 +1,8 @@
-import { PETALS_DOM, PETALS_TREE_DOM, BIP_DOM } from '../support/petals.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
-import { MESSAGE_DOM } from '../support/message.dom';
-import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
-import { WORKSPACES_LIST_DOM } from '../support/workspaces.dom';
+import { PETALS_DOM, PETALS_TREE_DOM, BIP_DOM } from '../../support/petals.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import { MESSAGE_DOM } from '../../support/message.dom';
+import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
 
 describe(`Petals`, () => {
   const expectedTreeNames = [

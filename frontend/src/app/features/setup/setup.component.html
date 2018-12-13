@@ -13,56 +13,99 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card *ngIf="(isLdapStatus$ | async) as status; else loadingSetup">
-  <h3 class="color-primary">Add your first administrator</h3>
-  <form [formGroup]="setupForm" (ngSubmit)="onSubmit(setupForm)" fxLayout="column" autocomplete="off">
+<mat-card *ngIf="(isLdapStatus$ | async) as status" class="mat-typography mat-elevation-z8">
+  <form [formGroup]="setupForm" (ngSubmit)="onSubmit(setupForm.value)" *ngIf="users$ | async as users">
 
-    <mat-form-field class="margin-top-x1">
-      <input matInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" placeholder="Token" formControlName="token" required>
-    </mat-form-field>
+    <div fxLayout="column">
+      <div fxLayout="column" fxLayoutAlign="center center">
+        <div mat-card-image class="logo-petals"></div>
+        <h1>Setup</h1>
+        <h3>Add your administrator</h3>
+      </div>
+  
+      <div fxFlex class="margin-top-x1">
+        <mat-form-field appearance="outline" fxFill class="token-form-field">
+          <mat-label>Token</mat-label>
+          <input matInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" formControlName="token" [errorStateMatcher]="matcher" required>
+          <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="ticket-alt"></fa-icon></mat-icon></span>
+          <mat-error>Required!</mat-error>
+        </mat-form-field>
+      </div>
+      
+      <div fxFlex>
+        <mat-form-field appearance="outline" fxFill class="username-form-field">
+          <mat-label>Username</mat-label>
+          <input matInput [appFocusInputIfLargeScreen]="focusUsernameInput" type="text" formControlName="username" [errorStateMatcher]="matcher" required>
+          <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="user-astronaut"></fa-icon></mat-icon></span>
+          <mat-error>Required!</mat-error>
+        </mat-form-field>
+      </div>
+      
+      <div fxFlex *ngIf="!status.isLdapMode">
+        <mat-form-field appearance="outline" fxFill class="pwd-form-field">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="show ? 'text' : 'password'" formControlName="password" [errorStateMatcher]="matcher" required >
+          <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
+          <span matSuffix>
+            <mat-icon 
+              *ngIf="!users.isSettingUp"
+              class="icon-x1 cursor-pointer icon-toggle-pwd" 
+              (click)="togglePassword()" 
+              [color]="show ? 'primary' : ''"
+              matTooltip="Toggle Visibility"
+            >
+              <fa-icon [icon]="show ? 'eye' : 'eye-slash'"></fa-icon>
+            </mat-icon>
+          </span>
+          <mat-error>Required!</mat-error>
+        </mat-form-field>
+      </div>
 
-    <mat-form-field class="margin-top-x1">
-      <input 
-        matInput 
-        [appFocusInputIfLargeScreen]="focusUsernameInput" 
-        type="text" 
-        placeholder="Username" 
-        formControlName="username"
-        required
+      <div fxFlex *ngIf="!status.isLdapMode">
+        <mat-form-field appearance="outline" fxFill class="name-form-field">
+          <mat-label>Name</mat-label>
+          <input matInput type="text" formControlName="name" [errorStateMatcher]="matcher" required>
+          <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="id-badge"></fa-icon></mat-icon></span>
+          <mat-error>Required!</mat-error>
+        </mat-form-field>
+      </div>
+  
+      <div
+        *ngIf="users.errorSetupUser"
+        fxLayout="row" 
+        fxFlex="100%" 
+        fxLayoutAlign="start center" 
+        class="form-error margin-bottom-x2"
       >
-    </mat-form-field>
-
-    <mat-form-field class="margin-top-x1" *ngIf="!status.isLdapMode">
-      <input matInput type="password" placeholder="Password" formControlName="password" required>
-    </mat-form-field>
-
-    <mat-form-field class="margin-top-x1" *ngIf="!status.isLdapMode">
-      <input matInput type="text" placeholder="Name" formControlName="name" required>
-    </mat-form-field>
-
-    <div fxLayout="row" fxFlex="100%" fxLayoutAlign="start center" class="form-error" *ngIf="setupFailed">
-      <mat-icon color="warn">error</mat-icon>
-      <p>{{ setupFailed }}</p>
+        <mat-icon color="warn">error</mat-icon>
+        <span>{{ users.errorSetupUser }}</span>
+      </div>
+      
+      <div fxLayout="column" fxLayoutAlign="center end">
+        <button
+          mat-raised-button 
+          color="primary"
+          [disabled]="setupForm.invalid || users.isSettingUp"
+        >
+          <span fxLayout="row" fxLayoutAlign="center center">
+            <mat-icon fxLayoutAlign="center end" class="icon-x2 margin-right-x1"><fa-icon icon="plus-circle"></fa-icon></mat-icon>
+            <span
+              *ngIf="users.isSettingUp; else setupTxtTpl"
+              class="text-upper"
+              fxLayout="row"
+              fxLayoutAlign="center center"
+            >
+              Adding
+              <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
+            </span>
+  
+            <ng-template #setupTxtTpl>
+              <span class="text-upper">Add</span>
+            </ng-template>
+          </span>
+        </button>
+      </div>
     </div>
 
-    <button mat-raised-button color="primary" class="margin-top-x1" [disabled]="setupForm.invalid || settingUp">
-      <span *ngIf="!settingUp && !setupSucceeded">
-        Add
-      </span>
-
-      <span *ngIf="settingUp" fxLayout="row" fxLayoutAlign="center center">
-        Adding <mat-spinner [diameter]="16" [strokeWidth]="1"></mat-spinner>
-      </span>
-
-      <span *ngIf="setupSucceeded" fxLayout="row" fxLayoutAlign="center center">
-        User added: click to login!
-      </span>
-    </button>
   </form>
 </mat-card>
-
-<ng-template #loadingSetup>
-  <div fxLayout="column" fxLayoutAlign="center center" >
-    <mat-spinner [diameter]="64" [strokeWidth]="4" color="accent"></mat-spinner>
-  </div>
-</ng-template>

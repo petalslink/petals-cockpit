@@ -1,6 +1,6 @@
-import { PETALS_COCKPIT_DOM } from '../support/petals-cockpit.dom';
-import { WORKSPACE_DOM } from '../support/workspace.dom';
-import { MESSAGE_DOM } from '../support/message.dom';
+import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import { MESSAGE_DOM } from '../../support/message.dom';
 
 describe(`Workspace`, () => {
   beforeEach(() => {

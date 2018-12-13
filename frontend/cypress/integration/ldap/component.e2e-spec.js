@@ -1,8 +1,8 @@
 import {
   COMPONENT_OV_SL_DOM,
   COMPONENT_UPLOAD_DOM,
-} from '../support/component.dom';
-import { SL_UPLOAD_DOM } from '../support/component.dom';
+} from '../../support/component.dom';
+import { SL_UPLOAD_DOM } from '../../support/component.dom';
 
 describe('Override shared libraries', () => {
   const sharedLibrariesInitial = [
