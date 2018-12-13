@@ -126,7 +126,7 @@
     "lodash": "4.17.4",
     "prettier": "1.11.1",
     "protractor": "5.3.2",
-    "ts-node": "6.0.3",
+    "ts-node": "6.1.2",
     "tslint": "5.10.0",
     "tslint-config-prettier": "1.13.0",
     "tslint-language-service": "0.9.9",
