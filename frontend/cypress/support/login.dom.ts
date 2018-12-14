@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2018 Linagora
+ * Copyright (C) 2018 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,25 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+// base selector
+const bs = `app-login`;
 
-import { CoreModule } from './core/core.module';
-import { SharedModule } from './shared/shared.module';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    CoreModule.forRoot(),
-    SharedModule.forRoot(),
-    AppRoutingModule,
-  ],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
+export const LOGIN_DOM = {
+  inputs: {
+    username: `${bs} input[formcontrolname=username]`,
+    password: `${bs} input[formcontrolname=password]`,
+  },
+  buttons: {
+    submit: `${bs} button`,
+  },
+  messages: {
+    valid: {
+      setupSucceeded: `${bs} .msg-add-setup-user`,
+    },
+    error: {
+      loginFailed: `${bs} .form-error`,
+    },
+  },
+  icons: {
+    togglePwd: `${bs} .icon-toggle-pwd`,
+  },
+  formFields: {
+    usernameFormField: `${bs} .username-form-field`,
+    pwdFormField: `${bs} .pwd-form-field`,
+  },
+};

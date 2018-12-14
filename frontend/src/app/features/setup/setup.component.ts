@@ -44,7 +44,7 @@ export class SetupComponent implements OnInit, OnDestroy {
   users$: Observable<IUsersTable>;
 
   focusUsernameInput = false;
-  focusTokenInput = false;
+  focusTokenInput = true;
 
   matcher = new FormErrorStateMatcher();
   setupForm: FormGroup;

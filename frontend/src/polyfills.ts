@@ -58,6 +58,15 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  */
 
 /**
+ * Required to support new versions of Angular Material.
+ * It seems to be caused by missing dependency 'Could not find HammerJS'
+ * which didn't cause major problems before but probably results in errors
+ * with new versions of Angular Material.
+ * https://stackoverflow.com/questions/41322566/angular-2-could-not-find-hammerjs
+ **/
+import 'hammerjs';
+
+/**
  * Date, currency, decimal and percent pipes.
  * Needed for: All but Chrome, Firefox, Edge, IE11 and Safari 10
  */
@@ -66,7 +75,3 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  * Need to import at least one locale-data with intl.
  */
 // import 'intl/locale-data/jsonp/en';
-
-// Required to remove error message: global is not defined
-// See https://stackoverflow.com/questions/50371593/angular-6-uncaught-referenceerror-buffer-is-not-defined/50377270#50377270
-(window as any).global = window;

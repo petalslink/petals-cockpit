@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2018 Linagora
+ * Copyright (C) 2018 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,25 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { SETUP_DOM } from './setup.dom';
 
-import { CoreModule } from './core/core.module';
-import { SharedModule } from './shared/shared.module';
+Cypress.Commands.add('setupUserAndExpectToFail', (username, msgError) => {
+  cy.get(SETUP_DOM.inputs.username).type(username);
+  cy.get(SETUP_DOM.buttons.submit).click();
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+  cy
+    .get(SETUP_DOM.messages.error.setupFailed)
+    .contains(msgError)
+    .should('be.visible');
 
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    CoreModule.forRoot(),
-    SharedModule.forRoot(),
-    AppRoutingModule,
-  ],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
+  cy.location().should(location => {
+    expect(location.pathname).not.to.eq('/login');
+  });
+});
