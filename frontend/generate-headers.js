@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 
-const currentYear = '2018';
+const currentYear = '2019';
 
 // folders
 const sourceFolders = [
@@ -17,6 +17,12 @@ const sourceFolders = [
 const sourceFiles = {
   ts: [
     './src/main.ts'
+  ],
+
+  js: [
+    './protractor.conf.js',
+    './gulpfile.js',
+    './src/karma.conf.js'
   ],
 
   scss: [
@@ -52,7 +58,8 @@ headers.ts =
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */`;
 
-// for now, ts and scss files will have the same header
+// for now, ts, js and scss files will have the same header
+headers.js = headers.ts;
 headers.scss = headers.ts;
 
 headers.html =
@@ -89,7 +96,7 @@ process.argv.forEach(arg => {
 const generateFileTree = (dir, filelist) => {
   let files = fs.readdirSync(dir);
 
-  filelist = filelist || {ts: [], scss: [], html: []};
+  filelist = filelist || {ts: [], js: [], scss: [], html: []};
 
   files.forEach((file) => {
     if (fs.statSync(path.join(dir, file)).isDirectory()) {
@@ -99,6 +106,10 @@ const generateFileTree = (dir, filelist) => {
     else {
       if (file.endsWith('.ts')) {
         filelist.ts.push(path.join(dir, file));
+      }
+
+      else if (file.endsWith('.js')) {
+        filelist.js.push(path.join(dir, file));
       }
 
       else if (file.endsWith('.scss')) {
