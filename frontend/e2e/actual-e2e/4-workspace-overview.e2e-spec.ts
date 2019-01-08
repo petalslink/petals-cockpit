@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, browser, ExpectedConditions as EC, Key } from 'protractor';
+import { $, Key } from 'protractor';
 
-import { page, waitTimeout } from './../common';
+import { page } from './../common';
 import { WorkspaceOverviewPage } from './../pages/workspace.po';
 import { waitAndClick } from './../utils';
 
@@ -217,7 +217,10 @@ describe(`Workspace Overview`, () => {
       workspace.usersAutocompleteInput.sendKeys('o');
       expect(workspace.getUsersAutocomplete()).toEqual(['mrobert', 'vnoel']);
       expect(workspace.btnAddUserToWks.isEnabled()).toBe(false);
-      workspace.usersAutocompleteInput.sendKeys(Key.BACK_SPACE, 'vnoe');
+      workspace.usersAutocompleteInput.sendKeys(
+        Key.BACK_SPACE.toString(),
+        'vnoe'
+      );
       expect(workspace.getUsersAutocomplete()).toEqual(['vnoel']);
       expect(workspace.btnAddUserToWks.isEnabled()).toBe(false);
       workspace.usersAutocompleteInput.sendKeys('l');
