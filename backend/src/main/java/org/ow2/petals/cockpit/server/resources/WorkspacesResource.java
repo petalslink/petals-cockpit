@@ -38,6 +38,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
@@ -70,7 +71,8 @@ public class WorkspacesResource {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord wsDb = new WorkspacesRecord();
             wsDb.setName(ws.name);
-            wsDb.setDescription("Put some description in **markdown** for the workspace here.");
+            wsDb.setDescription(ws.description != null && !ws.description.isEmpty() ? ws.description
+                    : "Put some description in **markdown** for the workspace here.");
             wsDb.attach(conf);
             wsDb.insert();
 
@@ -114,8 +116,14 @@ public class WorkspacesResource {
         @JsonProperty
         public final String name;
 
-        public NewWorkspace(@JsonProperty("name") String name) {
+        @Nullable
+        @JsonProperty
+        public final String description;
+
+        public NewWorkspace(@JsonProperty("name") String name,
+                @Nullable @JsonProperty("description") String description) {
             this.name = name;
+            this.description = description;
         }
     }
 
