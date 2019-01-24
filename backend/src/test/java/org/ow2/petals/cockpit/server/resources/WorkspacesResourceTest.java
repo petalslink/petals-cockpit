@@ -38,7 +38,7 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
     @Test
     public void createWorkspace() {
-        NewWorkspace newWs = new NewWorkspace("test");
+        NewWorkspace newWs = new NewWorkspace("test", null);
         Workspace post = resource.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
 
         assertThat(post.id).isGreaterThan(0);
@@ -48,6 +48,23 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
         assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
                 .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name).column(WORKSPACES.DESCRIPTION.getName())
                 .value().isEqualTo("Put some description in **markdown** for the workspace here.");
+
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
+                .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
+    }
+
+    @Test
+    public void createWorkspaceWithDescription() {
+        NewWorkspace newWs = new NewWorkspace("test", "This is a test workspace");
+        Workspace post = resource.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
+
+        assertThat(post.id).isGreaterThan(0);
+        assertThat(post.name).isEqualTo(newWs.name);
+
+        // there should be only one!
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name).column(WORKSPACES.DESCRIPTION.getName())
+                .value().isEqualTo("This is a test workspace");
 
         assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
                 .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
