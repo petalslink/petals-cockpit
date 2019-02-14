@@ -264,7 +264,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     protected void setupWorkspace(long wsId, String wsName, List<Tuple2<Domain, String>> data, String... users) {
         resource.db().transaction(conf -> {
 
-            DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, ""));
+            DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, "", ""));
 
             for (String user : users) {
                 DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsId, user));
@@ -282,7 +282,6 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 busDb.insert();
 
                 resource.new TestWorkspaceDbOperations().saveDomainToDatabase(conf, busDb, bus, WorkspaceDbWitness.NOP);
-
 
                 final String regexAny = ".*";
                 for (Container c : containers) {
@@ -346,9 +345,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected void expectEventAmongNext(int eventsNumber, @Nullable String expectedName, int timeout,
-            boolean failOnTimeout,
-            EventInput eventInput,
-            BiConsumer<InboundEvent, SoftAssertions> c) {
+            boolean failOnTimeout, EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> future = executor.submit(() -> {
@@ -419,7 +416,6 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         });
 
     }
-
 
     protected SharedLibraryFull assertSLContent(WorkspaceContent content, Container cont, String slName,
             String slVersion) {
@@ -625,18 +621,16 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     protected FormDataMultiPart getMultiPartFakeZip(String zipFilename) throws Exception {
         File file = new File(zipFolder.newFolder(), zipFilename + ".zip");
         file.createNewFile();
-        return (FormDataMultiPart) new FormDataMultiPart()
-                .bodyPart(new FileDataBodyPart("file", file));
+        return (FormDataMultiPart) new FormDataMultiPart().bodyPart(new FileDataBodyPart("file", file));
     }
 
     @SuppressWarnings({ "resource" })
     protected FormDataMultiPart getMultiPartEmptyZip(String zipFilename) throws Exception {
         File zip = new File(zipFolder.newFolder(), zipFilename + ".zip");
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zip))) {
-                zos.closeEntry();
+            zos.closeEntry();
         }
-        return (FormDataMultiPart) new FormDataMultiPart()
-                .bodyPart(new FileDataBodyPart("file", zip));
+        return (FormDataMultiPart) new FormDataMultiPart().bodyPart(new FileDataBodyPart("file", zip));
     }
 
     @SuppressWarnings({ "resource" })

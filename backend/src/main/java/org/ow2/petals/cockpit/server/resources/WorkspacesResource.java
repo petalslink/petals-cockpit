@@ -36,6 +36,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -57,6 +58,12 @@ import com.google.common.collect.ImmutableMap;
 @Path("/workspaces")
 public class WorkspacesResource {
 
+    public static final String DEFAULT_SHORT_DESCRIPTION = "No description provided.";
+
+    public static final String DEFAULT_DESCRIPTION = "Put some description in **markdown** for the workspace here.";
+
+    public static final int SHORT_DESCRIPTION_MAX_LENGTH = 200;
+
     private final Configuration jooq;
 
     @Inject
@@ -67,18 +74,25 @@ public class WorkspacesResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Workspace create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
+    public WorkspaceMin create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord wsDb = new WorkspacesRecord();
             wsDb.setName(ws.name);
-            wsDb.setDescription(ws.description != null && !ws.description.isEmpty() ? ws.description
-                    : "Put some description in **markdown** for the workspace here.");
+            wsDb.setDescription(ws.description != null ? ws.description : DEFAULT_DESCRIPTION);
+            if (ws.shortDescription == null) {
+                wsDb.setShortDescription(DEFAULT_SHORT_DESCRIPTION);
+            } else if (ws.shortDescription != null && ws.shortDescription.length() > SHORT_DESCRIPTION_MAX_LENGTH) {
+                    throw new WebApplicationException("Unprocessable entity: shortDescription must have less than "
+                            + SHORT_DESCRIPTION_MAX_LENGTH + " characters.", 422);
+            } else {
+                wsDb.setShortDescription(ws.shortDescription);
+            }
             wsDb.attach(conf);
             wsDb.insert();
 
             DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), profile.getId()));
 
-            return new Workspace(wsDb.getId(), wsDb.getName(), ImmutableList.of(profile.getId()));
+            return new WorkspaceMin(wsDb.getId(), wsDb.getName());
         });
     }
 
@@ -103,7 +117,8 @@ public class WorkspacesResource {
                     users.put(u.getUsername(), new UserMin(u));
                 }
 
-                wss.put(String.valueOf(w.getId()), new Workspace(w.getId(), w.getName(), wsUsers.build()));
+                wss.put(String.valueOf(w.getId()), new Workspace(w.getId(), w.getName(), w.getShortDescription(),
+                        wsUsers.build()));
             }
 
             return new WorkspacesContent(wss.build(), users);
@@ -118,12 +133,18 @@ public class WorkspacesResource {
 
         @Nullable
         @JsonProperty
+        public final String shortDescription;
+
+        @Nullable
+        @JsonProperty
         public final String description;
 
         public NewWorkspace(@JsonProperty("name") String name,
+                @Nullable @JsonProperty("shortDescription") String shortDescription,
                 @Nullable @JsonProperty("description") String description) {
             this.name = name;
             this.description = description;
+            this.shortDescription = shortDescription;
         }
     }
 
@@ -150,12 +171,18 @@ public class WorkspacesResource {
 
     public static class Workspace extends WorkspaceMin {
 
+        @NotNull
+        @JsonProperty
+        public final String shortDescription;
+
         @JsonProperty
         public final ImmutableList<String> users;
 
         public Workspace(@JsonProperty("id") long id, @JsonProperty("name") String name,
+                @JsonProperty("shortDescription") String shortDescription,
                 @JsonProperty("users") List<String> users) {
             super(id, name);
+            this.shortDescription = shortDescription;
             this.users = ImmutableList.copyOf(users);
         }
     }

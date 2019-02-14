@@ -166,6 +166,15 @@ public class WorkspaceResource {
                 ws.setName(update.name);
             }
 
+            if (update.shortDescription != null) {
+                if (update.shortDescription.length() > WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH) {
+                    throw new WebApplicationException("Unprocessable entity: shortDescription must have less than "
+                            + WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH + " characters.", 422);
+                } else {
+                    ws.setShortDescription(update.shortDescription);
+                }
+            }
+
             if (update.description != null) {
                 ws.setDescription(update.description);
             }
@@ -492,7 +501,7 @@ public class WorkspaceResource {
             LOG.debug("Returning 422 Unprocessable JBI entity because of :", e);
             return new WebApplicationException("Unprocessable JBI entity", e, 422);
         }
-            return e;
+        return e;
     }
 
     private WebApplicationException filterZipError(ZipError e) {
@@ -554,7 +563,8 @@ public class WorkspaceResource {
             this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
-            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
+            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(), ws.getDescription(),
+                    wsUsernames);
         }
 
         @JsonCreator
@@ -574,11 +584,17 @@ public class WorkspaceResource {
 
         @Nullable
         @JsonProperty
+        private final String shortDescription;
+
+        @Nullable
+        @JsonProperty
         private final String description;
 
         public WorkspaceUpdate(@Nullable @JsonProperty("name") String name,
+                @Nullable @JsonProperty("shortDescription") String shortDescription,
                 @Nullable @JsonProperty("description") String description) {
             this.name = name;
+            this.shortDescription = shortDescription;
             this.description = description;
         }
     }
@@ -586,11 +602,13 @@ public class WorkspaceResource {
     public static class WorkspaceOverview extends Workspace {
 
         @NotNull
+        @JsonProperty
         public final String description;
 
         public WorkspaceOverview(@JsonProperty("id") long id, @JsonProperty("name") String name,
-                @JsonProperty("users") List<String> users, @JsonProperty("description") String description) {
-            super(id, name, users);
+                @JsonProperty("shortDescription") String shortDescription,
+                @JsonProperty("description") String description, @JsonProperty("users") List<String> users) {
+            super(id, name, shortDescription, users);
             this.description = description;
         }
     }
@@ -851,7 +869,8 @@ public class WorkspaceResource {
         public final WorkspaceContent content;
 
         @JsonCreator
-        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason, @JsonProperty("content") WorkspaceContent content) {
+        public BusDeleted(@JsonProperty("id") long id, @JsonProperty("reason") String reason,
+                @JsonProperty("content") WorkspaceContent content) {
             this.id = id;
             this.reason = reason;
             this.content = content;
@@ -881,7 +900,8 @@ public class WorkspaceResource {
             this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
             List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
                     .collect(ImmutableList.toImmutableList());
-            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), wsUsernames, ws.getDescription());
+            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(), ws.getDescription(),
+                    wsUsernames);
             this.content = content;
         }
 
@@ -889,10 +909,10 @@ public class WorkspaceResource {
         private WorkspaceFullContent() {
             // jackson will inject values itself (because of @JsonUnwrapped)
             users = ImmutableMap.of();
-            content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
+            content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
-                    ImmutableMap.of(), ImmutableMap.of());
-            workspace = new WorkspaceOverview(0, "", ImmutableList.of(), "");
+                    ImmutableMap.of());
+            workspace = new WorkspaceOverview(0, "", "", "", ImmutableList.of());
         }
     }
 
