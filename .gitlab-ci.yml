@@ -45,8 +45,7 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
-    # webdriver updates frozen to 2.41, see: https://gitlab.com/linagora/petals-cockpit/issues/469
-    - yarn run webdriver-manager update --versions.chrome=2.41
+    - yarn run webdriver-manager update --versions.chrome=2.45
     - du -hs node_modules || true
     - cd ..
   cache:
