@@ -15,26 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@mixin custom-modal-workspaces-theme($theme) {
+@mixin custom-workspaces-theme($theme) {
   $primary: map-get($theme, primary);
 
-  .workspaces-item {
-    .icon-wks {
-      background: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(mat-color($primary, 900)),
-        to(mat-color($primary, 300))
-      );
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+  mat-card.workspaces {
+    .workspaces-wrapper {
+      .workspaces-list {
+        div > .info-wks,
+        div > .info-create-wks {
+          color: mat-color($mat-grey, 700);
+        }
+        .spinner-animation > .spinner {
+          border-top-color: mat-color($primary, 800);
+        }
+        .icon-wks-wrapper {
+          color: mat-color($mat-grey, 500);
+        }
+      }
     }
-    div > div > .workspace-short-description {
-      color: mat-color($mat-grey, 700);
-    }
-    div > div > .badge-users > .icon-users {
-      color: mat-color($mat-grey, 700);
+    .home-wrapper {
+      // linear gradient is the same for all themes but it must be added in the class of the theme
+      // the primary color is default background color
+      background: linear-gradient(135deg, transparent, rgba(0, 0, 0, 0.45) 85%),
+        mat-color($primary, 800);
+      color: mat-color($primary, default-contrast);
     }
   }
 }

@@ -26,6 +26,7 @@ export interface IWorkspaceUI {
   // from UI
   isRemoving: boolean;
   isFetchingDetails: boolean;
+  isSettingShortDescription: boolean;
   isSettingDescription: boolean;
   isAddingUserToWorkspace: boolean;
 }
@@ -36,6 +37,8 @@ export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackendDetails {}
 // used in generated views
 export interface IWorkspace extends IWorkspaceBackendCommon {
   users: IUser[];
+  shortDescription: string;
+  description: string;
 }
 
 export function workspaceRowFactory(): IWorkspaceRow {
@@ -43,10 +46,12 @@ export function workspaceRowFactory(): IWorkspaceRow {
     id: null,
     name: null,
 
+    shortDescription: undefined,
     description: undefined,
 
     isRemoving: false,
     isFetchingDetails: false,
+    isSettingShortDescription: false,
     isSettingDescription: false,
     isAddingUserToWorkspace: false,
 
@@ -60,7 +65,7 @@ export interface IWorkspacesCommon {
   // for all users of the workspace that was deleted
   isSelectedWorkspaceDeleted: boolean;
 
-  // for workspaces dialog
+  // for workspaces
   isAddingWorkspace: boolean;
   isFetchingWorkspaces: boolean;
 

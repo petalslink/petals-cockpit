@@ -23,7 +23,7 @@ import {
   getButtonByClass,
   getElementBySelector,
   getInputByName,
-} from 'testing';
+} from '@testing/index';
 import { UploadComponent } from './upload.component';
 
 describe(`[Integration test] UploadComponent`, () => {

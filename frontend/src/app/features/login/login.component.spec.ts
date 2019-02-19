@@ -32,7 +32,7 @@ import {
   getElementBySelector,
   getInputByName,
   setInputValue,
-} from 'testing';
+} from '@testing/index';
 import { LoginComponent } from './login.component';
 
 describe(`Login component`, () => {

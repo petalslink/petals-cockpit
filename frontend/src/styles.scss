@@ -32,17 +32,27 @@
 
 @import './styles/shared/shared.scss-theme';
 @import './styles/shared/utils.scss-theme';
+@import 'app/features/cockpit/cockpit.component.scss-theme';
+@import 'app/features/cockpit/sidebar/sidebar.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace/workspace.component.scss-theme';
+@import 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace-element/workspace-element.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component.scss-theme';
+@import 'app/features/cockpit/workspaces/workspaces.component.scss-theme';
+@import 'app/shared/components/generate-icon/generate-icon.component.scss-theme';
 @import 'app/app.component.scss-theme';
 
 @mixin custom-components-theme($theme) {
   @include custom-color-theme($theme);
+  @include custom-cockpit-theme($theme);
   @include custom-shared-theme($theme);
+  @include custom-sidebar-theme($theme);
   @include custom-sidenav-theme($theme);
   @include custom-wrapper-theme($theme);
+  @include custom-workspaces-theme($theme);
+  @include custom-workspace-overview-theme($theme);
   @include custom-modal-workspaces-theme($theme);
+  @include custom-generate-icon-theme($theme);
   @include custom-body-theme($theme);
 }
 

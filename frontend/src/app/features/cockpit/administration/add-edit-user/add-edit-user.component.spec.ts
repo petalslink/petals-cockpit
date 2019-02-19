@@ -27,7 +27,7 @@ import {
   getButtonByClass,
   getInputByName,
   setInputValue,
-} from 'testing';
+} from '@testing/index';
 
 describe('Administration edit user', () => {
   let component: TestHostAddUserComponent;

@@ -30,6 +30,7 @@ app-root {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: auto;
 }
 
 $sidebar-width: 360px;
@@ -210,8 +211,8 @@ app-workspace
 app-header .header-toolbar,
 .header-toolbar,
 .admin-page > mat-toolbar.toolbar-page-header {
-  height: 56px;
-  min-height: 56px;
+  height: 64px;
+  min-height: 64px;
 }
 
 app-header .toolbar-page-header,
@@ -426,4 +427,12 @@ app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
     position: absolute;
     color: #fff;
   }
+}
+
+app-workspaces-list
+  > div
+  > .workspaces-list
+  > .mat-list-item
+  > .mat-list-item-content {
+  padding: 16px 16px 6px;
 }

@@ -35,8 +35,12 @@ import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
-import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
+import {
+  IWorkspace,
+  IWorkspaceRow,
+} from '@wks/state/workspaces/workspaces.interface';
 
+import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
@@ -58,12 +62,22 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   isRemoving = false;
 
+  isSettingShortDescription = false;
+  isEditingShortDescription = false;
+
   isEditingDescription = false;
   isSettingDescription = false;
+
+  isFocusDescriptionTextarea = false;
+  isFocusShortDescriptionTextarea = false;
+
+  shortDescription: string = null;
   description: string = null;
 
   addUserFormGroup: FormGroup;
   filteredUsers$: Observable<string[]>;
+
+  matcher = new FormErrorStateMatcher();
 
   constructor(
     private fb: FormBuilder,
@@ -102,12 +116,11 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.workspace$ = this.store$.pipe(
       select(getCurrentWorkspace),
-      tap(
-        wk =>
-          wk.isAddingUserToWorkspace
-            ? this.addUserFormGroup.get('userSearchCtrl').disable()
-            : this.addUserFormGroup.get('userSearchCtrl').enable()
-      )
+      tap(wks => {
+        wks.isAddingUserToWorkspace
+          ? this.addUserFormGroup.get('userSearchCtrl').disable()
+          : this.addUserFormGroup.get('userSearchCtrl').enable();
+      })
     );
 
     this.users$ = this.store$.pipe(getCurrentWorkspaceUsers);
@@ -119,9 +132,13 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy$),
         tap(id => {
           // we reinit these in case one change workspace while editing
+          this.shortDescription = null;
           this.description = null;
+          this.isEditingShortDescription = false;
+          this.isSettingShortDescription = false;
           this.isEditingDescription = false;
           this.isSettingDescription = false;
+          this.isFocusDescriptionTextarea = false;
           this.store$.dispatch(new Workspaces.FetchDetails({ id }));
         })
       )
@@ -131,12 +148,26 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.onDestroy$),
         // only when we are setting the description and it has finished
-        filter(ws => !ws.isSettingDescription && this.isSettingDescription),
-        tap(ws => {
+        filter(
+          wks =>
+            (!wks.isSettingDescription && this.isSettingDescription) ||
+            (!wks.isSettingShortDescription && this.isSettingShortDescription)
+        ),
+        tap(_ => {
+          if (!this.isSettingShortDescription) {
+            this.description = null;
+            this.isEditingDescription = false;
+          }
+
+          if (!this.isSettingDescription) {
+            this.shortDescription = null;
+            this.isEditingShortDescription = false;
+          }
+
           // we reinit these, and it will show the current value of the description in the store
-          this.description = null;
-          this.isEditingDescription = false;
+          this.isSettingShortDescription = false;
           this.isSettingDescription = false;
+          this.isFocusDescriptionTextarea = false;
         })
       )
       .subscribe();
@@ -172,12 +203,25 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   editDescription() {
     this.isEditingDescription = true;
-    // note: there could be a small moment where description is not set!
     this.workspace$
       .pipe(
         first(),
         tap(ws => {
           this.description = ws.description;
+          this.isFocusDescriptionTextarea = true;
+        })
+      )
+      .subscribe();
+  }
+
+  editShortDescription() {
+    this.isEditingShortDescription = true;
+    this.workspace$
+      .pipe(
+        first(),
+        tap(wks => {
+          this.shortDescription = wks.shortDescription;
+          this.isFocusShortDescriptionTextarea = true;
         })
       )
       .subscribe();
@@ -187,17 +231,40 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.description = null;
     this.isEditingDescription = false;
     this.isSettingDescription = false;
+    this.isFocusDescriptionTextarea = false;
   }
 
-  validateDescription() {
+  cancelShortDescription() {
+    this.shortDescription = null;
+    this.isEditingShortDescription = false;
+    this.isSettingShortDescription = false;
+    this.isFocusShortDescriptionTextarea = false;
+  }
+
+  saveDescription() {
     this.isSettingDescription = true;
     const description = this.description;
     this.workspace$
       .pipe(
         first(),
-        tap(ws => {
+        tap(wks => {
           this.store$.dispatch(
-            new Workspaces.SetDescription({ id: ws.id, description })
+            new Workspaces.SetDescription({ id: wks.id, description })
+          );
+        })
+      )
+      .subscribe();
+  }
+
+  saveShortDescription() {
+    this.isSettingShortDescription = true;
+    const shortDescription = this.shortDescription;
+    this.workspace$
+      .pipe(
+        first(),
+        tap(wks => {
+          this.store$.dispatch(
+            new Workspaces.SetShortDescription({ id: wks.id, shortDescription })
           );
         })
       )
@@ -209,10 +276,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.workspace$
       .pipe(
         first(),
-        switchMap(ws =>
+        switchMap(wks =>
           this.dialog
             .open(WorkspaceDeleteDialogComponent, {
-              data: { name: ws.name },
+              data: { name: wks.name },
             })
             .afterClosed()
             .pipe(
@@ -220,12 +287,11 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
               tap(result => (this.isRemoving = result)),
               filter(result => result),
               tap(_ =>
-                this.store$.dispatch(new Workspaces.Delete({ id: ws.id }))
+                this.store$.dispatch(new Workspaces.Delete({ id: wks.id }))
               )
             )
         )
       )
-
       .subscribe();
   }
 
@@ -269,7 +335,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 export class WorkspaceDeleteDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<WorkspaceDeleteDialogComponent>,
-    // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: { workspace$: Observable<IWorkspace> }
   ) {}
 }

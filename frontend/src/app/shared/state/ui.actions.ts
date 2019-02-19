@@ -51,9 +51,33 @@ export namespace Ui {
     constructor() {}
   }
 
+  export const OpenWorkspacesListType = '[UI] Open Workspaces List';
+  export class OpenWorkspacesList implements Action {
+    readonly type = OpenWorkspacesListType;
+    constructor() {}
+  }
+
+  export const OpenCreateWorkspaceType = '[UI] Open Create Workspace';
+  export class OpenCreateWorkspace implements Action {
+    readonly type = OpenCreateWorkspaceType;
+    constructor() {}
+  }
+
   export const CloseWorkspacesType = '[UI] Close Workspaces';
   export class CloseWorkspaces implements Action {
     readonly type = CloseWorkspacesType;
+    constructor() {}
+  }
+
+  export const CloseWorkspacesListType = '[UI] Close Workspaces List';
+  export class CloseWorkspacesList implements Action {
+    readonly type = CloseWorkspacesListType;
+    constructor() {}
+  }
+
+  export const CloseCreateWorkspaceType = '[UI] Close Create Workspace';
+  export class CloseCreateWorkspace implements Action {
+    readonly type = CloseCreateWorkspaceType;
     constructor() {}
   }
 

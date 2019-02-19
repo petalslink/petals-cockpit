@@ -29,9 +29,9 @@
 //   workspacesTableFactory,
 // } from '@wks/state/workspaces/workspaces.interface';
 // import { click, elementText } from '@testing/index';
-// import { WorkspacesListComponent } from './workspaces-list.component';
+// import { WorkspacesCreateComponent } from './workspaces-create.component';
 
-// describe('WorkspacesListComponent', () => {
+// describe('WorkspacesCreateComponent', () => {
 //   let component: TestHostComponent;
 //   let fixture: ComponentFixture<TestHostComponent>;
 
@@ -39,7 +39,7 @@
 //     async(() => {
 //       TestBed.configureTestingModule({
 //         imports: [SharedModule.forRoot(), NoopAnimationsModule],
-//         declarations: [TestHostComponent, WorkspacesListComponent],
+//         declarations: [TestHostComponent, WorkspacesCreateComponent],
 //       }).compileComponents();
 //     })
 //   );
@@ -61,73 +61,25 @@
 //     fixture.detectChanges();
 //   });
 
-//   it('should show no workspaces', () => {
-//     const msg: HTMLDivElement = fixture.debugElement.query(
-//       By.css('.info-add-workspace > span')
+//   it('should create a workspace', () => {
+//     const input: HTMLInputElement = fixture.debugElement.query(
+//       By.css('input[formControlName="name"]')
 //     ).nativeElement;
+//     const button: HTMLButtonElement = fixture.debugElement.query(
+//       By.css('.btn-add-workspace')
+//     ).nativeElement;
+//     expect(button.disabled).toBe(true);
 
-//     expect(msg.textContent).toEqual(`You don't have any workspace yet`);
-//   });
-
-//   it('should show the workspaces', () => {
-//     component.workspaces = {
-//       ...(workspacesTableFactory() as IWorkspacesCommon),
-//       list: [
-//         {
-//           id: '0',
-//           name: 'WKS0',
-//           users: [
-//             { id: 'admin', name: 'Admin' },
-//             { id: 'user', name: 'User 0' },
-//           ],
-//         },
-//         {
-//           id: '1',
-//           name: 'WKS1',
-//           users: [{ id: 'admin', name: 'Admin' }],
-//         },
-//       ],
-//     };
+//     input.value = 'test';
+//     input.dispatchEvent(new Event('input'));
 //     fixture.detectChanges();
+//     expect(button.disabled).toBe(false);
 
-//     expect(
-//       elementText(
-//         fixture.debugElement.query(By.css('.workspace-list label'))
-//           .nativeElement
-//       ).trim()
-//     ).toEqual('2 Workspaces');
-//     expect(
-//       fixture.debugElement
-//         .queryAll(By.css('div.info-workspace .workspace-name'))
-//         .map(elementText)
-//     ).toEqual(['WKS0', 'WKS1']);
-//     expect(
-//       fixture.debugElement
-//         .queryAll(By.css('div.info-workspace .workspace-short-description'))
-//         .map(elementText)
-//         .map(s => s.trim())
-//     ).toEqual([
-//       'Shared with you and 1 other.',
-//       'You are the only one using this workspace.',
-//     ]);
-//     expect(
-//       fixture.debugElement.queryAll(By.css('div.info-workspace-selected'))
-//         .length
-//     ).toEqual(0);
-
-//     component.workspaces = {
-//       ...component.workspaces,
-//       selectedWorkspaceId: '0',
-//     };
+//     click(button);
 //     fixture.detectChanges();
-
-//     const greenWorkspaces = fixture.debugElement.queryAll(
-//       By.css('div.info-workspace-selected')
-//     );
-//     expect(greenWorkspaces.length).toEqual(1);
-//     expect(
-//       elementText(greenWorkspaces[0].query(By.css('.workspace-name')))
-//     ).toEqual('WKS0');
+//     expect(input.value).toEqual('');
+//     expect(button.disabled).toBe(true);
+//     expect(component.created).toEqual('test');
 //   });
 
 //   it('should fetch clicked workspace', () => {

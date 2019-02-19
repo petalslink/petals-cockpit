@@ -15,33 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.logo-toolbar {
-  max-height: 34px;
-}
-
-/*
-TODO
-While the issue on material **https://github.com/angular/material2/issues/3221** is still open,
-let's make something hacky by putting the header on top of the rest
-
-This should be cleaned as soon as the new feature is ready (see also cockpit component for scss hack)
-*/
-
-.header-toolbar {
+.toolbar {
   position: fixed;
-  z-index: 2000;
-  font-size: 14px;
-  line-height: 36px;
+  z-index: 10;
+  width: 100%;
+  left: 64px;
 }
 
 mat-toolbar {
   padding-left: 0;
-  .sidenav-toggle,
-  .toolbar-logo,
-  .btn-usr-admin {
-    margin-right: 4px;
-    min-height: 56px;
-    min-width: 56px;
+  .btn-sidenav-toggle {
+    min-height: 64px;
+    min-width: 64px;
+    padding: 0;
+    margin: 0;
   }
 }
 

@@ -28,8 +28,8 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 
 import { SharedModule } from '@shared/shared.module';
 import { ScreenSize } from '@shared/state/ui.interface';
+import { getInputByName } from '@testing/index';
 import { BehaviorSubject } from 'rxjs';
-import { getInputByName } from 'testing';
 
 describe(`appFocusInputIfLargeScreen`, () => {
   let fixtureDefault: ComponentFixture<HostDefaultComponent>;

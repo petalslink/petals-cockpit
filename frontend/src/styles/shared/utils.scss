@@ -111,6 +111,10 @@ $directions: '', '-left', '-right', '-top', '-bottom';
   @include mat-icon-size(48px);
 }
 
+.icon-x5 {
+  @include mat-icon-size(56px);
+}
+
 // ---------------------------------------------------------------
 
 // generate the color palette

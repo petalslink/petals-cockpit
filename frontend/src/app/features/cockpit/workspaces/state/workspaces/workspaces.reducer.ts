@@ -48,6 +48,9 @@ export namespace WorkspacesReducer {
     | Workspaces.FetchDetails
     | Workspaces.FetchDetailsError
     | Workspaces.FetchDetailsSuccess
+    | Workspaces.SetShortDescription
+    | Workspaces.SetShortDescriptionError
+    | Workspaces.SetShortDescriptionSuccess
     | Workspaces.SetDescription
     | Workspaces.SetDescriptionError
     | Workspaces.SetDescriptionSuccess
@@ -100,6 +103,15 @@ export namespace WorkspacesReducer {
       }
       case Workspaces.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
+      }
+      case Workspaces.SetShortDescriptionType: {
+        return setShortDescription(table, action.payload);
+      }
+      case Workspaces.SetShortDescriptionErrorType: {
+        return setShortDescriptionError(table, action.payload);
+      }
+      case Workspaces.SetShortDescriptionSuccessType: {
+        return setShortDescriptionSuccess(table, action.payload);
       }
       case Workspaces.SetDescriptionType: {
         return setDescription(table, action.payload);
@@ -233,6 +245,34 @@ export namespace WorkspacesReducer {
 
   function fetchDetailsError(table: IWorkspacesTable, payload: { id: string }) {
     return updateById(table, payload.id, { isFetchingDetails: false });
+  }
+
+  function setShortDescription(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
+      isSettingShortDescription: true,
+    });
+  }
+
+  function setShortDescriptionSuccess(
+    table: IWorkspacesTable,
+    payload: { id: string; shortDescription: string }
+  ) {
+    return updateById(table, payload.id, {
+      shortDescription: payload.shortDescription,
+      isSettingShortDescription: false,
+    });
+  }
+
+  function setShortDescriptionError(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
+      isSettingShortDescription: false,
+    });
   }
 
   function setDescription(table: IWorkspacesTable, payload: { id: string }) {

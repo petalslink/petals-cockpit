@@ -51,7 +51,9 @@ export namespace Workspaces {
   export const CreateType = '[Workspaces] Create';
   export class Create implements Action {
     readonly type = CreateType;
-    constructor(public readonly payload: { name: string }) {}
+    constructor(
+      public readonly payload: { name: string; shortDescription: string }
+    ) {}
   }
 
   export const CreateErrorType = '[Workspaces] Create error';
@@ -101,6 +103,30 @@ export namespace Workspaces {
     readonly type = FetchDetailsSuccessType;
     constructor(
       public readonly payload: { id: string; data: IWorkspaceBackendDetails }
+    ) {}
+  }
+
+  export const SetShortDescriptionType = '[Workspaces] Set short description';
+  export class SetShortDescription implements Action {
+    readonly type = SetShortDescriptionType;
+    constructor(
+      public readonly payload: { id: string; shortDescription: string }
+    ) {}
+  }
+
+  export const SetShortDescriptionErrorType =
+    '[Workspaces] Set short description error';
+  export class SetShortDescriptionError implements Action {
+    readonly type = SetShortDescriptionErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const SetShortDescriptionSuccessType =
+    '[Workspaces] Set short description success';
+  export class SetShortDescriptionSuccess implements Action {
+    readonly type = SetShortDescriptionSuccessType;
+    constructor(
+      public readonly payload: { id: string; shortDescription: string }
     ) {}
   }
 

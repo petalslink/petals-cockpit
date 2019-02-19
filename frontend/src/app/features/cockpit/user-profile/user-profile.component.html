@@ -13,14 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" class="wrapper-content">
-  <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
-    <div class="prefix-toolbar-title" fxLayout="row">
-      <mat-icon color="accent">person</mat-icon>
-    </div>
-
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">{{ (user$ | async).name }}</h1>
-  </mat-toolbar>
+<div fxLayout="column" [style.marginLeft.px]="64" class="wrapper-content mat-typography" cdkScrollable>
+  <div fxFlex class="toolbar mat-elevation-z4">
+    <mat-toolbar>
+      <span class="title-profile-page">{{ (user$ | async).name }}</span>
+    </mat-toolbar>
+  </div>
 
   <div fxFlex fxFlexFill class="content">
     <div class="central-content">

@@ -24,7 +24,6 @@ import {
   WorkspacesComponent,
 } from './workspaces.component';
 
-// /workspaces
 const routes: Routes = [
   {
     path: '',

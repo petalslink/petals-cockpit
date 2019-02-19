@@ -25,6 +25,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ScrollDispatchModule } from '@angular/cdk/scrolling';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -68,6 +69,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
 export const MaterialModules = [
+  MatBadgeModule,
   MatButtonModule,
   MatCardModule,
   MatChipsModule,
@@ -93,25 +95,40 @@ export const MaterialModules = [
 ];
 
 import {
+  faCog,
   faEye,
   faEyeSlash,
+  faFolderOpen,
+  faFolderPlus,
   faIdBadge,
   faKey,
   faPlusCircle,
   faSignInAlt,
+  faSignOutAlt,
   faTicketAlt,
   faUserAstronaut,
+  faUserCircle,
+  faUserFriends,
 } from '@fortawesome/free-solid-svg-icons';
 
+import { faFolder } from '@fortawesome/free-regular-svg-icons';
+
 library.add(
+  faCog,
   faEye,
   faEyeSlash,
+  faFolder,
+  faFolderOpen,
+  faFolderPlus,
   faIdBadge,
   faKey,
   faPlusCircle,
   faSignInAlt,
+  faSignOutAlt,
   faTicketAlt,
-  faUserAstronaut
+  faUserAstronaut,
+  faUserCircle,
+  faUserFriends
 );
 
 // used by the components in declarations below

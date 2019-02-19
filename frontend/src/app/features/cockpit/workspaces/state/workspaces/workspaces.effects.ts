@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable, of } from 'rxjs';
+import { Observable, of, pipe } from 'rxjs';
 import {
   catchError,
   filter,
@@ -31,6 +31,7 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
+import { Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { toJsTable } from '@shared/helpers/jstable.helper';
@@ -56,6 +57,7 @@ export class WorkspacesEffects {
   constructor(
     private actions$: Actions,
     private workspacesService: WorkspacesService,
+    private router: Router,
     private sseService: SseService,
     private notifications: NotificationsService,
     private store$: Store<IStore>
@@ -64,7 +66,7 @@ export class WorkspacesEffects {
   @Effect()
   fetchWorkspaces$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.FetchAll>(Workspaces.FetchAllType),
-    switchMap(action => this.workspacesService.fetchWorkspaces()),
+    switchMap(() => this.workspacesService.fetchWorkspaces()),
     map(res =>
       batchActions([
         new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
@@ -94,23 +96,34 @@ export class WorkspacesEffects {
   postWorkspace$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.Create>(Workspaces.CreateType),
     switchMap(action =>
-      this.workspacesService.postWorkspace(action.payload.name)
+      this.workspacesService.postWorkspace(
+        action.payload.name,
+        action.payload.shortDescription
+      )
     ),
-    map(res => new Workspaces.CreateSuccess(res)),
-    catchError((err: HttpErrorResponse) => {
-      if (environment.debug) {
-        console.group();
-        console.debug(`Error in workspaces.effects: ofType(Workspaces.Post)`);
-        console.error(err);
-        console.groupEnd();
-      }
+    pipe(
+      tap(newWks => {
+        if (newWks) {
+          this.store$.dispatch(new Ui.CloseWorkspaces());
+          this.router.navigate(['/workspaces', newWks.id]);
+        }
+      }),
+      map(res => new Workspaces.CreateSuccess(res)),
+      catchError((err: HttpErrorResponse) => {
+        if (environment.debug) {
+          console.group();
+          console.debug(`Error in workspaces.effects: ofType(Workspaces.Post)`);
+          console.error(err);
+          console.groupEnd();
+        }
 
-      this.notifications.error(
-        `Workspaces`,
-        `An error occurred while adding a new workspace.`
-      );
-      return of(new Workspaces.CreateError());
-    })
+        this.notifications.error(
+          `Workspaces`,
+          `An error occurred while adding a new workspace.`
+        );
+        return of(new Workspaces.CreateError());
+      })
+    )
   );
 
   @Effect({ dispatch: false })
@@ -223,6 +236,30 @@ export class WorkspacesEffects {
             }
 
             return of(new Workspaces.SetDescriptionError(action.payload));
+          })
+        )
+    )
+  );
+
+  @Effect()
+  setShortDescription$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.SetShortDescription>(Workspaces.SetShortDescriptionType),
+    switchMap(action =>
+      this.workspacesService
+        .setShortDescription(action.payload.id, action.payload.shortDescription)
+        .pipe(
+          map(_ => new Workspaces.SetShortDescriptionSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error catched in workspaces.effects: ofType(Workspaces.SetShortDescription)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            return of(new Workspaces.SetShortDescriptionError(action.payload));
           })
         )
     )

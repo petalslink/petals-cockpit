@@ -15,21 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, browser } from 'protractor';
+:host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
-import { page } from './common';
-import { waitAndCheck } from './utils';
+.add-workspace-form-field {
+  mat-icon {
+    padding-right: 8px;
+  }
+}
 
-describe(`Login`, () => {
-  it(`should display the current username`, () => {
-    page.goToLogin().loginToWorkspace(`admin`, `admin`);
+.add-short-description-form-field {
+  textarea {
+    max-height: 80px;
+    margin: 0;
+    padding: 0;
+  }
+}
 
-    // check the name of current user logged
-    browser
-      .actions()
-      .mouseMove($('app-generate-icon.btn-avatar-user'))
-      .perform();
-
-    waitAndCheck($(`mat-tooltip-component`), 'Administrator');
-  });
-});
+.workspace-create {
+  overflow-y: auto;
+}

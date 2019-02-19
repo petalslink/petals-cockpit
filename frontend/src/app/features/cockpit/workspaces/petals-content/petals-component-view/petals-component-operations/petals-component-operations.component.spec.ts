@@ -32,14 +32,14 @@ import * as uuid from 'uuid';
 
 import { HttpProgress } from '@shared/services/http-progress-tracker.service';
 import { SharedModule } from '@shared/shared.module';
-import { PetalsComponentOperationsComponent } from '@wks/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
-import { Components } from '@wks/state/components/components.actions';
-import { IComponentWithSLsAndSUs } from '@wks/state/components/components.selectors';
 import {
   getElementBySelector,
   getElementsBySelector,
   getInputListBySelector,
-} from 'testing';
+} from '@testing/index';
+import { PetalsComponentOperationsComponent } from '@wks/petals-content/petals-component-view/petals-component-operations/petals-component-operations.component';
+import { Components } from '@wks/state/components/components.actions';
+import { IComponentWithSLsAndSUs } from '@wks/state/components/components.selectors';
 
 describe('Petals component operations', () => {
   let component: TestHostPetalsComponentOperationsComponent;

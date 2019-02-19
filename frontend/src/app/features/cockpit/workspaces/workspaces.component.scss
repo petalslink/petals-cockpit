@@ -20,17 +20,94 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.central-content {
-  padding: 24px;
-  margin-top: 0;
-}
-
-h3 {
-  font-size: 16px;
-}
-
-mat-dialog-content {
+mat-card.workspaces {
+  width: 100%;
   height: 100%;
+  max-height: 65%;
+  max-width: 65%;
+  padding: 0;
+  margin-left: 64px;
+  .workspaces-wrapper {
+    .workspaces-list {
+      padding: 24px;
+      div > .title-workspaces-view,
+      div > .info-create-wks,
+      div > .info-workspaces-list {
+        margin: 0;
+        text-align: center;
+      }
+      .spinner-animation {
+        width: 100%;
+        height: 100%;
+      }
+      .spinner-animation > .spinner {
+        width: 120px;
+        height: 120px;
+        position: relative;
+        top: 50%;
+        border-radius: 50%;
+        border-top-width: 6px;
+        border-top-style: solid;
+        border-right: 6px solid transparent;
+        animation: spinner 1.6s linear infinite;
+      }
+      @keyframes spinner {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .icon-wks-wrapper {
+        .icon-no-wks-found {
+          font-size: calc(5vw + 5vh);
+        }
+
+        h1.info-no-wks {
+          font-size: calc(0.8em + 1vw);
+          line-height: calc(0.8em + 1vw);
+          font-weight: 300;
+          text-align: center;
+        }
+      }
+    }
+    .home-wrapper {
+      margin: 0;
+      padding: 0;
+      .logo-wrapper {
+        width: 170px;
+        height: 120px;
+        position: relative;
+        .logo-petals {
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          position: absolute;
+          background-image: url(../../../../assets/img/logo-petals-cockpit.png);
+          background-size: 100%;
+          background-repeat: no-repeat;
+        }
+      }
+      .custom-border {
+        width: 40%;
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+      }
+      .home-text {
+        font-weight: 400;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.btn-create-wks,
+.btn-back-wks-list {
+  border-radius: 9999px;
 }

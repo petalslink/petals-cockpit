@@ -46,10 +46,10 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     );
   }
 
-  postWorkspace(name: string) {
+  postWorkspace(name: string, description: string) {
     const mock = this.usersService as UsersServiceMock;
     const workspace = workspacesService
-      .create([mock.getCurrentUser().id], name)
+      .create([mock.getCurrentUser().id], name, description)
       .getDetails().workspace;
 
     return helper
@@ -64,6 +64,11 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       ? helper.responseBody(ws.getDetails())
       : helper.response(404)
     ).pipe(delay(environment.mock.httpDelay));
+  }
+
+  setShortDescription(id: string, shortDescription: string) {
+    workspacesService.get(id).shortDescription = shortDescription;
+    return helper.response(204).pipe(delay(environment.mock.httpDelay));
   }
 
   setDescription(id: string, description: string) {

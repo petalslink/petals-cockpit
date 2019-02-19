@@ -13,14 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" class="wrapper-content" cdkScrollable>
-  <mat-toolbar color="primary" class="toolbar-page-header" fxLayout="row" fxLayoutAlign="start center">
-    <div class="prefix-toolbar-title" fxLayout="row">
-      <mat-icon color="accent">settings</mat-icon>
-    </div>
-
-    <h1 class="title" [ngClass.lt-md]="'margin-left-x1'">Administration</h1>
-  </mat-toolbar>
+<div fxLayout="column" [style.marginLeft.px]="64" class="wrapper-content mat-typography" cdkScrollable>
+  <div fxFlex class="toolbar mat-elevation-z4">
+    <mat-toolbar>
+      <span class="title-admin-page">Administration</span>
+    </mat-toolbar>
+  </div>
 
   <div fxFlex *ngIf="user$ | async as currentUser" class="content">
     <div class="central-content" *ngIf="currentUser.isAdmin; else notAdmin">

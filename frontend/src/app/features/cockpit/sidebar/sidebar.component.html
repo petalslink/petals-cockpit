@@ -1,0 +1,61 @@
+<!-- Copyright (C) 2017-2019 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div class="sidebar">
+  <div fxFlex fxLayout="column" class="sidebar-wrapper">
+    <div fxLayout="column" fxLayoutAlign="start center" class="sidebar-top">
+      <button mat-button [routerLink]="['/workspaces']" (click)="clickPetalsLogo()" class="btn-logo">
+        <mat-icon class="icon-petals icon-x5" svgIcon="petals"></mat-icon>
+      </button>
+  
+      <button 
+        *ngIf="user.isAdmin" 
+        mat-button 
+        matTooltip="Administration" 
+        matTooltipPosition="right"
+        [routerLink]="['/admin']"
+        routerLinkActive="active"
+        class="btn-user-admin" 
+      >
+        <fa-icon class="icon-administration icon-x2" icon="cog"></fa-icon>
+      </button>
+    </div>
+    
+    <div fxFlex fxLayout="column" fxLayoutAlign="end center" class="sidebar-bottom">
+      <button 
+        mat-button
+        [matTooltip]="user.name" 
+        matTooltipPosition="right"
+        matTooltipClass="current-user-tooltip"
+        [routerLink]="['/profile']"
+        routerLinkActive="active"
+        class="btn-user-profile" 
+      >
+        <fa-icon class="icon-user-circle icon-x2" icon="user-circle"></fa-icon>
+      </button>
+
+      <button 
+        mat-icon-button
+        [disabled]="isDisconnecting" 
+        (click)="disconnect()"
+        matTooltip="Disconnect" 
+        matTooltipPosition="right"
+        class="btn-user-logout" 
+      >
+        <fa-icon class="icon-signout icon-x2" icon="sign-out-alt"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div>

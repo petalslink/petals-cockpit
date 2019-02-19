@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,17 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-:host {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
+@mixin custom-cockpit-theme($theme) {
+  $primary: map-get($theme, primary);
 
-.workspaces-list {
-  overflow-y: auto;
-  margin-top: 50px;
-  .mat-list-item {
-    height: auto;
+  .page-cockpit {
+    // The cockpit page depend of this background.
+    // Please consider that the background will not change according to the theme at the moment.
+    // This can change in a future refactor.
+    background-color: mat-color($mat-grey, 400);
   }
 }

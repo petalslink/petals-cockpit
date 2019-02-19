@@ -14,9 +14,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-cockpit" fxLayout="column" fxFill>
-  <app-header [isLargeScreen]="isLargeScreen$ | async" [ui]="ui$ | async"
-              [user]="user$ | async" [isDisconnecting]="isDisconnecting$ | async"
-              [isOnWorkspace]="isOnWorkspace$ | async"></app-header>
+
+  <app-sidebar [user]="user$ | async" [isDisconnecting]="isDisconnecting$ | async"></app-sidebar>
+    
+  <app-header *ngIf="isOnWorkspace$ | async" [isLargeScreen]="isLargeScreen$ | async" [ui]="ui$ | async" [isOnWorkspace]="isOnWorkspace$ | async"></app-header>
 
   <router-outlet class="header-hack"></router-outlet>
+  
 </div>

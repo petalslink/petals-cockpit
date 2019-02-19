@@ -16,13 +16,15 @@
  */
 
 :host {
-  width: 100%;
+  width: calc(100% - 64px);
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 mat-sidenav-container {
+  left: 32px;
+  width: calc(100% - 64px);
   background-image: url(../../../../../assets/img/gray_jean.png);
 
   // all menu views have the same size (petals, service)
