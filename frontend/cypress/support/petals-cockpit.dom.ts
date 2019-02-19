@@ -16,14 +16,14 @@
  */
 
 // base selector
-const bs = `app-header`;
+const bs = `app-sidebar`;
 
 export const PETALS_COCKPIT_DOM = {
   buttons: {
-    goToAdminPage: `${bs} .btn-usr-admin`,
-    userAvatar: `${bs} app-generate-icon`,
-    logout: `${bs} .btn-logout-user`,
-    logo: `${bs} .toolbar-logo`,
+    goToAdminPage: `${bs} .btn-user-admin`,
+    goToProfilePage: `${bs} .btn-user-profile`,
+    logout: `${bs} .btn-user-logout`,
+    goToWksList: `${bs} .btn-logo`,
     toggleSidenav: `${bs} .sidenav-toggle`,
   },
 };

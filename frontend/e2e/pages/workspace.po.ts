@@ -80,7 +80,7 @@ export abstract class WorkspacePage {
     browser.wait(test, waitTimeout);
   }
 
-  openWorkspacesDialog() {
+  openWorkspaces() {
     waitAndClick(this.changeWorkspaceButton);
     return WorkspacesPage.waitAndGet(true);
   }
@@ -181,23 +181,38 @@ export class WorkspaceOverviewPage extends WorkspacePage {
   public readonly title = this.component.$(`mat-toolbar .title`);
   public readonly deleteButton = this.component.$(`.btn-delete-wks`);
 
-  public readonly description = this.component.$(
-    `mat-card-content.workspace-description > div > div.description > span`
+  public readonly shortDescription = this.component.$(
+    `mat-card-content.workspace-short-description > div.short-description > span`
   );
-  public readonly editButton = this.component.$(
-    `.workspace-description button`
+  public readonly description = this.component.$(
+    `mat-card-content.workspace-description > div.description > span`
+  );
+  public readonly editShortDescriptionButton = this.component.$(
+    `.mat-card-actions .btn-edit-short-description`
+  );
+  public readonly editDescriptionButton = this.component.$(
+    `.mat-card-actions .btn-edit-description`
+  );
+  public readonly shortDescriptionArea = this.component.$(
+    `.workspace-short-description-edit textarea`
   );
   public readonly descriptionArea = this.component.$(
     `.workspace-description-edit textarea`
   );
   public readonly descriptionPreview = this.component.$(
-    `.workspace-description-edit mat-card-subtitle span.workspace-description-preview`
+    `.workspace-description-edit > div > span.workspace-description-preview`
+  );
+  public readonly shortDescriptionCancel = this.component.$(
+    `button.btn-cancel-short-description`
+  );
+  public readonly shortDescriptionSubmit = this.component.$(
+    `button.btn-save-short-description`
   );
   public readonly descriptionCancel = this.component.$(
-    `button.workspace-description-edit-cancel`
+    `button.btn-cancel-description`
   );
   public readonly descriptionSubmit = this.component.$(
-    `button.workspace-description-edit-submit`
+    `button.btn-save-description`
   );
 
   public readonly users = this.component.$(`.workspace-users`);

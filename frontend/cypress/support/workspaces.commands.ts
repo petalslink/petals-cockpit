@@ -18,18 +18,35 @@
 import {
   WORKSPACE_DELETED_DIALOG_DOM,
   WORKSPACE_DELETION_DIALOG_DOM,
+  WORKSPACES_CREATE_DOM,
   WORKSPACES_LIST_DOM,
 } from './workspaces.dom';
 
-Cypress.Commands.add('expectWorkspacesListToBe', list => {
-  const workspacesListNames = cy.get(WORKSPACES_LIST_DOM.texts.workspaceName);
-  workspacesListNames.should('have.length', list.length);
-  workspacesListNames.each((_, index) => cy.contains(list[index]));
+// (listWorkspacesNames, listWorkspacesShortDescriptions)
+Cypress.Commands.add('expectWorkspacesListToBe', listItemWorkspacesDetails => {
+  const listItemWorkspaces = cy.get(
+    WORKSPACES_LIST_DOM.listItem.itemWorkspaces
+  );
+
+  listItemWorkspaces.should(
+    'have.length',
+    listItemWorkspacesDetails.length / 2
+  );
+  listItemWorkspaces.each(($item, index) => {
+    const item = cy.wrap($item);
+    item.should('contain', listItemWorkspacesDetails[index * 2]);
+    item.should('contain', listItemWorkspacesDetails[index * 2 + 1]);
+  });
 });
 
-Cypress.Commands.add('addWorkspace', name => {
-  cy.get(WORKSPACES_LIST_DOM.inputs.name).type(name);
-  cy.get(WORKSPACES_LIST_DOM.buttons.addWorkspace).click();
+Cypress.Commands.add('addWorkspace', (name, shortDescription?) => {
+  cy.get(WORKSPACES_CREATE_DOM.inputs.name).type(name);
+  if (shortDescription) {
+    cy
+      .get(WORKSPACES_CREATE_DOM.textArea.shortDescription)
+      .type(shortDescription);
+  }
+  cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).click();
 });
 
 Cypress.Commands.add('expectDialogDeletionWksDescriptionToBe', description => {

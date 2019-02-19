@@ -470,7 +470,7 @@ describe(`Administration`, () => {
       cy.get(ADD_LDAP_USER_DOM.inputs.userSearchCtrl).type(`Yoann`);
 
       // we make sure that when we change the page and we come back on it, we clean the store correctly
-      cy.get(PETALS_COCKPIT_DOM.buttons.userAvatar).click();
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToProfilePage).click();
 
       cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).click();
 

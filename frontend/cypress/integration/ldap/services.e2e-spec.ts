@@ -413,7 +413,7 @@ describe(`Services`, () => {
 
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch1dot0);
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.logo).click();
+    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
 
     cy
       .get(WORKSPACES_LIST_DOM.texts.workspaceName)

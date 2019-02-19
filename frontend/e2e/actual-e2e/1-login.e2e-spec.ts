@@ -26,9 +26,12 @@ describe(`Login`, () => {
     // check the name of current user logged
     browser
       .actions()
-      .mouseMove($('app-generate-icon.btn-avatar-user'))
+      .mouseMove($('app-sidebar .btn-user-profile'))
       .perform();
 
-    waitAndCheck($(`mat-tooltip-component`), 'Administrator');
+    waitAndCheck(
+      $(`mat-tooltip-component > .current-user-tooltip`),
+      'Administrator'
+    );
   });
 });

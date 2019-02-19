@@ -28,8 +28,12 @@ describe(`Workspace Overview`, () => {
     // check the page content
     expect(workspace.title.getText()).toEqual(`Workspace 0`);
 
+    expect(workspace.shortDescription.getText()).toEqual(
+      'No description provided.'
+    );
+
     expect(workspace.description.getText()).toEqual(
-      `This is workspace 0 with id 1.`
+      'Put some description in markdown for the workspace here.'
     );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
@@ -49,17 +53,19 @@ describe(`Workspace Overview`, () => {
     const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
     // let's click on the edit button before switching workspace to ensure everything is reset
-    workspace.editButton.click();
+    workspace.editDescriptionButton.click();
 
     // let's check another workspace
-    const ws2 = workspace
-      .openWorkspacesDialog()
-      .selectWorkspace(1, `Workspace 1`);
+    const ws2 = workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
 
     expect(ws2.title.getText()).toEqual(`Workspace 1`);
 
+    expect(workspace.shortDescription.getText()).toEqual(
+      'No description provided.'
+    );
+
     expect(workspace.description.getText()).toEqual(
-      `This is workspace 1 with id 2 and markdown support.`
+      `Put some description in markdown for the workspace here.`
     );
     expect(workspace.descriptionArea.isPresent()).toBe(false);
 
@@ -78,14 +84,14 @@ describe(`Workspace Overview`, () => {
     ]);
 
     // and go back to the first one (for last workspace to be valid in other tests...)
-    workspace.openWorkspacesDialog().selectWorkspace(0, `Workspace 0`);
+    workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
   });
 
   it(`should have live markdown rendering of the description while edit`, () => {
     const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
     // let's check another workspace
-    workspace.openWorkspacesDialog().selectWorkspace(1, `Workspace 1`);
+    workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
 
     expect(workspace.description.getText()).toEqual(
       `This is workspace 1 with id 2 and markdown support.`
@@ -95,10 +101,10 @@ describe(`Workspace Overview`, () => {
     expect(workspace.description.$(`strong`).getText()).toEqual(`markdown`);
 
     // edition
-    workspace.editButton.click();
+    workspace.editDescriptionButton.click();
 
     expect(workspace.descriptionArea.getAttribute('value')).toEqual(
-      `This is workspace 1 with id 2 and **markdown** support.`
+      `Put some description in **markdown** for the workspace here.`
     );
 
     expect(workspace.descriptionPreview.getText()).toEqual(
@@ -109,7 +115,7 @@ describe(`Workspace Overview`, () => {
     workspace.descriptionArea.sendKeys(' And some ~~more~~.');
 
     expect(workspace.descriptionPreview.getText()).toEqual(
-      `This is workspace 1 with id 2 and markdown support. And some more.`
+      `Put some description in **markdown** for the workspace here. And some more.`
     );
 
     expect(workspace.descriptionPreview.$(`strong`).getText()).toEqual(
@@ -118,7 +124,7 @@ describe(`Workspace Overview`, () => {
     expect(workspace.descriptionPreview.$(`del`).getText()).toEqual(`more`);
 
     // and go back to the first one (for last workspace to be valid in other tests...)
-    workspace.openWorkspacesDialog().selectWorkspace(0, `Workspace 0`);
+    workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
   });
 
   // TODO: test inconsistently failing
@@ -127,33 +133,33 @@ describe(`Workspace Overview`, () => {
   //     .goToWorkspacesViaLogin()
   //     .loginToWorkspaces('bescudie', 'bescudie');
 
-  //   workspaces.addWorkspace('New workspace');
+  //   workspaces.addWorkspace('New workspace', 'New Description');
 
   //   const workspace = workspaces.selectWorkspace(1, `New workspace`);
 
   //   expect(workspace.title.getText()).toEqual(`New workspace`);
 
   //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
+  //     `No description provided.`
   //   );
 
-  //   workspace.editButton.click();
+  //   workspace.editDescriptionButton.click();
 
   //   // cancel
   //   workspace.descriptionArea.sendKeys(' Will disappear.');
   //   expect(workspace.descriptionPreview.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. Will disappear.`
+  //     `No description provided. Will disappear.`
   //   );
 
   //   workspace.descriptionCancel.click();
 
   //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
+  //     `No description provided.`
   //   );
 
   //   // edit again
 
-  //   workspace.editButton.click();
+  //   workspace.editDescriptionButton.click();
 
   //   workspace.descriptionArea.sendKeys(' And some more.');
 
@@ -162,20 +168,20 @@ describe(`Workspace Overview`, () => {
   //   browser.wait(EC.visibilityOf(workspace.description), waitTimeout);
 
   //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. And some more.`
+  //     `No description provided. And some more.`
   //   );
 
   //   // Test if it did not impact another workspace
-  //   workspace.openWorkspacesDialog().selectWorkspace(0, `Workspace 1`);
+  //   workspace.openWorkspaces().selectWorkspace(0, `Workspace 1`);
   //   expect(workspace.description.getText()).toEqual(
   //     `This is workspace 1 with id 2 and markdown support.`
   //   );
 
   //   // but correct in modified
-  //   workspace.openWorkspacesDialog().selectWorkspace(1, `New workspace`);
+  //   workspace.openWorkspaces().selectWorkspace(1, `New workspace`);
 
   //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. And some more.`
+  //     `No description provided. And some more.`
   //   );
   // });
 
@@ -187,12 +193,13 @@ describe(`Workspace Overview`, () => {
         .goToWorkspacesViaLogin()
         .loginToWorkspaces('admin', 'admin');
 
-      workspaces.addWorkspace('Test Users');
+      workspaces.addWorkspace('Test Users', 'Test Description');
 
       workspace = workspaces.selectWorkspace(2);
     });
 
     afterEach(() => {
+      workspace.openWorkspaces();
       // clean for backend
       workspace.workspaceButton.click();
       workspace.deleteButton.click();
