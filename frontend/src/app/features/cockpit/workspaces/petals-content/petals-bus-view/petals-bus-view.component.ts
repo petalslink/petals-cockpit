@@ -63,7 +63,7 @@ export class PetalsBusViewComponent implements OnInit {
         switchMap(bus =>
           this.dialog
             .open(BusDeleteDialogComponent, {
-              data: { bus },
+              data: { name: bus.name },
             })
             .afterClosed()
             .pipe(
@@ -89,7 +89,7 @@ export class PetalsBusViewComponent implements OnInit {
         </div>
         <mat-dialog-content>
           <p fxLayout="column" class="mat-body-1">
-            <span class="warning-message">Are you sure you want to delete <b>{{ data.bus.name }}</b>?</span>
+            <span class="warning-message">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
           </p>
         </mat-dialog-content>
 
@@ -105,7 +105,6 @@ export class PetalsBusViewComponent implements OnInit {
 export class BusDeleteDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<BusDeleteDialogComponent>,
-    // TODO add some type for data when https://github.com/angular/angular/issues/15424 is fixed
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: { name: string }
   ) {}
 }

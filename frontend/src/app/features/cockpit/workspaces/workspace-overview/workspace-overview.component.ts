@@ -35,10 +35,7 @@ import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
-import {
-  IWorkspace,
-  IWorkspaceRow,
-} from '@wks/state/workspaces/workspaces.interface';
+import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 
 import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
 import {
@@ -335,6 +332,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 export class WorkspaceDeleteDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<WorkspaceDeleteDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { workspace$: Observable<IWorkspace> }
+    @Inject(MAT_DIALOG_DATA) public data: { name: string }
   ) {}
 }
