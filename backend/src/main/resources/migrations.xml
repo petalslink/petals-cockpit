@@ -370,4 +370,12 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="v1.01.0-1" author="alagane">
+    <addColumn tableName="workspaces">
+      <column name="short_description" type="varchar(200)" defaultValue="">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

@@ -22,12 +22,14 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
-import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesContent;
 
 public class WorkspacesResourceTest extends AbstractBasicResourceTest {
@@ -38,8 +40,8 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
     @Test
     public void createWorkspace() {
-        NewWorkspace newWs = new NewWorkspace("test", null);
-        Workspace post = resource.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
+        NewWorkspace newWs = new NewWorkspace("test", null, null);
+        WorkspaceMin post = resource.target("/workspaces").request().post(Entity.json(newWs), WorkspaceMin.class);
 
         assertThat(post.id).isGreaterThan(0);
         assertThat(post.name).isEqualTo(newWs.name);
@@ -47,24 +49,57 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
         // there should be only one!
         assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
                 .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name).column(WORKSPACES.DESCRIPTION.getName())
-                .value().isEqualTo("Put some description in **markdown** for the workspace here.");
+                .value().isEqualTo(WorkspacesResource.DEFAULT_DESCRIPTION)
+                .column(WORKSPACES.SHORT_DESCRIPTION.getName()).value()
+                .isEqualTo(WorkspacesResource.DEFAULT_SHORT_DESCRIPTION);
 
         assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
                 .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
     }
 
     @Test
-    public void createWorkspaceWithDescription() {
-        NewWorkspace newWs = new NewWorkspace("test", "This is a test workspace");
-        Workspace post = resource.target("/workspaces").request().post(Entity.json(newWs), Workspace.class);
+    public void createWorkspaceWithShortDescription() {
+        NewWorkspace newWs = new NewWorkspace("test", "This is a test workspace short description", null);
+        WorkspaceMin post = resource.target("/workspaces").request().post(Entity.json(newWs), WorkspaceMin.class);
 
         assertThat(post.id).isGreaterThan(0);
         assertThat(post.name).isEqualTo(newWs.name);
 
         // there should be only one!
         assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
-                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name).column(WORKSPACES.DESCRIPTION.getName())
-                .value().isEqualTo("This is a test workspace");
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name)
+                .column(WORKSPACES.SHORT_DESCRIPTION.getName()).value()
+                .isEqualTo("This is a test workspace short description").column(WORKSPACES.DESCRIPTION.getName())
+                .value().isEqualTo(WorkspacesResource.DEFAULT_DESCRIPTION);
+
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
+                .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
+    }
+
+    @Test
+    public void createWorkspaceWithTooLongShortDescription() {
+        NewWorkspace newWs = new NewWorkspace("test",
+                RandomStringUtils.random(WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH + 1), null);
+        Response post = resource.target("/workspaces").request().post(Entity.json(newWs));
+        assertThat(post.getStatus()).isEqualTo(422);
+        assertThat(table(WORKSPACES)).hasNumberOfRows(0);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(0);
+    }
+
+    @Test
+    public void createWorkspaceWithDescription() {
+        NewWorkspace newWs = new NewWorkspace("test", null, "This is a test workspace description");
+        WorkspaceMin post = resource.target("/workspaces").request().post(Entity.json(newWs), WorkspaceMin.class);
+
+        assertThat(post.id).isGreaterThan(0);
+        assertThat(post.name).isEqualTo(newWs.name);
+
+        // there should be only one!
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1).column(WORKSPACES.ID.getName()).value().isEqualTo(post.id)
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo(post.name)
+                .column(WORKSPACES.SHORT_DESCRIPTION.getName()).value()
+                .isEqualTo(WorkspacesResource.DEFAULT_SHORT_DESCRIPTION).column(WORKSPACES.DESCRIPTION.getName())
+                .value().isEqualTo("This is a test workspace description");
 
         assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1).column(USERS_WORKSPACES.USERNAME.getName()).value()
                 .isEqualTo(ADMIN).column(USERS_WORKSPACES.WORKSPACE_ID.getName()).value().isEqualTo(post.id);
@@ -72,10 +107,10 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
     @Test
     public void getWorkspaces() {
-        resource.db().executeInsert(new WorkspacesRecord(1L, "test1", ""));
-        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
-        resource.db().executeInsert(new WorkspacesRecord(3L, "test3", ""));
-        resource.db().executeInsert(new WorkspacesRecord(4L, "test4", ""));
+        resource.db().executeInsert(new WorkspacesRecord(1L, "test1", "", ""));
+        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", "", ""));
+        resource.db().executeInsert(new WorkspacesRecord(3L, "test3", "", ""));
+        resource.db().executeInsert(new WorkspacesRecord(4L, "test4", "", ""));
 
         addUser("userX");
         addUser("userY");

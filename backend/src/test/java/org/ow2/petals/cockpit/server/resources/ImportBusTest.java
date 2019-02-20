@@ -98,7 +98,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         resource.petals.registerEndpoints(referenceEndpoints);
 
         resource.db().transaction(conf -> {
-            DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", ""));
+            DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", "", ""));
             DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
         });
     }
@@ -209,7 +209,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
     @Test
     public void importBusForbidden() {
 
-        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", ""));
+        resource.db().executeInsert(new WorkspacesRecord(2L, "test2", "", ""));
 
         Response post = resource.target("/workspaces/2/buses").request()
                 .post(Entity.json(new NewBus(container.getHost(), getPort(container), container.getJmxUsername(),

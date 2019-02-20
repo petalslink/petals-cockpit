@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.SoftAssertions;
 import org.glassfish.jersey.media.sse.EventInput;
 import org.glassfish.jersey.media.sse.SseFeature;
@@ -166,7 +167,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     @Test
     public void setDescriptionNonExistingWorkspaceForbidden() {
         Response put = resource.target("/workspaces/3").request()
-                .put(Entity.json(new WorkspaceUpdate(null, "description")));
+                .put(Entity.json(new WorkspaceUpdate(null, "shortDescription", "description")));
 
         assertThat(put.getStatus()).isEqualTo(403);
     }
@@ -174,7 +175,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     @Test
     public void setDescriptionExistingWorkspaceForbidden() {
         Response put = resource.target("/workspaces/2").request()
-                .put(Entity.json(new WorkspaceUpdate(null, "description")));
+                .put(Entity.json(new WorkspaceUpdate(null, "shortDescription", "description")));
 
         assertThat(put.getStatus()).isEqualTo(403);
 
@@ -183,20 +184,39 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void setDescription() {
+    public void setShortDescriptionAndDescription() {
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
 
         WorkspaceOverviewContent put = resource.target("/workspaces/1").request()
-                .put(Entity.json(new WorkspaceUpdate(null, "description")), WorkspaceOverviewContent.class);
+                .put(Entity.json(new WorkspaceUpdate(null, "shortDescription", "description")),
+                        WorkspaceOverviewContent.class);
 
         assertThat(put.workspace.id).isEqualTo(1);
         assertThat(put.workspace.name).isEqualTo("test");
         assertThat(put.workspace.users).containsExactlyInAnyOrder(ADMIN);
         assertThat(put.workspace.description).isEqualTo("description");
+        assertThat(put.workspace.shortDescription).isEqualTo("shortDescription");
 
         assertUsers(put.users);
 
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.SHORT_DESCRIPTION.getName())
+                .isEqualTo("shortDescription");
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("description");
+    }
+
+    @Test
+    public void setTooLongShortDescription() {
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.SHORT_DESCRIPTION.getName()).isEqualTo("");
+
+        Response put = resource.target("/workspaces/1").request()
+                .put(Entity.json(new WorkspaceUpdate(null,
+                        RandomStringUtils.random(WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH + 1),
+                        "newDescription")));
+        assertThat(put.getStatus()).isEqualTo(422);
+
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.SHORT_DESCRIPTION.getName()).isEqualTo("");
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
     }
 
     @Test
