@@ -21,7 +21,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import javax.inject.Singleton;
 import javax.ws.rs.ext.ContextResolver;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.text.RandomStringGenerator;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.server.Server;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -141,7 +141,8 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         Configuration jooqConf = jooq.getConfiguration();
         assert jooqConf != null;
 
-        String adminConsoleToken = RandomStringUtils.randomAlphanumeric(20);
+        char[][] pairs = { { 'a', 'z' }, { 'A', 'Z' }, { '0', '9' } };
+        String adminConsoleToken = new RandomStringGenerator.Builder().withinRange(pairs).build().generate(20);
 
         environment.jersey().register(new AbstractBinder() {
             @Override
