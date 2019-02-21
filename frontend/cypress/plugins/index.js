@@ -28,8 +28,6 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-/// <reference types="node" />
-
 // promisified fs module
 const fs = require('fs-extra');
 const path = require('path');
