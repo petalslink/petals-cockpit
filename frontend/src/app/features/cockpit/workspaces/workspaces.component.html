@@ -62,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <ng-template #wksList>
         <app-workspaces-list
+          #wksList
           *ngIf="workspacesListVisible$ | async"
           [style.height]="(workspaces$ | async).list.length === 0 ? '0%' : '100%'"
           [workspaces]="workspaces$ | async"
@@ -71,8 +72,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </ng-template>
 
       <app-workspaces-create
+        #wksCreate
         *ngIf="createWorkspaceVisible$ | async"
         [appFocusInputIfLargeScreen]="isFocusWksName"
+        [msgErrorInput]="(workspaces$ | async).createWksError"
         [canCreate]="!(workspaces$ | async).isAddingWorkspace"
         (evtCreate)="onCreate($event)"
         (evtFetch)="onFetch($event)"

@@ -63,6 +63,11 @@ export const WORKSPACES_CREATE_DOM = {
     addWorkspace: `${bsCreate} .btn-add-workspace`,
   },
   inputs: { name: `${bsCreate} input[formcontrolname="name"]` },
+  messages: {
+    error: {
+      addWksFailed: `${bs} .error-create-wks-details`,
+    },
+  },
   textArea: {
     shortDescription: `${bsCreate} textarea`,
   },

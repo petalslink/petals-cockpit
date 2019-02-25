@@ -24,10 +24,8 @@ export namespace UiReducer {
     | Ui.OpenSidenav
     | Ui.CloseSidenav
     | Ui.ToggleSidenav
-    | Ui.OpenWorkspaces
     | Ui.OpenWorkspacesList
     | Ui.OpenCreateWorkspace
-    | Ui.CloseWorkspaces
     | Ui.CloseWorkspacesList
     | Ui.CloseCreateWorkspace
     | Ui.ChangeScreenSize
@@ -46,17 +44,11 @@ export namespace UiReducer {
       case Ui.ToggleSidenavType: {
         return toggleSidenav(table);
       }
-      case Ui.OpenWorkspacesType: {
-        return openWorkspaces(table);
-      }
       case Ui.OpenWorkspacesListType: {
         return openWorkspacesList(table);
       }
       case Ui.OpenCreateWorkspaceType: {
         return openCreateWorkspace(table);
-      }
-      case Ui.CloseWorkspacesType: {
-        return closeWorkspaces(table);
       }
       case Ui.CloseWorkspacesListType: {
         return closeWorkspacesList(table);
@@ -107,13 +99,6 @@ export namespace UiReducer {
     };
   }
 
-  function openWorkspaces(ui: IUi): IUi {
-    return {
-      ...ui,
-      isWorkspacesVisible: true,
-    };
-  }
-
   function openWorkspacesList(ui: IUi): IUi {
     return {
       ...ui,
@@ -127,15 +112,6 @@ export namespace UiReducer {
       ...ui,
       isCreateWorkspaceVisible: true,
       isWorkspacesListVisible: false,
-    };
-  }
-
-  function closeWorkspaces(ui: IUi): IUi {
-    return {
-      ...ui,
-      isWorkspacesVisible: false,
-      isWorkspacesListVisible: false,
-      isCreateWorkspaceVisible: false,
     };
   }
 

@@ -18,17 +18,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <mat-nav-list *ngIf="workspaces.list.length !== 0 && !workspaces.isFetchingWorkspaces" class="workspaces-list">
     <mat-list-item *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" (click)="select(workspace)" class="workspaces-item">
       <mat-icon class="icon-x4 margin-right-x1 icon-wks">folder</mat-icon>
-      <div fxLayout="row" fxFlex>
+      <div fxLayout="row" fxFlex class="margin-right-x1">
         <div fxLayout="column">
           <div class="mat-body-2 workspace-name">{{ workspace.name }}</div>
-          <span class="mat-body workspace-short-description">{{ workspace.shortDescription }}</span>  
+          <span class="mat-body workspace-short-description">{{ workspace.shortDescription }}</span>
         </div>
         <div fxLayout="row" fxLayoutAlign="end start" fxFlex>
           <mat-icon  
-            [matBadge]="workspace.users.length" 
+            [matBadge]="workspace.users.length"
             matBadgeColor="primary"
             matBadgeOverlap="false"
-            [matTooltip]="'Member' + ((workspace.users.length - 1) >= 2 ? 's' : '') + ': ' + getUsersNames(workspace.users)" 
+            [matTooltip]="'Member' + ((workspace.users.length - 1) >= 2 ? 's' : '') + ': ' + getUsersNames(workspace.users)"
             matTooltipClass="members-tooltip"
             matTooltipPosition="above"
             class="icon-x1 badge-users margin-right-x2"

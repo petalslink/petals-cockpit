@@ -87,7 +87,7 @@ export namespace WorkspacesReducer {
         return post(table);
       }
       case Workspaces.CreateErrorType: {
-        return postError(table);
+        return postError(table, action.payload);
       }
       case Workspaces.CreateSuccessType: {
         return postSuccess(table, action.payload);
@@ -197,6 +197,7 @@ export namespace WorkspacesReducer {
     return {
       ...table,
       isAddingWorkspace: true,
+      createWksError: '',
     };
   }
 
@@ -210,10 +211,14 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function postError(table: IWorkspacesTable): IWorkspacesTable {
+  function postError(
+    table: IWorkspacesTable,
+    payload: { createWksError: string }
+  ): IWorkspacesTable {
     return {
       ...table,
       isAddingWorkspace: false,
+      createWksError: payload.createWksError,
     };
   }
 

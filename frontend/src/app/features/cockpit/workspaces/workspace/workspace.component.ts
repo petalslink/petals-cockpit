@@ -137,10 +137,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
   }
 
-  openWorkspaces() {
-    this.store$.dispatch(new Ui.OpenWorkspaces());
-  }
-
   saveCurrentTab(tabIndex: number) {
     this.storage.store('left-menu-selected-index', tabIndex);
   }

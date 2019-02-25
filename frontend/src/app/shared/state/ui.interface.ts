@@ -43,7 +43,6 @@ export interface IUi {
   // workspace
   isSidenavVisible: boolean;
   // workspaces
-  isWorkspacesVisible: boolean;
   isWorkspacesListVisible: boolean;
   isCreateWorkspaceVisible: boolean;
   // header
@@ -61,7 +60,6 @@ export function uiFactory(): IUi {
     isSidenavVisible: true,
     settings: settings,
     screenSize: '',
-    isWorkspacesVisible: false,
     isWorkspacesListVisible: false,
     isCreateWorkspaceVisible: false,
     titleMainPart1: 'Petals Cockpit',

@@ -25,7 +25,9 @@
 .workspaces-list {
   overflow-y: auto;
   margin-top: 50px;
-  .mat-list-item {
+  mat-list-item.workspaces-item {
     height: auto;
+    word-break: break-word;
+    white-space: pre-line;
   }
 }

@@ -45,12 +45,6 @@ export namespace Ui {
     constructor() {}
   }
 
-  export const OpenWorkspacesType = '[UI] Open Workspaces';
-  export class OpenWorkspaces implements Action {
-    readonly type = OpenWorkspacesType;
-    constructor() {}
-  }
-
   export const OpenWorkspacesListType = '[UI] Open Workspaces List';
   export class OpenWorkspacesList implements Action {
     readonly type = OpenWorkspacesListType;
@@ -60,12 +54,6 @@ export namespace Ui {
   export const OpenCreateWorkspaceType = '[UI] Open Create Workspace';
   export class OpenCreateWorkspace implements Action {
     readonly type = OpenCreateWorkspaceType;
-    constructor() {}
-  }
-
-  export const CloseWorkspacesType = '[UI] Close Workspaces';
-  export class CloseWorkspaces implements Action {
-    readonly type = CloseWorkspacesType;
     constructor() {}
   }
 

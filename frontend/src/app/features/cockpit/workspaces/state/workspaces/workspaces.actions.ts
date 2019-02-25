@@ -59,7 +59,7 @@ export namespace Workspaces {
   export const CreateErrorType = '[Workspaces] Create error';
   export class CreateError implements Action {
     readonly type = CreateErrorType;
-    constructor() {}
+    constructor(public readonly payload: { createWksError: string }) {}
   }
 
   export const CreateSuccessType = '[Workspaces] Create success';

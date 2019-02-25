@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { Observable, of, pipe } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -35,6 +35,7 @@ import { Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
@@ -95,35 +96,39 @@ export class WorkspacesEffects {
   @Effect()
   postWorkspace$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.Create>(Workspaces.CreateType),
-    switchMap(action =>
-      this.workspacesService.postWorkspace(
-        action.payload.name,
-        action.payload.shortDescription
-      )
-    ),
-    pipe(
-      tap(newWks => {
-        if (newWks) {
-          this.store$.dispatch(new Ui.CloseWorkspaces());
-          this.router.navigate(['/workspaces', newWks.id]);
-        }
-      }),
-      map(res => new Workspaces.CreateSuccess(res)),
-      catchError((err: HttpErrorResponse) => {
-        if (environment.debug) {
-          console.group();
-          console.debug(`Error in workspaces.effects: ofType(Workspaces.Post)`);
-          console.error(err);
-          console.groupEnd();
-        }
+    switchMap(action => {
+      return this.workspacesService
+        .postWorkspace(action.payload.name, action.payload.shortDescription)
+        .pipe(
+          tap(newWks => {
+            if (newWks) {
+              this.store$.dispatch(new Ui.CloseCreateWorkspace());
+              this.router.navigate(['/workspaces', newWks.id]);
+            }
+          }),
+          map(res => new Workspaces.CreateSuccess(res)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.debug(
+                `Error in workspaces.effects: ofType(Workspaces.Post)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-        this.notifications.error(
-          `Workspaces`,
-          `An error occurred while adding a new workspace.`
+            this.notifications.error(
+              `Workspaces`,
+              `An error occurred while adding a new workspace.`
+            );
+            return of(
+              new Workspaces.CreateError({
+                createWksError: getErrorMessage(err),
+              })
+            );
+          })
         );
-        return of(new Workspaces.CreateError());
-      })
-    )
+    })
   );
 
   @Effect({ dispatch: false })

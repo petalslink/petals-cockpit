@@ -43,13 +43,31 @@ import { takeUntil, tap } from 'rxjs/operators';
 export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   onDestroy$ = new Subject<void>();
 
+  msgError: string;
+
   @Input() workspace: IWorkspace;
-  @Input() canCreate = false;
+
+  @Input() canCreate: boolean;
   @Input() canFocus = true;
+  @Input()
+  set msgErrorInput(value: string) {
+    this.msgError = value;
+    if (this.newWksForm !== undefined) {
+      const formValues: { name: string; shortDescription: string } = this
+        .newWksForm.value;
+
+      this.newWksForm = this.fb.group({
+        name: { value: formValues.name, disabled: false },
+        shortDescription: {
+          value: formValues.shortDescription,
+          disabled: false,
+        },
+      });
+    }
+  }
 
   @Output()
   evtCreate = new EventEmitter<{ name?: string; shortDescription?: string }>();
-  @Output() evtFetch = new EventEmitter<IWorkspace>();
 
   newWksForm: FormGroup;
 
@@ -64,9 +82,14 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.newWksForm = this.fb.group({
-      name: ['', Validators.required],
+      name: [
+        '',
+        Validators.compose([Validators.required, Validators.maxLength(200)]),
+      ],
       shortDescription: '',
     });
+
+    this.reset();
 
     this.newWksForm.valueChanges
       .pipe(
@@ -81,6 +104,13 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
+
+  reset() {
+    this.newWksForm.reset({
+      name: this.workspace ? this.workspace.name : '',
+      shortDescription: this.workspace ? this.workspace.shortDescription : '',
+    });
   }
 
   doSubmit() {

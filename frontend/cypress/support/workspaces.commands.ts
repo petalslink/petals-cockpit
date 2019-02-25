@@ -49,6 +49,36 @@ Cypress.Commands.add('addWorkspace', (name, shortDescription?) => {
   cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).click();
 });
 
+Cypress.Commands.add(
+  'addWorkspaceAndExpectToFail',
+  (msgError, name, shortDescription?) => {
+    cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.inputs.name)
+      .should('not.be.disabled')
+      .type(name);
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.buttons.addWorkspace)
+      .should('not.be.disabled');
+
+    if (shortDescription) {
+      cy
+        .get(WORKSPACES_CREATE_DOM.textArea.shortDescription)
+        .should('not.be.disabled')
+        .type(shortDescription);
+    }
+
+    cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).click();
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.addWksFailed)
+      .contains(msgError)
+      .should('be.visible');
+  }
+);
+
 Cypress.Commands.add('expectDialogDeletionWksDescriptionToBe', description => {
   const eachLines = cy.get(WORKSPACE_DELETION_DIALOG_DOM.texts.description);
   eachLines.each((_, index) => cy.contains(description[index]));

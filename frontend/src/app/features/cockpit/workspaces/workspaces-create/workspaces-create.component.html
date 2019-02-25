@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             matInput 
             type="text" 
             formControlName="name"
+            maxLength="200"
             [appFocusInputIfLargeScreen]="canFocus"
             [errorStateMatcher]="matcher" 
             required
@@ -53,6 +54,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </ng-template>
         </mat-form-field>
       </div>
+
+      <app-message class="error-create-wks-details" type="error" [msg]="msgError"></app-message>
 
       <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
         <button mat-raised-button color="primary" (click)="doSubmit()" class="btn-add-workspace" [disabled]="newWksForm.invalid || !canCreate">

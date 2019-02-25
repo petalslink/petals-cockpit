@@ -37,7 +37,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
   user$: Observable<ICurrentUser>;
   isDisconnecting$: Observable<boolean>;
   isOnWorkspace$: Observable<boolean>;
-  isOnWorkspaces$: Observable<boolean>;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -52,9 +51,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
       select(state => !!state.workspaces.selectedWorkspaceId)
     );
     this.ui$ = this.store$.pipe(select(state => state.ui));
-    this.isOnWorkspaces$ = this.store$.pipe(
-      select(state => state.ui.isWorkspacesVisible)
-    );
   }
 
   ngOnDestroy() {

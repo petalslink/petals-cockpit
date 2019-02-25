@@ -156,7 +156,42 @@ describe(`Workspaces`, () => {
     cy.expectWorkspacesListToBe(expectedWorkspacesListDetails);
   });
 
-  it('should have only one workspace on the workspaces list', () => {
+  it('should failed the create of new workspace and then be successful', () => {
+    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+
+    cy.expectLocationToBe(`/workspaces`);
+
+    cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
+
+    // check the add workspace form and return http error message
+    cy.addWorkspaceAndExpectToFail(
+      'Error backend',
+      `ADD_WKS_HTTP_ERROR_BACKEND`
+    );
+
+    cy.expectLocationToBe(`/workspaces`);
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.inputs.name)
+      .should('have.value', 'ADD_WKS_HTTP_ERROR_BACKEND')
+      .and('not.be.disabled')
+      .clear()
+      .type('New Workspace');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.textArea.shortDescription)
+      .should('not.be.disabled')
+      .and('be.empty');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.buttons.addWorkspace)
+      .should('not.be.disabled')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces`);
+  });
+
+  it('should display message when there is only one workspace in the list', () => {
     cy.expectLocationToBe('/workspaces/idWks0');
 
     cy.openDialogToDeleteWks();
@@ -172,7 +207,7 @@ describe(`Workspaces`, () => {
     cy.expectWorkspacesListToBe([`Workspace 1`, `No description provided.`]);
   });
 
-  it('should have no access to any workspaces', () => {
+  it('should display empty list message when there are no workspaces', () => {
     cy.expectLocationToBe('/workspaces/idWks0');
 
     cy.openDialogToDeleteWks();

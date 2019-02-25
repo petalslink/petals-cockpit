@@ -73,6 +73,7 @@ export interface IWorkspacesCommon {
 
   searchPetals: string;
   searchServices: string;
+  createWksError: string;
 }
 
 export interface IWorkspacesTable
@@ -96,5 +97,6 @@ export function workspacesTableFactory(): IWorkspacesTable {
 
     searchPetals: '',
     searchServices: '',
+    createWksError: '',
   };
 }
