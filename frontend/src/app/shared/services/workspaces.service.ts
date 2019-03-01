@@ -28,10 +28,13 @@ export interface IWorkspaceBackendCommon {
 }
 
 export interface IWorkspaceBackendDetailsCommon {
+  shortDescription: string;
   description: string;
 }
 
-export interface IWorkspaceBackend extends IWorkspaceBackendCommon {
+export interface IWorkspaceBackend
+  extends IWorkspaceBackendCommon,
+    IWorkspaceBackendDetailsCommon {
   // from server (sse)
   users: string[];
 }
@@ -50,7 +53,10 @@ export abstract class WorkspacesService {
     };
   }>;
 
-  abstract postWorkspace(name: string): Observable<IWorkspaceBackendDetails>;
+  abstract postWorkspace(
+    name: string,
+    shortDescription: string
+  ): Observable<IWorkspaceBackendDetails>;
 
   abstract fetchWorkspace(
     id: string
@@ -62,6 +68,11 @@ export abstract class WorkspacesService {
   }>;
 
   abstract deleteWorkspace(id: string): Observable<void>;
+
+  abstract setShortDescription(
+    id: string,
+    shortDescription: string
+  ): Observable<void>;
 
   abstract setDescription(id: string, description: string): Observable<void>;
 
@@ -89,11 +100,12 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     }>(`${environment.urlBackend}/workspaces`);
   }
 
-  postWorkspace(name: string) {
+  postWorkspace(name: string, shortDescription: string) {
     return this.http.post<IWorkspaceBackendDetails>(
       `${environment.urlBackend}/workspaces`,
       {
         name: name,
+        shortDescription: shortDescription,
       }
     );
   }
@@ -109,6 +121,12 @@ export class WorkspacesServiceImpl extends WorkspacesService {
 
   deleteWorkspace(id: string) {
     return this.http.delete<void>(`${environment.urlBackend}/workspaces/${id}`);
+  }
+
+  setShortDescription(id: string, shortDescription: string) {
+    return this.http.put<void>(`${environment.urlBackend}/workspaces/${id}`, {
+      shortDescription,
+    });
   }
 
   setDescription(id: string, description: string) {

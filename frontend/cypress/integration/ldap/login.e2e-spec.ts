@@ -16,6 +16,7 @@
  */
 
 import { LOGIN_DOM } from '../../support/login.dom';
+import { PETALS_COCKPIT_DOM } from './../../support/petals-cockpit.dom';
 
 describe(`Login`, () => {
   beforeEach(() => {
@@ -131,5 +132,22 @@ describe(`Login`, () => {
       .and('have.attr', 'type', 'text')
       .and('have.value', 'test')
       .and('be.visible');
+  });
+
+  it(`should display the current username`, () => {
+    cy.login('admin', 'admin');
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.goToProfilePage).trigger('mouseenter');
+
+    // check if the name of current user is displayed
+    cy
+      .get('mat-tooltip-component > .current-user-tooltip')
+      .should('contain', 'Administrator');
+
+    cy.get(PETALS_COCKPIT_DOM.buttons.goToProfilePage).trigger('mouseleave');
+
+    cy
+      .get('mat-tooltip-component > .current-user-tooltip')
+      .should('not.be.visible');
   });
 });

@@ -212,16 +212,15 @@
             "specs": [
               "e2e/actual-e2e/1-login.e2e-spec.ts",
               "e2e/actual-e2e/2-import-bus.e2e-spec.ts",
-              "e2e/actual-e2e/3-workspaces.e2e-spec.ts",
-              "e2e/actual-e2e/4-workspace-overview.e2e-spec.ts",
-              "e2e/actual-e2e/5-administration.e2e-spec.ts"
+              "e2e/actual-e2e/3-workspace-overview.e2e-spec.ts",
+              "e2e/actual-e2e/4-administration.e2e-spec.ts"
             ]
           }
         },
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": "e2e/actual-e2e/tsconfig.e2e.json",
+            "tsConfig": "e2e/tsconfig.e2e.json",
             "exclude": ["**/node_modules/**"]
           }
         }

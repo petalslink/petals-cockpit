@@ -95,7 +95,12 @@ Cypress.Commands.add('triggerSSEForWks', (name, id) => {
 
   cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
 
-  cy.expectWorkspacesListToBe([`Workspace 0`, `Workspace 1`]);
+  cy.expectWorkspacesListToBe([
+    `Workspace 0`,
+    `This is short description for the Workspace 0.`,
+    `Workspace 1`,
+    `No description provided.`,
+  ]);
 
   const workspacesListNames = cy.get(WORKSPACES_LIST_DOM.texts.workspaceName);
 

@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { delay, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { ADD_WKS_HTTP_ERROR_BACKEND, errorBackend } from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
 import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
@@ -46,10 +47,15 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     );
   }
 
-  postWorkspace(name: string) {
+  postWorkspace(name: string, description: string) {
+    // only used by the tests to verify an error coming from the backend...
+    if (name === ADD_WKS_HTTP_ERROR_BACKEND) {
+      return helper.errorBackend(errorBackend, 500);
+    }
+
     const mock = this.usersService as UsersServiceMock;
     const workspace = workspacesService
-      .create([mock.getCurrentUser().id], name)
+      .create([mock.getCurrentUser().id], name, description)
       .getDetails().workspace;
 
     return helper
@@ -64,6 +70,11 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       ? helper.responseBody(ws.getDetails())
       : helper.response(404)
     ).pipe(delay(environment.mock.httpDelay));
+  }
+
+  setShortDescription(id: string, shortDescription: string) {
+    workspacesService.get(id).shortDescription = shortDescription;
+    return helper.response(204).pipe(delay(environment.mock.httpDelay));
   }
 
   setDescription(id: string, description: string) {

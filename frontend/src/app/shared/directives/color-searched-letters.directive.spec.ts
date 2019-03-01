@@ -19,7 +19,7 @@ import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ColorSearchedLettersDirective } from '@shared/directives/color-searched-letters.directive';
-import { getElementBySelector } from 'testing';
+import { getElementBySelector } from '@testing/index';
 
 describe(`appColorSearchedLetters`, () => {
   let component: HostComponent;

@@ -1,0 +1,44 @@
+/**
+ * Copyright (C) 2018-2019 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@mixin custom-workspaces-theme($theme) {
+  $primary: map-get($theme, primary);
+
+  mat-card.workspaces {
+    .workspaces-wrapper {
+      .workspaces-list {
+        div > .info-wks,
+        div > .info-create-wks {
+          color: mat-color($mat-grey, 700);
+        }
+        .spinner-animation > .spinner {
+          border-top-color: mat-color($primary, 800);
+        }
+        .icon-wks-wrapper {
+          color: mat-color($mat-grey, 500);
+        }
+      }
+    }
+    .home-wrapper {
+      // linear gradient is the same for all themes but it must be added in the class of the theme
+      // the primary color is default background color
+      background: linear-gradient(135deg, transparent, rgba(0, 0, 0, 0.45) 85%),
+        mat-color($primary, 800);
+      color: mat-color($primary, default-contrast);
+    }
+  }
+}

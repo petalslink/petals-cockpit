@@ -31,9 +31,11 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
+import { Router } from '@angular/router';
 import { environment } from '@env/environment';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
@@ -56,6 +58,7 @@ export class WorkspacesEffects {
   constructor(
     private actions$: Actions,
     private workspacesService: WorkspacesService,
+    private router: Router,
     private sseService: SseService,
     private notifications: NotificationsService,
     private store$: Store<IStore>
@@ -64,7 +67,7 @@ export class WorkspacesEffects {
   @Effect()
   fetchWorkspaces$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.FetchAll>(Workspaces.FetchAllType),
-    switchMap(action => this.workspacesService.fetchWorkspaces()),
+    switchMap(() => this.workspacesService.fetchWorkspaces()),
     map(res =>
       batchActions([
         new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
@@ -93,23 +96,38 @@ export class WorkspacesEffects {
   @Effect()
   postWorkspace$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.Create>(Workspaces.CreateType),
-    switchMap(action =>
-      this.workspacesService.postWorkspace(action.payload.name)
-    ),
-    map(res => new Workspaces.CreateSuccess(res)),
-    catchError((err: HttpErrorResponse) => {
-      if (environment.debug) {
-        console.group();
-        console.debug(`Error in workspaces.effects: ofType(Workspaces.Post)`);
-        console.error(err);
-        console.groupEnd();
-      }
+    switchMap(action => {
+      return this.workspacesService
+        .postWorkspace(action.payload.name, action.payload.shortDescription)
+        .pipe(
+          tap(newWks => {
+            if (newWks) {
+              this.store$.dispatch(new Ui.CloseCreateWorkspace());
+              this.router.navigate(['/workspaces', newWks.id]);
+            }
+          }),
+          map(res => new Workspaces.CreateSuccess(res)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.debug(
+                `Error in workspaces.effects: ofType(Workspaces.Post)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
 
-      this.notifications.error(
-        `Workspaces`,
-        `An error occurred while adding a new workspace.`
-      );
-      return of(new Workspaces.CreateError());
+            this.notifications.error(
+              `Workspaces`,
+              `An error occurred while adding a new workspace.`
+            );
+            return of(
+              new Workspaces.CreateError({
+                createWksError: getErrorMessage(err),
+              })
+            );
+          })
+        );
     })
   );
 
@@ -223,6 +241,30 @@ export class WorkspacesEffects {
             }
 
             return of(new Workspaces.SetDescriptionError(action.payload));
+          })
+        )
+    )
+  );
+
+  @Effect()
+  setShortDescription$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.SetShortDescription>(Workspaces.SetShortDescriptionType),
+    switchMap(action =>
+      this.workspacesService
+        .setShortDescription(action.payload.id, action.payload.shortDescription)
+        .pipe(
+          map(_ => new Workspaces.SetShortDescriptionSuccess(action.payload)),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                `Error catched in workspaces.effects: ofType(Workspaces.SetShortDescription)`
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            return of(new Workspaces.SetShortDescriptionError(action.payload));
           })
         )
     )

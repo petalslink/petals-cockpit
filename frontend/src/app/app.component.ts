@@ -87,7 +87,11 @@ export class AppComponent implements OnInit, OnDestroy {
         classList.add(effectiveTheme);
       });
 
-    // svg icons for petals tree & overviews
+    // svg icons
+
+    const petalsLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
+      './assets/icons/svg/petals-cockpit-logo.svg'
+    );
     const busLogo = this.sanitizer.bypassSecurityTrustResourceUrl(
       './assets/icons/svg/bus-logo.svg'
     );
@@ -128,6 +132,7 @@ export class AppComponent implements OnInit, OnDestroy {
       './assets/icons/svg/namespace-logo.svg'
     );
 
+    this.matIconRegistry.addSvgIcon('petals', petalsLogo);
     this.matIconRegistry.addSvgIcon('bus', busLogo);
     this.matIconRegistry.addSvgIcon('component', compLogo);
     this.matIconRegistry.addSvgIcon('sa', saLogo);

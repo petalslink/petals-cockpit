@@ -13,45 +13,20 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxFlex fxLayout="column">
-  <mat-toolbar role="header" color="primary" class="header-toolbar mat-elevation-z6">
-    <button
-      mat-button
-      class="toolbar-logo"
-      [routerLink]="['/workspaces']"
-      (click)="clickPetalsLogo()"
-      [disabled]="logoDisabled$ | async"
-    >
-      <img class="logo-toolbar" [src]="logo()">
-    </button>
-
-    <button *ngIf="isOnWorkspace" mat-button (click)="toggleSidenav()" class="sidenav-toggle">
+<div fxFlex class="toolbar mat-elevation-z4 mat-typography">
+  <mat-toolbar role="header">
+    <button 
+      *ngIf="isOnWorkspace" 
+      mat-icon-button 
+      (click)="toggleSidenav()" 
+      class="btn-sidenav-toggle">
       <mat-icon>menu</mat-icon>
     </button>
 
-    <span fxLayout="row" fxFlex class="text-upper" [ngClass.gt-sm]="'margin-right-x1'">
+    <div fxLayout="row" fxLayoutAlign="start center" fxFlex [ngClass.gt-sm]="'margin-right-x1'">
       <span [hidden]="!isLargeScreen" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
-      <span *ngIf="ui.titleMainPart2" fxLayoutAlign="center center">
-        <mat-icon *ngIf="isLargeScreen">chevron_right</mat-icon>
-        <span class="color-accent-light-bold text-upper" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
-    </span>
-    </span>
-
-    <button mat-button class="btn-usr-admin" *ngIf="user.isAdmin" [routerLink]="['/admin']">
-      <mat-icon>settings</mat-icon>
-    </button>
-
-    <button mat-icon-button class="btn-logout-user margin-right-x1" [disabled]="isDisconnecting" (click)="disconnect()">
-      <mat-icon>power_settings_new</mat-icon>
-    </button>
-
-    <app-generate-icon 
-      class="btn-avatar-user margin-right-x0 cursor-pointer" 
-      [matTooltip]="user.name" 
-      matTooltipPosition="below" 
-      [size]="24"
-      [text]="user.id"
-      [routerLink]="['/profile']"
-    ></app-generate-icon>
+      <mat-icon class="icon-x3" *ngIf="isLargeScreen">chevron_right</mat-icon>
+      <span *ngIf="ui.titleMainPart2" class="color-primary-light-bold" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
+    </div>
   </mat-toolbar>
 </div>

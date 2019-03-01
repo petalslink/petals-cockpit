@@ -45,8 +45,7 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
-    # webdriver updates frozen to 2.41, see: https://gitlab.com/linagora/petals-cockpit/issues/469
-    - yarn run webdriver-manager update --versions.chrome=2.41
+    - yarn run webdriver-manager update --versions.chrome=2.45
     - du -hs node_modules || true
     - cd ..
   cache:
@@ -247,64 +246,45 @@ package-product:
   tags:
     - docker
 
-chromium-cypress:
-  <<: *node-java-yarn
-  stage: integration
-  only:
-    - master
-    - /^full\/.*$/
-  allow_failure: true
-  script:
-    - cd frontend
-    - yarn run build:ldap:ci
-    - nohup http-server --push-state --silent -p 4200 dist &
-    - echo $! > pid-nohup.txt
-    - sleep 5
-    - time yarn run cypress:chromium
-  after_script:
-    - kill -9 $(cat pid-nohup.txt)
-    - rm pid-nohup.txt
-  tags:
-    - docker
+###  For now, we don't use e2e-product. It will be refactored later ..
 
-
-e2e-product:
-  <<: *node-java-yarn
-  stage: integration
-  except:
-    # we don't want to test the final product in front/*, back/* and product/*
-    - /^front\/.*$/
-    - /^back\/.*$/
-    - /^product\/.*$/
-    - tags
-  dependencies:
-    # one or the other
-    - package-product
-    - package-product-master
-  # not able to connect to JMI using docker, for now e2e test are without petals
-  # services:
-  #   - petals/petals-esb-test
-  variables:
-    COCKPIT_CONFIG: e2e/e2e-backend-config.yml
-  script:
-    # TODO reuse script?
-    - export JAR=$(ls -1 petals-cockpit-*/lib/petals-cockpit-*.jar 2>/dev/null)
-    - export COCKPIT="java -ea -jar $JAR"
-    - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
-    - nohup $COCKPIT server $COCKPIT_CONFIG  > e2e/logs/cockpit-e2e-run.out.log 2> e2e/logs/cockpit-e2e-run.err.log &
-    - cd frontend
-    - sleep 2
-    - time yarn run e2e:product --webdriver-update false
-  # Protractor tests are unstable and may fail unexpectedly
-  # this workaround has to be removed if we stop relying on protractor
-  artifacts:
-    expire_in: 1 week
-    name: ${CI_JOB_NAME}-backendLogs-${CI_BUILD_REF:0:7}
-    paths:
-    - e2e/logs/
-  retry: 1
-  tags:
-    - docker
+# e2e-product:
+#   <<: *node-java-yarn
+#   stage: integration
+#   except:
+#     # we don't want to test the final product in front/*, back/* and product/*
+#     - /^front\/.*$/
+#     - /^back\/.*$/
+#     - /^product\/.*$/
+#     - tags
+#   dependencies:
+#     # one or the other
+#     - package-product
+#     - package-product-master
+#   # not able to connect to JMI using docker, for now e2e test are without petals
+#   # services:
+#   #   - petals/petals-esb-test
+#   variables:
+#     COCKPIT_CONFIG: e2e/e2e-backend-config.yml
+#   script:
+#     # TODO reuse script?
+#     - export JAR=$(ls -1 petals-cockpit-*/lib/petals-cockpit-*.jar 2>/dev/null)
+#     - export COCKPIT="java -ea -jar $JAR"
+#     - time $COCKPIT db migrate $COCKPIT_CONFIG --migrations e2e/migrations.xml
+#     - nohup $COCKPIT server $COCKPIT_CONFIG  > e2e/logs/cockpit-e2e-run.out.log 2> e2e/logs/cockpit-e2e-run.err.log &
+#     - cd frontend
+#     - sleep 2
+#     - time yarn run e2e:product --webdriver-update false
+#   # Protractor tests are unstable and may fail unexpectedly
+#   # this workaround has to be removed if we stop relying on protractor
+#   artifacts:
+#     expire_in: 1 week
+#     name: ${CI_JOB_NAME}-backendLogs-${CI_BUILD_REF:0:7}
+#     paths:
+#     - e2e/logs/
+#   retry: 1
+#   tags:
+#     - docker
 
 
 ### Test gitlab ci

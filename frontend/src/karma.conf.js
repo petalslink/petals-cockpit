@@ -36,11 +36,11 @@ module.exports = function(config) {
       clearContext: false, // leave Jasmine Spec Runner output visible in browser
     },
     files: [
-      { pattern: './src/styles.scss', included: true, watched: true },
+      { pattern: './styles.scss', included: true, watched: true },
       { pattern: './test.ts', watched: false },
     ],
     preprocessors: {
-      './src/styles.scss': ['scss'],
+      './styles.scss': ['scss'],
     },
     coverageIstanbulReporter: {
       dir: require('path').join(__dirname, '../coverage'),

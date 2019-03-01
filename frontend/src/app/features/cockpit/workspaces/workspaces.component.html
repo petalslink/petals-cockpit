@@ -15,21 +15,113 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <router-outlet></router-outlet>
 
-<ng-template #workspaceList>
-  <div class="dialog-workspaces-list" fxLayout="column" class="content">
-    <mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="start center">
-      <h3 class="matDialogTitle margin-left-x1">SELECT THE WORKSPACE</h3>
-    </mat-toolbar>
+<mat-card *ngIf="workspacesVisible$ | async" fxFlex class="mat-typography mat-elevation-z8 workspaces">
+  <div fxLayout="row" fxFlexFill class="workspaces-wrapper">
+    <div fxLayout="column" fxFlex class="workspaces-list">
 
-    <div class="central-content">
-      <mat-dialog-content>
+      <div fxLayout="column" fxLayoutAlign="center center" class="padding-top-x2">
+        <h1 class="title-workspaces-view">
+          <b>
+            <span *ngIf="workspacesListVisible$ | async; else createWks">
+              <span *ngIf="(workspaces$ | async).list.length > 0" class="title-select-wks">Select Your Workspace</span>
+            </span>
+            <ng-template #createWks>
+              <span *ngIf="createWorkspaceVisible$ | async" class="title-create-wks">Create New Workspace</span>
+            </ng-template>
+          </b>
+        </h1>
+
+        <div *ngIf="workspaces$ | async as workspaces" fxLayout="row" fxFlex>
+          <div *ngIf="!(isFetchingWorkspaces$ | async) && !(createWorkspaceVisible$ | async)">
+            <h3 *ngIf="!workspaces.isAddingWorkspace" class="info-workspaces-list">
+              <span *ngIf="workspaces.list.length > 0 && workspaces.list.length !== 1">You have access to several workspaces</span>
+              <span *ngIf="workspaces.list.length === 1">You have only access to this workspace</span>
+            </h3>
+          </div>
+        </div>
+
+        <div *ngIf="createWorkspaceVisible$ | async" fxLayout="row" fxFlex>
+          <h3 class="info-create-wks">
+            <span>You must create a workspace to work</span>
+          </h3>
+        </div>
+      </div>
+
+      <div *ngIf="isFetchingWorkspaces$ | async; else wksList" fxLayout="column" fxLayoutAlign="center center" fxFlex class="spinner-animation">
+        <span class="spinner"></span>
+      </div>
+
+      <div *ngIf="!(createWorkspaceVisible$ | async)" fxLayout="column" fxLayoutAlign="center center" fxFlex>
+        <div *ngIf="!(isFetchingWorkspaces$ | async)">
+          <div *ngIf="(workspaces$ | async).list.length === 0" fxLayout="column" fxLayoutAlign="center center" class="icon-wks-wrapper">
+            <fa-icon class="far icon-no-wks-found" [icon]="['far','folder']"></fa-icon>
+            <h1 fxLayout="row" fxLayoutAlign="center center" class="info-no-wks margin-top-x3">You have no access to any workspaces</h1>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #wksList>
         <app-workspaces-list
-          (fetch)="fetchWorkspace($event)"
-          (create)="createWorkspace($event)"
+          #wksList
+          *ngIf="workspacesListVisible$ | async"
+          [style.height]="(workspaces$ | async).list.length === 0 ? '0%' : '100%'"
           [workspaces]="workspaces$ | async"
-          [user]="user$ | async">
-        </app-workspaces-list>
-      </mat-dialog-content>
+          [user]="user$ | async"
+          (evtFetch)="onFetch($event)"
+        ></app-workspaces-list>
+      </ng-template>
+
+      <app-workspaces-create
+        #wksCreate
+        *ngIf="createWorkspaceVisible$ | async"
+        [appFocusInputIfLargeScreen]="isFocusWksName"
+        [msgErrorInput]="(workspaces$ | async).createWksError"
+        [canCreate]="!(workspaces$ | async).isAddingWorkspace"
+        (evtCreate)="onCreate($event)"
+        (evtFetch)="onFetch($event)"
+      ></app-workspaces-create>
+      
+      <div 
+        *ngIf="!(isFetchingWorkspaces$ | async)" 
+        fxLayout="column" 
+        fxLayoutAlign="center center" 
+        [ngClass.gt-md]="'margin-bottom-x2'"
+        class="margin-top-x2"
+      >
+        <a *ngIf="workspacesListVisible$ | async; else backWksListTpl" mat-stroked-button (click)="openCreateWorkspace()" class="btn-create-wks">
+          <span fxLayout="row" fxLayoutAlign="center center">
+            <fa-icon class="folder-plus icon-x2 margin-right-x1" icon="folder-plus"></fa-icon>
+            <span fxLayout="row" fxLayoutAlign="center center">Create New Workspace</span>
+          </span>
+        </a>
+        
+        <ng-template #backWksListTpl>
+          <a *ngIf="!(workspaces$ | async).isAddingWorkspace" mat-stroked-button (click)="backToWorkspacesList()" class="btn-back-wks-list">
+            <span fxLayout="row" fxLayoutAlign="center center">
+              <fa-icon class="icon-x2 margin-right-x1" icon="folder-open"></fa-icon>
+              <span fxLayout="row" fxLayoutAlign="center center">Back to Workspaces</span>
+            </span>
+          </a>
+        </ng-template>
+      </div>
+
     </div>
+
+    <div *ngIf="isLargeScreen$ | async" fxLayout="column" fxFlex="35" fxLayoutAlign="center center" class="home-wrapper">
+      <div fxLayout="row wrap" fxLayoutAlign="center center" class="logo-wrapper">
+        <div class="logo-petals"></div>
+      </div>
+      <div class="custom-border"></div>
+      <h2 fxLayout="column" fxLayoutAlign="center center" class="home-text margin-top-x2">
+        <span>
+            Build, Run, Monitor
+        </span>
+        <span>
+          Your SOA Integration Backbone.
+        </span>
+      </h2>
+    </div>
+    
   </div>
-</ng-template>
+
+</mat-card>

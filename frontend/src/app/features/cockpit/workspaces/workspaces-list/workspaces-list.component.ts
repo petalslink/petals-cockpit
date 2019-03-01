@@ -20,16 +20,17 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { ICurrentUser, IUser } from '@shared/state/users.interface';
 import {
   IWorkspace,
   IWorkspaces,
 } from '@wks/state/workspaces/workspaces.interface';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-workspaces-list',
@@ -37,52 +38,40 @@ import {
   styleUrls: ['./workspaces-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorkspacesListComponent implements OnInit {
+export class WorkspacesListComponent implements OnInit, OnDestroy {
+  onDestroy$ = new Subject<void>();
+
   private _workspaces: IWorkspaces;
   @Input() user: ICurrentUser;
-  @Output() fetch = new EventEmitter<IWorkspace>();
-  @Output() create = new EventEmitter<string>();
+  @Output() evtFetch = new EventEmitter<IWorkspace>();
 
-  newWksForm: FormGroup;
-
-  constructor(private fb: FormBuilder) {}
+  constructor() {}
 
   @Input()
   set workspaces(workspaces: IWorkspaces) {
     this._workspaces = workspaces;
-    if (this.newWksForm) {
-      if (workspaces.isAddingWorkspace) {
-        this.newWksForm.disable();
-      } else {
-        this.newWksForm.enable();
-      }
-    }
   }
 
   get workspaces() {
     return this._workspaces;
   }
 
-  ngOnInit() {
-    this.newWksForm = this.fb.group({
-      name: ['', Validators.required],
-    });
+  ngOnInit() {}
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   select(workspace: IWorkspace) {
-    this.fetch.emit(workspace);
-  }
-
-  onSubmit({ value }: { value: { name: string } }) {
-    this.create.emit(value.name);
-    this.newWksForm.reset();
+    this.evtFetch.emit(workspace);
   }
 
   getUsersNames(users: IUser[]) {
     return users
-      .filter(u => u.id !== this.user.id)
       .map(user => user.name)
-      .join(', ');
+      .join(', ')
+      .concat('.');
   }
 
   trackByWorkspace(i: number, workspace: IWorkspace) {

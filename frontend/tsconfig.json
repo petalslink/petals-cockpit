@@ -1,12 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    // can't use es6.
-    // see the followings issues :
-    // https://github.com/angular/material2/issues/11090
-    // https://github.com/angular/material2/issues/10567
-    "target": "es5",
-    "baseUrl": "./",
+    "baseUrl": "src",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -16,8 +11,6 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "jsx": "preserve",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2017", "dom"],
     "plugins": [
       {
         "name": "tslint-language-service",
@@ -27,6 +20,13 @@
         "disableNoUnusedVariableRule": false
       }
     ],
+    // can't use es6.
+    // see the followings issues :
+    // https://github.com/angular/material2/issues/11090
+    // https://github.com/angular/material2/issues/10567
+    "target": "es5",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
     "paths": {
       // temporary fix https://github.com/Stuk/jszip/issues/524
       "stream": ["../node_modules/readable-stream/readable.js"],
@@ -35,10 +35,10 @@
       "@feat/*": ["app/features/*"],
       "@shared/*": ["app/shared/*"],
       "@cock/*": ["app/features/cockpit/*"],
-      "@wks/*": ["app/features/cockpit/workspaces/*"]
+      "@wks/*": ["app/features/cockpit/workspaces/*"],
+      "@testing/*": ["testing/*"]
     }
   },
-  "include": ["src/**/*"],
   "angularCompilerOptions": {
     "preserveWhitespaces": false
   }

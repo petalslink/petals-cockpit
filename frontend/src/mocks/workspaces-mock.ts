@@ -45,6 +45,7 @@ export class Workspace {
   private static cpt = 0;
   public readonly id: string;
   public readonly name: string;
+  public shortDescription: string;
   public description: string;
   private readonly users = new Map<string, BackendUser>();
   private readonly buses = new Map<string, Bus>();
@@ -53,12 +54,21 @@ export class Workspace {
   private readonly services = new Map<string, Service>();
   private readonly endpoints = new Map<string, Endpoint>();
 
-  constructor(users: string[] = ['admin'], name?: string) {
+  constructor(
+    users: string[] = ['admin'],
+    name?: string,
+    shortDescription?: string,
+    description?: string
+  ) {
     const i = Workspace.cpt++;
     this.id = `idWks${i}`;
     this.name = name ? name : `Workspace ${i}`;
-    this.description =
-      'Put some description in **markdown** for the workspace here.';
+    this.shortDescription = shortDescription
+      ? shortDescription
+      : 'No description provided.';
+    this.description = description
+      ? description
+      : 'Put some description in **markdown** for the workspace here.';
     users.forEach(u => this.users.set(u, BackendUser.get(u)));
 
     // by default add 1 bus
@@ -81,6 +91,7 @@ export class Workspace {
       workspace: {
         id: this.id,
         name: this.name,
+        shortDescription: this.shortDescription,
         description: this.description,
         users: this.getUsersIds(),
       },
@@ -90,7 +101,13 @@ export class Workspace {
 
   toObj(): { [id: string]: IWorkspaceBackend } {
     return {
-      [this.id]: { id: this.id, name: this.name, users: this.getUsersIds() },
+      [this.id]: {
+        id: this.id,
+        name: this.name,
+        users: this.getUsersIds(),
+        shortDescription: this.shortDescription,
+        description: this.description,
+      },
     };
   }
 
@@ -551,8 +568,13 @@ export class Workspaces {
     };
   }
 
-  create(users?: string[], name?: string) {
-    const ws = new Workspace(users, name);
+  create(
+    users?: string[],
+    name?: string,
+    shortDescription?: string,
+    description?: string
+  ) {
+    const ws = new Workspace(users, name, shortDescription, description);
     this.workspaces.set(ws.id, ws);
     return ws;
   }
@@ -575,6 +597,7 @@ export class Workspaces {
 export const workspacesService = new Workspaces();
 
 const ws0 = workspacesService.create();
+ws0.shortDescription = 'This is short description for the Workspace 0.';
 ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 

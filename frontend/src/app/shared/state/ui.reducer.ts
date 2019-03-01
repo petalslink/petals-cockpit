@@ -24,8 +24,10 @@ export namespace UiReducer {
     | Ui.OpenSidenav
     | Ui.CloseSidenav
     | Ui.ToggleSidenav
-    | Ui.OpenWorkspaces
-    | Ui.CloseWorkspaces
+    | Ui.OpenWorkspacesList
+    | Ui.OpenCreateWorkspace
+    | Ui.CloseWorkspacesList
+    | Ui.CloseCreateWorkspace
     | Ui.ChangeScreenSize
     | Ui.SetTitles
     | Ui.ChangeTheme
@@ -42,11 +44,17 @@ export namespace UiReducer {
       case Ui.ToggleSidenavType: {
         return toggleSidenav(table);
       }
-      case Ui.OpenWorkspacesType: {
-        return openWorkspaces(table);
+      case Ui.OpenWorkspacesListType: {
+        return openWorkspacesList(table);
       }
-      case Ui.CloseWorkspacesType: {
-        return closeWorkspaces(table);
+      case Ui.OpenCreateWorkspaceType: {
+        return openCreateWorkspace(table);
+      }
+      case Ui.CloseWorkspacesListType: {
+        return closeWorkspacesList(table);
+      }
+      case Ui.CloseCreateWorkspaceType: {
+        return closeCreateWorkspace(table);
       }
       case Ui.ChangeScreenSizeType: {
         return changeScreenSize(table, action.payload);
@@ -60,6 +68,7 @@ export namespace UiReducer {
       case Users.DisconnectedType: {
         return {
           ...uiFactory(),
+          isWorkspacesListVisible: table.isWorkspacesListVisible,
           screenSize: table.screenSize,
           settings: table.settings,
         };
@@ -90,17 +99,33 @@ export namespace UiReducer {
     };
   }
 
-  function openWorkspaces(ui: IUi): IUi {
+  function openWorkspacesList(ui: IUi): IUi {
     return {
       ...ui,
-      isPopupListWorkspacesVisible: true,
+      isWorkspacesListVisible: true,
+      isCreateWorkspaceVisible: false,
     };
   }
 
-  function closeWorkspaces(ui: IUi): IUi {
+  function openCreateWorkspace(ui: IUi): IUi {
     return {
       ...ui,
-      isPopupListWorkspacesVisible: false,
+      isCreateWorkspaceVisible: true,
+      isWorkspacesListVisible: false,
+    };
+  }
+
+  function closeWorkspacesList(ui: IUi): IUi {
+    return {
+      ...ui,
+      isWorkspacesListVisible: false,
+    };
+  }
+
+  function closeCreateWorkspace(ui: IUi): IUi {
+    return {
+      ...ui,
+      isCreateWorkspaceVisible: false,
     };
   }
 

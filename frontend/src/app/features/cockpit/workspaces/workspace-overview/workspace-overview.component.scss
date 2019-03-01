@@ -24,20 +24,41 @@
   font-weight: bold;
 }
 
-.description-wks {
-  resize: none;
-  border: none;
-  overflow: auto;
-  word-break: break-word;
-  white-space: pre-line;
-}
-
 .mat-card-title {
   font-size: 16px;
 }
 
 .description,
 .workspace-description-edit {
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+mat-card-content.workspace-short-description > .short-description {
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+.short-description-form-field,
+.description-form-field {
+  textarea {
+    min-height: 80px;
+    margin: 0;
+    padding: 0;
+    resize: none;
+    border: none;
+    overflow: auto;
+    word-break: break-word;
+    white-space: pre-line;
+  }
+}
+
+.custom-border {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}
+
+mat-toolbar.toolbar-page-header {
   word-break: break-word;
   white-space: pre-line;
 }

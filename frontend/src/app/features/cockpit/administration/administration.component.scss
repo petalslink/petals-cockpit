@@ -20,6 +20,14 @@
   overflow: auto;
 }
 
+.toolbar {
+  position: fixed;
+  z-index: 2000;
+  width: 100%;
+  left: 64px;
+  top: 0;
+}
+
 mat-form-field [matprefix] {
   margin-right: 10px;
 }

@@ -21,6 +21,7 @@ import { SharedModule } from '@shared/shared.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { WorkspacesRoutingModule } from './workspaces-routing.module';
 
+import { WorkspacesCreateComponent } from './workspaces-create/workspaces-create.component';
 import { WorkspacesListComponent } from './workspaces-list/workspaces-list.component';
 import {
   NoWorkspaceComponent,
@@ -33,6 +34,7 @@ import {
     WorkspacesComponent,
     NoWorkspaceComponent,
     WorkspacesListComponent,
+    WorkspacesCreateComponent,
   ],
 })
 export class WorkspacesModule {}

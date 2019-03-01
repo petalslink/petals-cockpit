@@ -22,40 +22,53 @@ import { Matcher, urlToMatch, waitAndClick } from '../utils';
 import { WorkspaceOverviewPage } from './workspace.po';
 
 export class WorkspacesPage {
-  public static readonly component = $(`app-workspaces-list`);
+  public static readonly component = $(`app-workspaces`);
+  public static readonly componentList = $(`app-workspaces-list`);
+  public static readonly componentCreate = $(`app-workspaces-create`);
 
   public readonly component = WorkspacesPage.component;
-  public readonly workspacesInfo = this.component.$(`.info-workspaces`);
-  public readonly workspacesInfos = this.workspacesInfo.$$(
-    'div.info-workspace'
+  public readonly componentList = WorkspacesPage.componentList;
+  public readonly componentCreate = WorkspacesPage.componentCreate;
+
+  public readonly goToCreateWksButton = this.component.$(`.btn-create-wks`);
+  public readonly goToWksListButton = this.component.$(`.btn-back-wks-list`);
+
+  public readonly workspacesList = this.componentList.$(`.workspaces-list`);
+  public readonly workspacesItem = this.workspacesList.$$('.workspaces-item');
+
+  public readonly inputName = this.componentCreate.$(
+    `input[formControlName="name"]`
   );
+  public readonly textareaShortDescription = this.componentCreate.$(`textarea`);
+  public readonly addButton = this.componentCreate.$(`.btn-add-workspace`);
 
-  public readonly inputName = this.component.$(`input[formControlName="name"]`);
-  public readonly addButton = this.component.$(`.btn-add-workspace`);
-
-  static waitAndGet(asDialog = false) {
-    if (!asDialog) {
+  static waitAndGet(asCard = false) {
+    if (!asCard) {
       browser.wait(urlToMatch(/\/workspaces$/), waitTimeout);
     }
-    browser.wait(EC.visibilityOf(WorkspacesPage.component), waitTimeout);
+    browser.wait(EC.visibilityOf(WorkspacesPage.componentList), waitTimeout);
     return new WorkspacesPage();
   }
 
   private constructor() {}
 
-  addWorkspace(name: string) {
+  addWorkspace(name: string, shortDescription?: string) {
+    // go to create workspace view first
+    waitAndClick(this.goToCreateWksButton);
+
     // because of
     // https://github.com/angular/protractor/issues/3196
     // https://github.com/angular/protractor/issues/4280
     // https://github.com/angular/protractor/issues/698
-    for (let i = 0; i < name.length; i++) {
+    for (let i = 0; i < (name.length && shortDescription.length); i++) {
       this.inputName.sendKeys(name.charAt(i));
+      this.textareaShortDescription.sendKeys(shortDescription.charAt(i));
     }
     waitAndClick(this.addButton);
   }
 
   selectWorkspace(index: number, expectedName?: Matcher) {
-    waitAndClick(this.workspacesInfo.$$('div.info-workspace').get(index));
+    waitAndClick(this.workspacesList.$$('.workspaces-item').get(index));
 
     return WorkspaceOverviewPage.waitAndGet(expectedName);
   }

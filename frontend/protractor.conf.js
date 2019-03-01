@@ -25,7 +25,13 @@ const initConfig = () => {
       browserName: 'chrome',
       chromeOptions: {
         useAutomationExtension: false,
-        args: ['--no-sandbox', '--headless', '--disable-gpu'],
+        args: [
+          '--no-sandbox',
+          '--headless',
+          '--disable-gpu',
+          '--disable-extensions',
+          '--disable-dev-shm-usage',
+        ],
       },
     },
     directConnect: true,

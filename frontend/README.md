@@ -15,25 +15,28 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Run `yarn build` to build the project. The build artifacts will be stored in the `dist/` directory. 
+
+To build the project with specific environment
+* run `yarn build:product` for a production build, 
+* run `yarn build:ldap` for a production build and ldap mode
+* run `yarn build:no-ldap` for a production build and no ldap mode
+* run `yarn build:demo` for a demo gitlab pages build
 
 ## Running unit tests
 
-Run `yarn run test` to execute the unit tests.
+Run `yarn test` to execute the unit tests.
 
 ## Running "end-to-end" tests
 
 Considered end to end by frontend standards (ie: functionnal, integration)   
 
-Run `yarn run e2e` to execute the end-to-end tests (against frontend mocks) via [Protractor](http://www.protractortest.org/).  
+Run `yarn e2e` to execute the "end-to-end" tests (against frontend mocks) via [Protractor](http://www.protractortest.org/).  
 
-To execute end-to-end tests (against frontend mocks) via [cypress](https://www.cypress.io/)
+To execute "end-to-end" tests (against frontend mocks) via [cypress](https://www.cypress.io/)
 * run `yarn cypress open` for interactive mode
-* run `yarn cypress:chromium` for headless mode
-
-## Running actual end-to-end tests
-
-See `../e2e/README.md` to execute end-to-end tests against a real backend via [Protractor](http://www.protractortest.org/).
+* run `yarn cypress:e2e-ldap` for headless mode and ldap mode
+* run `yarn cypress:e2e-no-ldap` for headless mode and no ldap mode
 
 ## Further help
 
@@ -49,6 +52,6 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 ## Notes about the various `tsconfig.json` files
 
-Angular-cli (configured in `.angular-cli.conf`) uses `src/tsconfig.app.json` to compile the application, `src/tsconfig.spec.json` to compile the tests and `e2e/tsconfig.e2e.json` to compile the e2e tests.
+Angular-cli (configured in `.angular.json`) uses `src/tsconfig.app.json` to compile the application, `src/tsconfig.spec.json` to compile the tests, `e2e/tsconfig.e2e.json` to compile the "end-to-end" tests and `cypress/tsconfig.json` to compile the "end-to-end" tests.
 
 The IDE will most certainly uses `src/tsconfig.json` for the files in `src/` and `src/tsconfig.json` for the files in `e2e/`.

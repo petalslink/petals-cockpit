@@ -21,10 +21,11 @@ const conf = require('../../protractor.conf.js');
 const defaultConfig = conf.initConfig();
 
 const actualConfig = {
+  framework: 'jasmine',
   specs: ['./*.e2e-spec.ts'],
   onPrepare() {
     require('ts-node').register({
-      project: 'e2e/actual-e2e/tsconfig.e2e.json',
+      project: 'e2e/tsconfig.e2e.json',
     });
     jasmine
       .getEnv()

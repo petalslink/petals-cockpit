@@ -22,7 +22,7 @@ const bsAddLdapUser = `app-add-ldap-user`;
 
 export const ADMINISTRATION_DOM = {
   texts: {
-    title: `${bs} mat-toolbar .title`,
+    title: `${bs} mat-toolbar .title-admin-page`,
     titleUserIds: `${bs} .pnl-list-users mat-panel-title .user-id`,
     titleUserNames: `${bs} .pnl-list-users mat-panel-title .user-name`,
     userId: `${bs} mat-expansion-panel-content .user-id`,

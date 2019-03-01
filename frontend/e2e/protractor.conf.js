@@ -21,6 +21,7 @@ const conf = require('../protractor.conf.js');
 const defaultConfig = conf.initConfig();
 
 const e2eConfig = {
+  framework: 'jasmine',
   specs: ['./*.e2e-spec.ts'],
   extends: '../../protractor.conf.js',
   onPrepare() {

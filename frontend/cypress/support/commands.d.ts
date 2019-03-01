@@ -51,7 +51,12 @@ declare namespace Cypress {
 
     // workspaces.commands
     expectWorkspacesListToBe(list: string[]): any;
-    addWorkspace(name: string): any;
+    addWorkspace(name: string, description?: string): any;
+    addWorkspaceAndExpectToFail(
+      msgError: string,
+      name: string,
+      description?: string
+    ): any;
     expectDialogDeletionWksDescriptionToBe(description: string[]): any;
     deleteWks(shouldSuccess?: boolean): any;
 
