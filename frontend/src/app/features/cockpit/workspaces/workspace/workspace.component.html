@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     *ngIf="workspace$ | async as workspace"
     fxLayout="column"
     class="workspace-sidenav"
-    [opened]="sidenavVisible$ | async"
-    [mode]="sidenavMode$ | async"
+    mode="side" 
+    opened
     [disableClose]="true"
   >
     <div class="pnl-buttons-workspaces">
