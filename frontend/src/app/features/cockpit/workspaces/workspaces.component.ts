@@ -55,8 +55,8 @@ export class WorkspacesComponent
   user$: Observable<ICurrentUser>;
 
   workspacesVisible$: Observable<boolean>;
-
   isFetchingWorkspaces$: Observable<boolean>;
+  isFetchingWorkspace$: Observable<boolean>;
   workspacesListVisible$: Observable<boolean>;
   createWorkspaceVisible$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
@@ -95,6 +95,10 @@ export class WorkspacesComponent
     );
 
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
+
+    this.isFetchingWorkspace$ = this.store$.pipe(
+      select(state => state.workspaces.isFetchingWorkspace)
+    );
   }
 
   ngOnDestroy() {

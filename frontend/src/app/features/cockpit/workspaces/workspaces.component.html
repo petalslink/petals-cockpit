@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <router-outlet></router-outlet>
 
+<app-loading *ngIf="isFetchingWorkspace$ | async" [isOnLoading]="isFetchingWorkspace$ | async"></app-loading>
+
 <mat-card *ngIf="workspacesVisible$ | async" fxFlex class="mat-typography mat-elevation-z8 workspaces">
   <div fxLayout="row" fxFlexFill class="workspaces-wrapper">
     <div fxLayout="column" fxFlex class="workspaces-list">

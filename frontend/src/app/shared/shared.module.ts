@@ -53,6 +53,7 @@ import { NgPipesModule } from 'ngx-pipes';
 
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
+import { LoadingComponent } from './components/loading/loading.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
 import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-toolbar.component';
 import { MessageComponent } from './components/message/message.component';
@@ -149,6 +150,7 @@ export const declarations = [
   ColorSearchedLettersDirective,
   NotFound404Component,
   LedComponent,
+  LoadingComponent,
   FocusInputDirective,
   FocusInputIfLargeScreenDirective,
   MessageComponent,

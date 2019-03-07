@@ -68,6 +68,7 @@ export interface IWorkspacesCommon {
   // for workspaces
   isAddingWorkspace: boolean;
   isFetchingWorkspaces: boolean;
+  isFetchingWorkspace: boolean;
 
   isFetchingServices: boolean;
 
@@ -92,6 +93,7 @@ export function workspacesTableFactory(): IWorkspacesTable {
 
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
+    isFetchingWorkspace: false,
 
     isFetchingServices: false,
 
