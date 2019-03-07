@@ -27,6 +27,9 @@ import { select, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { distinctUntilChanged, map, takeUntil, tap } from 'rxjs/operators';
 
+import { CockpitComponent } from '@feat/cockpit/cockpit.component';
+import { LoginComponent } from '@feat/login/login.component';
+import { SetupComponent } from '@feat/setup/setup.component';
 import { IStore } from './shared/state/store.interface';
 import { Ui } from './shared/state/ui.actions';
 import { ScreenSize } from './shared/state/ui.interface';
@@ -40,6 +43,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   @HostBinding('class') componentCssClass: any;
+
+  displayLoadingAccess = true;
 
   public notificationOptions = {
     position: ['bottom', 'right'],
@@ -151,5 +156,17 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
+
+  onActivate(component: Component) {
+    if (
+      component instanceof LoginComponent ||
+      component instanceof SetupComponent ||
+      component instanceof CockpitComponent
+    ) {
+      this.displayLoadingAccess = false;
+    } else {
+      this.displayLoadingAccess = true;
+    }
   }
 }

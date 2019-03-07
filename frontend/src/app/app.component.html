@@ -13,6 +13,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<router-outlet></router-outlet>
+<router-outlet (activate)="onActivate($event)"></router-outlet>
+
+<app-loading *ngIf="displayLoadingAccess" [isOnLoading]="displayLoadingAccess"></app-loading>
 
 <simple-notifications [options]="notificationOptions"></simple-notifications>
