@@ -68,7 +68,6 @@ export namespace UiReducer {
       case Users.DisconnectedType: {
         return {
           ...uiFactory(),
-          isWorkspacesListVisible: table.isWorkspacesListVisible,
           screenSize: table.screenSize,
           settings: table.settings,
         };
