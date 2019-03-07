@@ -19,7 +19,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <button mat-button (click)="clickPetalsLogo()" class="btn-logo">
         <mat-icon class="icon-petals icon-x5" svgIcon="petals"></mat-icon>
       </button>
-  
+    </div>
+    
+    <div fxFlex fxLayout="column" fxLayoutAlign="end center" class="sidebar-bottom">
       <button 
         *ngIf="user.isAdmin" 
         mat-button 
@@ -31,9 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       >
         <fa-icon class="icon-administration icon-x2" icon="cog"></fa-icon>
       </button>
-    </div>
-    
-    <div fxFlex fxLayout="column" fxLayoutAlign="end center" class="sidebar-bottom">
+      
       <button 
         mat-button
         [matTooltip]="user.name" 

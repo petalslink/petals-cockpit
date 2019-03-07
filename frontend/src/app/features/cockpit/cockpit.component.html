@@ -16,9 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div class="page-cockpit" fxLayout="column" fxFill>
 
   <app-sidebar [user]="user$ | async" [isDisconnecting]="isDisconnecting$ | async"></app-sidebar>
-    
-  <app-header *ngIf="isOnWorkspace$ | async" [isLargeScreen]="isLargeScreen$ | async" [ui]="ui$ | async" [isOnWorkspace]="isOnWorkspace$ | async"></app-header>
 
-  <router-outlet class="header-hack"></router-outlet>
+  <router-outlet></router-outlet>
   
 </div>

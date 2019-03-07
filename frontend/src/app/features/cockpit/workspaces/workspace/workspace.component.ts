@@ -28,6 +28,8 @@ import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
+import { IUi } from '@shared/state/ui.interface';
+import { isLargeScreen } from '@shared/state/ui.selectors';
 import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
 import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
@@ -52,12 +54,19 @@ import {
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  ui$: Observable<IUi>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
   interfaces$: Observable<IInterfaceRow[]>;
   endpoints$: Observable<IEndpointRow[]>;
   services$: Observable<IServiceRow[]>;
   tree$: Observable<WorkspaceElement[]>;
+
+  sidenavMode$: Observable<string>;
+
+  isLargeScreen$: Observable<boolean>;
+  isOnWorkspace$: Observable<boolean>;
+  sidenavVisible$: Observable<boolean>;
 
   retrievedSelectedIndex: number;
 
@@ -69,8 +78,11 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // TODO: investigate observable unsubscription
-    // See https://gitlab.com/linagora/petals-cockpit/issues/445
+    this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
+    this.isOnWorkspace$ = this.store$.pipe(
+      select(state => !!state.workspaces.selectedWorkspaceId)
+    );
+    this.ui$ = this.store$.pipe(select(state => state.ui));
 
     this.workspace$ = this.store$.pipe(select(getCurrentWorkspace));
     this.busesInProgress$ = this.store$.pipe(select(getBusesInProgress));

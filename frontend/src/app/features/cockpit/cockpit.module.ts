@@ -24,7 +24,6 @@ import { UserProfileModule } from './user-profile/user-profile.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 
 import { CockpitComponent } from './cockpit.component';
-import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 
 @NgModule({
@@ -35,6 +34,6 @@ import { SidebarComponent } from './sidebar/sidebar.component';
     AdministrationModule,
     UserProfileModule,
   ],
-  declarations: [CockpitComponent, HeaderComponent, SidebarComponent],
+  declarations: [CockpitComponent, SidebarComponent],
 })
 export class CockpitModule {}

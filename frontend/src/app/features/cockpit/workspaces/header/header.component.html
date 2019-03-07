@@ -13,12 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxFlex class="toolbar mat-elevation-z4 mat-typography">
+<div fxLayout="column" class="toolbar mat-elevation-z4 mat-typography">
   <mat-toolbar role="header">
     <div fxLayout="row" fxLayoutAlign="start center" fxFlex [ngClass.gt-sm]="'margin-right-x1'">
       <span [hidden]="!isLargeScreen" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
       <mat-icon class="icon-x3" *ngIf="isLargeScreen">chevron_right</mat-icon>
-      <span *ngIf="ui.titleMainPart2" class="color-primary-light-bold" [ngClass.lt-sm]="'pnl-title-main'">{{ ui.titleMainPart2 }}</span>
+      <span *ngIf="ui.titleMainPart2" class="color-primary-light-bold">{{ ui.titleMainPart2 }}</span>
     </div>
   </mat-toolbar>
 </div>

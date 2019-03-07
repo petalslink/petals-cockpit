@@ -23,6 +23,7 @@ import { ServicesMenuModule } from '@wks/services-menu/services-menu.module';
 import { WorkspaceOverviewModule } from '@wks/workspace-overview/workspace-overview.module';
 import { WorkspaceRoutingModule } from './workspace-routing.module';
 
+import { HeaderComponent } from '@wks/header/header.component';
 import {
   DeletedWorkspaceDialogComponent,
   WorkspaceComponent,
@@ -36,7 +37,11 @@ import {
     ServicesMenuModule,
     WorkspaceRoutingModule,
   ],
-  declarations: [WorkspaceComponent, DeletedWorkspaceDialogComponent],
+  declarations: [
+    HeaderComponent,
+    WorkspaceComponent,
+    DeletedWorkspaceDialogComponent,
+  ],
   entryComponents: [DeletedWorkspaceDialogComponent],
 })
 export class WorkspaceModule {}
