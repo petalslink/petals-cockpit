@@ -15,14 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxFlex class="toolbar mat-elevation-z4 mat-typography">
   <mat-toolbar role="header">
-    <button 
-      *ngIf="isOnWorkspace" 
-      mat-icon-button 
-      (click)="toggleSidenav()" 
-      class="btn-sidenav-toggle">
-      <mat-icon>menu</mat-icon>
-    </button>
-
     <div fxLayout="row" fxLayoutAlign="start center" fxFlex [ngClass.gt-sm]="'margin-right-x1'">
       <span [hidden]="!isLargeScreen" *ngIf="ui.titleMainPart1">{{ ui.titleMainPart1 }}</span>
       <mat-icon class="icon-x3" *ngIf="isLargeScreen">chevron_right</mat-icon>

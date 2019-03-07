@@ -21,10 +21,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
 
-import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { IUi } from '@shared/state/ui.interface';
 
 @Component({
@@ -38,11 +35,7 @@ export class HeaderComponent implements OnInit {
   @Input() ui: IUi;
   @Input() isOnWorkspace: boolean;
 
-  constructor(private store$: Store<IStore>) {}
+  constructor() {}
 
   ngOnInit() {}
-
-  toggleSidenav() {
-    this.store$.dispatch(new Ui.ToggleSidenav());
-  }
 }

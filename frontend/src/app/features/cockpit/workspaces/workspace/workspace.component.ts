@@ -24,11 +24,10 @@ import { select, Store } from '@ngrx/store';
 // tslint:disable: no-unused-variable
 import { LocalStorageService } from 'ngx-webstorage';
 import { Observable, Subject } from 'rxjs';
-import { filter, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
-import { isSmallScreen } from '@shared/state/ui.selectors';
 import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 import { getBusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
 import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
@@ -53,8 +52,6 @@ import {
 export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  sidenavVisible$: Observable<boolean>;
-  sidenavMode$: Observable<string>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
   interfaces$: Observable<IInterfaceRow[]>;
@@ -97,15 +94,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
     this.retrievedSelectedIndex = this.storage.retrieve(
       'left-menu-selected-index'
-    );
-
-    // sidenav
-    this.sidenavVisible$ = this.store$.pipe(
-      select(state => state.ui.isSidenavVisible)
-    );
-    this.sidenavMode$ = this.store$.pipe(
-      isSmallScreen,
-      map(ss => (ss ? `over` : `side`))
     );
 
     // open deleted warning if the workspace has been deleted
