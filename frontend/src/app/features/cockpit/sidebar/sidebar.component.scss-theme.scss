@@ -28,6 +28,9 @@
         .btn-logo {
           border-bottom-color: mat-color($primary, default-contrast);
         }
+      }
+      .sidebar-bottom {
+        color: mat-color($primary, default-contrast);
         .btn-user-admin {
           &.active {
             border-left-color: mat-color($accent);
@@ -35,9 +38,6 @@
             background-color: mat-color($primary, 900);
           }
         }
-      }
-      .sidebar-bottom {
-        color: mat-color($primary, default-contrast);
         .btn-user-profile {
           &.active {
             border-left-color: mat-color($accent);

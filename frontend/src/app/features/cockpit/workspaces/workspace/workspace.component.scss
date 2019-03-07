@@ -22,9 +22,15 @@
   flex-direction: column;
 }
 
+app-header {
+  left: 32px;
+  width: 100%;
+}
+
 mat-sidenav-container {
   left: 32px;
-  width: calc(100% - 64px);
+  margin-top: 64px;
+  width: 100%;
   background-image: url(../../../../../assets/img/gray_jean.png);
 
   // all menu views have the same size (petals, service)

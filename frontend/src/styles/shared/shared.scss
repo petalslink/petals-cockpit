@@ -207,9 +207,9 @@ app-workspace
 }
 
 // customize toolbars
-app-header .header-toolbar,
-.header-toolbar,
-.admin-page > mat-toolbar.toolbar-page-header {
+app-workspace > app-header > .toolbar > mat-toolbar,
+app-administration > .wrapper-content > .toolbar > mat-toolbar,
+app-user-profile > .wrapper-content > .toolbar > mat-toolbar {
   height: 64px;
   min-height: 64px;
 }
