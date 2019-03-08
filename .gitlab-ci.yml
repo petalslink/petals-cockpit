@@ -35,8 +35,8 @@ variables:
     - docker
 
 
-.node-6: &node-java-yarn
-  image: registry.gitlab.com/linagora/node-java-yarn-docker:n9-j8
+.node-10: &node-java-yarn
+  image: registry.gitlab.com/linagora/node-java-yarn-docker:n10-j8
   before_script:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
