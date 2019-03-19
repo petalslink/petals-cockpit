@@ -19,10 +19,10 @@ package org.ow2.petals.cockpit.server.bundles.security;
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.pac4j.core.client.IndirectClient;
-import org.pac4j.core.context.WebContext;
 import org.pac4j.core.credentials.UsernamePasswordCredentials;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.redirect.RedirectAction;
+import org.pac4j.jax.rs.pac4j.JaxRsAjaxRequestResolver;
 
 public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredentials, CommonProfile> {
 
@@ -31,7 +31,8 @@ public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredential
 
     public CockpitAuthClient() {
         // let's always consider it as an ajax request: no redirect will happen then!
-        setAjaxRequestResolver(ctx -> true);
+        setAjaxRequestResolver(new JaxRsAjaxRequestResolver());
+
         // we don't really care because we never use it to redirect (see above)
         setRedirectActionBuilder(wc -> RedirectAction.success(""));
     }
@@ -44,12 +45,12 @@ public class CockpitAuthClient extends IndirectClient<UsernamePasswordCredential
     }
 
     @Override
-    protected void clientInit(WebContext context) {
+    protected void clientInit() {
         if (ldapConf != null) {
             defaultAuthenticator(new LdapAuthenticator(ldapConf));
         } else {
             defaultAuthenticator(new CockpitAuthenticator());
         }
-        defaultCredentialsExtractor(new CockpitExtractor(getName()));
+        defaultCredentialsExtractor(new CockpitExtractor());
     }
 }
