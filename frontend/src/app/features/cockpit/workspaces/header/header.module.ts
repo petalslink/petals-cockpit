@@ -15,29 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
+import { NgModule } from '@angular/core';
 
-import { IUi } from '@shared/state/ui.interface';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
+import { SharedModule } from '@shared/shared.module';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { HeaderComponent } from './header.component';
 
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+@NgModule({
+  imports: [SharedModule],
+  declarations: [BreadcrumbComponent, HeaderComponent],
+  exports: [HeaderComponent],
 })
-export class HeaderComponent implements OnInit {
-  @Input() isLargeScreen: boolean;
-  @Input() isOnWorkspace: boolean;
-  @Input() ui: IUi;
-  @Input() workspace: IWorkspace;
-
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class HeaderModule {}

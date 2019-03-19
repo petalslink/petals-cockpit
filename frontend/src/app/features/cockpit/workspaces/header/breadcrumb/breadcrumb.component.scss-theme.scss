@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,29 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
+@mixin custom-breadcrumb-theme($theme) {
+  $primary: map-get($theme, primary);
 
-import { IUi } from '@shared/state/ui.interface';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
-
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class HeaderComponent implements OnInit {
-  @Input() isLargeScreen: boolean;
-  @Input() isOnWorkspace: boolean;
-  @Input() ui: IUi;
-  @Input() workspace: IWorkspace;
-
-  constructor() {}
-
-  ngOnInit() {}
+  nav.breadcrumb {
+    div.breadcrumb-item {
+      a.breadcrumb-item-link {
+        div {
+          h4.item-name {
+            color: mat-color($mat-grey, 800);
+          }
+        }
+        &.active-link {
+          div {
+            background-color: mat-color($mat-grey, 300);
+            h4.item-name {
+              color: mat-color($primary, 800);
+            }
+          }
+        }
+      }
+    }
+  }
 }

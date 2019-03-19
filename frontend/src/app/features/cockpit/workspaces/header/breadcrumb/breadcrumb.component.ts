@@ -21,21 +21,27 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-
-import { IUi } from '@shared/state/ui.interface';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
+import { IWorkspace } from '../../state/workspaces/workspaces.interface';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  selector: 'app-breadcrumb',
+  templateUrl: './breadcrumb.component.html',
+  styleUrls: ['./breadcrumb.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HeaderComponent implements OnInit {
-  @Input() isLargeScreen: boolean;
-  @Input() isOnWorkspace: boolean;
-  @Input() ui: IUi;
-  @Input() workspace: IWorkspace;
+export class BreadcrumbComponent implements OnInit {
+  private _workspace: IWorkspace;
+
+  @Input() maxLength = 16;
+
+  @Input('workspace')
+  set workspace(workspace: IWorkspace) {
+    this._workspace = workspace;
+  }
+
+  get workspace() {
+    return this._workspace;
+  }
 
   constructor() {}
 

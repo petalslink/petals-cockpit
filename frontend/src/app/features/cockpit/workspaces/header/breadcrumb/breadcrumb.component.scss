@@ -15,29 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
-
-import { IUi } from '@shared/state/ui.interface';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
-
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class HeaderComponent implements OnInit {
-  @Input() isLargeScreen: boolean;
-  @Input() isOnWorkspace: boolean;
-  @Input() ui: IUi;
-  @Input() workspace: IWorkspace;
-
-  constructor() {}
-
-  ngOnInit() {}
+nav.breadcrumb {
+  div.breadcrumb-item {
+    a.breadcrumb-item-link {
+      min-width: 0;
+      padding: 2px 6px;
+      border-radius: 6px;
+      div {
+        h4.item-name {
+          font-weight: normal;
+        }
+      }
+      &.active-link {
+        div {
+          z-index: 1;
+          h4.item-name {
+            z-index: 2;
+            font-weight: normal;
+          }
+        }
+      }
+    }
+  }
 }
