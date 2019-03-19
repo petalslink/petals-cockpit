@@ -20,7 +20,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import {
   componentsOfCurrentContainerByName,
   getCurrentContainer,
@@ -50,13 +49,6 @@ export class PetalsContainerViewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals',
-        titleMainPart2: 'Container',
-      })
-    );
-
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );

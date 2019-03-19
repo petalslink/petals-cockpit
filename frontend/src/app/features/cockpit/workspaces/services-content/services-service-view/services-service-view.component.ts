@@ -20,7 +20,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentServiceInterfacesEndpoints,
   IServiceOverview,
@@ -40,13 +39,6 @@ export class ServicesServiceViewComponent implements OnInit {
   ngOnInit() {
     this.service$ = this.store$.pipe(
       select(getCurrentServiceInterfacesEndpoints)
-    );
-
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Services',
-        titleMainPart2: 'Service',
-      })
     );
 
     this.workspaceId$ = this.store$.pipe(

@@ -20,7 +20,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentServiceAssembly,
   IServiceAssemblyWithSUsAndComponents,
@@ -39,13 +38,6 @@ export class PetalsServiceAssemblyViewComponent implements OnInit {
 
   ngOnInit() {
     this.serviceAssembly$ = this.store$.pipe(select(getCurrentServiceAssembly));
-
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals',
-        titleMainPart2: 'Service Assemblies',
-      })
-    );
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)

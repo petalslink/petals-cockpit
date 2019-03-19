@@ -26,7 +26,6 @@ import { Observable } from 'rxjs';
 import { filter, first, switchMap, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { Buses } from '@wks/state/buses/buses.actions';
 import {
   getCurrentBus,
@@ -45,10 +44,6 @@ export class PetalsBusViewComponent implements OnInit {
   constructor(private store$: Store<IStore>, public dialog: MatDialog) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({ titleMainPart1: 'Petals', titleMainPart2: 'Bus' })
-    );
-
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );

@@ -29,7 +29,6 @@ import { filter, first, map, tap } from 'rxjs/operators';
 
 import { IUserNew } from '@shared/services/users.service';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { isLargeScreen } from '@shared/state/ui.selectors';
 import { Users } from '@shared/state/users.actions';
 import { ICurrentUser, IUser } from '@shared/state/users.interface';
@@ -57,13 +56,6 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals Cockpit',
-        titleMainPart2: 'Administration',
-      })
-    );
-
     this.users$ = this.store$.pipe(
       select(getAllUsers),
       map(users => users.sort((u1, u2) => u1.id.localeCompare(u2.id)))

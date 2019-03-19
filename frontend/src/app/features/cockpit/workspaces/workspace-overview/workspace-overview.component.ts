@@ -28,21 +28,19 @@ import { Observable, Subject } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
+import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
-
-import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
   getUsersNotInCurrentWorkspace,
-} from '../state/workspaces/workspaces.selectors';
+} from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-workspace-overview',
@@ -84,13 +82,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Workspace',
-        titleMainPart2: 'Petals',
-      })
-    );
-
     this.store$.dispatch(new Users.FetchAll());
 
     this.appUsers$ = this.store$.pipe(

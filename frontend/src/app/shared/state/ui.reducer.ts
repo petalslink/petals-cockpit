@@ -29,7 +29,6 @@ export namespace UiReducer {
     | Ui.CloseWorkspacesList
     | Ui.CloseCreateWorkspace
     | Ui.ChangeScreenSize
-    | Ui.SetTitles
     | Ui.ChangeTheme
     | Users.Disconnected;
 
@@ -58,9 +57,6 @@ export namespace UiReducer {
       }
       case Ui.ChangeScreenSizeType: {
         return changeScreenSize(table, action.payload);
-      }
-      case Ui.SetTitlesType: {
-        return setTitles(table, action.payload);
       }
       case Ui.ChangeThemeType: {
         return changeTheme(table, action.payload);
@@ -125,28 +121,6 @@ export namespace UiReducer {
     return {
       ...ui,
       isCreateWorkspaceVisible: false,
-    };
-  }
-
-  function setTitles(
-    ui: IUi,
-    payload: {
-      titleMainPart1?: string;
-      titleMainPart2?: string;
-      titleSubPart?: string;
-    }
-  ): IUi {
-    return {
-      ...ui,
-      titleMainPart1: payload.titleMainPart1
-        ? payload.titleMainPart1
-        : ui.titleMainPart1,
-      titleMainPart2: payload.titleMainPart2
-        ? payload.titleMainPart2
-        : ui.titleMainPart2,
-      titleSubPart: payload.titleSubPart
-        ? payload.titleSubPart
-        : ui.titleSubPart,
     };
   }
 

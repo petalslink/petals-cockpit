@@ -45,10 +45,6 @@ export interface IUi {
   // workspaces
   isWorkspacesListVisible: boolean;
   isCreateWorkspaceVisible: boolean;
-  // header
-  titleMainPart1: string;
-  titleMainPart2: string;
-  titleSubPart: string;
 }
 
 export const settings: ISettings = {
@@ -62,8 +58,5 @@ export function uiFactory(): IUi {
     screenSize: '',
     isWorkspacesListVisible: false,
     isCreateWorkspaceVisible: false,
-    titleMainPart1: 'Petals Cockpit',
-    titleMainPart2: '',
-    titleSubPart: '',
   };
 }

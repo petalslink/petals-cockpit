@@ -16,10 +16,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { Store } from '@ngrx/store';
-
-import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 
 @Component({
   selector: 'app-not-found-404',
@@ -27,9 +23,7 @@ import { Ui } from '@shared/state/ui.actions';
   styleUrls: ['./not-found-404.component.scss'],
 })
 export class NotFound404Component implements OnInit {
-  constructor(private store$: Store<IStore>) {}
+  constructor() {}
 
-  ngOnInit() {
-    this.store$.dispatch(new Ui.SetTitles({ titleMainPart2: '404' }));
-  }
+  ngOnInit() {}
 }
