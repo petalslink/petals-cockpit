@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
+import { HEADER_DOM } from '../../support/header.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import {
@@ -30,6 +32,22 @@ describe(`Workspaces`, () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
+  });
+
+  it(`should not show the header in workspaces view`, () => {
+    cy.expectLocationToBe('/workspaces/idWks0');
+
+    // expect to have header and nav visible
+    cy.get(HEADER_DOM.toolbar).should('be.visible');
+    cy.get(BREADCRUMB_DOM.nav).should('be.visible');
+
+    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+
+    cy.expectLocationToBe(`/workspaces`);
+
+    // check if header and nav are not visible
+    cy.get(HEADER_DOM.toolbar).should('not.be.visible');
+    cy.get(BREADCRUMB_DOM.nav).should('not.be.visible');
   });
 
   it(`should have empty fields by default in Workspaces - Create New Workspace`, () => {

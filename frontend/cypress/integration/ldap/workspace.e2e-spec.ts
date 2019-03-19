@@ -15,23 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
+import { HEADER_DOM } from '../../support/header.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 
 describe(`Workspace`, () => {
   beforeEach(() => {
     cy.visit(`/login`);
+
+    cy.login('admin', 'admin');
   });
 
   it(`should logout after logging in`, () => {
-    cy.login('admin', 'admin');
     cy.logout();
 
     cy.expectNotification('success', 'Log out !', `You're now disconnected.`);
   });
 
   it(`should active the tab petals`, () => {
-    cy.login('admin', 'admin');
-
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
     cy.get(WORKSPACE_DOM.menu.workspaceMenu);
     cy
@@ -43,8 +44,6 @@ describe(`Workspace`, () => {
   });
 
   it(`should active the tab services`, () => {
-    cy.login('admin', 'admin');
-
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
     cy.get(WORKSPACE_DOM.menu.workspaceMenu);
     cy
@@ -53,6 +52,41 @@ describe(`Workspace`, () => {
       .click()
       .parent()
       .should(`have.class`, `mat-tab-label-active`);
+  });
+
+  it(`should show the workspace name in the header and active link when the route match with workspace overview`, () => {
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    // check if header and nav are visible
+    cy.get(HEADER_DOM.toolbar).should('be.visible');
+    cy.get(BREADCRUMB_DOM.nav).should('be.visible');
+
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    // expect to have router link active
+    cy
+      .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+      .should('have.class', 'active-link');
+
+    // go to the child view
+    cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    // expect to have router link inactive
+    cy
+      .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+      .should('not.have.class', 'active-link')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    // expect to have router link active
+    cy
+      .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+      .should('have.class', 'active-link');
   });
 
   // TODO: for now there's an ongoing issue with hover
