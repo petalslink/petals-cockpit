@@ -29,23 +29,23 @@ Cypress.Commands.add('expectBusImportFields', () => {
 Cypress.Commands.add(
   'addBusImportInformations',
   (ip, port, username, password, passphrase) => {
-    cy.get(IMPORT_BUS_DOM.inputs.ip).type(ip);
-    cy.get(IMPORT_BUS_DOM.inputs.port).type(port);
-    cy.get(IMPORT_BUS_DOM.inputs.username).type(username);
-    cy.get(IMPORT_BUS_DOM.inputs.password).type(password);
-    cy.get(IMPORT_BUS_DOM.inputs.passphrase).type(passphrase);
+    cy.get(IMPORT_BUS_DOM.inputs.ip).type(ip, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.port).type(port, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.username).type(username, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.password).type(password, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.passphrase).type(passphrase, { force: true });
   }
 );
 
 Cypress.Commands.add(
   'importBusAndCheck',
   (ip, port, username, password, passphrase, shouldSuccess = true) => {
-    cy.get(IMPORT_BUS_DOM.inputs.ip).type(ip);
-    cy.get(IMPORT_BUS_DOM.inputs.port).type(port);
-    cy.get(IMPORT_BUS_DOM.inputs.username).type(username);
-    cy.get(IMPORT_BUS_DOM.inputs.password).type(password);
-    cy.get(IMPORT_BUS_DOM.inputs.passphrase).type(passphrase);
-    cy.get(IMPORT_BUS_DOM.buttons.submit).click();
+    cy.get(IMPORT_BUS_DOM.inputs.ip).type(ip, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.port).type(port, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.username).type(username, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.password).type(password, { force: true });
+    cy.get(IMPORT_BUS_DOM.inputs.passphrase).type(passphrase, { force: true });
+    cy.get(IMPORT_BUS_DOM.buttons.submit).click({ force: true });
 
     if (shouldSuccess) {
       cy.get(MESSAGE_DOM.texts.msgDetails).should('not.be.visible');
