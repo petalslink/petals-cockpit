@@ -36,7 +36,7 @@ describe(`Import Bus `, () => {
 
     cy.expectBusImportFields().should('be.empty');
 
-    cy.get(IMPORT_BUS_DOM.buttons.clear).should('be.visible');
+    cy.get(IMPORT_BUS_DOM.buttons.clear).should('be.enabled');
     cy.get(IMPORT_BUS_DOM.buttons.submit).should('be.disabled');
     cy.get(IMPORT_BUS_DOM.buttons.discard).should('not.be.visible');
   });
@@ -54,7 +54,10 @@ describe(`Import Bus `, () => {
       'passphrase'
     );
 
-    cy.get(IMPORT_BUS_DOM.buttons.clear).click();
+    cy
+      .get(IMPORT_BUS_DOM.buttons.clear)
+      .should('be.enabled')
+      .click({ force: true });
 
     cy.expectBusImportFields().should('be.empty');
   });
