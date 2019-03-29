@@ -87,7 +87,8 @@ import org.ow2.petals.jbi.descriptor.JBIDescriptorException;
 import org.ow2.petals.jbi.descriptor.original.JBIDescriptorBuilder;
 import org.ow2.petals.jbi.descriptor.original.generated.Component;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
-import org.pac4j.jax.rs.annotations.Pac4JProfile;
+import org.pac4j.core.profile.ProfileManager;
+import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,15 +122,16 @@ public class WorkspaceResource {
     private final WorkspaceDbOperations workspaceDb;
 
     @Inject
-    public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId, @Pac4JProfile CockpitProfile profile,
+    public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId,
+            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager,
             WorkspacesService workspaces, Configuration jooq, ArtifactServer httpServer,
             WorkspaceDbOperations workspaceDb) {
-        this.profile = profile;
+        this.profile = profileManager.get(true).orElseThrow(() -> new WebApplicationException(Status.UNAUTHORIZED));
         this.wsId = wsId;
         this.jooq = jooq;
         this.httpServer = httpServer;
         this.workspaceDb = workspaceDb;
-        workspace = workspaces.get(wsId, profile.getId());
+        this.workspace = workspaces.get(wsId, profile.getId());
     }
 
     private WorkspacesRecord get(Configuration conf) {

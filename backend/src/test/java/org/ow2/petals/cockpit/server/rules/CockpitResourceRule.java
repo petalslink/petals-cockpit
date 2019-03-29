@@ -63,6 +63,9 @@ import org.ow2.petals.cockpit.server.services.PetalsAdmin;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
 import org.ow2.petals.cockpit.server.services.WorkspacesService;
 import org.ow2.petals.cockpit.server.utils.PetalsAdminExceptionMapper;
+import org.pac4j.core.context.MockWebContext;
+import org.pac4j.core.profile.CommonProfile;
+import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.jax.rs.jersey.features.Pac4JValueFactoryProvider;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 import org.zapodot.junit.db.plugin.LiquibaseInitializer;
@@ -75,6 +78,9 @@ public class CockpitResourceRule implements TestRule {
 
     @Nullable
     private CockpitProfile currentProfile = null;
+
+    @Nullable
+    private ProfileManager<CommonProfile> currentProfileManager = null;
 
     public final PetalsAdministrationApi petals = new PetalsAdministrationApi();
 
@@ -120,8 +126,9 @@ public class CockpitResourceRule implements TestRule {
                 }).setClientConfigurator(cc -> cc.register(MultiPartFeature.class));
         builder.addProvider(new PetalsAdminExceptionMapper(true));
         // we need to use the factory-based constructor to be sure it will always use the current value of profile!
-        builder.addProvider(new Pac4JValueFactoryProvider.Binder(p -> () -> currentProfile,
-                p -> () -> Optional.ofNullable(currentProfile), null));
+        builder.addProvider(new Pac4JValueFactoryProvider.Binder(() -> () -> currentProfile,
+                () -> () -> Optional.ofNullable(currentProfile), () -> () -> currentProfileManager));
+
         builder.addProvider(MultiPartFeature.class);
         for (Class<?> resource : resources) {
             // we pass the resource as a provider to get injection in constructor
@@ -151,6 +158,10 @@ public class CockpitResourceRule implements TestRule {
      */
     public void setCurrentProfile(@Nullable CockpitProfile currentProfile) {
         this.currentProfile = currentProfile;
+        this.currentProfileManager = new ProfileManager<CommonProfile>(MockWebContext.create());
+        if (currentProfile != null) {
+            this.currentProfileManager.save(true, currentProfile, false);
+        }
     }
 
     @Override
@@ -158,7 +169,8 @@ public class CockpitResourceRule implements TestRule {
         assert base != null;
         assert description != null;
         return RulesHelper.chain(base, description, resource, httpServer, RulesHelper.dropDbAfter(db), db, petals,
-                RulesHelper.jerseyCookies(), RulesHelper.after(() -> currentProfile = null));
+                RulesHelper.jerseyCookies(), RulesHelper.after(() -> currentProfileManager = null),
+                RulesHelper.after(() -> currentProfile = null));
 
     }
 

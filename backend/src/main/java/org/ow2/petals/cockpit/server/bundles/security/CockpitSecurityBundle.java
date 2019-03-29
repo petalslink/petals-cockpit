@@ -80,14 +80,7 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
 
         // this ensure Pac4JSecurity annotations use all the clients
         // (for example on /user)
-        pac4jConf.setDefaultClients(defaultClients);
-
-        // if the local db client is enabled, use it by default for callbacks
-        // because the frontend does not pass a client name as a parameter by default
-        String defaultClient = CockpitAuthClient.class.getSimpleName();
-        if (clientsNames.contains(defaultClient)) {
-            pac4jConf.setDefaultClient(defaultClient);
-        }
+        pac4jConf.setDefaultSecurityClients(defaultClients);
 
         pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
 

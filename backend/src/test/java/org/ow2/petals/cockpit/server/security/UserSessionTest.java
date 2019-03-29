@@ -74,8 +74,7 @@ public class UserSessionTest extends AbstractSecurityTest {
         assertMatches(get, ADMIN, true);
 
         final Response logout = app.target("/user/session").request().delete();
-        // TODO should be 204: https://github.com/pac4j/pac4j/issues/701
-        assertThat(logout.getStatus()).isEqualTo(200);
+        assertThat(logout.getStatus()).isEqualTo(204);
 
         final Response getWrong = app.target("/user/session").request().get();
         assertThat(getWrong.getStatus()).isEqualTo(401);

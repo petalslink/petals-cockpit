@@ -30,10 +30,8 @@ import com.google.common.base.Strings;
 
 public class CockpitExtractor implements CredentialsExtractor<UsernamePasswordCredentials> {
 
-    private final String clientName;
 
-    public CockpitExtractor(String clientName) {
-        this.clientName = clientName;
+    public CockpitExtractor() {
     }
 
     @Override
@@ -52,8 +50,7 @@ public class CockpitExtractor implements CredentialsExtractor<UsernamePasswordCr
             if (auth == null || Strings.isNullOrEmpty(auth.username) || Strings.isNullOrEmpty(auth.password)) {
                 return null;
             }
-
-            return new UsernamePasswordCredentials(auth.username, auth.password, clientName);
+            return new UsernamePasswordCredentials(auth.username, auth.password);
         } else {
             return null;
         }
