@@ -39,12 +39,12 @@ const routes: Routes = [
       {
         path: 'petals',
         loadChildren:
-          '../petals-content/petals-content.module#PetalsContentModule',
+          '@wks/petals-content/petals-content.module#PetalsContentModule',
       },
       {
         path: 'services',
         loadChildren:
-          '../services-content/services-content.module#ServicesContentModule',
+          '@wks/services-content/services-content.module#ServicesContentModule',
       },
     ],
   },

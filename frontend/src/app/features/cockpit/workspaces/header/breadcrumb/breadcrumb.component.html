@@ -13,8 +13,24 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" class="toolbar mat-elevation-z4 mat-typography">
-  <mat-toolbar role="header">
-    <app-breadcrumb [workspace]="workspace"></app-breadcrumb>
-  </mat-toolbar>
-</div>
+<nav fxLayout="row wrap" fxFlex class="breadcrumb mat-typography">
+  <div
+    fxLayout="row"
+    fxLayoutAlign="start center"
+    class="breadcrumb-item"
+    >
+    <a
+      mat-button
+      [routerLink]="['/workspaces', workspace.id]"
+      routerLinkActive="active-link"
+      [routerLinkActiveOptions]="{exact: true}"
+      class="breadcrumb-item-link"
+    >
+      <div fxLayout="row" fxLayoutAlign="start center">
+        <h4 class="item-name">
+          {{ workspace.name | shorten: maxLength:'...' }}
+        </h4>
+      </div>
+    </a>
+  </div>
+</nav>

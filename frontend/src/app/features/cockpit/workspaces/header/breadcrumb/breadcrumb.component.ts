@@ -15,14 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
+import { IWorkspace } from '../../state/workspaces/workspaces.interface';
 
 @Component({
-  selector: 'app-not-found-404',
-  templateUrl: './not-found-404.component.html',
-  styleUrls: ['./not-found-404.component.scss'],
+  selector: 'app-breadcrumb',
+  templateUrl: './breadcrumb.component.html',
+  styleUrls: ['./breadcrumb.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NotFound404Component implements OnInit {
+export class BreadcrumbComponent implements OnInit {
+  private _workspace: IWorkspace;
+
+  @Input() maxLength = 16;
+
+  @Input('workspace')
+  set workspace(workspace: IWorkspace) {
+    this._workspace = workspace;
+  }
+
+  get workspace() {
+    return this._workspace;
+  }
+
   constructor() {}
 
   ngOnInit() {}

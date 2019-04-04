@@ -35,6 +35,7 @@
 @import 'app/features/cockpit/cockpit.component.scss-theme';
 @import 'app/features/cockpit/sidebar/sidebar.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace/workspace.component.scss-theme';
+@import 'app/features/cockpit/workspaces/header/breadcrumb/breadcrumb.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace-element/workspace-element.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component.scss-theme';
@@ -43,6 +44,7 @@
 @import 'app/app.component.scss-theme';
 
 @mixin custom-components-theme($theme) {
+  @include custom-breadcrumb-theme($theme);
   @include custom-color-theme($theme);
   @include custom-cockpit-theme($theme);
   @include custom-shared-theme($theme);

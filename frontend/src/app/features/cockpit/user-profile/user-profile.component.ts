@@ -20,7 +20,6 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { isLargeScreen } from '@shared/state/ui.selectors';
 import { ICurrentUser } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
@@ -37,12 +36,6 @@ export class UserProfileComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals Cockpit',
-        titleMainPart2: 'Profile',
-      })
-    );
     this.user$ = this.store$.pipe(getCurrentUser);
 
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);

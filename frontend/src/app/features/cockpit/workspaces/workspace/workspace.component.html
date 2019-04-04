@@ -16,8 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <app-header 
   *ngIf="isOnWorkspace$ | async" 
   [isLargeScreen]="isLargeScreen$ | async" 
-  [ui]="ui$ | async" 
   [isOnWorkspace]="isOnWorkspace$ | async"
+  [ui]="ui$ | async" 
+  [workspace]="workspace$ | async"
 ></app-header>
 
 <mat-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">

@@ -32,7 +32,6 @@ import { assert } from '@shared/helpers/shared.helper';
 import { deletable, IDeletable } from '@shared/operators/deletable.operator';
 import { BusesService, IBusImport } from '@shared/services/buses.service';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
 import { IBusInProgressRow } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 import { getCurrentBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
@@ -70,13 +69,6 @@ export class PetalsBusInProgressViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals',
-        titleMainPart2: 'Import bus',
-      })
-    );
-
     this.store$
       .pipe(
         select(state => state.busesInProgress),

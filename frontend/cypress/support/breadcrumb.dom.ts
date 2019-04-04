@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,15 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+// base selector
+const bs = `app-breadcrumb`;
 
-@Component({
-  selector: 'app-not-found-404',
-  templateUrl: './not-found-404.component.html',
-  styleUrls: ['./not-found-404.component.scss'],
-})
-export class NotFound404Component implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export const BREADCRUMB_DOM = {
+  buttons: { breadcrumbItemLink: `${bs} .breadcrumb-item-link` },
+  nav: `${bs} .breadcrumb`,
+  texts: {
+    itemName: `${bs} .item-name`,
+  },
+};

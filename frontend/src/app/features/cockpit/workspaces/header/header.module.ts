@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
 
-@Component({
-  selector: 'app-not-found-404',
-  templateUrl: './not-found-404.component.html',
-  styleUrls: ['./not-found-404.component.scss'],
+import { SharedModule } from '@shared/shared.module';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { HeaderComponent } from './header.component';
+
+@NgModule({
+  imports: [SharedModule],
+  declarations: [BreadcrumbComponent, HeaderComponent],
+  exports: [HeaderComponent],
 })
-export class NotFound404Component implements OnInit {
-  constructor() {}
-
-  ngOnInit() {}
-}
+export class HeaderModule {}

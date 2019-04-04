@@ -20,7 +20,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentComponent,
   IComponentWithSLsAndSUs,
@@ -38,13 +37,6 @@ export class PetalsComponentViewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals',
-        titleMainPart2: 'Component',
-      })
-    );
-
     this.component$ = this.store$.pipe(select(getCurrentComponent));
 
     this.workspaceId$ = this.store$.pipe(

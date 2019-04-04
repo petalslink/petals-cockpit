@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 
 import { IUi } from '@shared/state/ui.interface';
+import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
 
 @Component({
   selector: 'app-header',
@@ -32,8 +33,9 @@ import { IUi } from '@shared/state/ui.interface';
 })
 export class HeaderComponent implements OnInit {
   @Input() isLargeScreen: boolean;
-  @Input() ui: IUi;
   @Input() isOnWorkspace: boolean;
+  @Input() ui: IUi;
+  @Input() workspace: IWorkspace;
 
   constructor() {}
 

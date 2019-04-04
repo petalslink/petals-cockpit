@@ -75,18 +75,6 @@ export namespace Ui {
     constructor(public readonly payload: { screenSize: ScreenSize }) {}
   }
 
-  export const SetTitlesType = '[UI] Set titles';
-  export class SetTitles implements Action {
-    readonly type = SetTitlesType;
-    constructor(
-      public readonly payload: {
-        titleMainPart1?: string;
-        titleMainPart2?: string;
-        titleSubPart?: string;
-      }
-    ) {}
-  }
-
   export const ChangeThemeType = '[UI] Change theme';
   export class ChangeTheme implements Action {
     readonly type = ChangeThemeType;

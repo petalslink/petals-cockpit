@@ -23,7 +23,7 @@ import { ServicesMenuModule } from '@wks/services-menu/services-menu.module';
 import { WorkspaceOverviewModule } from '@wks/workspace-overview/workspace-overview.module';
 import { WorkspaceRoutingModule } from './workspace-routing.module';
 
-import { HeaderComponent } from '@wks/header/header.component';
+import { HeaderModule } from '../header/header.module';
 import {
   DeletedWorkspaceDialogComponent,
   WorkspaceComponent,
@@ -32,16 +32,13 @@ import {
 @NgModule({
   imports: [
     SharedModule,
+    HeaderModule,
     WorkspaceOverviewModule,
     PetalsMenuModule,
     ServicesMenuModule,
     WorkspaceRoutingModule,
   ],
-  declarations: [
-    HeaderComponent,
-    WorkspaceComponent,
-    DeletedWorkspaceDialogComponent,
-  ],
+  declarations: [WorkspaceComponent, DeletedWorkspaceDialogComponent],
   entryComponents: [DeletedWorkspaceDialogComponent],
 })
 export class WorkspaceModule {}

@@ -20,7 +20,6 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import {
   getCurrentServiceUnit,
   IServiceUnitWithSAAndComponent,
@@ -39,13 +38,6 @@ export class PetalsServiceUnitViewComponent implements OnInit {
 
   ngOnInit() {
     this.serviceUnit$ = this.store$.pipe(select(getCurrentServiceUnit));
-
-    this.store$.dispatch(
-      new Ui.SetTitles({
-        titleMainPart1: 'Petals',
-        titleMainPart2: 'Service Unit',
-      })
-    );
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
