@@ -36,9 +36,5 @@ mat-sidenav-container {
   // all menu views have the same size (petals, service)
   > mat-sidenav {
     height: 100%;
-    // customize the buttons of petals menu view
-    .pnl-buttons-workspaces > .no-border-radius {
-      border-radius: 0;
-    }
   }
 }
