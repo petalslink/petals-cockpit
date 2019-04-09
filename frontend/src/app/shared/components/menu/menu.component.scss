@@ -15,22 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-
-import { SharedModule } from '@shared/shared.module';
-import { WorkspaceModule } from './workspace/workspace.module';
-import { WorkspacesRoutingModule } from './workspaces-routing.module';
-
-import { WorkspacesCreateComponent } from './workspaces-create/workspaces-create.component';
-import { WorkspacesListComponent } from './workspaces-list/workspaces-list.component';
-import { WorkspacesComponent } from './workspaces.component';
-
-@NgModule({
-  imports: [SharedModule, WorkspacesRoutingModule, WorkspaceModule],
-  declarations: [
-    WorkspacesComponent,
-    WorkspacesListComponent,
-    WorkspacesCreateComponent,
-  ],
-})
-export class WorkspacesModule {}
+.menu + * .cdk-overlay-pane > div.mat-menu-panel > div.mat-menu-content {
+  padding-top: 0;
+  padding-bottom: 0;
+  div > a.menu-item-wks-name {
+    &.active {
+      span {
+        span.workspace-name {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+}

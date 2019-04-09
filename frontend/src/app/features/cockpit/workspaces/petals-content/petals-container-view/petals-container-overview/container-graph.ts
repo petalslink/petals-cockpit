@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// TODO Fix Lint error: is declared but its value is never read.
-// tslint:disable: no-unused-variable
 import { VisEdges, VisNetworkOptions, VisNodes } from 'ngx-vis';
 
 import { IContainerRow } from '@wks/state/containers/containers.interface';

@@ -20,11 +20,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
-// TODO Fix Lint error: all imports on this line are unused.
-// tslint:disable: no-unused-variable
 import { LocalStorageService } from 'ngx-webstorage';
 import { Observable, Subject } from 'rxjs';
-import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { filter, switchMap, takeUntil } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
@@ -43,6 +41,8 @@ import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceTree,
+  getWorkspacesIdsNames,
+  IWorkspacesIdsNames,
   WorkspaceElement,
 } from '@wks/state/workspaces/workspaces.selectors';
 
@@ -55,6 +55,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   ui$: Observable<IUi>;
+  workspacesIdsNames$: Observable<{ list: IWorkspacesIdsNames[] }>;
   workspace$: Observable<IWorkspaceRow>;
   busesInProgress$: Observable<IBusInProgress[]>;
   interfaces$: Observable<IInterfaceRow[]>;
@@ -64,6 +65,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
 
   sidenavMode$: Observable<string>;
 
+  isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
   isOnWorkspace$: Observable<boolean>;
   sidenavVisible$: Observable<boolean>;
@@ -78,13 +80,18 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.workspacesIdsNames$ = this.store$.pipe(getWorkspacesIdsNames);
+
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
+
     this.isOnWorkspace$ = this.store$.pipe(
       select(state => !!state.workspaces.selectedWorkspaceId)
     );
+
     this.ui$ = this.store$.pipe(select(state => state.ui));
 
     this.workspace$ = this.store$.pipe(select(getCurrentWorkspace));
+
     this.busesInProgress$ = this.store$.pipe(select(getBusesInProgress));
 
     this.interfaces$ = this.store$.pipe(
@@ -116,10 +123,13 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy$),
         switchMap(() =>
           this.dialog.open(DeletedWorkspaceDialogComponent).afterClosed()
-        ),
-        tap(() => this.router.navigate(['/workspaces']))
+        )
       )
       .subscribe();
+
+    this.isFetchingWorkspace$ = this.store$.pipe(
+      select(state => state.workspaces.isFetchingWorkspace)
+    );
   }
 
   ngOnDestroy() {
@@ -127,6 +137,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
 
     this.store$.dispatch(new Workspaces.Clean());
+  }
+
+  goToWorkspacesList() {
+    this.router.navigate(['/workspaces'], { queryParams: { page: 'list' } });
   }
 
   closeSidenav() {
@@ -159,11 +173,17 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           </div>
         </mat-dialog-content>
         <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button mat-raised-button matDialogClose color="primary">OK</button>
+          <button mat-raised-button matDialogClose (click)="goToWorkspacesList()" color="primary">OK</button>
         </mat-dialog-actions>
       </div>
     </div>
   `,
   styles: ['.central-content { padding: 24px; }'],
 })
-export class DeletedWorkspaceDialogComponent {}
+export class DeletedWorkspaceDialogComponent {
+  constructor(private router: Router) {}
+
+  goToWorkspacesList() {
+    this.router.navigate(['/workspaces'], { queryParams: { page: 'list' } });
+  }
+}

@@ -21,10 +21,8 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { select, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 
-import { Router } from '@angular/router';
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
 import { Users } from '@shared/state/users.actions';
@@ -40,15 +38,9 @@ export class SidebarComponent implements OnInit {
   @Input() user: ICurrentUser;
   @Input() isDisconnecting: boolean;
 
-  constructor(
-    private router: Router,
-    private store$: Store<IStore>,
-    private matDialog: MatDialog
-  ) {}
+  constructor(private store$: Store<IStore>) {}
 
-  ngOnInit() {
-    this.store$.pipe(select(state => state.ui.isWorkspacesListVisible));
-  }
+  ngOnInit() {}
 
   toggleSidenav() {
     this.store$.dispatch(new Ui.ToggleSidenav());
@@ -56,10 +48,5 @@ export class SidebarComponent implements OnInit {
 
   disconnect() {
     this.store$.dispatch(new Users.Disconnect());
-  }
-
-  clickPetalsLogo() {
-    this.matDialog.closeAll();
-    this.router.navigate(['/workspaces']);
   }
 }

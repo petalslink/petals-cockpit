@@ -19,9 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   [isOnWorkspace]="isOnWorkspace$ | async"
   [ui]="ui$ | async" 
   [workspace]="workspace$ | async"
+  [workspacesIdsNames]="workspacesIdsNames$ | async"
 ></app-header>
 
-<mat-sidenav-container fxLayout="column" fxFlex (backdropClick)="closeSidenav()" (disableClose)="true">
+<mat-sidenav-container 
+  xLayout="column" 
+  fxFlex 
+  (backdropClick)="closeSidenav()" 
+  (disableClose)="true" 
+  [style.display]="!(isFetchingWorkspace$ | async) ? null : 'none'"
+  >
   <mat-sidenav 
     *ngIf="workspace$ | async as workspace"
     fxLayout="column"
@@ -36,29 +43,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <button 
             fxFlex="80" 
             mat-raised-button 
+            color="accent"
             (click)="closeSidenavOnSmallScreen()" 
             [routerLink]="['/workspaces', workspace.id]"
             class="btn-workspace-name width-full no-border-radius text-upper" 
-            color="accent"
           >{{ workspace.name }}</button>
     
           <button 
             fxFlex
             mat-raised-button
-            [routerLink]="['/workspaces']"
+            color="accent"
+            (click)="goToWorkspacesList()"
             class="btn-change-workspace width-full no-border-radius"
-            color="accent">
+          >
             <mat-icon>view_list</mat-icon>
           </button>
       </div>
     </div>
 
     <mat-tab-group
-      class="workspace-menu"
       mat-stretch-tabs
       fxFlex="0px"
       [selectedIndex]="retrievedSelectedIndex"
       (selectedIndexChange)="saveCurrentTab($event)"
+      class="workspace-menu"
     >
       <mat-tab label="Petals">
         <app-petals-menu-view

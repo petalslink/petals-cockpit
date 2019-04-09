@@ -1,0 +1,51 @@
+/**
+ * Copyright (C) 2018-2019 Linagora
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@mixin custom-menu-theme($theme) {
+  $primary: map-get($theme, primary);
+
+  .menu + * .cdk-overlay-pane > div.mat-menu-panel > div.mat-menu-content {
+    .mat-divider {
+      border-top-color: mat-color($mat-grey, 200);
+    }
+    a.menu-item-wks-name {
+      span > mat-icon.icon-wks {
+        color: mat-color($mat-grey, 900);
+      }
+      &.active {
+        background-color: mat-color($mat-grey, 200);
+        span {
+          span.workspace-name {
+            color: mat-color($primary, 700);
+          }
+          mat-icon.icon-wks {
+            background: -webkit-gradient(
+              linear,
+              left top,
+              left bottom,
+              from(mat-color($primary, 900)),
+              to(mat-color($primary, 300))
+            );
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+        }
+      }
+    }
+  }
+}

@@ -41,12 +41,14 @@
 @import 'app/features/cockpit/workspaces/workspaces-list/workspaces-list.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspaces.component.scss-theme';
 @import 'app/shared/components/generate-icon/generate-icon.component.scss-theme';
+@import 'app/shared/components/menu/menu.component.scss-theme';
 @import 'app/app.component.scss-theme';
 
 @mixin custom-components-theme($theme) {
   @include custom-breadcrumb-theme($theme);
   @include custom-color-theme($theme);
   @include custom-cockpit-theme($theme);
+  @include custom-menu-theme($theme);
   @include custom-shared-theme($theme);
   @include custom-sidebar-theme($theme);
   @include custom-sidenav-theme($theme);

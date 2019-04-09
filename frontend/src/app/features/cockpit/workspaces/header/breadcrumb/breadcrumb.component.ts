@@ -21,7 +21,8 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { IWorkspace } from '../../state/workspaces/workspaces.interface';
+
+import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
 
 @Component({
   selector: 'app-breadcrumb',

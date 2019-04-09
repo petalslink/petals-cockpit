@@ -1,0 +1,68 @@
+<!-- Copyright (C) 2017-2019 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<button mat-icon-button matTooltip="Menu" [matMenuTriggerFor]="menu" class="btn-menu">
+  <span fxLayout="row" fxLayoutAlign="center center">
+    <mat-icon  class="icon-x1 icon-ellipsis-menu">
+      <fa-icon icon="ellipsis-v"></fa-icon>
+    </mat-icon>
+  </span>
+</button>
+
+<mat-menu #menu="matMenu" fxLayout="column" fxLayoutAlign="center start" backdropClass="menu" [overlapTrigger]="false">
+  <a 
+    fxLayoutAlign="start center" 
+    mat-menu-item 
+    (click)="goToWorkspacesList()"
+    class="menu-item-back-wks-list"
+  >
+    <span fxLayout="row" fxLayoutAlign="center center">
+      <fa-icon icon="folder-open" class="margin-right-x1 icon-x1"></fa-icon>
+      <span class="back-to-wks">Back to Workspaces</span>
+    </span>
+  </a>
+
+  <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
+  
+  <div *ngIf="workspacesIdsNames" class="item-list">
+    <a
+      *ngFor="let workspace of workspacesIdsNames.list"
+      fxLayoutAlign="start center" 
+      mat-menu-item
+      [routerLink]="['/workspaces', workspace.id]"
+      routerLinkActive="active"
+      class="menu-item-wks-name"
+    >
+      <span fxLayout="row" fxLayoutAlign="center center">
+        <mat-icon class="margin-right-x1 icon-x1 icon-wks">folder</mat-icon>
+        <span class="workspace-name">{{ workspace.name | shorten: maxLength:'...' }}</span>
+      </span>
+    </a>
+  </div>
+
+  <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
+
+  <a 
+    fxLayoutAlign="start center" 
+    mat-menu-item 
+    (click)="goToCreateWorkspace()"
+    class="menu-item-create-wks"
+  >
+    <span fxLayout="row" fxLayoutAlign="center center">
+      <fa-icon icon="folder-plus" class="margin-right-x1 icon-x1"></fa-icon>
+      <span class="create-new-wks">Create New Workspace</span>
+    </span>
+  </a>
+</mat-menu>

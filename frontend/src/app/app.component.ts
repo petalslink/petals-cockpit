@@ -18,8 +18,6 @@
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Component, HostBinding, OnDestroy, OnInit } from '@angular/core';
 
-// TODO Fix Lint error: all imports on this line are unused.
-// tslint:disable: no-unused-variable
 import { MediaChange, ObservableMedia } from '@angular/flex-layout';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';

@@ -201,7 +201,9 @@ export class UsersEffects {
           action.payload.user.lastWorkspace,
         ]);
       } else {
-        this.router.navigate(['/workspaces']);
+        this.router.navigate(['/workspaces'], {
+          queryParams: { page: 'list' },
+        });
       }
     })
   );

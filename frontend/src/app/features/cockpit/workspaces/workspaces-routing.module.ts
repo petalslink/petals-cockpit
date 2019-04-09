@@ -19,21 +19,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { WorkspaceGuard } from './workspace.guard';
-import {
-  NoWorkspaceComponent,
-  WorkspacesComponent,
-} from './workspaces.component';
+import { WorkspacesComponent } from './workspaces.component';
 
 const routes: Routes = [
   {
     path: '',
     component: WorkspacesComponent,
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        component: NoWorkspaceComponent,
-      },
       {
         path: ':workspaceId',
         canActivate: [WorkspaceGuard],

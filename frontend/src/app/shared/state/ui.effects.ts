@@ -22,9 +22,6 @@ import { Observable } from 'rxjs';
 import { filter, map, tap, withLatestFrom } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
-
-// TODO Fix Lint error: all imports on this line are unused.
-// tslint:disable: no-unused-variable
 import { LocalStorageService } from 'ngx-webstorage';
 import { Ui } from './ui.actions';
 import { SETTINGS_THEME_KEY } from './ui.interface';

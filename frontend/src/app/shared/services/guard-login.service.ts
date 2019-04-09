@@ -51,11 +51,13 @@ export class GuardLoginService implements CanActivate {
           if (isLoginPage) {
             if (environment.debug) {
               console.debug(
-                `Guard Login: User already retrieved. Redirecting to /workspaces.`
+                `Guard Login: User already retrieved. Redirecting to /workspaces?page=list.`
               );
             }
 
-            this.router.navigate(['/workspaces']);
+            this.router.navigate(['/workspaces'], {
+              queryParams: { page: 'list' },
+            });
 
             return of(false);
           } else {
@@ -73,7 +75,7 @@ export class GuardLoginService implements CanActivate {
               if (isLoginPage) {
                 if (environment.debug) {
                   console.debug(
-                    `Guard Login: User already logged. Redirecting to /workspaces.`
+                    `Guard Login: User already logged. Redirecting to /workspaces?page=list.`
                   );
                 }
 

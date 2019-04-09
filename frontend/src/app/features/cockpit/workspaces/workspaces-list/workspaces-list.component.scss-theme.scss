@@ -27,6 +27,7 @@
         from(mat-color($primary, 900)),
         to(mat-color($primary, 300))
       );
+      background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }

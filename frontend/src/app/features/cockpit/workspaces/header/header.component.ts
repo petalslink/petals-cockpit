@@ -24,6 +24,7 @@ import {
 
 import { IUi } from '@shared/state/ui.interface';
 import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
+import { IWorkspacesIdsNames } from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-header',
@@ -36,6 +37,7 @@ export class HeaderComponent implements OnInit {
   @Input() isOnWorkspace: boolean;
   @Input() ui: IUi;
   @Input() workspace: IWorkspace;
+  @Input() workspacesIdsNames: { list: IWorkspacesIdsNames[] };
 
   constructor() {}
 
