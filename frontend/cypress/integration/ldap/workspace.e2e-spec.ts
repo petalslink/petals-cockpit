@@ -227,6 +227,7 @@ describe(`Workspace`, () => {
       .and('be.visible')
       .click();
 
+    cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=create');
   });
 

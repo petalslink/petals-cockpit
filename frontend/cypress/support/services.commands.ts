@@ -15,10 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from './breadcrumb.dom';
 import { COMPONENT_DOM } from './component.dom';
 import { SERVICES_TREE_DOM } from './services.dom';
 import { WORKSPACE_DOM } from './workspace.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
+import { MENU_DOM } from './menu.dom';
 
 Cypress.Commands.add('expectInterfacesTreeToBe', tree => {
   cy
@@ -93,7 +95,18 @@ Cypress.Commands.add('triggerSSEForWks', (name, id) => {
     .contains(`Services`)
     .click();
 
-  cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+  // open menu
+  cy
+    .get(MENU_DOM.buttons.toggleMenu)
+    .should('be.visible')
+    .click();
+
+  cy
+    .get(`.menu-item-back-wks-list`)
+    .find(MENU_DOM.texts.itemNameWksList)
+    .should('contain', `Back to Workspaces`)
+    .and('be.visible')
+    .click();
 
   cy.expectWorkspacesListToBe([
     `Workspace 0`,
@@ -108,5 +121,6 @@ Cypress.Commands.add('triggerSSEForWks', (name, id) => {
 
   cy.expectLocationToBe(`/workspaces/${id}`);
 
-  cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 1`);
+  // expect to have workspace name
+  cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 1');
 });

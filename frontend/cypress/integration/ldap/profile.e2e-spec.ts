@@ -64,6 +64,7 @@ describe(`Profile`, () => {
       .and('be.visible')
       .click();
 
+    cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=list');
 
     cy.get(MENU_DOM.buttons.toggleMenu).should('not.be.visible');
@@ -93,6 +94,7 @@ describe(`Profile`, () => {
       .and('be.visible')
       .click();
 
+    cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=create');
   });
 });
