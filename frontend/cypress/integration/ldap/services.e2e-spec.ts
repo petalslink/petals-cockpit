@@ -21,7 +21,7 @@ import {
   expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
 } from '../../support/helper.const';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { MENU_DOM } from '../../support/menu.dom';
 import { SERVICES_DOM, SERVICES_TREE_DOM } from '../../support/services.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
@@ -413,7 +413,13 @@ describe(`Services`, () => {
 
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch1dot0);
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
+    // open menu
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .click();
 
     cy
       .get(WORKSPACES_LIST_DOM.texts.workspaceName)

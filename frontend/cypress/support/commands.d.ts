@@ -63,6 +63,9 @@ declare namespace Cypress {
     // workspace.commands
     openDialogToDeleteWks(): any;
 
+    // menu.commands
+    expectWorkspacesListMenuToBe(list: string[]): any;
+
     // petals.commands
     expectPetalsTreeToBe(tree: string[]): any;
     getElementInPetalsTree(type: string, name: string): any;

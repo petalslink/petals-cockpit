@@ -15,14 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// base selector
-const bs = `app-sidebar`;
+const bs = `app-menu`;
 
-export const PETALS_COCKPIT_DOM = {
+export const MENU_DOM = {
   buttons: {
-    goToAdminPage: `${bs} .btn-user-admin`,
-    goToProfilePage: `${bs} .btn-user-profile`,
-    logout: `${bs} .btn-user-logout`,
-    toggleSidenav: `${bs} .sidenav-toggle`,
+    toggleMenu: `${bs} .btn-menu`,
+  },
+  links: {
+    goToWksList: `${bs} .menu-item-back-wks-list`,
+    goToCreateWks: `${bs} .menu-item-create-wks`,
+    itemList: `${bs} .item-list`,
+    itemsWksNames: `${bs} .item-list .menu-item-wks-name`,
+  },
+  texts: {
+    itemNameWksList: `span .back-to-wks`,
+    itemNameCreateWks: `span .create-new-wks`,
+    wksNames: `span .workspace-name`,
   },
 };

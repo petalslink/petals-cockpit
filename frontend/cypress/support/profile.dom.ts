@@ -15,14 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// base selector
-const bs = `app-sidebar`;
-
-export const PETALS_COCKPIT_DOM = {
-  buttons: {
-    goToAdminPage: `${bs} .btn-user-admin`,
-    goToProfilePage: `${bs} .btn-user-profile`,
-    logout: `${bs} .btn-user-logout`,
-    toggleSidenav: `${bs} .sidenav-toggle`,
+export const PROFILE_DOM = {
+  texts: {
+    title: `.title-profile-page`,
   },
 };

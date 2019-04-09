@@ -17,7 +17,7 @@
 
 import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { HEADER_DOM } from '../../support/header.dom';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { MENU_DOM } from '../../support/menu.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import {
   WORKSPACE_DELETED_DIALOG_DOM,
@@ -98,7 +98,13 @@ describe(`Workspaces`, () => {
 
     cy.expectLocationToBe('/workspaces/idWks2');
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
+    // open menu
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .click();
 
     cy.expectWorkspacesListToBe(expectedNewWorkspacesListDetails);
 
