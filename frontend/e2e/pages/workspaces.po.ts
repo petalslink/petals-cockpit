@@ -18,7 +18,7 @@
 import { $, browser, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
-import { Matcher, urlToMatch, waitAndClick } from '../utils';
+import { urlToMatch, waitAndClick } from '../utils';
 import { WorkspaceOverviewPage } from './workspace.po';
 
 export class WorkspacesPage {
@@ -44,7 +44,7 @@ export class WorkspacesPage {
 
   static waitAndGet(asCard = false) {
     if (!asCard) {
-      browser.wait(urlToMatch(/\/workspaces$/), waitTimeout);
+      browser.wait(urlToMatch(/\/workspaces\?page=list$/), waitTimeout);
     }
     browser.wait(EC.visibilityOf(WorkspacesPage.componentList), waitTimeout);
     return new WorkspacesPage();
@@ -67,9 +67,9 @@ export class WorkspacesPage {
     waitAndClick(this.addButton);
   }
 
-  selectWorkspace(index: number, expectedName?: Matcher) {
+  selectWorkspace(index: number) {
     waitAndClick(this.workspacesList.$$('.workspaces-item').get(index));
 
-    return WorkspaceOverviewPage.waitAndGet(expectedName);
+    return WorkspaceOverviewPage.waitAndGet();
   }
 }
