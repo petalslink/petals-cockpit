@@ -23,7 +23,6 @@ export const PETALS_COCKPIT_DOM = {
     goToAdminPage: `${bs} .btn-user-admin`,
     goToProfilePage: `${bs} .btn-user-profile`,
     logout: `${bs} .btn-user-logout`,
-    goToWksList: `${bs} .btn-logo`,
     toggleSidenav: `${bs} .sidenav-toggle`,
   },
 };

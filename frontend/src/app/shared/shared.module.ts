@@ -36,6 +36,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -56,6 +57,7 @@ import { LedComponent } from './components/led/led.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
 import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-toolbar.component';
+import { MenuComponent } from './components/menu/menu.component';
 import { MessageComponent } from './components/message/message.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { SettingsThemeColorComponent } from './components/settings-theme-color/settings-theme-color.component';
@@ -81,6 +83,7 @@ export const MaterialModules = [
   MatExpansionModule,
   MatFormFieldModule,
   MatListModule,
+  MatMenuModule,
   MatProgressBarModule,
   MatProgressSpinnerModule,
   MatSidenavModule,
@@ -97,6 +100,7 @@ export const MaterialModules = [
 
 import {
   faCog,
+  faEllipsisV,
   faEye,
   faEyeSlash,
   faFolderOpen,
@@ -116,6 +120,7 @@ import { faFolder } from '@fortawesome/free-regular-svg-icons';
 
 library.add(
   faCog,
+  faEllipsisV,
   faEye,
   faEyeSlash,
   faFolder,
@@ -160,6 +165,7 @@ export const declarations = [
   MaterialTreeComponent,
   TruncateStringPipe,
   SettingsThemeColorComponent,
+  MenuComponent,
 ];
 
 export const exportss = [

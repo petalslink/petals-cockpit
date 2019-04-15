@@ -20,6 +20,7 @@ import {
   ADD_LDAP_USER_DOM,
   ADMINISTRATION_DOM,
 } from '../../support/administration.dom';
+import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
 
@@ -38,7 +39,12 @@ describe(`Administration`, () => {
     it(`should open the administration page`, () => {
       cy.expectLocationToBe(`/admin`);
 
-      cy.get(ADMINISTRATION_DOM.texts.title).contains('Administration');
+      // check if the name of page is displayed in toolbar
+      cy
+        .get(`mat-toolbar`)
+        .find(ADMINISTRATION_DOM.texts.title)
+        .should('contain', 'Administration')
+        .and('be.visible');
 
       cy.expectUsersListToBe(expectedUsersIds, expectedUsersNames);
 
@@ -47,6 +53,65 @@ describe(`Administration`, () => {
         'info',
         'As an administrator, you can ADD, EDIT, and DELETE any user.'
       );
+    });
+
+    it(`should navigate to the workspaces page from the menu administration`, () => {
+      cy.expectLocationToBe(`/admin`);
+
+      // open menu
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      // check that no workspaces names in the menu administration
+      cy.get(`.item-list .menu-item-wks-name`).should('not.be.visible');
+
+      cy
+        .get(`.menu-item-create-wks`)
+        .find(MENU_DOM.texts.itemNameCreateWks)
+        .should('contain', `Create New Workspace`)
+        .and('be.visible');
+
+      cy
+        .get(`.menu-item-back-wks-list`)
+        .find(MENU_DOM.texts.itemNameWksList)
+        .should('contain', `Back to Workspaces`)
+        .and('be.visible')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces`);
+      cy.url().should('include', '?page=list');
+
+      cy.get(MENU_DOM.buttons.toggleMenu).should('not.be.visible');
+      cy.get(MENU_DOM.links.goToWksList).should('not.be.visible');
+      cy.get(MENU_DOM.links.goToCreateWks).should('not.be.visible');
+
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).click();
+
+      cy.expectLocationToBe(`/admin`);
+
+      // open menu
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(`.menu-item-back-wks-list`)
+        .find(MENU_DOM.texts.itemNameWksList)
+        .should('contain', `Back to Workspaces`)
+        .and('be.visible');
+
+      cy
+        .get(`.menu-item-create-wks`)
+        .find(MENU_DOM.texts.itemNameCreateWks)
+        .should('contain', `Create New Workspace`)
+        .and('be.visible')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces`);
+      cy.url().should('include', '?page=create');
     });
 
     it(`should open and close add a new user with always empty form fieds`, () => {
@@ -433,7 +498,12 @@ describe(`Administration`, () => {
     it(`should open the administration page`, () => {
       cy.expectLocationToBe(`/admin`);
 
-      cy.get(ADMINISTRATION_DOM.texts.title).contains('Administration');
+      // check if the name of page is displayed in toolbar
+      cy
+        .get(`mat-toolbar`)
+        .find(ADMINISTRATION_DOM.texts.title)
+        .should('contain', 'Administration')
+        .and('be.visible');
 
       cy.expectUsersListToBe(expectedUsersIds, expectedUsersNames);
 

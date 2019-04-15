@@ -17,7 +17,7 @@
 
 import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { HEADER_DOM } from '../../support/header.dom';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { MENU_DOM } from '../../support/menu.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import {
   WORKSPACE_DELETED_DIALOG_DOM,
@@ -41,9 +41,21 @@ describe(`Workspaces`, () => {
     cy.get(HEADER_DOM.toolbar).should('be.visible');
     cy.get(BREADCRUMB_DOM.nav).should('be.visible');
 
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     // check if header and nav are not visible
     cy.get(HEADER_DOM.toolbar).should('not.be.visible');
@@ -51,10 +63,22 @@ describe(`Workspaces`, () => {
   });
 
   it(`should have empty fields by default in Workspaces - Create New Workspace`, () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
     cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=create');
 
     cy.get(WORKSPACES_CREATE_DOM.inputs.name).should('be.empty');
     cy.get(WORKSPACES_CREATE_DOM.textArea.shortDescription).should('be.empty');
@@ -62,7 +86,18 @@ describe(`Workspaces`, () => {
   });
 
   it(`should update the title and info message in the different views of /workspaces`, () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy.get(WORKSPACES_DOM.texts.titleSelectWks).should('be.visible');
     cy.get(WORKSPACES_DOM.texts.titleCreateWks).should('not.be.visible');
@@ -74,6 +109,7 @@ describe(`Workspaces`, () => {
     cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=create');
 
     cy.get(WORKSPACES_DOM.texts.infoWksList).should('not.be.visible');
     cy.get(WORKSPACES_DOM.texts.titleSelectWks).should('not.be.visible');
@@ -84,9 +120,21 @@ describe(`Workspaces`, () => {
   });
 
   it(`should create a new workspace and then delete it`, () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy.expectWorkspacesListToBe(expectedWorkspacesListDetails);
 
@@ -98,7 +146,13 @@ describe(`Workspaces`, () => {
 
     cy.expectLocationToBe('/workspaces/idWks2');
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
+    // open menu
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .click();
 
     cy.expectWorkspacesListToBe(expectedNewWorkspacesListDetails);
 
@@ -134,7 +188,8 @@ describe(`Workspaces`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks2`);
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 2`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 2');
 
     cy.openDialogToDeleteWks();
 
@@ -168,6 +223,7 @@ describe(`Workspaces`, () => {
     cy.get(WORKSPACE_DELETED_DIALOG_DOM.buttons.ok).click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav).should('not.be.visible');
 
@@ -175,9 +231,21 @@ describe(`Workspaces`, () => {
   });
 
   it('should failed the create of new workspace and then be successful', () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
 
@@ -188,6 +256,7 @@ describe(`Workspaces`, () => {
     );
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=create');
 
     cy
       .get(WORKSPACES_CREATE_DOM.inputs.name)
@@ -206,7 +275,7 @@ describe(`Workspaces`, () => {
       .should('not.be.disabled')
       .click();
 
-    cy.expectLocationToBe(`/workspaces`);
+    cy.expectLocationToBe('/workspaces/idWks2');
   });
 
   it('should display message when there is only one workspace in the list', () => {
@@ -235,6 +304,7 @@ describe(`Workspaces`, () => {
     cy.get(WORKSPACE_DELETED_DIALOG_DOM.buttons.ok).click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy.get(WORKSPACES_DOM.texts.infoNoWks).should('not.be.visible');
 
@@ -253,6 +323,7 @@ describe(`Workspaces`, () => {
     cy.get(WORKSPACE_DELETED_DIALOG_DOM.buttons.ok).click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy
       .get(WORKSPACES_DOM.texts.infoNoWks)
@@ -261,7 +332,18 @@ describe(`Workspaces`, () => {
   });
 
   it('should display all names members for each workspace', () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy
       .get(WORKSPACES_LIST_DOM.icons.iconUsers)
@@ -304,7 +386,18 @@ describe(`Workspaces`, () => {
   });
 
   it('should display the total number of members for each workspace', () => {
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     // check the total number of members for the fisrt workspace
     cy
@@ -322,9 +415,21 @@ describe(`Workspaces`, () => {
   it(`should not reopen the workspace list after logout and re-login`, () => {
     cy.expectLocationToBe('/workspaces/idWks0');
 
-    cy.get(WORKSPACE_DOM.buttons.changeWorkspace).click();
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
 
     cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=list');
 
     cy.logout();
 

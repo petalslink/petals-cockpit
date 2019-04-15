@@ -15,13 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { COMPONENT_DOM } from '../../support/component.dom';
 import {
   expectedEndpointsTreeWks0,
   expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
 } from '../../support/helper.const';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+import { MENU_DOM } from '../../support/menu.dom';
 import { SERVICES_DOM, SERVICES_TREE_DOM } from '../../support/services.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
@@ -34,7 +35,8 @@ describe(`Services`, () => {
   it(`should contain the interface, service, endpoint list on first workspace`, () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -166,7 +168,8 @@ describe(`Services`, () => {
   it(`should update the service, endpoint list on SERVICE_UPDATED event`, () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy.triggerSSEForComp('Comp 0', 'idComp0');
 
@@ -180,7 +183,8 @@ describe(`Services`, () => {
   it(`should group interfaces and services by namespace even when modified`, () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy.triggerSSEForComp('Comp 1', 'idComp1');
 
@@ -192,7 +196,8 @@ describe(`Services`, () => {
   it(`should clean all services, endpoints on empty SERVICE_UPDATED event`, () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy.triggerSSEForComp('Comp 2', 'idComp2');
 
@@ -206,7 +211,8 @@ describe(`Services`, () => {
   it(`should update interface, services, endpoints even when not on services tab`, () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -237,7 +243,8 @@ describe(`Services`, () => {
   it('should refresh services on clicking button', () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -273,7 +280,8 @@ describe(`Services`, () => {
   it('should show removed service as removed when clicking on refresh button', () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -300,7 +308,8 @@ describe(`Services`, () => {
   it('should not show existing service as removed when clicking on refresh button', () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains(`Workspace 0`);
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -327,7 +336,8 @@ describe(`Services`, () => {
   it('should show only searched interfaces, services and endpoints when some text is entered in search bar', () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains('Workspace 0');
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -390,7 +400,8 @@ describe(`Services`, () => {
   it('should reset services search when changing page', () => {
     cy.login('admin', 'admin');
 
-    cy.get(WORKSPACE_DOM.buttons.workspaceName).contains('Workspace 0');
+    // expect to have workspace name
+    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
 
     cy
       .get(WORKSPACE_DOM.tabs)
@@ -413,7 +424,13 @@ describe(`Services`, () => {
 
     cy.expectEndpointsTreeToBe(expectedEndpointsTreeSearch1dot0);
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
+    // open menu
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .click();
 
     cy
       .get(WORKSPACES_LIST_DOM.texts.workspaceName)

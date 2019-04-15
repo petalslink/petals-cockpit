@@ -15,89 +15,88 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  AfterViewChecked,
-  ChangeDetectorRef,
-  Component,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 
-import { Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { isLargeScreen } from '@shared/state/ui.selectors';
 import { ICurrentUser } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
-import { first, tap } from 'rxjs/operators';
+import { first, map, takeUntil, tap } from 'rxjs/operators';
 import { Workspaces } from './state/workspaces/workspaces.actions';
 import {
   IWorkspace,
   IWorkspaces,
 } from './state/workspaces/workspaces.interface';
-import {
-  getWorkspaces,
-  getWorkspacesListOrCreateWks,
-} from './state/workspaces/workspaces.selectors';
+import { getWorkspaces } from './state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-workspaces',
   templateUrl: './workspaces.component.html',
   styleUrls: ['./workspaces.component.scss'],
 })
-export class WorkspacesComponent
-  implements OnInit, OnDestroy, AfterViewChecked {
+export class WorkspacesComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   workspaces$: Observable<IWorkspaces>;
   user$: Observable<ICurrentUser>;
 
-  workspacesVisible$: Observable<boolean>;
   isFetchingWorkspaces$: Observable<boolean>;
   isFetchingWorkspace$: Observable<boolean>;
-  workspacesListVisible$: Observable<boolean>;
-  createWorkspaceVisible$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
 
   isFocusWksName = false;
 
+  page: string;
+
   constructor(
     private router: Router,
-    private store$: Store<IStore>,
-    private changeDetector: ChangeDetectorRef
+    private route: ActivatedRoute,
+    private store$: Store<IStore>
   ) {}
 
   ngOnInit() {
     this.workspaces$ = this.store$.pipe(getWorkspaces);
     this.user$ = this.store$.pipe(getCurrentUser);
 
-    this.workspacesVisible$ = this.store$.pipe(
-      select(getWorkspacesListOrCreateWks),
-      tap(isWorkspacesListOrCreateWksVisible => {
-        if (isWorkspacesListOrCreateWksVisible) {
-          this.fetchWorkspaces();
-        }
-      })
-    );
+    this.route.queryParams
+      .pipe(
+        takeUntil(this.onDestroy$),
+        map((params: Params) => {
+          this.page = params['page'];
+          switch (this.page) {
+            case 'create':
+              this.isFocusWksName = true;
+              break;
+            case 'list':
+              this.fetchWorkspaces();
+              break;
+            default:
+              this.fetchWorkspaces();
+              break;
+          }
+        })
+      )
+      .subscribe();
 
     this.isFetchingWorkspaces$ = this.store$.pipe(
       select(state => state.workspaces.isFetchingWorkspaces)
     );
 
-    this.workspacesListVisible$ = this.store$.pipe(
-      select(state => state.ui.isWorkspacesListVisible)
-    );
-
-    this.createWorkspaceVisible$ = this.store$.pipe(
-      select(state => state.ui.isCreateWorkspaceVisible)
-    );
-
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
 
     this.isFetchingWorkspace$ = this.store$.pipe(
-      select(state => state.workspaces.isFetchingWorkspace)
+      select(state => state.workspaces.isFetchingWorkspace),
+      tap(isFetchingWorkspace => {
+        if (
+          (this.page === 'create' || this.page === 'list') &&
+          isFetchingWorkspace
+        ) {
+          this.page = null;
+        }
+      })
     );
   }
 
@@ -106,17 +105,20 @@ export class WorkspacesComponent
     this.onDestroy$.complete();
   }
 
-  ngAfterViewChecked() {
-    this.changeDetector.detectChanges();
-  }
+  goToCreateWorkspace() {
+    this.router.navigate(['/workspaces'], {
+      queryParams: { page: 'create' },
+    });
 
-  openCreateWorkspace() {
-    this.store$.dispatch(new Ui.OpenCreateWorkspace());
     this.isFocusWksName = true;
   }
 
-  backToWorkspacesList() {
-    this.store$.dispatch(new Ui.OpenWorkspacesList());
+  goToWorkspacesList() {
+    this.fetchWorkspaces();
+
+    this.router.navigate(['/workspaces'], {
+      queryParams: { page: 'list' },
+    });
   }
 
   onFetch(selected: IWorkspace) {
@@ -126,9 +128,6 @@ export class WorkspacesComponent
           select(state => state.workspaces.selectedWorkspaceId),
           first(),
           tap(_ => {
-            // close workspaces view when selecting a workspace
-            this.store$.dispatch(new Ui.CloseWorkspacesList());
-            this.store$.dispatch(new Ui.CloseCreateWorkspace());
             this.router.navigate(['/workspaces', selected.id]);
           })
         )
@@ -161,17 +160,5 @@ export class WorkspacesComponent
         })
       )
       .subscribe();
-  }
-}
-
-@Component({
-  selector: 'app-no-workspace',
-  template: '',
-})
-export class NoWorkspaceComponent implements OnInit {
-  constructor(private store$: Store<IStore>) {}
-
-  ngOnInit() {
-    this.store$.dispatch(new Ui.OpenWorkspacesList());
   }
 }

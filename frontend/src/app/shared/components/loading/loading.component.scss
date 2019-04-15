@@ -28,16 +28,23 @@
     background: url(../../../../assets/img/logo-petals.png) center center
       no-repeat;
     background-size: cover;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    // right: 32px;
     margin: auto;
     .spinner {
       height: 200px;
       width: 200px;
       animation: rotate 2s linear infinite;
       transform-origin: center center;
-      position: absolute;
+      position: fixed;
       top: 0;
       bottom: 0;
       left: 0;
+      // right: 32px;
       right: 0;
       margin: auto;
       .path {
@@ -47,6 +54,12 @@
         stroke-linecap: round;
         stroke: #ddd;
       }
+    }
+    .spinner:before {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
     }
   }
 }

@@ -32,11 +32,11 @@ mat-card.workspaces {
   padding: 0;
   margin-left: 64px;
   .workspaces-wrapper {
-    .workspaces-list {
+    .workspaces-content {
       padding: 24px;
       div > .title-workspaces-view,
       div > .info-create-wks,
-      div > .info-workspaces-list {
+      div > div > .info-workspaces-list {
         margin: 0;
         text-align: center;
       }
@@ -48,7 +48,6 @@ mat-card.workspaces {
         width: 120px;
         height: 120px;
         position: relative;
-        top: 50%;
         border-radius: 50%;
         border-top-width: 6px;
         border-top-style: solid;
@@ -63,16 +62,18 @@ mat-card.workspaces {
           transform: rotate(360deg);
         }
       }
-      .icon-wks-wrapper {
-        .icon-no-wks-found {
-          font-size: calc(5vw + 5vh);
-        }
+      div.no-wks-found {
+        .icon-wks-wrapper {
+          .icon-no-wks-found {
+            font-size: calc(5vw + 5vh);
+          }
 
-        h1.info-no-wks {
-          font-size: calc(0.8em + 1vw);
-          line-height: calc(0.8em + 1vw);
-          font-weight: 300;
-          text-align: center;
+          h1.info-no-wks {
+            font-size: calc(0.8em + 1vw);
+            line-height: calc(0.8em + 1vw);
+            font-weight: 300;
+            text-align: center;
+          }
         }
       }
     }

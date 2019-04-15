@@ -15,27 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@mixin custom-modal-workspaces-theme($theme) {
-  $primary: map-get($theme, primary);
+const bs = `app-menu`;
 
-  .workspaces-item {
-    .icon-wks {
-      background: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(mat-color($primary, 900)),
-        to(mat-color($primary, 300))
-      );
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    div > div > .workspace-short-description {
-      color: mat-color($mat-grey, 700);
-    }
-    div > div > .badge-users > .icon-users {
-      color: mat-color($mat-grey, 700);
-    }
-  }
-}
+export const MENU_DOM = {
+  buttons: {
+    toggleMenu: `${bs} .btn-menu`,
+  },
+  links: {
+    goToWksList: `${bs} .menu-item-back-wks-list`,
+    goToCreateWks: `${bs} .menu-item-create-wks`,
+    itemList: `${bs} .item-list`,
+    itemsWksNames: `${bs} .item-list .menu-item-wks-name`,
+  },
+  texts: {
+    itemNameWksList: `span .back-to-wks`,
+    itemNameCreateWks: `span .create-new-wks`,
+    wksNames: `span .workspace-name`,
+  },
+};

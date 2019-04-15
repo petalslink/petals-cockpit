@@ -46,7 +46,9 @@ export class WorkspaceGuard implements CanActivate {
       first(),
       map(action => {
         if (action instanceof Workspaces.FetchError) {
-          this.router.navigate(['/workspaces']);
+          this.router.navigate(['/workspaces'], {
+            queryParams: { page: 'list' },
+          });
           return false;
         } else {
           return true;

@@ -39,6 +39,7 @@ import './helper.commands';
 import './import-bus.commands';
 import './interface.commands';
 import './login.commands';
+import './menu.commands';
 import './petals-cockpit.commands';
 import './petals.commands';
 import './service.commands';

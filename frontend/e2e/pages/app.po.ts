@@ -51,7 +51,7 @@ export class PetalsCockpitPage {
   }
 
   goToWorkspacesViaLogin(): LoginPage {
-    return this.goToViaLogin('/workspaces');
+    return this.goToViaLogin('/workspaces?page=list');
   }
 
   logout() {

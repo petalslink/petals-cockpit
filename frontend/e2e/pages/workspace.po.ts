@@ -18,13 +18,7 @@
 import { $, $$, browser, by, ExpectedConditions as EC } from 'protractor';
 
 import { waitTimeout } from '../common';
-import {
-  getMultipleElementsTexts,
-  Matcher,
-  textToMatchInElement,
-  urlToMatch,
-  waitAndClick,
-} from '../utils';
+import { getMultipleElementsTexts, urlToMatch, waitAndClick } from '../utils';
 import { BusPage } from './bus.po';
 import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
@@ -33,28 +27,20 @@ import { MessageComponentPage } from './message-component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
 import { SharedLibraryOverviewPage } from './shared-library.po';
-import { WorkspacesPage } from './workspaces.po';
 
 export abstract class WorkspacePage {
   public static readonly component = $(`app-workspace`);
   public static readonly sidenav = WorkspacePage.component.$('mat-sidenav');
-  public static readonly workspaceButton = WorkspacePage.sidenav.$(
-    '.btn-workspace-name'
-  );
 
   public readonly component = WorkspacePage.component;
   public readonly sidenav = WorkspacePage.sidenav;
   public readonly addBusButton = this.sidenav.$(`a.btn-add-bus`);
-  public readonly changeWorkspaceButton = this.sidenav.$(
-    `.btn-change-workspace`
-  );
   public readonly searchBar = this.sidenav.$(`input.search`);
   public readonly busesInProgress = this.sidenav.$$(
     `app-buses-in-progress mat-nav-list a`
   );
-  public readonly workspaceButton = WorkspacePage.workspaceButton;
 
-  static wait(expectedName?: Matcher) {
+  static waitAndGet() {
     browser.wait(urlToMatch(/\/workspaces\/\w+$/), waitTimeout);
 
     browser.wait(EC.visibilityOf(this.component), waitTimeout);
@@ -63,26 +49,6 @@ export abstract class WorkspacePage {
       EC.stalenessOf(this.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
-
-    let test = EC.elementToBeClickable(this.workspaceButton);
-    if (expectedName) {
-      test = EC.and(
-        test,
-        textToMatchInElement(
-          this.workspaceButton,
-          typeof expectedName === 'string'
-            ? expectedName.toUpperCase()
-            : expectedName
-        )
-      );
-    }
-
-    browser.wait(test, waitTimeout);
-  }
-
-  openWorkspaces() {
-    waitAndClick(this.changeWorkspaceButton);
-    return WorkspacesPage.waitAndGet(true);
   }
 
   openImportBus() {
@@ -227,9 +193,7 @@ export class WorkspaceOverviewPage extends WorkspacePage {
     by.cssContainingText(`button`, `Add`)
   );
 
-  static waitAndGet(expectedName?: Matcher) {
-    super.wait(expectedName);
-
+  static waitAndGet() {
     return new WorkspaceOverviewPage();
   }
 

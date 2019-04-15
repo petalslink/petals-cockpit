@@ -19,11 +19,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     fxLayoutAlign="start center"
     class="breadcrumb-item"
     >
+    <!-- 
+      Temporary fix: routerLinkActive not updating when routerLink changed.
+      This hack seems to be worked fine '__change_detection_hack__'.
+      See https://github.com/angular/angular/issues/18469#issuecomment-345436335 
+    -->
     <a
       mat-button
       [routerLink]="['/workspaces', workspace.id]"
       routerLinkActive="active-link"
-      [routerLinkActiveOptions]="{exact: true}"
+      [routerLinkActiveOptions]="{exact: true, __change_detection_hack__: workspace.id}"
       class="breadcrumb-item-link"
     >
       <div fxLayout="row" fxLayoutAlign="start center">

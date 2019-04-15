@@ -15,27 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@mixin custom-modal-workspaces-theme($theme) {
-  $primary: map-get($theme, primary);
+import { MENU_DOM } from './menu.dom';
 
-  .workspaces-item {
-    .icon-wks {
-      background: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        from(mat-color($primary, 900)),
-        to(mat-color($primary, 300))
-      );
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    div > div > .workspace-short-description {
-      color: mat-color($mat-grey, 700);
-    }
-    div > div > .badge-users > .icon-users {
-      color: mat-color($mat-grey, 700);
-    }
+Cypress.Commands.add(
+  'expectWorkspacesListMenuToBe',
+  listItemWorkspacesNames => {
+    const wksNames = cy.get(MENU_DOM.texts.wksNames);
+
+    wksNames.should('have.length', listItemWorkspacesNames.length);
+    wksNames.each((_, index) => cy.contains(listItemWorkspacesNames[index]));
   }
-}
+);

@@ -43,8 +43,28 @@ export function getSelectedWorkspaceId(state: IStore) {
   return state.workspaces.selectedWorkspaceId;
 }
 
-export function getWorkspacesListOrCreateWks(state: IStore) {
-  return state.ui.isWorkspacesListVisible || state.ui.isCreateWorkspaceVisible;
+export function getWorkspacesIdsNames(
+  store$: Store<IStore>
+): Observable<{ list: IWorkspacesIdsNames[] }> {
+  return store$.pipe(
+    select(state => state.workspaces),
+    map(workspaces => {
+      return {
+        list: workspaces.allIds.map(id => {
+          const name = workspaces.byId[id].name;
+          return {
+            id,
+            name,
+          };
+        }),
+      };
+    })
+  );
+}
+
+export interface IWorkspacesIdsNames {
+  id: string;
+  name: string;
 }
 
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {

@@ -102,7 +102,6 @@ export class WorkspacesEffects {
         .pipe(
           tap(newWks => {
             if (newWks) {
-              this.store$.dispatch(new Ui.CloseCreateWorkspace());
               this.router.navigate(['/workspaces', newWks.id]);
             }
           }),

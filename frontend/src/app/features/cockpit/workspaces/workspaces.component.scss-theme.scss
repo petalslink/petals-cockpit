@@ -20,16 +20,19 @@
 
   mat-card.workspaces {
     .workspaces-wrapper {
-      .workspaces-list {
+      .workspaces-content {
         div > .info-wks,
-        div > .info-create-wks {
+        div > .info-create-wks,
+        div > div > .info-workspaces-list {
           color: mat-color($mat-grey, 700);
         }
         .spinner-animation > .spinner {
           border-top-color: mat-color($primary, 800);
         }
-        .icon-wks-wrapper {
-          color: mat-color($mat-grey, 500);
+        div.no-wks-found {
+          .icon-wks-wrapper {
+            color: mat-color($mat-grey, 500);
+          }
         }
       }
     }

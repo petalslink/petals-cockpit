@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
 import { BIP_DOM, PETALS_DOM, PETALS_TREE_DOM } from '../../support/petals.dom';
@@ -161,7 +162,13 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).click();
 
-    cy.get(PETALS_COCKPIT_DOM.buttons.goToWksList).click();
+    // open menu
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .click();
 
     cy
       .get(WORKSPACES_LIST_DOM.texts.workspaceName)

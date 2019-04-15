@@ -42,9 +42,6 @@ export interface IUi {
   settings: ISettings;
   // workspace
   isSidenavVisible: boolean;
-  // workspaces
-  isWorkspacesListVisible: boolean;
-  isCreateWorkspaceVisible: boolean;
 }
 
 export const settings: ISettings = {
@@ -56,7 +53,5 @@ export function uiFactory(): IUi {
     isSidenavVisible: true,
     settings: settings,
     screenSize: '',
-    isWorkspacesListVisible: false,
-    isCreateWorkspaceVisible: false,
   };
 }
