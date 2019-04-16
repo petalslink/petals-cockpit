@@ -438,6 +438,86 @@ describe(`Workspaces`, () => {
     cy.expectLocationToBe('/workspaces/idWks0');
   });
 
+  it('should have the workspaces names list sorted by name', () => {
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
+
+    cy.expectWorkspacesListToBe(expectedWorkspacesListDetails);
+
+    cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
+
+    cy.addWorkspace('A Workspace Name');
+
+    cy.expectLocationToBe('/workspaces/idWks2');
+
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
+
+    // expect to have workspaces sort by name
+    cy.expectWorkspacesListToBe([
+      `A Workspace Name`,
+      `No description provided.`,
+      `Workspace 0`,
+      `This is short description for the Workspace 0`,
+      `Workspace 1`,
+      `No description provided.`,
+    ]);
+
+    cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
+
+    cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=create');
+
+    cy.addWorkspace('Z Workspace Name');
+
+    cy.expectLocationToBe('/workspaces/idWks3');
+
+    // open menu
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.menu-item-back-wks-list`)
+      .find(MENU_DOM.texts.itemNameWksList)
+      .should('contain', `Back to Workspaces`)
+      .and('be.visible')
+      .click();
+
+    // expect to have workspaces sort by name
+    cy.expectWorkspacesListToBe([
+      `A Workspace Name`,
+      `No description provided.`,
+      `Workspace 0`,
+      `This is short description for the Workspace 0`,
+      `Workspace 1`,
+      `No description provided.`,
+      `Z Workspace Name`,
+      `No description provided.`,
+    ]);
+  });
+
   // ---------------------------- Default Workspaces List ---------------------------- //
 
   const expectedWorkspacesListDetails = [
