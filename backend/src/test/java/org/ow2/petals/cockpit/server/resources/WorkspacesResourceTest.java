@@ -143,4 +143,52 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
         assertThat(ws.users.get("userX").name).isEqualTo("userX");
         assertThat(ws.users.get("userY")).isNull();
     }
+
+    @Test
+    public void createWorkspaceTwice() {
+        NewWorkspace newWs = new NewWorkspace("test", null, null);
+        Response add = resource.target("/workspaces").request().post(Entity.json(newWs));
+        assertThat(add.getStatus()).isEqualTo(200);
+
+        Response add2 = resource.target("/workspaces").request().post(Entity.json(newWs));
+        assertThat(add2.getStatus()).isEqualTo(409);
+
+        // there should be only one!
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1);
+    }
+
+    @Test
+    public void createWorkspacesSimilarNames() {
+        NewWorkspace newWs = new NewWorkspace("this is a test workspace name", null, null);
+        NewWorkspace newWs2 = new NewWorkspace("this? is_'a'_(test-workspace) {name}", null, null);
+
+        Response add = resource.target("/workspaces").request().post(Entity.json(newWs));
+        assertThat(add.getStatus()).isEqualTo(200);
+
+        Response add2 = resource.target("/workspaces").request().post(Entity.json(newWs2));
+        assertThat(add2.getStatus()).isEqualTo(409);
+
+        // there should be only one!
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1);
+    }
+
+    @Test
+    public void createWorkspacesRidiculousButSimilarNames() {
+        NewWorkspace newWs = new NewWorkspace("th(is 'I__s) a ]tE|st_ w$$o;rk   .sp:Ac!e name", null, null);
+        NewWorkspace newWs2 = new NewWorkspace("tHis? is_'a'_(tE\\St-wo°rksp/Ace) {nam&e}", null, null);
+
+        Response add = resource.target("/workspaces").request().post(Entity.json(newWs));
+        assertThat(add.getStatus()).isEqualTo(200);
+
+        Response add2 = resource.target("/workspaces").request().post(Entity.json(newWs2));
+        assertThat(add2.getStatus()).isEqualTo(409);
+
+        // there should be only one!
+        assertThat(table(WORKSPACES)).hasNumberOfRows(1);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1);
+    }
+
+
 }

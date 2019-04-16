@@ -300,7 +300,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
-    
+
     @Test
     public void deleteBus() {
         assertThat(requestBus(domain)).hasNumberOfRows(1);
@@ -311,10 +311,30 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(res.id).isEqualTo(getId(domain));
         assertThat(res.reason).isEqualTo("Bus deleted by " + ADMIN);
         assertWorkspaceContentForServices(new SoftAssertions(), res.content, 1, new ArrayList<Endpoint>());
-        
+
         assertThat(requestContainer(container1)).hasNumberOfRows(0);
         assertThat(requestContainer(container2)).hasNumberOfRows(0);
         assertThat(requestContainer(container3)).hasNumberOfRows(0);
+    }
+
+    @Test
+    public void updateWorkspaceWithNameSimilarToAnotherWorkspaceName() {
+        Response put = resource.target("/workspaces/1").request()
+                .put(Entity.json(new WorkspaceUpdate("test_2", null, null)));
+        assertThat(put.getStatus()).isEqualTo(409);
+
+        // it wasn't changed!
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.NAME.getName()).isEqualTo("test");
+    }
+
+    @Test
+    public void updateWorkspaceWithNameSimilarToPreviousName() {
+        Response put = resource.target("/workspaces/1").request()
+                .put(Entity.json(new WorkspaceUpdate("te_st", null, null)));
+        assertThat(put.getStatus()).isEqualTo(200);
+
+        // it was changed!
+        assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.NAME.getName()).isEqualTo("te_st");
     }
 
     private void assertContent(SoftAssertions a, WorkspaceFullContent content, Domain... buses) {
