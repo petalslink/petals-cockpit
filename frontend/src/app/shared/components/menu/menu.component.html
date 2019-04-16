@@ -44,6 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       [routerLink]="['/workspaces', workspace.id]"
       routerLinkActive="active"
       class="menu-item-wks-name"
+      [disabled]="workspace.id === selectedWksId"
     >
       <span fxLayout="row" fxLayoutAlign="center center">
         <mat-icon class="margin-right-x1 icon-x1 icon-wks">folder</mat-icon>
