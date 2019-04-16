@@ -60,7 +60,7 @@ describe(`Workspace`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0`);
 
     // ========== Case 1 ==========
-    // open menu and check if current workspace is selected
+    // open menu and check if current workspace is selected and disabled
     cy
       .get(MENU_DOM.buttons.toggleMenu)
       .should('be.visible')
@@ -70,6 +70,7 @@ describe(`Workspace`, () => {
       .get(`.item-list .menu-item-wks-name`)
       .first()
       .should('have.class', 'active')
+      .and('have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
       .should('contain', `Workspace 0`)
       .and('be.visible');
@@ -78,6 +79,7 @@ describe(`Workspace`, () => {
       .get(`.item-list .menu-item-wks-name`)
       .last()
       .should('not.have.class', 'active')
+      .and('not.have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
       .should('contain', `Workspace 1`)
       .and('be.visible')
@@ -86,7 +88,7 @@ describe(`Workspace`, () => {
     cy.expectLocationToBe(`/workspaces/idWks1`);
 
     // ========== Case 2 ==========
-    // open menu and check if the next workspace is selected
+    // open menu and check if the next workspace is selected and disabled
     cy
       .get(MENU_DOM.buttons.toggleMenu)
       .should('be.visible')
@@ -95,17 +97,19 @@ describe(`Workspace`, () => {
     cy
       .get(`.item-list .menu-item-wks-name`)
       .first()
-      .should('not.have.class', 'active')
+      .should('have.class', 'active')
+      .and('have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
-      .should('contain', `Workspace 0`)
+      .should('contain', `Workspace 1`)
       .and('be.visible');
 
     cy
       .get(`.item-list .menu-item-wks-name`)
       .last()
-      .should('have.class', 'active')
+      .should('not.have.class', 'active')
+      .and('not.have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
-      .should('contain', `Workspace 1`)
+      .should('contain', `Workspace 0`)
       .and('be.visible');
 
     // create new workspace
@@ -116,7 +120,7 @@ describe(`Workspace`, () => {
     cy.expectLocationToBe('/workspaces/idWks2');
 
     // ========== Case 3 ==========
-    // open menu and check if the new workspace is selected
+    // open menu and check if the new workspace is selected and disabled
     cy
       .get(MENU_DOM.buttons.toggleMenu)
       .should('be.visible')
@@ -124,18 +128,29 @@ describe(`Workspace`, () => {
 
     cy
       .get(`.item-list .menu-item-wks-name`)
+      .first()
+      .should('have.class', 'active')
+      .and('have.attr', 'disabled', 'disabled')
+      .find(MENU_DOM.texts.wksNames)
+      .should('contain', `Workspace 2`)
+      .and('be.visible');
+
+    cy
+      .get(`.item-list .menu-item-wks-name`)
       .eq(-2)
       .should('not.have.class', 'active')
+      .and('not.have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
-      .should('contain', `Workspace 1`)
+      .should('contain', `Workspace 0`)
       .and('be.visible');
 
     cy
       .get(`.item-list .menu-item-wks-name`)
       .last()
-      .should('have.class', 'active')
+      .should('not.have.class', 'active')
+      .and('not.have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
-      .should('contain', `Workspace 2`)
+      .should('contain', `Workspace 1`)
       .and('be.visible');
   });
 
@@ -166,9 +181,9 @@ describe(`Workspace`, () => {
       .click();
 
     cy.expectWorkspacesListMenuToBe([
+      `Workspace 2`,
       `Workspace 0`,
       `Workspace 1`,
-      `Workspace 2`,
     ]);
   });
 
@@ -256,10 +271,20 @@ describe(`Workspace`, () => {
       .get(`.item-list .menu-item-wks-name`)
       .first()
       .should('have.class', 'active')
+      .and('have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
       .should('contain', `Workspace 0`)
-      .and('be.visible')
-      .click();
+      .and('be.visible');
+
+    // close menu
+    cy.get(`.cdk-overlay-container`).click(600, 600);
+
+    // expect to have the menu closed
+    cy
+      .get(
+        `.menu + * .cdk-overlay-pane > div.mat-menu-panel > div.mat-menu-content`
+      )
+      .should('not.be.visible');
 
     // go to the child view
     cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
@@ -277,6 +302,7 @@ describe(`Workspace`, () => {
       .get(`.item-list .menu-item-wks-name`)
       .first()
       .should('have.class', 'active')
+      .and('have.attr', 'disabled', 'disabled')
       .find(MENU_DOM.texts.wksNames)
       .should('contain', `Workspace 0`)
       .and('be.visible');
@@ -325,5 +351,51 @@ describe(`Workspace`, () => {
     cy
       .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
       .should('have.class', 'active-link');
+  });
+
+  it('should have the workspaces names list sorted by name', () => {
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy.expectWorkspacesListMenuToBe(['Workspace 0', 'Workspace 1']);
+
+    cy.get(`.menu-item-create-wks`).click();
+
+    cy.addWorkspace('Z Workspace Name');
+
+    cy.expectLocationToBe(`/workspaces/idWks2`);
+
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy.expectWorkspacesListMenuToBe([
+      'Z Workspace Name',
+      'Workspace 0',
+      'Workspace 1',
+    ]);
+
+    cy.get(`.menu-item-create-wks`).click();
+
+    cy.addWorkspace('A Workspace Name');
+
+    cy.expectLocationToBe(`/workspaces/idWks3`);
+
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy.expectWorkspacesListMenuToBe([
+      'A Workspace Name',
+      'Workspace 0',
+      'Workspace 1',
+      'Z Workspace Name',
+    ]);
   });
 });
