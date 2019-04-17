@@ -41,9 +41,17 @@ export class MenuComponent implements OnInit {
 
   // 28 characters max > width size of menu panel
   @Input() maxLength = 28;
+  @Input() selectedWksId: string;
   @Input('workspacesIdsNames')
   set workspacesIdsNames(workspacesIdsNames: { list: IWorkspacesIdsNames[] }) {
-    this._workspacesIdsNames = workspacesIdsNames;
+    this._workspacesIdsNames = {
+      list: [
+        workspacesIdsNames.list.find(
+          selectedWks => selectedWks.id === this.selectedWksId
+        ),
+        ...workspacesIdsNames.list.filter(wks => wks.id !== this.selectedWksId),
+      ],
+    };
   }
 
   get workspacesIdsNames() {

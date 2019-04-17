@@ -50,13 +50,15 @@ export function getWorkspacesIdsNames(
     select(state => state.workspaces),
     map(workspaces => {
       return {
-        list: workspaces.allIds.map(id => {
-          const name = workspaces.byId[id].name;
-          return {
-            id,
-            name,
-          };
-        }),
+        list: workspaces.allIds
+          .map(id => {
+            const name = workspaces.byId[id].name;
+            return {
+              id,
+              name,
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name)),
       };
     })
   );
