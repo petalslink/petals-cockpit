@@ -76,13 +76,15 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
     map(([workspaces, usersById]) => {
       return {
         ...workspaces,
-        list: workspaces.allIds.map(wId => {
-          const ws = workspaces.byId[wId];
-          return {
-            ...ws,
-            users: ws.users.map(id => usersById[id]),
-          };
-        }),
+        list: workspaces.allIds
+          .map(wId => {
+            const ws = workspaces.byId[wId];
+            return {
+              ...ws,
+              users: ws.users.map(id => usersById[id]),
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name)),
       };
     })
   );
