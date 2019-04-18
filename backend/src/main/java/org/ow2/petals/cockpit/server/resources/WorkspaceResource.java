@@ -164,8 +164,13 @@ public class WorkspaceResource {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
 
-            if (update.name != null) {
-                ws.setName(update.name);
+            final String newName = update.name;
+            if (newName != null) {
+                if (WorkspacesResource.similarWorkspaceNameAlreadyTaken(newName, conf, ws.getName())) {
+                    throw new WebApplicationException(
+                            "Conflict: another workspace with a similar name already exists.", 409);
+                }
+                ws.setName(newName);
             }
 
             if (update.shortDescription != null) {

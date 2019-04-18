@@ -25,6 +25,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -39,6 +40,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
@@ -76,6 +78,12 @@ public class WorkspacesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceMin create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
+
+            if (similarWorkspaceNameAlreadyTaken(ws.name, jooq)) {
+                throw new WebApplicationException("Conflict: another workspace with a similar name already exists.",
+                        409);
+            }
+
             WorkspacesRecord wsDb = new WorkspacesRecord();
             wsDb.setName(ws.name);
             wsDb.setDescription(ws.description != null ? ws.description : DEFAULT_DESCRIPTION);
@@ -122,6 +130,25 @@ public class WorkspacesResource {
             }
 
             return new WorkspacesContent(wss.build(), users);
+        });
+    }
+
+    public static boolean similarWorkspaceNameAlreadyTaken(String name, Configuration jooq) {
+        return similarWorkspaceNameAlreadyTaken(name, jooq, null);
+    }
+
+    public static boolean similarWorkspaceNameAlreadyTaken(String name, Configuration jooq,
+            @Nullable String ignoredName) {
+
+        return DSL.using(jooq).transactionResult(conf -> {
+            final String searchChars = "-_@~!?,;.:^${}[]()=+#~²%§&|*\\/'\":° ";
+
+            List<String> workspaces = DSL.using(conf).fetchValues(WORKSPACES.NAME).stream()
+                    .filter(names -> !names.equals(ignoredName))
+                    .map(names -> StringUtils.replaceChars(names, searchChars, "").toUpperCase())
+                    .collect(Collectors.toList());
+
+            return workspaces.contains(StringUtils.replaceChars(name, searchChars, "").toUpperCase());
         });
     }
 
