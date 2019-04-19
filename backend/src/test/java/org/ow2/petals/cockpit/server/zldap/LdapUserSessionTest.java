@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Could not consistently run these test without making UserSessionTest and UsersResourceSecurityTest fail as side
@@ -43,10 +45,26 @@ import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
  */
 public class LdapUserSessionTest extends AbstractLdapTest {
 
+    Logger log = LoggerFactory.getLogger(LdapUserSessionTest.class);
+
     @Before
     public void setUpDb() {
         addUser(ADMIN_LDAP_DB, true);
         addUser(USER_NOLDAP_DB, false);
+    }
+
+    @Before
+    public void safetySleep() {
+        /*
+         * Wait a bit to prevent a binding conflict.
+         * LDAPException(resultCode=82 (local error), errorMessage='An error occurred while attempting to 
+         * start listener 'mylistener': BindException(message='Address in use (Bind failed)',...)
+         */
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            log.error("Safety thread sleep failed : {}", e.getMessage());
+        }
     }
 
     @Test
