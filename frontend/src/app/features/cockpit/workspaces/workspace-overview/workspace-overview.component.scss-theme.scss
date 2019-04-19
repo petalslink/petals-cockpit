@@ -22,4 +22,20 @@
       background-color: mat-color($mat-grey, 50);
     }
   }
+
+  mat-card.bus-list
+    > mat-card-content.bus-content
+    > div.bus-grid-item
+    > div.bus-item {
+    border-color: mat-color($mat-grey, 200);
+    a.bus-link {
+      div.bus-svg-content:hover {
+        background-color: mat-color($mat-grey, 400);
+      }
+      div.bus-footer {
+        background-color: mat-color($mat-grey, 100);
+        color: mat-color($mat-grey, 900);
+      }
+    }
+  }
 }

@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -34,6 +40,10 @@ import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
+import {
+  getBusesIdsNames,
+  IBusesIdsNames,
+} from '@wks/state/buses/buses.selectors';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
@@ -46,12 +56,16 @@ import {
   selector: 'app-workspace-overview',
   templateUrl: './workspace-overview.component.html',
   styleUrls: ['./workspace-overview.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  busesIdsNames$: Observable<{ list: IBusesIdsNames[] }>;
+
   workspace$: Observable<IWorkspaceRow>;
   users$: Observable<IUserRow[]>;
+
   currentUserId$: Observable<string>;
   appUsers$: Observable<string[]>;
 
@@ -83,6 +97,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store$.dispatch(new Users.FetchAll());
+
+    this.busesIdsNames$ = this.store$.pipe(getBusesIdsNames);
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),

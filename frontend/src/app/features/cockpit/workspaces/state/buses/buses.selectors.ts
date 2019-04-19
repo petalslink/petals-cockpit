@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createSelector } from '@ngrx/store';
+import { createSelector, select, Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import {
   IBusBackendDetailsCommon,
@@ -58,3 +60,29 @@ export const getCurrentBus = createSelector(
     }
   }
 );
+
+export function getBusesIdsNames(
+  store$: Store<IStore>
+): Observable<{ list: IBusesIdsNames[] }> {
+  return store$.pipe(
+    select(state => state.buses),
+    map(buses => {
+      return {
+        list: buses.allIds
+          .map(id => {
+            const name = buses.byId[id].name;
+            return {
+              id,
+              name,
+            };
+          })
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    })
+  );
+}
+
+export interface IBusesIdsNames {
+  id: string;
+  name: string;
+}
