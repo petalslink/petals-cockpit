@@ -90,7 +90,9 @@ build-backend:
     # ensure they are the same in the other jobs
     - maven -pl backend -am versions:lock-snapshots
     # deploy to the staging directory
-    - maven_build -pl backend -am deploy
+    # ignore liquibase info logs flooding (to prevent gitlab log size hitting its default limit) 
+    # See issue https://gitlab.com/linagora/petals-cockpit/issues/544
+    - maven_build -pl backend -am deploy | grep -vE "^INFO  \[.*\] liquibase.*$"     
     # build the docs
     - maven -pl backend -am com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
   artifacts:
