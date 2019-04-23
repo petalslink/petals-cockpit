@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -56,7 +57,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Singleton
 @Path("/users")
-@Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
+@Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_AUTHORIZER)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UsersResource {
@@ -78,80 +79,104 @@ public class UsersResource {
     @GET
     @Pac4JSecurity(ignore = true)
     public Collection<UserMin> getAllUsers() {
-        return DSL.using(jooq).selectFrom(USERS).stream().map(UserMin::new).collect(Collectors.toList());
-    }
+        return DSL.using(jooq).transactionResult(conf -> {
+            return DSL.using(jooq).selectFrom(USERS).stream().map(UserMin::new).collect(Collectors.toList());
+        });
+   }
 
     @POST
     public void add(@Valid NewUser user) {
-        try {
-            if (ldapConfig != null) {
-                assert ldapService != null;
-                String name = ldapService.getUserByUsername(user.username).name;
+        DSL.using(jooq).transaction(conf -> {
+            try {
+                if (ldapConfig != null) {
+                    assert ldapService != null;
+                    String name = ldapService.getUserByUsername(user.username).name;
 
-                DSL.using(jooq).executeInsert(new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
-            } else {
-                final String password = user.password;
-                final String name = user.name;
-
-                if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
-                    throw new WebApplicationException("Unprocessable entity: password and name must be valid.", 422);
+                    DSL.using(jooq).executeInsert(
+                            new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
                 } else {
-                    DSL.using(jooq).executeInsert(new UsersRecord(user.username,
-                            CockpitAuthenticator.passwordEncoder.encode(password), name, null, false, false));
+                    final String password = user.password;
+                    final String name = user.name;
+                    final boolean isAdmin = user.isAdmin;
+
+                    if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
+                        throw new WebApplicationException("Unprocessable entity: password and name must be valid.",
+                                422);
+                    } else {
+                        DSL.using(jooq).executeInsert(new UsersRecord(user.username,
+                                CockpitAuthenticator.passwordEncoder.encode(password), name, null, isAdmin, false));
+                    }
                 }
+            } catch (DataAccessException e) {
+                if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
+                    throw new WebApplicationException(Status.CONFLICT);
+                } else {
+                    throw e;
+                }
+            } catch (LdapException e) {
+                throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
             }
-        } catch (DataAccessException e) {
-            if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
-                throw new WebApplicationException(Status.CONFLICT);
-            } else {
-                throw e;
-            }
-        } catch (LdapException e) {
-            throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-        }
+        });
     }
 
     @GET
     @Path("/{username}")
     public UserMin user(@NotEmpty @PathParam("username") String username) {
-        UsersRecord user = DSL.using(jooq).fetchOne(USERS, USERS.USERNAME.eq(username));
-
-        if (user == null) {
-            throw new NotFoundException();
-        }
-
-        return new UserMin(user);
+        return DSL.using(jooq).transactionResult(conf -> {
+            UsersRecord user = DSL.using(jooq).fetchOne(USERS, USERS.USERNAME.eq(username));
+            if (user == null) {
+                throw new NotFoundException();
+            }
+            return new UserMin(user);
+        });
     }
 
     @DELETE
     @Path("/{username}")
     public void delete(@NotEmpty @PathParam("username") String username) {
-        int deleted = DSL.using(jooq).deleteFrom(USERS).where(USERS.USERNAME.eq(username)).execute();
-        if (deleted < 1) {
-            throw new NotFoundException();
-        }
+        DSL.using(jooq).transaction(conf -> {
+            int deleted = DSL.using(jooq).deleteFrom(USERS).where(USERS.USERNAME.eq(username)).execute();
+            if (deleted < 1) {
+                throw new NotFoundException();
+            }
+        });
     }
 
     @PUT
     @Path("/{username}")
-    public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser user) {
+    public void update(@NotEmpty @PathParam("username") String username, @Valid UpdateUser userUpdated) {
+        DSL.using(jooq).transaction(conf -> {
+            UsersRecord user = new UsersRecord();
+            String name = userUpdated.name;
+            if (name != null && !name.trim().isEmpty()) {
+                failIfLdapMode();
+                user.set(USERS.NAME, name);
+            }
+            String password = userUpdated.password;
+            if (password != null && !password.trim().isEmpty()) {
+                failIfLdapMode();
+                user.set(USERS.PASSWORD, CockpitAuthenticator.passwordEncoder.encode(password));
+            }
 
+            final Integer currentAdminsCount = DSL.using(conf).selectCount().from(USERS).where(USERS.ADMIN.eq(true))
+                    .fetchOne(0, int.class);
+            boolean isAlreadyAdmin = DSL.using(conf).select(USERS.ADMIN).from(USERS).where(USERS.USERNAME.eq(username))
+                    .fetchOne(0, boolean.class);
+            boolean willBeAdmin = userUpdated.isAdmin;
+            if ((currentAdminsCount == 1) && isAlreadyAdmin && !willBeAdmin) {
+                throw new WebApplicationException("At least one cockpit administrator must remain!", Status.CONFLICT);
+            }
+            user.set(USERS.ADMIN, willBeAdmin);
+
+            DSL.using(jooq).executeUpdate(user, USERS.USERNAME.eq(username));
+
+        });
+    }
+
+    private void failIfLdapMode() {
         if (ldapConfig != null) {
-            throw new WebApplicationException("Method not allowed: cannot edit users in LDAP mode",
+            throw new WebApplicationException("Method not allowed: cannot change user name and password in LDAP mode",
                     Status.METHOD_NOT_ALLOWED);
-        }
-
-        UsersRecord r = new UsersRecord();
-        String name = user.name;
-        if (name != null && !name.trim().isEmpty()) {
-            r.set(USERS.NAME, name);
-        }
-        String password = user.password;
-        if (password != null && !password.trim().isEmpty()) {
-            r.set(USERS.PASSWORD, CockpitAuthenticator.passwordEncoder.encode(password));
-        }
-        if (r.changed()) {
-            DSL.using(jooq).executeUpdate(r, USERS.USERNAME.eq(username));
         }
     }
 
@@ -165,10 +190,15 @@ public class UsersResource {
         @JsonProperty
         public final String name;
 
+        @NotNull
+        @JsonProperty
+        public final boolean isAdmin;
+
         public UpdateUser(@Nullable @JsonProperty("password") String password,
-                @Nullable @JsonProperty("name") String name) {
+                @Nullable @JsonProperty("name") String name, @JsonProperty("isAdmin") boolean isAdmin) {
             this.password = password;
             this.name = name;
+            this.isAdmin = isAdmin;
         }
     }
 
@@ -186,11 +216,16 @@ public class UsersResource {
         @JsonProperty
         public final String password;
 
+        @NotNull
+        @JsonProperty
+        public final boolean isAdmin;
+
         public NewUser(@JsonProperty("username") String username, @Nullable @JsonProperty("password") String password,
-                @Nullable @JsonProperty("name") String name) {
+                @Nullable @JsonProperty("name") String name, @JsonProperty("isAdmin") boolean isAdmin) {
             this.name = name;
             this.username = username;
             this.password = password;
+            this.isAdmin = isAdmin;
         }
     }
 
@@ -204,13 +239,18 @@ public class UsersResource {
         @JsonProperty
         public final String name;
 
+        @NotNull
+        @JsonProperty
+        public boolean isAdmin;
+
         public UserMin(UsersRecord record) {
-            this(record.getUsername(), record.getName());
+            this(record.getUsername(), record.getName(), record.getAdmin());
         }
 
-        private UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name) {
+        private UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("isAdmin") boolean isAdmin) {
             this.id = id;
             this.name = name;
+            this.isAdmin = isAdmin;
         }
     }
 }

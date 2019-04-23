@@ -125,7 +125,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                         wsDb.attach(c);
                         wsDb.insert();
 
-                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), username));
+                        DSL.using(c)
+                                .executeInsert(new UsersWorkspacesRecord(wsDb.getId(), username, true, true, true));
 
                         userRecord.setLastWorkspace(wsDb.getId());
                         DSL.using(c).executeUpdate(userRecord);

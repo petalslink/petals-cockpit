@@ -62,7 +62,7 @@ public class LdapResource {
 
     @GET
     @Path("/users")
-    @Pac4JSecurity(authorizers = CockpitSecurityBundle.IS_ADMIN_AUTHORIZER)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_AUTHORIZER)
     @Produces(MediaType.APPLICATION_JSON)
     public List<LdapResource.LdapUser> getUsersByNameOrUsername(@NotNull @NotEmpty @Pattern(regexp="^[^()=*]+$") @QueryParam("name") String name)
             throws LdapException {

@@ -97,8 +97,8 @@ public class WorkspacesResource {
             }
             wsDb.attach(conf);
             wsDb.insert();
-
-            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), profile.getId()));
+            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), profile.getId(), true, true, true));
+            profile.updatePermissions(conf);
 
             return new WorkspaceMin(wsDb.getId(), wsDb.getName());
         });

@@ -37,6 +37,7 @@ import org.ow2.petals.cockpit.server.resources.ContainersResource;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource;
 import org.ow2.petals.cockpit.server.resources.InterfacesResource;
 import org.ow2.petals.cockpit.server.resources.LdapResource;
+import org.ow2.petals.cockpit.server.resources.PermissionsResource;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource;
 import org.ow2.petals.cockpit.server.resources.ServicesResource;
@@ -196,6 +197,7 @@ public class CockpitApplication<C extends CockpitConfiguration> extends Applicat
         environment.jersey().register(SetupResource.class);
         environment.jersey().register(UsersResource.class);
         environment.jersey().register(LdapResource.class);
+        environment.jersey().register(PermissionsResource.class);
 
         if (!DSL.using(jooqConf).fetchExists(USERS, USERS.ADMIN.eq(true))) {
             environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {

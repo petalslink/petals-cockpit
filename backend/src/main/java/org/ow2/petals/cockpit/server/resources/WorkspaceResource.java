@@ -67,6 +67,7 @@ import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
 import org.ow2.petals.admin.api.artifact.SharedLibrary;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
@@ -89,6 +90,7 @@ import org.ow2.petals.jbi.descriptor.original.generated.Component;
 import org.ow2.petals.jbi.descriptor.original.generated.Jbi;
 import org.pac4j.core.profile.ProfileManager;
 import org.pac4j.jax.rs.annotations.Pac4JProfileManager;
+import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,9 +125,8 @@ public class WorkspaceResource {
 
     @Inject
     public WorkspaceResource(@NotNull @PathParam("wsId") @Min(1) long wsId,
-            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager,
-            WorkspacesService workspaces, Configuration jooq, ArtifactServer httpServer,
-            WorkspaceDbOperations workspaceDb) {
+            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager, WorkspacesService workspaces,
+            Configuration jooq, ArtifactServer httpServer, WorkspaceDbOperations workspaceDb) {
         this.profile = profileManager.get(true).orElseThrow(() -> new WebApplicationException(Status.UNAUTHORIZED));
         this.wsId = wsId;
         this.jooq = jooq;
@@ -160,15 +161,15 @@ public class WorkspaceResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public WorkspaceOverviewContent put(WorkspaceUpdate update) {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
-
             final String newName = update.name;
             if (newName != null) {
                 if (WorkspacesResource.similarWorkspaceNameAlreadyTaken(newName, conf, ws.getName())) {
-                    throw new WebApplicationException(
-                            "Conflict: another workspace with a similar name already exists.", 409);
+                    throw new WebApplicationException("Conflict: another workspace with a similar name already exists.",
+                            409);
                 }
                 ws.setName(newName);
             }
@@ -224,6 +225,7 @@ public class WorkspaceResource {
 
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public WorkspaceDeleted delete() {
         return workspace.delete();
     }
@@ -248,6 +250,7 @@ public class WorkspaceResource {
     @Path("/sharedlibraries/{slId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.LIFECYCLE_ARTIFACT_AUTHORIZER)
     public SLStateChanged changeSLState(@NotNull @PathParam("slId") @Min(1) long slId,
             @NotNull @Valid SLChangeState action) {
         return workspace.changeSLState(slId, action);
@@ -258,6 +261,7 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.LIFECYCLE_ARTIFACT_AUTHORIZER)
     public SAStateChanged changeSAState(@NotNull @PathParam("saId") @Min(1) long saId,
             @NotNull @Valid SAChangeState action) {
         return workspace.changeSAState(saId, action);
@@ -268,8 +272,10 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Warnings({ @ResponseCode(code = 409, condition = "The state transition is not valid.") })
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.LIFECYCLE_ARTIFACT_AUTHORIZER)
     public ComponentStateChanged changeComponentState(@NotNull @PathParam("compId") @Min(1) long compId,
             @NotNull @Valid ComponentChangeState action) {
+
         return workspace.changeComponentState(compId, action);
     }
 
@@ -277,11 +283,12 @@ public class WorkspaceResource {
     @Path("/components/{compId}/parameters")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.DEPLOY_ARTIFACT_AUTHORIZER)
     public void changeComponentParameters(@NotNull @PathParam("compId") @Min(1) long compId,
             @NotNull @Valid ComponentChangeParameters action) {
         workspace.changeComponentParameters(compId, action);
     }
-
+    
     /**
      * @param containerId
      * @param file
@@ -303,11 +310,11 @@ public class WorkspaceResource {
     @Path("/containers/{containerId}/sharedlibraries")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.DEPLOY_ARTIFACT_AUTHORIZER)
     public WorkspaceContent deploySharedLibrary(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @Nullable @Valid @FormDataParam("overrides") SLDeployOverrides overrides)
-            throws Exception {
+            @Nullable @Valid @FormDataParam("overrides") SLDeployOverrides overrides) throws Exception {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -347,6 +354,7 @@ public class WorkspaceResource {
     @Path("/components/{componentId}/serviceunits")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.DEPLOY_ARTIFACT_AUTHORIZER)
     public WorkspaceContent deployServiceUnit(@NotNull @PathParam("componentId") @Min(1) long componentId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
@@ -394,6 +402,7 @@ public class WorkspaceResource {
     @Path("/containers/{containerId}/components")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.DEPLOY_ARTIFACT_AUTHORIZER)
     public WorkspaceContent deployComponent(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
@@ -463,11 +472,11 @@ public class WorkspaceResource {
     @Path("/containers/{containerId}/serviceassemblies")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.DEPLOY_ARTIFACT_AUTHORIZER)
     public WorkspaceContent deployServiceAssembly(@NotNull @PathParam("containerId") @Min(1) long containerId,
             @NotNull @FormDataParam("file") InputStream file,
             @NotNull @FormDataParam("file") FormDataContentDisposition fileDisposition,
-            @Nullable @Valid @FormDataParam("overrides") SADeployOverrides overrides)
-            throws Exception {
+            @Nullable @Valid @FormDataParam("overrides") SADeployOverrides overrides) throws Exception {
         if (!DSL.using(jooq).fetchExists(CONTAINERS, CONTAINERS.ID.eq(containerId))) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -519,6 +528,7 @@ public class WorkspaceResource {
     @POST
     @Path("/users/")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public void addUsers(@Valid AddUser userToAdd) {
         try {
             DSL.using(jooq).insertInto(USERS_WORKSPACES).set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
@@ -534,6 +544,7 @@ public class WorkspaceResource {
 
     @DELETE
     @Path("/users/{id}")
+    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public void deleteUser(@NotEmpty @PathParam("id") String username) {
         DSL.using(jooq).delete(USERS_WORKSPACES)
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
@@ -681,7 +692,7 @@ public class WorkspaceResource {
         @JsonProperty
         public final int port;
 
-        @NotEmpty
+        @NotEmpty	
         @JsonProperty
         public final String username;
 
@@ -1095,7 +1106,6 @@ public class WorkspaceResource {
                 return false;
             return true;
         }
-
 
         public static SharedLibraryIdentifier from(SharedLibrary sl) {
             return new SharedLibraryIdentifier(sl.getName(), sl.getVersion());

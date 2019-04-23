@@ -52,17 +52,19 @@ public class CockpitAuthenticator implements Authenticator<UsernamePasswordCrede
                 .getContextResolver(Configuration.class, MediaType.WILDCARD_TYPE).getContext(null);
 
         UsersRecord user = DSL.using(conf).selectFrom(USERS)
-                    .where(USERS.USERNAME.eq(username))
-                    .and(USERS.IS_FROM_LDAP.isFalse()).fetchOne();
+                .where(USERS.USERNAME.eq(username))
+                .and(USERS.IS_FROM_LDAP.isFalse())
+                .fetchOne();
 
         if (user != null) {
             if (!passwordEncoder.matches(credentials.getPassword(), user.getPassword())) {
                 throw new BadCredentialsException("Bad credentials for: " + username);
             } else {
-                credentials.setUserProfile(new CockpitProfile(user.getUsername(), user.getAdmin()));
+                credentials.setUserProfile(new CockpitProfile(user.getUsername(), conf));
             }
         } else {
             throw new AccountNotFoundException("No account found for: " + username);
         }
     }
+
 }
