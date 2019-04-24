@@ -170,31 +170,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         
       </mat-card>
 
-<<<<<<< HEAD
-      <mat-card class="buses-list">
-        <mat-card-title class="light-bold">Bus list</mat-card-title>
-        <mat-card-content *ngIf="busesIdsNames$ | async" class="grid-content">
-          <mat-grid-list #grid cols="4" rowHeight="4:3"  gutterSize="24px" class="grid-list">
-            <mat-grid-tile 
-              *ngFor="let bus of (busesIdsNames$ | async).list" 
-              [colspan]="1"
-              [rowspan]="1"
-              class="grid-tile"
-            >
-              <div class="bus-svg-container">
-                <a 
-                  [routerLink]="['/workspaces', workspace.id, 'petals', 'buses', bus.id]"
-                  class="bus-link"
-                >
-                  <mat-icon color="primary" svgIcon="bus" class="bus-svg-content"></mat-icon>
-                  <mat-grid-tile-footer fxLayout="row" fxLayout="start center" class="grid-tile-footer">
-                    <h3 class="bus-name">{{ bus.name }}</h3>
-                  </mat-grid-tile-footer>
-                </a>
-              </div>
-            </mat-grid-tile>
-          </mat-grid-list>
-=======
       <mat-card class="bus-list">
         <mat-card-title class="light-bold">Bus list</mat-card-title>
         <mat-card-content 
@@ -226,7 +201,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </a>
             </div>
           </div>
->>>>>>> 16063eed... tmp
         </mat-card-content>
       </mat-card>
 

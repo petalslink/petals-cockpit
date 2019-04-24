@@ -18,7 +18,10 @@
 import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { HEADER_DOM } from '../../support/header.dom';
 import { MENU_DOM } from '../../support/menu.dom';
-import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import {
+  WORKSPACE_DOM,
+  WORKSPACE_OVERVIEW_DOM,
+} from '../../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
 
 describe(`Workspace`, () => {
@@ -398,4 +401,45 @@ describe(`Workspace`, () => {
       'Z Workspace Name',
     ]);
   });
+
+  it('should display the bus names list from overview', () => {
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy.expectBusListToBe([`Bus 0`]);
+
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(`.item-list .menu-item-wks-name`)
+      .last()
+      .should('not.have.class', 'active')
+      .and('not.have.attr', 'disabled', 'disabled')
+      .find(MENU_DOM.texts.wksNames)
+      .should('contain', `Workspace 1`)
+      .and('be.visible')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks1`);
+
+    cy.expectBusListToBe([`Bus 3`]);
+  });
+
+  it('should navigate to the bus selected page from the bus list', () => {
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy.expectBusListToBe([`Bus 0`]);
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.gridItemBus).click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
+  });
+
+  // TODO: after adding new features "attach / detach bus" in workspace overview, check if :
+  // - bus list is sort by name
+  // - bus list is update after detaching bus
+  // it('should have the bus names list sorted by name', () => {});
+  // it('should update the bus names list after detaching bus', () => {});
 });

@@ -61,6 +61,7 @@ declare namespace Cypress {
     deleteWks(shouldSuccess?: boolean): any;
 
     // workspace.commands
+    expectBusListToBe(list: string[]): any;
     openDialogToDeleteWks(): any;
 
     // menu.commands

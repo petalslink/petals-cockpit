@@ -39,5 +39,27 @@ export const WORKSPACE_ELEMENT_DOM = {
 };
 
 export const WORKSPACE_OVERVIEW_DOM = {
-  buttons: { openDialogDeleteWks: `${bsWksOverview} .btn-delete-wks` },
+  buttons: {
+    openDialogDeleteWks: `${bsWksOverview} .btn-delete-wks`,
+    addEditDescriptions: `${bsWksOverview} .btn-add-edit-descriptions`,
+    cancelDescriptions: `${bsWksOverview} .btn-cancel-descriptions`,
+    saveDescriptions: `${bsWksOverview} .btn-save-descriptions`,
+  },
+  formFields: {
+    shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
+    descriptionFormField: `${bsWksOverview} .workspace-description-edit .description-form-field`,
+  },
+  listGridItem: {
+    gridItemBus: `${bsWksOverview} .bus-grid-item`,
+  },
+  texts: {
+    busNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-link .bus-footer .bus-name`,
+    shortDescription: `${bsWksOverview} .workspace-short-description .short-description .short-description-text`,
+    description: `${bsWksOverview} .workspace-description .description .description-text`,
+    descriptionPreview: `${bsWksOverview} .workspace-description-edit div .workspace-description-preview`,
+  },
+  textArea: {
+    shortDescriptionTextarea: `${bsWksOverview} textarea.short-description-wks`,
+    descriptionTextarea: `${bsWksOverview} textarea.description-wks`,
+  },
 };

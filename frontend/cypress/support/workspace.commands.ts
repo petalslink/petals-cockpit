@@ -24,3 +24,10 @@ Cypress.Commands.add('openDialogToDeleteWks', () => {
     .click({ force: true })
     .should('be.disabled');
 });
+
+Cypress.Commands.add('expectBusListToBe', listGridItemBusNames => {
+  const busNames = cy.get(WORKSPACE_OVERVIEW_DOM.texts.busNames);
+
+  busNames.should('have.length', listGridItemBusNames.length);
+  busNames.each((_, index) => busNames.contains(listGridItemBusNames[index]));
+});
