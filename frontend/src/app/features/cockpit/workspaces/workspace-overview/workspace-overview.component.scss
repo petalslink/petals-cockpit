@@ -34,6 +34,10 @@
   white-space: pre-line;
 }
 
+mat-card-content.workspace-description {
+  margin-bottom: -16px;
+}
+
 mat-card-content.workspace-short-description > .short-description {
   word-break: break-word;
   white-space: pre-line;

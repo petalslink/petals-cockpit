@@ -72,12 +72,8 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     ).pipe(delay(environment.mock.httpDelay));
   }
 
-  setShortDescription(id: string, shortDescription: string) {
+  setDescriptions(id: string, shortDescription: string, description: string) {
     workspacesService.get(id).shortDescription = shortDescription;
-    return helper.response(204).pipe(delay(environment.mock.httpDelay));
-  }
-
-  setDescription(id: string, description: string) {
     workspacesService.get(id).description = description;
     return helper.response(204).pipe(delay(environment.mock.httpDelay));
   }

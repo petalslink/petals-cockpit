@@ -69,12 +69,11 @@ export abstract class WorkspacesService {
 
   abstract deleteWorkspace(id: string): Observable<void>;
 
-  abstract setShortDescription(
+  abstract setDescriptions(
     id: string,
-    shortDescription: string
+    shortDescription: string,
+    description: string
   ): Observable<void>;
-
-  abstract setDescription(id: string, description: string): Observable<void>;
 
   abstract addUser(workspaceId: string, userId: string): Observable<void>;
 
@@ -123,14 +122,9 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     return this.http.delete<void>(`${environment.urlBackend}/workspaces/${id}`);
   }
 
-  setShortDescription(id: string, shortDescription: string) {
+  setDescriptions(id: string, shortDescription: string, description: string) {
     return this.http.put<void>(`${environment.urlBackend}/workspaces/${id}`, {
       shortDescription,
-    });
-  }
-
-  setDescription(id: string, description: string) {
-    return this.http.put<void>(`${environment.urlBackend}/workspaces/${id}`, {
       description,
     });
   }
