@@ -22,12 +22,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         
         <mat-card-content *ngIf="!isEditingDescriptions; else shortDescriptionEdit" fxLayout="column" class="workspace-short-description">
           <div *ngIf="workspace.shortDescription; else noShortDescription" fxFill class="short-description">
-            <span fxFlex>{{ workspace.shortDescription }}</span>
+            <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
           </div>   
           <ng-template #noShortDescription>
             <app-message
               type="info"
-              msg="This workspace doesn't have any short descripion."
+              msg="This workspace doesn't have any short description."
               [isClosable]="false"
               class="info-no-short-description"
             ></app-message>
@@ -62,12 +62,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-card-content *ngIf="!isEditingDescriptions; else descriptionEdit" fxLayout="column" class="workspace-description">
           <div *ngIf="workspace.description; else noDescription" fxFill class="description">
-            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
+            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
           </div>
           <ng-template #noDescription>
             <app-message
               type="info"
-              msg="This workspace doesn't have any descripion."
+              msg="This workspace doesn't have any description."
               [isClosable]="false"
               class="info-no-description margin-bottom-x2"
             ></app-message>
@@ -113,7 +113,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             mat-raised-button 
             color="primary" 
             (click)="editDescriptions()" 
-            class="btn-edit-description text-upper margin-right-x1"
+            class="btn-add-edit-descriptions text-upper margin-right-x1"
           > 
             <span
               *ngIf="(workspace.description.length || workspace.shortDescription.length); else addDescriptions" 
@@ -121,12 +121,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               fxLayoutAlign="start center"
             >
               <mat-icon class="margin-right-x1">edit</mat-icon>
-              <span fxLayoutAlign="center center">Edit</span>
+              <span fxLayoutAlign="center center" class="edit-text-btn">Edit</span>
             </span>
             <ng-template #addDescriptions>
               <span fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon class="margin-right-x1">add</mat-icon>
-                <span fxLayoutAlign="center center">Add</span>
+                <span fxLayoutAlign="center center" class="add-text-btn">Add</span>
               </span>
             </ng-template>
           </button>
@@ -152,7 +152,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               color="primary"
               [disabled]="isSettingDescriptions"
               (click)="cancelDescriptions()"
-              class="btn-cancel-description text-upper margin-right-x1"
+              class="btn-cancel-descriptions text-upper margin-right-x1"
             >
               <span fxLayoutAlign="center center">Cancel</span>
             </button>
@@ -161,7 +161,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               color="accent" 
               (click)="saveDescriptions()" 
               [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)" 
-              class="btn-save-description text-upper"
+              class="btn-save-descriptions text-upper"
             >
               <span fxLayoutAlign="center center">Save</span>
             </button>

@@ -52,6 +52,9 @@ export const WORKSPACE_OVERVIEW_DOM = {
   listGridItem: {
     gridItemBus: `${bsWksOverview} .bus-grid-item`,
   },
+  messages: {
+    nothingToPreview: `${bsWksOverview} workspace-description-edit div .msg-no-description`,
+  },
   texts: {
     busNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-link .bus-footer .bus-name`,
     shortDescription: `${bsWksOverview} .workspace-short-description .short-description .short-description-text`,

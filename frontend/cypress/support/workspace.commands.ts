@@ -31,3 +31,55 @@ Cypress.Commands.add('expectBusListToBe', listGridItemBusNames => {
   busNames.should('have.length', listGridItemBusNames.length);
   busNames.each((_, index) => busNames.contains(listGridItemBusNames[index]));
 });
+
+Cypress.Commands.add(
+  'updateShortDescription',
+  (shortDescriptionText, hintLabel?, errorLabel?) => {
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+      .expectFocused()
+      .type(shortDescriptionText);
+
+    if (hintLabel) {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.formFields.shortDescriptionFormField)
+        .find(`.mat-hint`)
+        .should('contain', hintLabel);
+    }
+    if (errorLabel) {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.formFields.shortDescriptionFormField)
+        .find(`.mat-error`)
+        .should('contain', errorLabel);
+    }
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+      .should('be.enabled')
+      .click();
+  }
+);
+
+Cypress.Commands.add('updateDescription', (descriptionText, hintLabel?) => {
+  cy.get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions).should('be.disabled');
+
+  cy
+    .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+    .type(descriptionText);
+
+  if (hintLabel) {
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.formFields.descriptionFormField)
+      .find(`.mat-hint`)
+      .should('contain', hintLabel);
+  }
+
+  cy
+    .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+    .should('be.enabled')
+    .click();
+});
