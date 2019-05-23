@@ -15,18 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnInit } from '@angular/core';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { filter, first, switchMap, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
-import { Buses } from '@wks/state/buses/buses.actions';
 import {
   getCurrentBus,
   IBusWithContainers,
@@ -41,7 +34,7 @@ export class PetalsBusViewComponent implements OnInit {
   public workspaceId$: Observable<string>;
   public bus$: Observable<IBusWithContainers>;
 
-  constructor(private store$: Store<IStore>, public dialog: MatDialog) {}
+  constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.workspaceId$ = this.store$.pipe(
@@ -50,56 +43,4 @@ export class PetalsBusViewComponent implements OnInit {
 
     this.bus$ = this.store$.pipe(select(getCurrentBus));
   }
-
-  openDeletionDialog() {
-    this.bus$
-      .pipe(
-        first(),
-        switchMap(bus =>
-          this.dialog
-            .open(BusDeleteDialogComponent, {
-              data: { name: bus.name },
-            })
-            .afterClosed()
-            .pipe(
-              filter((result: boolean) => result),
-              tap(_ => this.store$.dispatch(new Buses.Delete(bus)))
-            )
-        )
-      )
-      .subscribe();
-  }
-}
-
-@Component({
-  selector: 'app-bus-deletion-dialog',
-  template: `
-    <div fxLayout="column" class="content">
-      <div class="central-content">
-        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
-          <span fxLayoutAlign="start center">
-            <mat-icon color="accent">warning</mat-icon>
-            <span class="warning-title margin-left-x1">Delete bus?</span>
-          </span>
-        </div>
-        <mat-dialog-content>
-          <p fxLayout="column" class="mat-body-1">
-            <span class="warning-message">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
-          </p>
-        </mat-dialog-content>
-
-        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button mat-button matDialogClose class="margin-right-x1">Cancel</button>
-          <button mat-raised-button color="warn" class="btn-confirm-delete-bus" (click)="dialogRef.close(true)">Delete</button>
-        </mat-dialog-actions>
-      </div>
-    </div>
-  `,
-  styles: ['.central-content { padding: 24px; }'],
-})
-export class BusDeleteDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<BusDeleteDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { name: string }
-  ) {}
 }

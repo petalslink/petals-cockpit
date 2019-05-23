@@ -22,7 +22,6 @@ import {
   IBusBackendDetails,
   IBusBackendSSE,
 } from '@shared/services/buses.service';
-import { IBusRow } from '@wks/state/buses/buses.interface';
 
 export namespace Buses {
   export const FetchedType = '[Buses] Fetched';
@@ -66,28 +65,6 @@ export namespace Buses {
     ) {}
   }
 
-  export const DeleteType = '[Buses] Delete';
-  export class Delete implements Action {
-    readonly type = DeleteType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  export const DeleteErrorType = '[Buses] Delete error';
-  export class DeleteError implements Action {
-    readonly type = DeleteErrorType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  /**
-   * Note: while DELETE_BUS concerns the HTTP action of deleting a bus,
-   * REMOVE_BUS concerns the event coming from the SSE that a bus has been deleted.
-   */
-  export const RemovedType = '[Buses] Removed';
-  export class Removed implements Action {
-    readonly type = RemovedType;
-    constructor(public readonly payload: IBusRow) {}
-  }
-
   export const FoldType = '[Buses] Fold';
   export class Fold implements Action {
     readonly type = FoldType;
@@ -103,6 +80,46 @@ export namespace Buses {
   export const ToggleFoldType = '[Buses] Toggle fold';
   export class ToggleFold implements Action {
     readonly type = ToggleFoldType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const CancelSelectType = '[Buses] Cancel select';
+  export class CancelSelect implements Action {
+    readonly type = CancelSelectType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const ToggleSelectType = '[Buses] Toggle select';
+  export class ToggleSelect implements Action {
+    readonly type = ToggleSelectType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DetachType = '[Buses] Detach';
+  export class Detach implements Action {
+    readonly type = DetachType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DetachErrorType = '[Buses] Detach error';
+  export class DetachError implements Action {
+    readonly type = DetachErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const DetachSuccessType = '[Buses] Detach success';
+  export class DetachSuccess implements Action {
+    readonly type = DetachSuccessType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  /**
+   * Note: while Detach concerns the HTTP action of detaching a bus,
+   * Detached concerns the event coming from the SSE that a bus has been detached.
+   */
+  export const DetachedType = '[Buses] Detached';
+  export class Detached implements Action {
+    readonly type = DetachedType;
     constructor(public readonly payload: { id: string }) {}
   }
 }

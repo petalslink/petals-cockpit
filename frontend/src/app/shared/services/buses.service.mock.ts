@@ -90,14 +90,14 @@ export class BusesServiceMock extends BusesServiceImpl {
     );
   }
 
-  deleteBus(_idWorkspace: string, id: string) {
+  detachBus(_idWorkspace: string, id: string) {
     return helper.response(204).pipe(
       tap(_ => {
         // simulate the backend sending the answer on the SSE
         setTimeout(
           () =>
             (this.sseService as SseServiceMock).triggerSseEvent(
-              SseActions.BusDeletedSse,
+              SseActions.BusDetachedSse,
               {
                 id,
                 reason: `bus deleted by ${

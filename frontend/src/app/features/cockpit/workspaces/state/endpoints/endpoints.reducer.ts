@@ -47,7 +47,7 @@ export namespace EndpointsReducer {
     | Endpoints.Clean
     | Workspaces.Clean
     | SseActions.ServicesUpdated
-    | SseActions.BusDeleted;
+    | SseActions.BusDetached;
 
   export function reducer(
     table = endpointsTableFactory(),
@@ -81,7 +81,7 @@ export namespace EndpointsReducer {
       case SseActions.ServicesUpdatedType: {
         return endpointsUpdated(table, action.payload);
       }
-      case SseActions.BusDeletedType: {
+      case SseActions.BusDetachedType: {
         return endpointsUpdated(table, action.payload.content);
       }
       default:

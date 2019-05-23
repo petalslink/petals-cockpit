@@ -78,7 +78,7 @@ export abstract class BusesService {
     bus: IBusImport
   ): Observable<IBusInProgressBackend>;
 
-  abstract deleteBus(
+  abstract detachBus(
     idWorkspace: string,
     id: string
   ): Observable<{ id: string; reason: string }>;
@@ -119,7 +119,7 @@ export class BusesServiceImpl extends BusesService {
     );
   }
 
-  deleteBus(idWorkspace: string, id: string) {
+  detachBus(idWorkspace: string, id: string) {
     return this.http.delete<{ id: string; reason: string }>(
       `${environment.urlBackend}/workspaces/${idWorkspace}/buses/${id}`
     );

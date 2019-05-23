@@ -47,7 +47,7 @@ export namespace InterfacesReducer {
     | Interfaces.Clean
     | Workspaces.Clean
     | SseActions.ServicesUpdated
-    | SseActions.BusDeleted;
+    | SseActions.BusDetached;
 
   export function reducer(
     table = interfacesTableFactory(),
@@ -81,7 +81,7 @@ export namespace InterfacesReducer {
       case SseActions.ServicesUpdatedType: {
         return interfacesUpdated(table, action.payload);
       }
-      case SseActions.BusDeletedType: {
+      case SseActions.BusDetachedType: {
         return interfacesUpdated(table, action.payload.content);
       }
       default:

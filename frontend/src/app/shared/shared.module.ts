@@ -101,6 +101,7 @@ export const MaterialModules = [
 ];
 
 import {
+  faCheck,
   faCog,
   faEllipsisV,
   faEye,
@@ -113,6 +114,7 @@ import {
   faSignInAlt,
   faSignOutAlt,
   faTicketAlt,
+  faUnlink,
   faUserAstronaut,
   faUserCircle,
   faUserFriends,
@@ -121,6 +123,7 @@ import {
 import { faFolder } from '@fortawesome/free-regular-svg-icons';
 
 library.add(
+  faCheck,
   faCog,
   faEllipsisV,
   faEye,
@@ -134,6 +137,7 @@ library.add(
   faSignInAlt,
   faSignOutAlt,
   faTicketAlt,
+  faUnlink,
   faUserAstronaut,
   faUserCircle,
   faUserFriends

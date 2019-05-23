@@ -62,15 +62,9 @@ mat-card-content.workspace-short-description > .short-description {
   border-bottom-style: solid;
 }
 
-mat-card.bus-list
-  > mat-card-content.bus-content
-  > div.bus-grid-item
-  > div.bus-item {
-  display: block;
-  margin-bottom: 12px;
-  border-width: 1px;
-  border-style: solid;
+mat-card.bus-list > mat-card-content > div.bus-grid-item > div.bus-item {
   a.bus-link {
+    cursor: pointer;
     text-decoration: none;
     div.bus-svg-content {
       width: 100%;
@@ -78,6 +72,35 @@ mat-card.bus-list
       .mat-icon {
         width: 110px;
         height: 110px;
+      }
+      fa-icon {
+        position: absolute;
+      }
+    }
+    div.bus-footer {
+      word-break: break-word;
+      white-space: pre-line;
+      padding: 0 16px;
+    }
+  }
+  a.bus-detach {
+    cursor: pointer;
+    text-decoration: none;
+    div.bus-svg-content {
+      width: 100%;
+      height: 100%;
+      .mat-icon {
+        width: 110px;
+        height: 110px;
+        opacity: 0.1;
+      }
+      fa-icon {
+        position: absolute;
+      }
+      &.active {
+        mat-icon {
+          opacity: 0.8;
+        }
       }
     }
     div.bus-footer {

@@ -22,10 +22,7 @@ import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsBusOverviewComponent } from './petals-bus-overview/petals-bus-overview.component';
 import { PetalsBusViewRoutingModule } from './petals-bus-view-routing.module';
-import {
-  BusDeleteDialogComponent,
-  PetalsBusViewComponent,
-} from './petals-bus-view.component';
+import { PetalsBusViewComponent } from './petals-bus-view.component';
 
 @NgModule({
   imports: [
@@ -34,11 +31,6 @@ import {
     SwiperModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    PetalsBusViewComponent,
-    PetalsBusOverviewComponent,
-    BusDeleteDialogComponent,
-  ],
-  entryComponents: [BusDeleteDialogComponent],
+  declarations: [PetalsBusViewComponent, PetalsBusOverviewComponent],
 })
 export class PetalsBusViewModule {}

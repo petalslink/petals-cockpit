@@ -16,13 +16,13 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { LocalStorageService } from 'ngx-webstorage';
 import { Observable, Subject } from 'rxjs';
-import { filter, switchMap, takeUntil } from 'rxjs/operators';
+import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
@@ -122,7 +122,16 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         filter(d => d),
         takeUntil(this.onDestroy$),
         switchMap(() =>
-          this.dialog.open(DeletedWorkspaceDialogComponent).afterClosed()
+          this.dialog
+            .open(DeletedWorkspaceDialogComponent)
+            .beforeClose()
+            .pipe(
+              tap(_ => {
+                this.router.navigate(['/workspaces'], {
+                  queryParams: { page: 'list' },
+                });
+              })
+            )
         )
       )
       .subscribe();
@@ -173,7 +182,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           </div>
         </mat-dialog-content>
         <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button mat-raised-button matDialogClose (click)="goToWorkspacesList()" color="primary">OK</button>
+          <button mat-raised-button matDialogClose (click)="close()" color="primary" class="text-upper">Ok</button>
         </mat-dialog-actions>
       </div>
     </div>
@@ -181,9 +190,11 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   styles: ['.central-content { padding: 24px; }'],
 })
 export class DeletedWorkspaceDialogComponent {
-  constructor(private router: Router) {}
+  constructor(
+    public dialogRef: MatDialogRef<DeletedWorkspaceDialogComponent>
+  ) {}
 
-  goToWorkspacesList() {
-    this.router.navigate(['/workspaces'], { queryParams: { page: 'list' } });
+  close() {
+    this.dialogRef.close();
   }
 }

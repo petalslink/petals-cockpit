@@ -21,13 +21,18 @@ import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 import { SharedModule } from '@shared/shared.module';
 
 import {
+  BusDetachDialogComponent,
   WorkspaceDeleteDialogComponent,
   WorkspaceOverviewComponent,
 } from './workspace-overview.component';
 
 @NgModule({
   imports: [SharedModule, MarkdownToHtmlModule],
-  declarations: [WorkspaceOverviewComponent, WorkspaceDeleteDialogComponent],
-  entryComponents: [WorkspaceDeleteDialogComponent],
+  declarations: [
+    WorkspaceOverviewComponent,
+    WorkspaceDeleteDialogComponent,
+    BusDetachDialogComponent,
+  ],
+  entryComponents: [WorkspaceDeleteDialogComponent, BusDetachDialogComponent],
 })
 export class WorkspaceOverviewModule {}

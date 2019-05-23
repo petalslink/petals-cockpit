@@ -104,13 +104,13 @@ describe(`Petals bus content`, () => {
     bus.deleteButton.click();
 
     // a dialog is shown
-    expect($(`app-bus-deletion-dialog .mat-dialog-content`).getText()).toEqual(
+    expect($(`app-bus-detach-dialog .mat-dialog-content`).getText()).toEqual(
       `Are you sure you want to delete Bus 0?`
     );
 
-    // let's confirm the deletion
+    // let's confirm the detach
     page.clickAndExpectNotification(
-      $(`app-bus-deletion-dialog .btn-confirm-delete-bus`)
+      $(`app-bus-detach-dialog .btn-confirm-delete-bus`)
     );
 
     expect(browser.getCurrentUrl()).toMatch(

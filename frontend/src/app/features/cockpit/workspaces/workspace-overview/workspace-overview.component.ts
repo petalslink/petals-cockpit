@@ -40,10 +40,9 @@ import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
-import {
-  getBusesIdsNames,
-  IBusesIdsNames,
-} from '@wks/state/buses/buses.selectors';
+import { Buses } from '@wks/state/buses/buses.actions';
+import { IBusRow } from '@wks/state/buses/buses.interface';
+import { getBuses } from '@wks/state/buses/buses.selectors';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
@@ -61,7 +60,7 @@ import {
 export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  busesIdsNames$: Observable<{ list: IBusesIdsNames[] }>;
+  buses$: Observable<{ list: IBusRow[] }>;
 
   workspace$: Observable<IWorkspaceRow>;
   users$: Observable<IUserRow[]>;
@@ -69,10 +68,18 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   currentUserId$: Observable<string>;
   appUsers$: Observable<string[]>;
 
+  busSelected: IBusRow;
+  buses: IBusRow[];
+  disabledDetachBtn = false;
+
   isRemoving = false;
+  isDetaching = false;
 
   isEditingDescriptions = false;
   isSettingDescriptions = false;
+
+  isEditingBusList = false;
+  isSettingBusList = false;
 
   isFocusShortDescriptionTextarea = false;
 
@@ -94,7 +101,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.store$.dispatch(new Users.FetchAll());
 
-    this.busesIdsNames$ = this.store$.pipe(getBusesIdsNames);
+    this.buses$ = this.store$.pipe(
+      getBuses,
+      tap(buses => (this.buses = buses.list))
+    );
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
@@ -233,8 +243,93 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  toggleSelectDetachBus(id: string) {
+    this.buses.map((bus: IBusRow) => {
+      if (bus.id === id) {
+        this.store$.dispatch(new Buses.ToggleSelect({ id }));
+        if (!this.busSelected) {
+          // select if no bus selected
+          this.busSelected = bus;
+          this.disabledDetachBtn = false;
+        } else if (this.busSelected.id === id) {
+          // select the same previous bus selected
+          this.busSelected = null;
+          this.disabledDetachBtn = true;
+        } else {
+          this.busSelected = bus;
+        }
+      } else if (bus.id !== id && bus.isBusSelectedForDetachment) {
+        // select other bus
+        this.store$.dispatch(new Buses.ToggleSelect({ id: bus.id }));
+        this.disabledDetachBtn = false;
+      }
+    });
+  }
+
+  isBusDetaching() {
+    for (const bus of this.buses) {
+      if (bus.isDetaching) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isBusSelectedForDetachment() {
+    for (const bus of this.buses) {
+      if (bus.isBusSelectedForDetachment) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  editDetachBus() {
+    this.isSettingBusList = false;
+    this.isEditingBusList = true;
+    this.disabledDetachBtn = true;
+  }
+
+  cancelDetachBus() {
+    this.isEditingBusList = false;
+    this.disabledDetachBtn = false;
+
+    if (this.busSelected) {
+      this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+      this.busSelected = null;
+      this.isSettingBusList = true;
+    }
+  }
+
+  openDetachBusDialog() {
+    this.isDetaching = true;
+    this.disabledDetachBtn = true;
+
+    this.dialog
+      .open(BusDetachDialogComponent, {
+        data: { name: this.busSelected.name },
+      })
+      .beforeClose()
+      .pipe(
+        map(res => !!res),
+        tap(result => {
+          this.isDetaching = result;
+          this.disabledDetachBtn = false;
+        }),
+        filter(result => result),
+        tap(_ => {
+          this.store$.dispatch(new Buses.Detach({ id: this.busSelected.id }));
+          this.isEditingBusList = false;
+          this.isSettingBusList = true;
+          this.busSelected = null;
+        })
+      )
+      .subscribe();
+  }
+
   openDeletionDialog() {
     this.isRemoving = true;
+
     this.workspace$
       .pipe(
         first(),
@@ -243,14 +338,14 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
             .open(WorkspaceDeleteDialogComponent, {
               data: { name: wks.name },
             })
-            .afterClosed()
+            .beforeClose()
             .pipe(
               map(res => !!res),
               tap(result => (this.isRemoving = result)),
               filter(result => result),
-              tap(_ =>
-                this.store$.dispatch(new Workspaces.Delete({ id: wks.id }))
-              )
+              tap(_ => {
+                this.store$.dispatch(new Workspaces.Delete({ id: wks.id }));
+              })
             )
         )
       )
@@ -260,6 +355,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+
+    if (this.busSelected) {
+      this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+    }
   }
 
   trackByUser(i: number, user: IUserRow) {
@@ -280,14 +379,14 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         </div>
         <mat-dialog-content>
           <p fxLayout="column" class="mat-body-1">
-            <span>Everything in the workspace will be deleted! <b>Please, be certain</b>.</span>
-            <span class="margin-top-x1">Are you sure you want to delete <b>{{ data.name }}</b>?</span>
+            <span>This will delete <b>{{ data.name }}</b> along with its settings (members, permissions, descriptions).</span>
+            <span>Buses will be detached.</span>
           </p>
         </mat-dialog-content>
 
-        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button mat-button matDialogClose class="btn-cancel-delete-wks margin-right-x1">Cancel</button>
-          <button mat-raised-button color="warn" class="btn-confirm-delete-wks" (click)="dialogRef.close(true)">Delete</button>
+        <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+          <button mat-button color="primary" (click)="close()" class="btn-cancel-delete-wks margin-right-x1 text-upper">Cancel</button>
+          <button mat-raised-button color="warn" (click)="delete()" [matDialogClose]="data.name" class="btn-confirm-delete-wks text-upper">Delete</button>
         </mat-dialog-actions>
       </div>
     </div>
@@ -299,4 +398,53 @@ export class WorkspaceDeleteDialogComponent {
     public dialogRef: MatDialogRef<WorkspaceDeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { name: string }
   ) {}
+
+  close() {
+    this.dialogRef.close();
+  }
+
+  delete() {
+    this.dialogRef.close(true);
+  }
+}
+
+@Component({
+  selector: 'app-bus-detach-dialog',
+  template: `
+    <div fxLayout="column" class="content">
+      <div class="central-content">
+        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
+          <span fxLayoutAlign="start center">
+            <mat-icon color="accent">warning</mat-icon>
+            <span class="warning-title margin-left-x1">Detach bus?</span>
+          </span>
+        </div>
+        <mat-dialog-content>
+          <p fxLayout="column" class="mat-body-1">
+            <span>This will detach <b>{{ data.name }}</b>.</span>
+          </p>
+        </mat-dialog-content>
+
+        <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+          <button mat-button color="primary" (click)="close()" class="btn-cancel-detach-bus-dialog margin-right-x1 text-upper">Cancel</button>
+          <button mat-raised-button color="primary" (click)="detach()" [matDialogClose]="data.name" class="btn-confirm-detach-bus-dialog text-upper">Detach</button>
+        </mat-dialog-actions>
+      </div>
+    </div>
+  `,
+  styles: ['.central-content { padding: 24px; }'],
+})
+export class BusDetachDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<BusDetachDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { name: string }
+  ) {}
+
+  close() {
+    this.dialogRef.close();
+  }
+
+  detach() {
+    this.dialogRef.close(true);
+  }
 }

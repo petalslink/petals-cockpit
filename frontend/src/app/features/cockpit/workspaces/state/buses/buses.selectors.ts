@@ -61,28 +61,19 @@ export const getCurrentBus = createSelector(
   }
 );
 
-export function getBusesIdsNames(
+export function getBuses(
   store$: Store<IStore>
-): Observable<{ list: IBusesIdsNames[] }> {
+): Observable<{ list: IBusRow[] }> {
   return store$.pipe(
     select(state => state.buses),
     map(buses => {
       return {
         list: buses.allIds
           .map(id => {
-            const name = buses.byId[id].name;
-            return {
-              id,
-              name,
-            };
+            return buses.byId[id];
           })
           .sort((a, b) => a.name.localeCompare(b.name)),
       };
     })
   );
-}
-
-export interface IBusesIdsNames {
-  id: string;
-  name: string;
 }
