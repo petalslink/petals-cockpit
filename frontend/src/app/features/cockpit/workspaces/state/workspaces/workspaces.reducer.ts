@@ -50,12 +50,9 @@ export namespace WorkspacesReducer {
     | Workspaces.FetchDetails
     | Workspaces.FetchDetailsError
     | Workspaces.FetchDetailsSuccess
-    | Workspaces.SetShortDescription
-    | Workspaces.SetShortDescriptionError
-    | Workspaces.SetShortDescriptionSuccess
-    | Workspaces.SetDescription
-    | Workspaces.SetDescriptionError
-    | Workspaces.SetDescriptionSuccess
+    | Workspaces.SetDescriptions
+    | Workspaces.SetDescriptionsError
+    | Workspaces.SetDescriptionsSuccess
     | Workspaces.Delete
     | Workspaces.DeleteError
     | Workspaces.DeleteSuccess
@@ -112,23 +109,14 @@ export namespace WorkspacesReducer {
       case Workspaces.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
-      case Workspaces.SetShortDescriptionType: {
-        return setShortDescription(table, action.payload);
+      case Workspaces.SetDescriptionsType: {
+        return setDescriptions(table, action.payload);
       }
-      case Workspaces.SetShortDescriptionErrorType: {
-        return setShortDescriptionError(table, action.payload);
+      case Workspaces.SetDescriptionsErrorType: {
+        return setDescriptionsError(table, action.payload);
       }
-      case Workspaces.SetShortDescriptionSuccessType: {
-        return setShortDescriptionSuccess(table, action.payload);
-      }
-      case Workspaces.SetDescriptionType: {
-        return setDescription(table, action.payload);
-      }
-      case Workspaces.SetDescriptionErrorType: {
-        return setDescriptionError(table, action.payload);
-      }
-      case Workspaces.SetDescriptionSuccessType: {
-        return setDescriptionSuccess(table, action.payload);
+      case Workspaces.SetDescriptionsSuccessType: {
+        return setDescriptionsSuccess(table, action.payload);
       }
       case Workspaces.DeleteType: {
         return deletee(table, action.payload);
@@ -275,56 +263,29 @@ export namespace WorkspacesReducer {
     return updateById(table, payload.id, { isFetchingDetails: false });
   }
 
-  function setShortDescription(
-    table: IWorkspacesTable,
-    payload: { id: string }
-  ) {
+  function setDescriptions(table: IWorkspacesTable, payload: { id: string }) {
     return updateById(table, payload.id, {
-      isSettingShortDescription: true,
+      isSettingDescriptions: true,
     });
   }
 
-  function setShortDescriptionSuccess(
+  function setDescriptionsSuccess(
     table: IWorkspacesTable,
-    payload: { id: string; shortDescription: string }
+    payload: { id: string; shortDescription: string; description: string }
   ) {
     return updateById(table, payload.id, {
       shortDescription: payload.shortDescription,
-      isSettingShortDescription: false,
-    });
-  }
-
-  function setShortDescriptionError(
-    table: IWorkspacesTable,
-    payload: { id: string }
-  ) {
-    return updateById(table, payload.id, {
-      isSettingShortDescription: false,
-    });
-  }
-
-  function setDescription(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, payload.id, {
-      isSettingDescription: true,
-    });
-  }
-
-  function setDescriptionSuccess(
-    table: IWorkspacesTable,
-    payload: { id: string; description: string }
-  ) {
-    return updateById(table, payload.id, {
       description: payload.description,
-      isSettingDescription: false,
+      isSettingDescriptions: false,
     });
   }
 
-  function setDescriptionError(
+  function setDescriptionsError(
     table: IWorkspacesTable,
     payload: { id: string }
   ) {
     return updateById(table, payload.id, {
-      isSettingDescription: false,
+      isSettingDescriptions: false,
     });
   }
 

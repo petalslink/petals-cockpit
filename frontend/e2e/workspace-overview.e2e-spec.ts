@@ -15,176 +15,176 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { page } from './common';
+// import { page } from './common';
 
-describe(`Workspace Overview`, () => {
-  it(`should have the workspace information in overview`, () => {
-    const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
+// describe(`Workspace Overview`, () => {
+//   it(`should have the workspace information in overview`, () => {
+//     const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
-    // check the page content
-    expect(workspace.title.getText()).toEqual(`Workspace 0`);
+//     // check the page content
+//     expect(workspace.title.getText()).toEqual(`Workspace 0`);
 
-    expect(workspace.shortDescription.getText()).toEqual(
-      `This is short description for the Workspace 0.`
-    );
+//     expect(workspace.shortDescription.getText()).toEqual(
+//       `This is short description for the Workspace 0.`
+//     );
 
-    expect(workspace.description.getText()).toEqual(
-      `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
-    );
-    expect(workspace.descriptionArea.isPresent()).toBeFalsy();
+//     expect(workspace.description.getText()).toEqual(
+//       `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+//     );
+//     expect(workspace.descriptionArea.isPresent()).toBeFalsy();
 
-    workspace
-      .getInfoUserWorkspaceMessage()
-      .expectToBe('info', `You are the only one using this workspace.`);
+//     workspace
+//       .getInfoUserWorkspaceMessage()
+//       .expectToBe('info', `You are the only one using this workspace.`);
 
-    expect(
-      workspace.users.$$(`mat-list-item .mat-list-text`).getText()
-    ).toEqual(['admin\nAdministrator']);
-  });
+//     expect(
+//       workspace.users.$$(`mat-list-item .mat-list-text`).getText()
+//     ).toEqual(['admin\nAdministrator']);
+//   });
 
-  // TODO: test need refactor
-  // - issue to switch from another workspace
-  // - would need to implement the menu
-  // - will be done in Cypress later
-  // it(`should reset workspace overview when changing workspaces`, () => {
-  //   const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
+// TODO: test need refactor
+// - issue to switch from another workspace
+// - would need to implement the menu
+// - will be done in Cypress later
+// it(`should reset workspace overview when changing workspaces`, () => {
+//   const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
-  //   // let's click on the edit button before switching workspace to ensure everything is reset
-  //   workspace.editDescriptionButton.click();
+//   // let's click on the edit button before switching workspace to ensure everything is reset
+//   workspace.editDescriptionButton.click();
 
-  //   // let's check another workspace
-  //   const ws2 = workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
+//   // let's check another workspace
+//   const ws2 = workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
 
-  //   expect(ws2.title.getText()).toEqual(`Workspace 1`);
+//   expect(ws2.title.getText()).toEqual(`Workspace 1`);
 
-  //   expect(workspace.shortDescription.getText()).toEqual(
-  //     `No description provided.`
-  //   );
+//   expect(workspace.shortDescription.getText()).toEqual(
+//     `No description provided.`
+//   );
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
-  //   expect(workspace.descriptionArea.isPresent()).toBe(false);
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
+//   expect(workspace.descriptionArea.isPresent()).toBe(false);
 
-  //   ws2
-  //     .getInfoUserWorkspaceSharedMessage()
-  //     .expectToBe('info', `6 people are using this workspace.`);
+//   ws2
+//     .getInfoUserWorkspaceSharedMessage()
+//     .expectToBe('info', `6 people are using this workspace.`);
 
-  //   expect(
-  //     workspace.users.$$(`mat-list-item .mat-list-text`).getText()
-  //   ).toEqual([
-  //     'admin\nAdministrator',
-  //     'adminldap\nAdministrator LDAP',
-  //     'bescudie\nBertrand ESCUDIE',
-  //     'mrobert\nMaxime ROBERT',
-  //     'cchevalier\nChristophe CHEVALIER',
-  //     'vnoel\nVictor NOEL',
-  //   ]);
+//   expect(
+//     workspace.users.$$(`mat-list-item .mat-list-text`).getText()
+//   ).toEqual([
+//     'admin\nAdministrator',
+//     'adminldap\nAdministrator LDAP',
+//     'bescudie\nBertrand ESCUDIE',
+//     'mrobert\nMaxime ROBERT',
+//     'cchevalier\nChristophe CHEVALIER',
+//     'vnoel\nVictor NOEL',
+//   ]);
 
-  //   // and go back to the first one (for last workspace to be valid in other tests...)
-  //   workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
-  // });
+//   // and go back to the first one (for last workspace to be valid in other tests...)
+//   workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
+// });
 
-  // it(`should have live markdown rendering of the description while edit`, () => {
-  //   const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
+// it(`should have live markdown rendering of the description while edit`, () => {
+//   const workspace = page.goToLogin().loginToWorkspace('admin', 'admin');
 
-  //   // let's check another workspace
-  //   workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
+//   // let's check another workspace
+//   workspace.openWorkspaces().selectWorkspace(1, `Workspace 1`);
 
-  //   expect(workspace.shortDescription.getText()).toEqual(
-  //     `No description provided.`
-  //   );
+//   expect(workspace.shortDescription.getText()).toEqual(
+//     `No description provided.`
+//   );
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
 
-  //   // the description should be rendered via markdown
-  //   expect(workspace.description.$(`strong`).getText()).toEqual(`markdown`);
+//   // the description should be rendered via markdown
+//   expect(workspace.description.$(`strong`).getText()).toEqual(`markdown`);
 
-  //   // edition
-  //   workspace.editDescriptionButton.click();
+//   // edition
+//   workspace.editDescriptionButton.click();
 
-  //   expect(workspace.descriptionPreview.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
+//   expect(workspace.descriptionPreview.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
 
-  //   // write a few words
-  //   workspace.descriptionArea.sendKeys(' And some ~~more~~.');
+//   // write a few words
+//   workspace.descriptionArea.sendKeys(' And some ~~more~~.');
 
-  //   expect(workspace.descriptionPreview.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. And some more.`
-  //   );
+//   expect(workspace.descriptionPreview.getText()).toEqual(
+//     `Put some description in markdown for the workspace here. And some more.`
+//   );
 
-  //   expect(workspace.descriptionPreview.$(`strong`).getText()).toEqual(
-  //     `markdown`
-  //   );
-  //   expect(workspace.descriptionPreview.$(`del`).getText()).toEqual(`more`);
+//   expect(workspace.descriptionPreview.$(`strong`).getText()).toEqual(
+//     `markdown`
+//   );
+//   expect(workspace.descriptionPreview.$(`del`).getText()).toEqual(`more`);
 
-  //   // and go back to the first one (for last workspace to be valid in other tests...)
-  //   workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
-  // });
+//   // and go back to the first one (for last workspace to be valid in other tests...)
+//   workspace.openWorkspaces().selectWorkspace(0, `Workspace 0`);
+// });
 
-  // TODO: test need refactor
-  // it(`should edit the workspace description in overview`, () => {
-  //   const workspaces = page
-  //     .goToWorkspacesViaLogin()
-  //     .loginToWorkspaces('bescudie', 'bescudie');
+// TODO: test need refactor
+// it(`should edit the workspace description in overview`, () => {
+//   const workspaces = page
+//     .goToWorkspacesViaLogin()
+//     .loginToWorkspaces('bescudie', 'bescudie');
 
-  //   workspaces.addWorkspace('New workspace', 'New Short Description');
+//   workspaces.addWorkspace('New workspace', 'New Short Description');
 
-  //   const workspace = workspaces.selectWorkspace(1, `New workspace`);
+//   const workspace = workspaces.selectWorkspace(1, `New workspace`);
 
-  //   expect(workspace.title.getText()).toEqual(`New workspace`);
+//   expect(workspace.title.getText()).toEqual(`New workspace`);
 
-  //   expect(workspace.shortDescription.getText()).toEqual(
-  //     `No description provided.`
-  //   );
+//   expect(workspace.shortDescription.getText()).toEqual(
+//     `No description provided.`
+//   );
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
 
-  //   workspace.editDescriptionButton.click();
+//   workspace.editDescriptionButton.click();
 
-  //   // cancel
-  //   workspace.descriptionArea.sendKeys(' Will disappear.');
-  //   expect(workspace.descriptionPreview.getText()).toEqual(
-  //     `Put some description in **markdown** for the workspace here.. Will disappear.`
-  //   );
+//   // cancel
+//   workspace.descriptionArea.sendKeys(' Will disappear.');
+//   expect(workspace.descriptionPreview.getText()).toEqual(
+//     `Put some description in **markdown** for the workspace here.. Will disappear.`
+//   );
 
-  //   workspace.descriptionCancel.click();
+//   workspace.descriptionCancel.click();
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
 
-  //   // edit again
+//   // edit again
 
-  //   workspace.editDescriptionButton.click();
+//   workspace.editDescriptionButton.click();
 
-  //   workspace.descriptionArea.sendKeys(' And some more.');
+//   workspace.descriptionArea.sendKeys(' And some more.');
 
-  //   workspace.descriptionSubmit.click();
+//   workspace.descriptionSubmit.click();
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. And some more.`
-  //   );
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here. And some more.`
+//   );
 
-  //   // let's check it is not modified in other...
-  //   workspace.openWorkspaces().selectWorkspace(0, `Workspace 1`);
+//   // let's check it is not modified in other...
+//   workspace.openWorkspaces().selectWorkspace(0, `Workspace 1`);
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here.`
-  //   );
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here.`
+//   );
 
-  //   // but correct in modified
-  //   workspace.openWorkspaces().selectWorkspace(1, `New workspace`);
+//   // but correct in modified
+//   workspace.openWorkspaces().selectWorkspace(1, `New workspace`);
 
-  //   expect(workspace.description.getText()).toEqual(
-  //     `Put some description in markdown for the workspace here. And some more.`
-  //   );
-});
+//   expect(workspace.description.getText()).toEqual(
+//     `Put some description in markdown for the workspace here. And some more.`
+//   );
+// });
 
 // TODO: test need refactor
 // describe(`Users`, () => {

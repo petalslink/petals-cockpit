@@ -106,47 +106,35 @@ export namespace Workspaces {
     ) {}
   }
 
-  export const SetShortDescriptionType = '[Workspaces] Set short description';
-  export class SetShortDescription implements Action {
-    readonly type = SetShortDescriptionType;
+  export const SetDescriptionsType = '[Workspaces] Set descriptions';
+  export class SetDescriptions implements Action {
+    readonly type = SetDescriptionsType;
     constructor(
-      public readonly payload: { id: string; shortDescription: string }
+      public readonly payload: {
+        id: string;
+        shortDescription: string;
+        description: string;
+      }
     ) {}
   }
 
-  export const SetShortDescriptionErrorType =
-    '[Workspaces] Set short description error';
-  export class SetShortDescriptionError implements Action {
-    readonly type = SetShortDescriptionErrorType;
+  export const SetDescriptionsErrorType = '[Workspaces] Set descriptions error';
+  export class SetDescriptionsError implements Action {
+    readonly type = SetDescriptionsErrorType;
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const SetShortDescriptionSuccessType =
-    '[Workspaces] Set short description success';
-  export class SetShortDescriptionSuccess implements Action {
-    readonly type = SetShortDescriptionSuccessType;
+  export const SetDescriptionsSuccessType =
+    '[Workspaces] Set descriptions success';
+  export class SetDescriptionsSuccess implements Action {
+    readonly type = SetDescriptionsSuccessType;
     constructor(
-      public readonly payload: { id: string; shortDescription: string }
+      public readonly payload: {
+        id: string;
+        shortDescription: string;
+        description: string;
+      }
     ) {}
-  }
-
-  export const SetDescriptionType = '[Workspaces] Set description';
-  export class SetDescription implements Action {
-    readonly type = SetDescriptionType;
-    constructor(public readonly payload: { id: string; description: string }) {}
-  }
-
-  export const SetDescriptionErrorType = '[Workspaces] Set description error';
-  export class SetDescriptionError implements Action {
-    readonly type = SetDescriptionErrorType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  export const SetDescriptionSuccessType =
-    '[Workspaces] Set description success';
-  export class SetDescriptionSuccess implements Action {
-    readonly type = SetDescriptionSuccessType;
-    constructor(public readonly payload: { id: string; description: string }) {}
   }
 
   export const DeleteType = '[Workspaces] Delete';

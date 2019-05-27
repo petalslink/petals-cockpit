@@ -222,48 +222,28 @@ export class WorkspacesEffects {
   );
 
   @Effect()
-  setDescription$: Observable<Action> = this.actions$.pipe(
-    ofType<Workspaces.SetDescription>(Workspaces.SetDescriptionType),
+  setDescriptions$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.SetDescriptions>(Workspaces.SetDescriptionsType),
     switchMap(action =>
       this.workspacesService
-        .setDescription(action.payload.id, action.payload.description)
-        .pipe(
-          map(_ => new Workspaces.SetDescriptionSuccess(action.payload)),
-          catchError((err: HttpErrorResponse) => {
-            if (environment.debug) {
-              console.group();
-              console.warn(
-                `Error catched in workspaces.effects: ofType(Workspaces.SetDescription)`
-              );
-              console.error(err);
-              console.groupEnd();
-            }
-
-            return of(new Workspaces.SetDescriptionError(action.payload));
-          })
+        .setDescriptions(
+          action.payload.id,
+          action.payload.shortDescription,
+          action.payload.description
         )
-    )
-  );
-
-  @Effect()
-  setShortDescription$: Observable<Action> = this.actions$.pipe(
-    ofType<Workspaces.SetShortDescription>(Workspaces.SetShortDescriptionType),
-    switchMap(action =>
-      this.workspacesService
-        .setShortDescription(action.payload.id, action.payload.shortDescription)
         .pipe(
-          map(_ => new Workspaces.SetShortDescriptionSuccess(action.payload)),
+          map(_ => new Workspaces.SetDescriptionsSuccess(action.payload)),
           catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
               console.warn(
-                `Error catched in workspaces.effects: ofType(Workspaces.SetShortDescription)`
+                `Error catched in workspaces.effects: ofType(Workspaces.SetDescriptions)`
               );
               console.error(err);
               console.groupEnd();
             }
 
-            return of(new Workspaces.SetShortDescriptionError(action.payload));
+            return of(new Workspaces.SetDescriptionsError(action.payload));
           })
         )
     )

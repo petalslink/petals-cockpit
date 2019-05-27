@@ -34,6 +34,10 @@
   white-space: pre-line;
 }
 
+mat-card-content.workspace-description {
+  margin-bottom: -16px;
+}
+
 mat-card-content.workspace-short-description > .short-description {
   word-break: break-word;
   white-space: pre-line;
@@ -58,7 +62,28 @@ mat-card-content.workspace-short-description > .short-description {
   border-bottom-style: solid;
 }
 
-mat-toolbar.toolbar-page-header {
-  word-break: break-word;
-  white-space: pre-line;
+mat-card.bus-list
+  > mat-card-content.bus-content
+  > div.bus-grid-item
+  > div.bus-item {
+  display: block;
+  margin-bottom: 12px;
+  border-width: 1px;
+  border-style: solid;
+  a.bus-link {
+    text-decoration: none;
+    div.bus-svg-content {
+      width: 100%;
+      height: 100%;
+      .mat-icon {
+        width: 110px;
+        height: 110px;
+      }
+    }
+    div.bus-footer {
+      word-break: break-word;
+      white-space: pre-line;
+      padding: 0 16px;
+    }
+  }
 }

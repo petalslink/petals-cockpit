@@ -13,55 +13,26 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlexFill class="wrapper-content mat-typography ">
-  <mat-toolbar color="primary" class="toolbar-page-header">
-    <div class="prefix-toolbar-title">
-      <mat-icon *ngIf="!workspace.isFetchingDetails" color="accent">grade</mat-icon>
-      <mat-spinner *ngIf="workspace.isFetchingDetails" color="accent" [diameter]="16" [strokeWidth]="1"></mat-spinner>
-    </div>
-
-    <h1 fxFlex [ngClass.lt-md]="'margin-left-x1'" class="title">{{ workspace.name }}</h1>
-
-    <button 
-      color="warn" 
-      type="button" 
-      mat-mini-fab matTooltip="Delete the workspace"
-      matTooltipPosition="before" 
-      (click)="openDeletionDialog()" 
-      [disabled]="workspace.isRemoving || isRemoving"
-      class="btn-delete-wks" 
-    >
-      <mat-icon>delete</mat-icon>
-    </button>
-  </mat-toolbar>
-
+<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
   <div fxFlex class="content">
-    <div class="central-content" fxLayout="column" fxLayoutGap="10px">
+    <div fxLayout="column" fxLayoutGap="10px">
+
       <mat-card>
-        <mat-card-title>Short Description</mat-card-title>
+        <mat-card-title class="light-bold">Short Description</mat-card-title>
         
-        <mat-card-content *ngIf="!isEditingShortDescription; else shortDescriptionEdit" fxLayout="column" class="workspace-short-description">
+        <mat-card-content *ngIf="!isEditingDescriptions; else shortDescriptionEdit" fxLayout="column" class="workspace-short-description">
           <div *ngIf="workspace.shortDescription; else noShortDescription" fxFill class="short-description">
-            <span fxFlex>{{ workspace.shortDescription }}</span>
+            <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
           </div>   
           <ng-template #noShortDescription>
             <app-message
               type="info"
-              msg="This workspace doesn't have any short descripion."
+              msg="This workspace doesn't have any short description."
               [isClosable]="false"
               class="info-no-short-description"
             ></app-message>
           </ng-template>
         </mat-card-content>
-
-        <mat-card-actions *ngIf="!isEditingShortDescription" fxFill fxLayoutAlign="end center">
-          <button mat-raised-button color="primary" (click)="editShortDescription()" class="btn-edit-short-description text-upper">
-            <span *ngIf="workspace.shortDescription.length; else addShortDescription" fxLayoutAlign="center center">Edit</span>
-            <ng-template #addShortDescription>
-              <span fxLayoutAlign="center center">Add</span>
-            </ng-template>
-          </button>
-        </mat-card-actions>
 
         <ng-template #shortDescriptionEdit>
           <mat-card-content fxLayout="column">
@@ -74,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   maxLength="200"
                   placeholder="Add short description to the current workspace"
                   [appFocusInputIfLargeScreen]="isFocusShortDescriptionTextarea"
-                  [disabled]="isSettingShortDescription" 
+                  [disabled]="isSettingDescriptions" 
                   [(ngModel)]="shortDescription"
                   class="short-description-wks"
                 ></textarea>
@@ -85,56 +56,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </mat-form-field>
             </div>
           </mat-card-content>
-
-          <mat-card-actions *ngIf="isEditingShortDescription" fxFill fxLayoutAlign="end center">
-            <button
-              mat-button
-              type="button"
-              color="primary"
-              [disabled]="isSettingShortDescription"
-              (click)="cancelShortDescription()"
-              class="btn-cancel-short-description text-upper margin-right-x1"
-            >
-              <span fxLayoutAlign="center center">Cancel</span>
-            </button>
-            <button 
-              mat-raised-button
-              color="accent" 
-              (click)="saveShortDescription()" 
-              [disabled]="isSettingShortDescription || shortDescription === workspace.shortDescription" 
-              class="btn-save-short-description text-upper"
-            >
-              <span fxLayoutAlign="center center">Save</span>
-            </button>
-          </mat-card-actions>
         </ng-template>
-      </mat-card>
-          
-      <mat-card>
-        <mat-card-title>Description</mat-card-title>
 
-        <mat-card-content *ngIf="!isEditingDescription; else descriptionEdit" fxLayout="column" class="workspace-description">
+        <mat-card-title class="light-bold margin-top-x1">Description</mat-card-title>
+
+        <mat-card-content *ngIf="!isEditingDescriptions; else descriptionEdit" fxLayout="column" class="workspace-description">
           <div *ngIf="workspace.description; else noDescription" fxFill class="description">
-            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml"></span>
+            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
           </div>
           <ng-template #noDescription>
             <app-message
               type="info"
-              msg="This workspace doesn't have any descripion."
+              msg="This workspace doesn't have any description."
               [isClosable]="false"
-              class="info-no-description"
+              class="info-no-description margin-bottom-x2"
             ></app-message>
           </ng-template>
         </mat-card-content>
-
-        <mat-card-actions *ngIf="!isEditingDescription" fxFill fxLayoutAlign="end center">
-          <button mat-raised-button color="primary" (click)="editDescription()" class="btn-edit-description text-upper">
-            <span *ngIf="workspace.description.length; else addDescription" fxLayoutAlign="center center">Edit</span>
-            <ng-template #addDescription>
-              <span fxLayoutAlign="center center">Add</span>
-            </ng-template>
-          </button>
-        </mat-card-actions>
 
         <ng-template #descriptionEdit>
           <mat-card-content fxLayout="column">
@@ -144,8 +82,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   matInput 
                   matTextareaAutosize
                   placeholder="Add description to the current workspace"
-                  [appFocusInputIfLargeScreen]="isFocusDescriptionTextarea"
-                  [disabled]="isSettingDescription" 
+                  [disabled]="isSettingDescriptions" 
                   [(ngModel)]="description"
                   class="description-wks" 
                 ></textarea>
@@ -165,39 +102,113 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </div>
             </div>
           </mat-card-content>
+        </ng-template>
 
-          <mat-card-actions *ngIf="isEditingDescription" fxFill fxLayoutAlign="end center">
+        <mat-card-actions 
+          *ngIf="!isEditingDescriptions; else descriptionsBtnEdit"
+          fxFill
+          fxLayoutAlign="end center"
+        >
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="editDescriptions()" 
+            class="btn-add-edit-descriptions text-upper margin-right-x1"
+          > 
+            <span
+              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addDescriptions" 
+              fxLayout="row" 
+              fxLayoutAlign="start center"
+            >
+              <mat-icon class="margin-right-x1">edit</mat-icon>
+              <span fxLayoutAlign="center center" class="edit-text-btn">Edit</span>
+            </span>
+            <ng-template #addDescriptions>
+              <span fxLayout="row" fxLayoutAlign="start center">
+                <mat-icon class="margin-right-x1">add</mat-icon>
+                <span fxLayoutAlign="center center" class="add-text-btn">Add</span>
+              </span>
+            </ng-template>
+          </button>
+          <button 
+            mat-raised-button
+            color="warn" 
+            (click)="openDeletionDialog()" 
+            [disabled]="workspace.isRemoving || isRemoving"
+            class="btn-delete-wks" 
+          >
+            <span fxLayout="row" fxLayoutAlign="start center">
+              <mat-icon class="margin-right-x1">delete</mat-icon>
+              <span fxFlex class="text-upper">Delete this workspace</span>
+            </span>
+          </button>
+        </mat-card-actions>
+
+        <ng-template #descriptionsBtnEdit>
+          <mat-card-actions *ngIf="isEditingDescriptions" fxFill fxLayoutAlign="end center">
             <button
               mat-button
               type="button"
               color="primary"
-              [disabled]="isSettingDescription"
-              (click)="cancelDescription()"
-              class="btn-cancel-description text-upper margin-right-x1"
+              [disabled]="isSettingDescriptions"
+              (click)="cancelDescriptions()"
+              class="btn-cancel-descriptions text-upper margin-right-x1"
             >
               <span fxLayoutAlign="center center">Cancel</span>
             </button>
             <button 
               mat-raised-button
               color="accent" 
-              (click)="saveDescription()" 
-              [disabled]="isSettingDescription || description === workspace.description" 
-              class="btn-save-description text-upper"
+              (click)="saveDescriptions()" 
+              [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)" 
+              class="btn-save-descriptions text-upper"
             >
               <span fxLayoutAlign="center center">Save</span>
             </button>
           </mat-card-actions>
         </ng-template>
+        
       </mat-card>
 
-      <mat-card>
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="text-upper">Users</span>
-          <mat-icon color="primary">supervisor_account</mat-icon>
-        </mat-card-title>
+      <mat-card class="bus-list">
+        <mat-card-title class="light-bold">Bus list</mat-card-title>
+        <mat-card-content 
+          *ngIf="busesIdsNames$ | async" 
+          fxLayout="row wrap" 
+          fxLayout.lt-sm="column"
+          fxLayoutGap="24px" 
+          fxLayoutAlign="flex-start"
+          class="bus-content"
+        >
+          <div *ngFor="let bus of (busesIdsNames$ | async).list" class="bus-grid-item">
+            <div 
+              fxFlex="0 1 calc(20% - 24px)"
+              fxFlex.lt-md="0 1 calc(50% - 24px)"
+              class="bus-item"
+            >
+              <a
+                [routerLink]="['/workspaces', workspace.id, 'petals', 'buses', bus.id]"
+                gdAreas="content | footer"
+                gdRows="60px 36px"
+                class="bus-link"
+              >
+                <div gdArea="content" fxLayout="row" fxLayoutAlign="center center" class="bus-svg-content">
+                  <mat-icon color="primary" svgIcon="bus" class="padding-x2"></mat-icon>
+                </div>
+                <div gdArea="footer" fxLayout="row" fxLayoutAlign="start center" class="bus-footer">
+                  <span class="bus-name">{{ bus.name }}</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="users-list">
+        <mat-card-title class="light-bold">Users</mat-card-title>
 
         <mat-card-content>
-          <div *ngIf="(users$ | async) as users" fxLayout="column" class="workspace-users">
+          <div *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
 
             <app-message
               *ngIf="users.length === 1; else workspaceShared"

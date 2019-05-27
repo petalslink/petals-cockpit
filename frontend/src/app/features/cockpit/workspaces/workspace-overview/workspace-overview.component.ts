@@ -15,7 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
@@ -34,6 +40,10 @@ import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
+import {
+  getBusesIdsNames,
+  IBusesIdsNames,
+} from '@wks/state/buses/buses.selectors';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
@@ -46,24 +56,24 @@ import {
   selector: 'app-workspace-overview',
   templateUrl: './workspace-overview.component.html',
   styleUrls: ['./workspace-overview.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
+  busesIdsNames$: Observable<{ list: IBusesIdsNames[] }>;
+
   workspace$: Observable<IWorkspaceRow>;
   users$: Observable<IUserRow[]>;
+
   currentUserId$: Observable<string>;
   appUsers$: Observable<string[]>;
 
   isRemoving = false;
 
-  isSettingShortDescription = false;
-  isEditingShortDescription = false;
+  isEditingDescriptions = false;
+  isSettingDescriptions = false;
 
-  isEditingDescription = false;
-  isSettingDescription = false;
-
-  isFocusDescriptionTextarea = false;
   isFocusShortDescriptionTextarea = false;
 
   shortDescription: string = null;
@@ -83,6 +93,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store$.dispatch(new Users.FetchAll());
+
+    this.busesIdsNames$ = this.store$.pipe(getBusesIdsNames);
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
@@ -122,11 +134,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           // we reinit these in case one change workspace while editing
           this.shortDescription = null;
           this.description = null;
-          this.isEditingShortDescription = false;
-          this.isSettingShortDescription = false;
-          this.isEditingDescription = false;
-          this.isSettingDescription = false;
-          this.isFocusDescriptionTextarea = false;
+
+          this.isEditingDescriptions = false;
+          this.isSettingDescriptions = false;
+          this.isFocusShortDescriptionTextarea = false;
           this.store$.dispatch(new Workspaces.FetchDetails({ id }));
         })
       )
@@ -135,27 +146,17 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.workspace$
       .pipe(
         takeUntil(this.onDestroy$),
-        // only when we are setting the description and it has finished
-        filter(
-          wks =>
-            (!wks.isSettingDescription && this.isSettingDescription) ||
-            (!wks.isSettingShortDescription && this.isSettingShortDescription)
-        ),
+        // only when we are setting the descriptions and it has finished
+        filter(wks => !wks.isSettingDescriptions && this.isSettingDescriptions),
         tap(_ => {
-          if (!this.isSettingShortDescription) {
-            this.description = null;
-            this.isEditingDescription = false;
-          }
+          this.shortDescription = null;
+          this.description = null;
 
-          if (!this.isSettingDescription) {
-            this.shortDescription = null;
-            this.isEditingShortDescription = false;
-          }
+          this.isEditingDescriptions = false;
 
-          // we reinit these, and it will show the current value of the description in the store
-          this.isSettingShortDescription = false;
-          this.isSettingDescription = false;
-          this.isFocusDescriptionTextarea = false;
+          // we reinit these, and it will show the current value of the descriptions in the store
+          this.isSettingDescriptions = false;
+          this.isFocusShortDescriptionTextarea = false;
         })
       )
       .subscribe();
@@ -189,25 +190,13 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Workspaces.DeleteUser({ id }));
   }
 
-  editDescription() {
-    this.isEditingDescription = true;
-    this.workspace$
-      .pipe(
-        first(),
-        tap(ws => {
-          this.description = ws.description;
-          this.isFocusDescriptionTextarea = true;
-        })
-      )
-      .subscribe();
-  }
-
-  editShortDescription() {
-    this.isEditingShortDescription = true;
+  editDescriptions() {
+    this.isEditingDescriptions = true;
     this.workspace$
       .pipe(
         first(),
         tap(wks => {
+          this.description = wks.description;
           this.shortDescription = wks.shortDescription;
           this.isFocusShortDescriptionTextarea = true;
         })
@@ -215,45 +204,30 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
-  cancelDescription() {
+  cancelDescriptions() {
     this.description = null;
-    this.isEditingDescription = false;
-    this.isSettingDescription = false;
-    this.isFocusDescriptionTextarea = false;
-  }
-
-  cancelShortDescription() {
     this.shortDescription = null;
-    this.isEditingShortDescription = false;
-    this.isSettingShortDescription = false;
+
+    this.isEditingDescriptions = false;
+    this.isSettingDescriptions = false;
     this.isFocusShortDescriptionTextarea = false;
   }
 
-  saveDescription() {
-    this.isSettingDescription = true;
+  saveDescriptions() {
     const description = this.description;
-    this.workspace$
-      .pipe(
-        first(),
-        tap(wks => {
-          this.store$.dispatch(
-            new Workspaces.SetDescription({ id: wks.id, description })
-          );
-        })
-      )
-      .subscribe();
-  }
-
-  saveShortDescription() {
-    this.isSettingShortDescription = true;
     const shortDescription = this.shortDescription;
     this.workspace$
       .pipe(
         first(),
         tap(wks => {
           this.store$.dispatch(
-            new Workspaces.SetShortDescription({ id: wks.id, shortDescription })
+            new Workspaces.SetDescriptions({
+              id: wks.id,
+              shortDescription,
+              description,
+            })
           );
+          this.isSettingDescriptions = true;
         })
       )
       .subscribe();
