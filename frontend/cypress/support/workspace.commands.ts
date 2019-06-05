@@ -15,7 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { WORKSPACE_OVERVIEW_DOM } from './workspace.dom';
+import {
+  WORKSPACE_BUS_DETACH_DIALOG_DOM,
+  WORKSPACE_DELETED_DIALOG_DOM,
+  WORKSPACE_DELETION_DIALOG_DOM,
+  WORKSPACE_OVERVIEW_DOM,
+} from './workspace.dom';
 
 Cypress.Commands.add('openDialogToDeleteWks', () => {
   cy
@@ -25,11 +30,74 @@ Cypress.Commands.add('openDialogToDeleteWks', () => {
     .should('be.disabled');
 });
 
+Cypress.Commands.add('deleteWks', (shouldSuccess = true) => {
+  if (shouldSuccess) {
+    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.submit).click();
+
+    cy
+      .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
+      .should('not.be.visible');
+
+    /*
+    * We can't simpy use 'be visible' for the moment because of
+    * https://github.com/cypress-io/cypress/issues/723
+    * A more global issue has been created on the visibility of elements
+    * See https://github.com/cypress-io/cypress/issues/1242
+    *
+    * cy
+    *   .get(WORKSPACE_DELETED_DIALOG_DOM.dialog.dialogDeletedWks)
+    *   .should('be.visible');
+    */
+  } else {
+    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.cancel).click();
+
+    cy
+      .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
+      .should('not.be.visible');
+
+    cy
+      .get(WORKSPACE_DELETED_DIALOG_DOM.dialog.dialogDeletedWks)
+      .should('not.be.visible');
+  }
+});
+
+Cypress.Commands.add('expectDialogDeletionWksDescriptionToBe', description => {
+  const eachLines = cy.get(WORKSPACE_DELETION_DIALOG_DOM.texts.description);
+  eachLines.each((_, index) => eachLines.contains(description[index]));
+});
+
+Cypress.Commands.add('detachBusAndCheck', (username, shouldSuccess = true) => {
+  if (shouldSuccess) {
+    cy.get(WORKSPACE_BUS_DETACH_DIALOG_DOM.buttons.submit).click();
+
+    cy
+      .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.dialog.dialogDetachBus)
+      .should('not.be.visible');
+
+    cy.expectNotification('info', /^Bus .*$/, 'Bus detached by ' + username);
+  } else {
+    cy.get(WORKSPACE_BUS_DETACH_DIALOG_DOM.buttons.cancel).click();
+
+    cy
+      .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.dialog.dialogDetachBus)
+      .should('not.be.visible');
+  }
+});
+
 Cypress.Commands.add('expectBusListToBe', listGridItemBusNames => {
   const busNames = cy.get(WORKSPACE_OVERVIEW_DOM.texts.busNames);
 
   busNames.should('have.length', listGridItemBusNames.length);
   busNames.each((_, index) => busNames.contains(listGridItemBusNames[index]));
+});
+
+Cypress.Commands.add('expectDetachBusListToBe', listGridItemDetachBusNames => {
+  const detachBusNames = cy.get(WORKSPACE_OVERVIEW_DOM.texts.busDetachNames);
+
+  detachBusNames.should('have.length', listGridItemDetachBusNames.length);
+  detachBusNames.each((_, index) =>
+    detachBusNames.contains(listGridItemDetachBusNames[index])
+  );
 });
 
 Cypress.Commands.add(

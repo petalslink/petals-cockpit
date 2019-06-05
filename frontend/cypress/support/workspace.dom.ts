@@ -17,8 +17,11 @@
 
 // base selector
 const bs = `app-workspace`;
+const bsWksDeletionDiag = `app-workspace-deletion-dialog`;
+const bsWksDeletedDiag = `app-workspace-deleted-dialog`;
 const bsWksElement = `app-workspace-element`;
 const bsWksOverview = `app-workspace-overview`;
+const bsWksBusDetachDiag = `app-bus-detach-dialog`;
 
 export const WORKSPACE_DOM = {
   buttons: {
@@ -29,6 +32,27 @@ export const WORKSPACE_DOM = {
   tabs: `${bs} .mat-tab-label`,
   sidenav: {
     workspaceSidenav: `${bs} .mat-sidenav-container .workspace-sidenav`,
+  },
+};
+
+export const WORKSPACE_DELETION_DIALOG_DOM = {
+  buttons: {
+    cancel: `${bsWksDeletionDiag} .btn-cancel-delete-wks`,
+    submit: `${bsWksDeletionDiag} .btn-confirm-delete-wks`,
+  },
+  dialog: { dialogDeletionWks: `${bsWksDeletionDiag}` },
+  texts: {
+    infoTitle: `${bsWksDeletionDiag} .mat-dialog-title span span`,
+    description: `${bsWksDeletionDiag} .mat-dialog-content p`,
+  },
+};
+
+export const WORKSPACE_DELETED_DIALOG_DOM = {
+  buttons: { ok: `${bsWksDeletedDiag} button` },
+  dialog: { dialogDeletedWks: `${bsWksDeletedDiag}` },
+  texts: {
+    infoTitle: `${bsWksDeletedDiag} .mat-dialog-title span span`,
+    description: `${bsWksDeletedDiag} .mat-dialog-content div p`,
   },
 };
 
@@ -44,19 +68,24 @@ export const WORKSPACE_OVERVIEW_DOM = {
     addEditDescriptions: `${bsWksOverview} .btn-add-edit-descriptions`,
     cancelDescriptions: `${bsWksOverview} .btn-cancel-descriptions`,
     saveDescriptions: `${bsWksOverview} .btn-save-descriptions`,
+    editDetachBus: `${bsWksOverview} .btn-detach-bus`,
+    cancelDetachBus: `${bsWksOverview} .btn-cancel-detach-bus`,
+    openDialogDetachBus: `${bsWksOverview} .btn-open-detach-bus-dialog`,
   },
   formFields: {
     shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
     descriptionFormField: `${bsWksOverview} .workspace-description-edit .description-form-field`,
   },
   listGridItem: {
-    gridItemBus: `${bsWksOverview} .bus-grid-item`,
+    itemBus: `${bsWksOverview} .bus-grid-item .bus-item .bus-link`,
+    itemDetachBus: `${bsWksOverview} .bus-grid-item .bus-item .bus-detach`,
   },
   messages: {
     nothingToPreview: `${bsWksOverview} workspace-description-edit div .msg-no-description`,
   },
   texts: {
     busNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-link .bus-footer .bus-name`,
+    busDetachNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-detach .bus-footer .bus-name`,
     shortDescription: `${bsWksOverview} .workspace-short-description .short-description .short-description-text`,
     description: `${bsWksOverview} .workspace-description .description .description-text`,
     descriptionPreview: `${bsWksOverview} .workspace-description-edit div .workspace-description-preview`,
@@ -64,5 +93,17 @@ export const WORKSPACE_OVERVIEW_DOM = {
   textArea: {
     shortDescriptionTextarea: `${bsWksOverview} textarea.short-description-wks`,
     descriptionTextarea: `${bsWksOverview} textarea.description-wks`,
+  },
+};
+
+export const WORKSPACE_BUS_DETACH_DIALOG_DOM = {
+  buttons: {
+    cancel: `${bsWksBusDetachDiag} .btn-cancel-detach-bus-dialog`,
+    submit: `${bsWksBusDetachDiag} .btn-confirm-detach-bus-dialog`,
+  },
+  dialog: { dialogDetachBus: `${bsWksBusDetachDiag}` },
+  texts: {
+    infoTitle: `${bsWksBusDetachDiag} .mat-dialog-title span span`,
+    description: `${bsWksBusDetachDiag} .mat-dialog-content p`,
   },
 };

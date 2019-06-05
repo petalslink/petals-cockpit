@@ -19,6 +19,7 @@ import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { HEADER_DOM } from '../../support/header.dom';
 import { MENU_DOM } from '../../support/menu.dom';
 import {
+  WORKSPACE_BUS_DETACH_DIALOG_DOM,
   WORKSPACE_DOM,
   WORKSPACE_OVERVIEW_DOM,
 } from '../../support/workspace.dom';
@@ -488,16 +489,75 @@ describe(`Workspace`, () => {
 
     cy.expectBusListToBe([`Bus 0`]);
 
-    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.gridItemBus).click();
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
   });
 
+  it('should detach bus selected and update the bus names list', () => {
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy.expectBusListToBe([`Bus 0`]);
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemDetachBus)
+      .should('not.be.visible');
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editDetachBus).click();
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus)
+      .should('not.be.visible');
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemDetachBus).click();
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDetachBus)
+      .should('be.enabled')
+      .click()
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.texts.infoTitle)
+      .contains(`Detach bus?`);
+
+    cy
+      .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.texts.description)
+      .should('contain', `This will detach Bus 0.`);
+
+    // cancel the dialog
+    cy.detachBusAndCheck('admin', false);
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemDetachBus).click();
+
+    // check if the button dialog detach bus is disabled
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDetachBus)
+      .should('be.disabled');
+
+    // the button detach the bus must be activated after selecting the bus
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemDetachBus).click();
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDetachBus)
+      .should('be.enabled')
+      .click();
+
+    // detach the bus selected
+    cy.detachBusAndCheck('admin');
+
+    cy.expectDetachBusListToBe([]);
+
+    cy.expectMessageToBe(
+      `.info-no-buses`,
+      'info',
+      `There are no buses attached to this workspace.`
+    );
+  });
+
   // TODO: after adding new features "attach / detach bus" in workspace overview, check if :
   // - bus list is sort by name
-  // - bus list is update after detaching bus
   // it('should have the bus names list sorted by name', () => {});
-  // it('should update the bus names list after detaching bus', () => {});
 
   it('should have the workspace descriptions', () => {
     cy.expectLocationToBe(`/workspaces/idWks0`);

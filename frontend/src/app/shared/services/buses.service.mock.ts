@@ -100,7 +100,7 @@ export class BusesServiceMock extends BusesServiceImpl {
               SseActions.BusDetachedSse,
               {
                 id,
-                reason: `bus deleted by ${
+                reason: `Bus detached by ${
                   (this.userService as UsersServiceMock).getCurrentUser().id
                 }`,
                 content: {

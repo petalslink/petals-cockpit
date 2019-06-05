@@ -17,10 +17,10 @@
 
 import { BREADCRUMB_DOM } from './breadcrumb.dom';
 import { COMPONENT_DOM } from './component.dom';
+import { MENU_DOM } from './menu.dom';
 import { SERVICES_TREE_DOM } from './services.dom';
 import { WORKSPACE_DOM } from './workspace.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
-import { MENU_DOM } from './menu.dom';
 
 Cypress.Commands.add('expectInterfacesTreeToBe', tree => {
   cy
