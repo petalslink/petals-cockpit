@@ -32,7 +32,16 @@ Cypress.Commands.add('openDialogToDeleteWks', () => {
 
 Cypress.Commands.add('deleteWks', (shouldSuccess = true) => {
   if (shouldSuccess) {
-    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.submit).click();
+    // cypress-pipe does not retry any Cypress commands
+    // so we need to click on the element using
+    // jQuery method "$el.click()" and not "cy.click()"
+    const click = ($el: any) => $el.click();
+
+    cy
+      .get(WORKSPACE_DELETION_DIALOG_DOM.buttons.submit)
+      .should('be.visible')
+      .pipe(click)
+      .should($el => expect($el).to.not.be.visible);
 
     cy
       .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
@@ -49,7 +58,10 @@ Cypress.Commands.add('deleteWks', (shouldSuccess = true) => {
     *   .should('be.visible');
     */
   } else {
-    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.cancel).click();
+    cy
+      .get(WORKSPACE_DELETION_DIALOG_DOM.buttons.cancel)
+      .should('be.visible')
+      .click();
 
     cy
       .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
