@@ -2655,6 +2655,11 @@ cyclist@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
 
+cypress-pipe@1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/cypress-pipe/-/cypress-pipe-1.4.0.tgz#0a5136f2d486ffabdc962628686db46226541f27"
+  integrity sha512-ZrNxleBOMQIZQKluHaBYwnt84t0eBaaE8jp5qZFwfULvG6GGlMk+ecySTbdwDAgC1ECNHTjVmTy4lXc5UXBNtw==
+
 cypress@3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cypress/-/cypress-3.1.5.tgz#5227b2ce9306c47236d29e703bad9055d7218042"
