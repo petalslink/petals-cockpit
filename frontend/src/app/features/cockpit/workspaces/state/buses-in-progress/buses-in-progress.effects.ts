@@ -73,7 +73,7 @@ export class BusesInProgressEffects {
 
   @Effect()
   watchBusDeleted$: Observable<Action> = this.actions$.pipe(
-    ofType<SseActions.BusDeleted>(SseActions.BusDeletedType),
+    ofType<SseActions.BusDetached>(SseActions.BusDetachedType),
     withLatestFrom(this.store$),
     filter(
       ([action, state]) => !!state.busesInProgress.byId[action.payload.id]
@@ -128,7 +128,7 @@ export class BusesInProgressEffects {
       this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
     ),
     switchMap(([action, idWorkspace]) =>
-      this.busesService.deleteBus(idWorkspace, action.payload.id).pipe(
+      this.busesService.detachBus(idWorkspace, action.payload.id).pipe(
         mergeMap(_ => EMPTY),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {

@@ -44,7 +44,7 @@ declare namespace Cypress {
     // petals-cockpit.commands
     expectNotification(
       type: string,
-      title: string,
+      title: RegExp | string,
       message: RegExp | string
     ): any;
     logout(): any;
@@ -59,9 +59,11 @@ declare namespace Cypress {
     ): any;
     expectDialogDeletionWksDescriptionToBe(description: string[]): any;
     deleteWks(shouldSuccess?: boolean): any;
+    detachBusAndCheck(username: string, shouldSuccess?: boolean): any;
 
     // workspace.commands
     expectBusListToBe(list: string[]): any;
+    expectDetachBusListToBe(list: string[]): any;
     openDialogToDeleteWks(): any;
     updateDescription(shortDescriptionText: string, hintLabel?: string): any;
     updateShortDescription(

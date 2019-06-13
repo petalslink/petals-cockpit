@@ -19,8 +19,6 @@
 const bs = `app-workspaces`;
 const bsCreate = `app-workspaces-create`;
 const bsList = `app-workspaces-list`;
-const bsWksDeletionDiag = `app-workspace-deletion-dialog`;
-const bsWksDeletedDiag = `app-workspace-deleted-dialog`;
 
 export const WORKSPACES_DOM = {
   buttons: {
@@ -70,26 +68,5 @@ export const WORKSPACES_CREATE_DOM = {
   },
   textArea: {
     shortDescription: `${bsCreate} textarea`,
-  },
-};
-
-export const WORKSPACE_DELETION_DIALOG_DOM = {
-  buttons: {
-    cancel: `${bsWksDeletionDiag} .btn-cancel-delete-wks`,
-    submit: `${bsWksDeletionDiag} .btn-confirm-delete-wks`,
-  },
-  dialog: { dialogDeletionWks: `${bsWksDeletionDiag}` },
-  texts: {
-    infoTitle: `${bsWksDeletionDiag} .mat-dialog-title span span`,
-    description: `${bsWksDeletionDiag} .mat-dialog-content p`,
-  },
-};
-
-export const WORKSPACE_DELETED_DIALOG_DOM = {
-  buttons: { ok: `${bsWksDeletedDiag} button` },
-  dialog: { dialogDeletedWks: `${bsWksDeletedDiag}` },
-  texts: {
-    infoTitle: `${bsWksDeletedDiag} .mat-dialog-title span span`,
-    description: `${bsWksDeletedDiag} .mat-dialog-content div p`,
   },
 };

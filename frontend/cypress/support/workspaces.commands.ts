@@ -15,12 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  WORKSPACE_DELETED_DIALOG_DOM,
-  WORKSPACE_DELETION_DIALOG_DOM,
-  WORKSPACES_CREATE_DOM,
-  WORKSPACES_LIST_DOM,
-} from './workspaces.dom';
+import { WORKSPACES_CREATE_DOM, WORKSPACES_LIST_DOM } from './workspaces.dom';
 
 // (listWorkspacesNames, listWorkspacesShortDescriptions)
 Cypress.Commands.add('expectWorkspacesListToBe', listItemWorkspacesDetails => {
@@ -78,39 +73,3 @@ Cypress.Commands.add(
       .should('be.visible');
   }
 );
-
-Cypress.Commands.add('expectDialogDeletionWksDescriptionToBe', description => {
-  const eachLines = cy.get(WORKSPACE_DELETION_DIALOG_DOM.texts.description);
-  eachLines.each((_, index) => cy.contains(description[index]));
-});
-
-Cypress.Commands.add('deleteWks', (shouldSuccess = true) => {
-  if (shouldSuccess) {
-    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.submit).click();
-
-    cy
-      .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
-      .should('not.be.visible');
-
-    /*
-    * We can't simpy use 'be visible' for the moment because of
-    * https://github.com/cypress-io/cypress/issues/723
-    * A more global issue has been created on the visibility of elements
-    * See https://github.com/cypress-io/cypress/issues/1242
-    *
-    * cy
-    *   .get(WORKSPACE_DELETED_DIALOG_DOM.dialog.dialogDeletedWks)
-    *   .should('be.visible');
-    */
-  } else {
-    cy.get(WORKSPACE_DELETION_DIALOG_DOM.buttons.cancel).click();
-
-    cy
-      .get(WORKSPACE_DELETION_DIALOG_DOM.dialog.dialogDeletionWks)
-      .should('not.be.visible');
-
-    cy
-      .get(WORKSPACE_DELETED_DIALOG_DOM.dialog.dialogDeletedWks)
-      .should('not.be.visible');
-  }
-});

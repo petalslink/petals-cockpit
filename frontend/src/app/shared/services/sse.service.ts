@@ -52,7 +52,7 @@ export namespace SseActions {
     | typeof SseActions.BusImportErrorSse
     | typeof SseActions.SaStateChangeSse
     | typeof SseActions.ComponentStateChangeSse
-    | typeof SseActions.BusDeletedSse
+    | typeof SseActions.BusDetachedSse
     | typeof SseActions.WorkspaceDeletedSse
     | typeof SseActions.SaDeployedSse
     | typeof SseActions.ComponentDeployedSse
@@ -133,10 +133,11 @@ export namespace SseActions {
     ) {}
   }
 
-  export const BusDeletedSse = 'BUS_DELETED';
-  export const BusDeletedType = '[Sse] Bus deleted';
-  export class BusDeleted implements Action {
-    readonly type = BusDeletedType;
+  // 'BUS_DELETED' is the legacy string we expect from the backend.
+  export const BusDetachedSse = 'BUS_DELETED';
+  export const BusDetachedType = '[Sse] Bus detached';
+  export class BusDetached implements Action {
+    readonly type = BusDetachedType;
     constructor(
       public readonly payload: {
         id: string;
@@ -227,7 +228,7 @@ export namespace SseActions {
       new SseActions.SaStateChange(payload),
     [SseActions.ComponentStateChangeSse]: payload =>
       new SseActions.ComponentStateChange(payload),
-    [SseActions.BusDeletedSse]: payload => new SseActions.BusDeleted(payload),
+    [SseActions.BusDetachedSse]: payload => new SseActions.BusDetached(payload),
     [SseActions.WorkspaceDeletedSse]: payload =>
       new SseActions.WorkspaceDeleted(payload),
     [SseActions.SaDeployedSse]: payload => new SseActions.SaDeployed(payload),

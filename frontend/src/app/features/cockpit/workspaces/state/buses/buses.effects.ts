@@ -21,12 +21,11 @@ import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
-import { EMPTY, Observable, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {
   catchError,
   filter,
   map,
-  mergeMap,
   switchMap,
   withLatestFrom,
 } from 'rxjs/operators';
@@ -60,7 +59,7 @@ export class BusesEffects {
 
   @Effect()
   watchDeleted$: Observable<Action> = this.actions$.pipe(
-    ofType<SseActions.BusDeleted>(SseActions.BusDeletedType),
+    ofType<SseActions.BusDetached>(SseActions.BusDetachedType),
     withLatestFrom(this.store$),
     filter(([action, state]) => !!state.buses.byId[action.payload.id]),
     map(([action, state]) => {
@@ -76,7 +75,7 @@ export class BusesEffects {
         new Endpoints.Added(toJsTable(content.endpoints)),
         new Interfaces.Added(toJsTable(content.interfaces)),
         new Services.Added(toJsTable(content.services)),
-        new Buses.Removed(bus),
+        new Buses.Detached({ id }),
       ]);
     })
   );
@@ -154,25 +153,25 @@ export class BusesEffects {
   );
 
   @Effect()
-  deleteBus$: Observable<Action> = this.actions$.pipe(
-    ofType<Buses.Delete>(Buses.DeleteType),
+  detachBus$: Observable<Action> = this.actions$.pipe(
+    ofType<Buses.Detach>(Buses.DetachType),
     withLatestFrom(
       this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
     ),
     switchMap(([action, idWorkspace]) =>
-      this.busesService.deleteBus(idWorkspace, action.payload.id).pipe(
-        mergeMap(_ => EMPTY),
+      this.busesService.detachBus(idWorkspace, action.payload.id).pipe(
+        map(_ => new Buses.DetachSuccess(action.payload)),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
             console.warn(
-              'Error catched in buses.effects: ofType<Buses.Delete>(Buses.DeleteType)'
+              'Error catched in buses.effects: ofType<Buses.Detach>(Buses.DetachType)'
             );
             console.error(err);
             console.groupEnd();
           }
 
-          return of(new Buses.DeleteError(action.payload));
+          return of(new Buses.DetachError(action.payload));
         })
       )
     )

@@ -15,21 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-workspace-element [resourceObservable]="bus$" deletedMessage="This bus has been removed" #we>
 
-  <button
-    appWorkspaceElementHeaderExtra
-    *ngIf="we.resource"
-    color="warn"
-    type="button"
-    class="btn-delete-bus"
-    (click)="openDeletionDialog()"
-    mat-mini-fab
-    matTooltip="Delete the bus"
-    matTooltipPosition="before"
-    [disabled]="we.resource.isRemoving"
-  >
-    <mat-icon>delete</mat-icon>
-  </button>
-
   <app-petals-bus-overview
     *appWorkspaceElementTab="'Overview'"
     [bus]="we.resource"

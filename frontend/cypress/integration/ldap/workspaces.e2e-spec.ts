@@ -18,10 +18,12 @@
 import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { HEADER_DOM } from '../../support/header.dom';
 import { MENU_DOM } from '../../support/menu.dom';
-import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import {
   WORKSPACE_DELETED_DIALOG_DOM,
   WORKSPACE_DELETION_DIALOG_DOM,
+  WORKSPACE_DOM,
+} from '../../support/workspace.dom';
+import {
   WORKSPACES_CREATE_DOM,
   WORKSPACES_DOM,
   WORKSPACES_LIST_DOM,
@@ -198,8 +200,8 @@ describe(`Workspaces`, () => {
       .contains(`Delete workspace?`);
 
     cy.expectDialogDeletionWksDescriptionToBe([
-      `Everything in the workspace will be deleted! Please, be certain.`,
-      `Are you sure you want to delete Workspace 2?`,
+      `This will delete Workspace 2 along with its settings (members, permissions, descriptions).`,
+      `Buses will be detached.`,
     ]);
 
     // cancel the dialog
@@ -220,7 +222,14 @@ describe(`Workspaces`, () => {
         `This workspace was deleted, click on OK to go back to the workspaces list.`
       );
 
-    cy.get(WORKSPACE_DELETED_DIALOG_DOM.buttons.ok).click();
+    cy
+      .get(WORKSPACE_DELETED_DIALOG_DOM.buttons.ok)
+      .should('be.visible')
+      .click();
+
+    cy
+      .get(WORKSPACE_DELETED_DIALOG_DOM.dialog.dialogDeletedWks)
+      .should('not.be.visible');
 
     cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=list');

@@ -26,9 +26,10 @@ import { IContainers } from '@wks/state/containers/containers.interface';
 
 export interface IBusUI {
   // for UI
+  isBusSelectedForDetachment: boolean;
   isFolded: boolean;
   isFetchingDetails: boolean;
-  isRemoving: boolean;
+  isDetaching: boolean;
 }
 
 // used within table
@@ -58,9 +59,10 @@ export function busRowFactory(): IBusRow {
     name: null,
     workspaceId: null,
 
+    isBusSelectedForDetachment: false,
     isFolded: false,
     isFetchingDetails: false,
-    isRemoving: false,
+    isDetaching: false,
 
     containers: [],
   };

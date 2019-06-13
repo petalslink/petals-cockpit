@@ -47,7 +47,7 @@ export namespace ServicesReducer {
     | Services.Clean
     | Workspaces.Clean
     | SseActions.ServicesUpdated
-    | SseActions.BusDeleted;
+    | SseActions.BusDetached;
 
   export function reducer(
     table = servicesTableFactory(),
@@ -81,7 +81,7 @@ export namespace ServicesReducer {
       case SseActions.ServicesUpdatedType: {
         return servicesUpdated(table, action.payload);
       }
-      case SseActions.BusDeletedType: {
+      case SseActions.BusDetachedType: {
         return servicesUpdated(table, action.payload.content);
       }
       default:

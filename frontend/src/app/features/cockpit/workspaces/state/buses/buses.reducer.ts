@@ -43,12 +43,15 @@ export namespace BusesReducer {
     | Buses.FetchDetails
     | Buses.FetchDetailsError
     | Buses.FetchDetailsSuccess
-    | Buses.Removed
-    | Buses.Delete
-    | Buses.DeleteError
     | Buses.Fold
     | Buses.Unfold
     | Buses.ToggleFold
+    | Buses.CancelSelect
+    | Buses.ToggleSelect
+    | Buses.Detach
+    | Buses.DetachSuccess
+    | Buses.DetachError
+    | Buses.Detached
     | Workspaces.Clean;
 
   export function reducer(
@@ -74,15 +77,6 @@ export namespace BusesReducer {
       case Buses.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
-      case Buses.RemovedType: {
-        return removed(table, action.payload);
-      }
-      case Buses.DeleteType: {
-        return deletee(table, action.payload);
-      }
-      case Buses.DeleteErrorType: {
-        return deleteError(table, action.payload);
-      }
       case Buses.FoldType: {
         return fold(table, action.payload);
       }
@@ -91,6 +85,24 @@ export namespace BusesReducer {
       }
       case Buses.ToggleFoldType: {
         return toggleFold(table, action.payload);
+      }
+      case Buses.CancelSelectType: {
+        return cancelSelect(table, action.payload);
+      }
+      case Buses.ToggleSelectType: {
+        return toggleSelect(table, action.payload);
+      }
+      case Buses.DetachType: {
+        return detach(table, action.payload);
+      }
+      case Buses.DetachErrorType: {
+        return detachError(table, action.payload);
+      }
+      case Buses.DetachSuccessType: {
+        return detachSuccess(table, action.payload);
+      }
+      case Buses.DetachedType: {
+        return detached(table, action.payload);
       }
       case Workspaces.CleanType: {
         return busesTableFactory();
@@ -136,15 +148,35 @@ export namespace BusesReducer {
     return updateById(table, payload.id, { isFetchingDetails: false });
   }
 
-  function deletee(table: IBusesTable, payload: { id: string }) {
-    return updateById(table, payload.id, { isRemoving: true });
+  function cancelSelect(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
+      isBusSelectedForDetachment: false,
+    });
   }
 
-  function deleteError(table: IBusesTable, payload: { id: string }) {
-    return updateById(table, payload.id, { isRemoving: false });
+  function toggleSelect(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, {
+      isBusSelectedForDetachment: !table.byId[payload.id]
+        .isBusSelectedForDetachment,
+    });
   }
 
-  function removed(table: IBusesTable, payload: { id: string }) {
+  function detachSuccess(
+    table: IBusesTable,
+    payload: { id: string }
+  ): IBusesTable {
+    return updateById(table, payload.id, { isDetaching: true });
+  }
+
+  function detached(table: IBusesTable, payload: { id: string }) {
     return removeById(table, payload.id);
+  }
+
+  function detach(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isDetaching: true });
+  }
+
+  function detachError(table: IBusesTable, payload: { id: string }) {
+    return updateById(table, payload.id, { isDetaching: false });
   }
 }

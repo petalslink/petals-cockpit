@@ -31,6 +31,7 @@
 // ***********************************************************
 
 // Index of commands declarations
+import 'cypress-pipe';
 // LDAP
 import './administration.commands';
 import './component.commands';

@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { $, browser } from 'protractor';
-
 import { page } from './common';
 import { NotFoundPage } from './pages/not-found';
 import { WorkspacePage } from './pages/workspace.po';
@@ -97,30 +95,4 @@ describe(`Petals bus content`, () => {
   //     { name: 'Cont 3', reachable: false },
   //   ]);
   // });
-
-  it(`should delete a bus and hover it with blank opacity saying it has been removed withtout redirecting somewhere else`, () => {
-    const bus = workspace.openBus('Bus 0');
-
-    bus.deleteButton.click();
-
-    // a dialog is shown
-    expect($(`app-bus-deletion-dialog .mat-dialog-content`).getText()).toEqual(
-      `Are you sure you want to delete Bus 0?`
-    );
-
-    // let's confirm the deletion
-    page.clickAndExpectNotification(
-      $(`app-bus-deletion-dialog .btn-confirm-delete-bus`)
-    );
-
-    expect(browser.getCurrentUrl()).toMatch(
-      /\/workspaces\/\w+\/petals\/buses\/\w+$/
-    );
-
-    expect(workspace.getWorkspaceTree()).toEqual([]);
-
-    expect(bus.hasBeenDeletedMessage.getText()).toEqual(
-      `This bus has been removed`
-    );
-  });
 });
