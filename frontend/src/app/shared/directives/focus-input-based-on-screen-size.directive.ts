@@ -55,7 +55,7 @@ export class FocusInputIfLargeScreenDirective
         takeUntil(this.onDestroy$),
         filter(shouldFocus => shouldFocus),
         withLatestFrom(largeScreen$),
-        tap(() => this.el.nativeElement.focus())
+        tap(() => setTimeout(() => this.el.nativeElement.focus(), 0))
       )
       .subscribe();
   }
