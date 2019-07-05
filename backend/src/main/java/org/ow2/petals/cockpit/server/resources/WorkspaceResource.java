@@ -694,8 +694,8 @@ public class WorkspaceResource {
         @JsonInclude(Include.NON_EMPTY)
         public final String importError;
 
-        public BusInProgress(BusesRecord bDb) {
-            this(bDb.getId(), bDb.getImportIp(), bDb.getImportPort(), bDb.getImportUsername(), bDb.getImportError());
+        public BusInProgress(BusesRecord bDb, @Nullable String importError) {
+            this(bDb.getId(), bDb.getImportIp(), bDb.getImportPort(), bDb.getImportUsername(), importError);
         }
 
         @JsonCreator

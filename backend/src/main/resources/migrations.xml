@@ -378,4 +378,8 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="v1.01.0-2" author="psouquet">
+    <dropColumn tableName="buses" columnName="import_error"/>
+  </changeSet>
+
 </databaseChangeLog>

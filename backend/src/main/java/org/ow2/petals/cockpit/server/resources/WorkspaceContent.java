@@ -132,7 +132,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
 
         @Override
         public void addBusInProgress(BusesRecord bDb) {
-            BusInProgress bip = new BusInProgress(bDb);
+            BusInProgress bip = new BusInProgress(bDb, null);
             busesInProgress.put(bip.getId(), bip);
         }
 
