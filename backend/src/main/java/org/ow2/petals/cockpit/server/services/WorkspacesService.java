@@ -278,14 +278,14 @@ public class WorkspacesService {
 
         public synchronized BusInProgress importBus(BusImport nb) {
             final BusesRecord bDb = DSL.using(jooq).transactionResult(conf -> {
-                BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, null, null);
+                BusesRecord br = new BusesRecord(null, wId, false, nb.ip, nb.port, nb.username, null);
                 br.attach(conf);
                 br.insert();
                 return br;
             });
             assert bDb != null;
 
-            BusInProgress bip = new BusInProgress(bDb);
+            BusInProgress bip = new BusInProgress(bDb, null);
 
             broadcast(WorkspaceEvent.busImport(bip));
 
@@ -333,10 +333,9 @@ public class WorkspacesService {
                 }).fold(error -> {
                     LOG.info("Can't import bus from container {}:{}: {}", bDb.getImportIp(), bDb.getImportPort(),
                             error);
-                    bDb.setImportError(error);
                     bDb.attach(jooq);
-                    bDb.update();
-                    return WorkspaceEvent.busImportError(new BusInProgress(bDb));
+                    bDb.delete();
+                    return WorkspaceEvent.busImportError(new BusInProgress(bDb, error));
                 }, WorkspaceEvent::busImportOk));
             }
         }

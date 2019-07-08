@@ -172,7 +172,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
 
         // these should have been set now
         assertThat(bus.getImported()).isEqualTo(true);
-        assertThat(bus.getImportError()).isNull();
         assertThat(bus.getName()).isEqualTo(domain.getName());
     }
 
@@ -297,7 +296,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
         String incorrectHost = "wrong-host";
         int incorrectPort = 7700;
 
-        final long busId;
         try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);
@@ -313,63 +311,18 @@ public class ImportBusTest extends AbstractBasicResourceTest {
 
             expectImportBusEvent(eventInput, post);
 
-            // there should be only one!
-            Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
-            assertThat(buses).hasSize(1);
-            BusesRecord bus = buses.iterator().next();
-
-            // we can't really check for the temporary state because it is executed concurrently
-            assertThat(bus.getImportIp()).isEqualTo(incorrectHost);
-            assertThat(bus.getImportPort()).isEqualTo(incorrectPort);
-            assertThat(bus.getImportUsername()).isEqualTo(container.getJmxUsername());
-            assertThat(bus.getWorkspaceId()).isEqualTo(1);
-            assertThat(bus.getImported()).isEqualTo(false);
-            assertThat(post.id).isEqualTo(bus.getId());
-            busId = bus.getId();
-
-            expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
-                BusInProgress data = e.readData(BusInProgress.class);
-                a.assertThat(data.id).isEqualTo(busId);
-                a.assertThat(data.importError).isEqualTo("Unknown Host");
-            });
-        }
-
-        Result<BusesRecord> busesDb = resource.db().selectFrom(BUSES).where(BUSES.ID.eq(busId)).fetch();
-        assertThat(busesDb).hasSize(1);
-        BusesRecord busDb = busesDb.iterator().next();
-
-        // these shouldn't have changed
-        assertThat(busDb.getImportIp()).isEqualTo(incorrectHost);
-        assertThat(busDb.getImportPort()).isEqualTo(incorrectPort);
-        assertThat(busDb.getImportUsername()).isEqualTo(container.getJmxUsername());
-        assertThat(busDb.getWorkspaceId()).isEqualTo(1);
-        // these should have been set now
-        assertThat(busDb.getImported()).isEqualTo(false);
-        assertThat(busDb.getImportError()).isEqualTo("Unknown Host");
-        assertThat(busDb.getName()).isNull();
-
-        try (EventInput eventInput = resource.sse(1)) {
-
-            expectWorkspaceContent(eventInput, (c, a) -> {
-                a.assertThat(c.content.busesInProgress).containsOnlyKeys(String.valueOf(busId));
-            });
-
-            BusDeleted delete = resource.target("/workspaces/1/buses/" + busId).request().delete(BusDeleted.class);
-
-            assertThat(delete.id).isEqualTo(busId);
-            assertThat(delete.reason).isEqualTo("Bus deleted by admin");
-
+            // there should be nothing !
             Result<BusesRecord> buses = resource.db().selectFrom(BUSES).fetch();
             assertThat(buses).hasSize(0);
 
             expectEvent(eventInput, (e, a) -> {
-                a.assertThat(e.getName()).isEqualTo("BUS_DELETED");
-                BusDeleted data = e.readData(BusDeleted.class);
-                a.assertThat(data.id).isEqualTo(delete.id);
-                a.assertThat(data.reason).isEqualTo(delete.reason);
+                a.assertThat(e.getName()).isEqualTo("BUS_IMPORT_ERROR");
+                BusInProgress data = e.readData(BusInProgress.class);
+                a.assertThat(data.id).isNotNull();
+                a.assertThat(data.importError).isEqualTo("Unknown Host");
             });
         }
+
     }
 
     private List<Endpoint> makeEndpoints() {

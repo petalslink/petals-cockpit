@@ -277,7 +277,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 Container entry = containers.iterator().next();
 
                 BusesRecord busDb = new BusesRecord(null, wsId, true, entry.getHost(), getPort(entry),
-                        entry.getJmxUsername(), null, bus.getName());
+                        entry.getJmxUsername(), bus.getName());
                 busDb.attach(conf);
                 busDb.insert();
 
