@@ -19,12 +19,11 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '@shared/shared.module';
 
-import { BusesInProgressComponent } from './buses-in-progress/buses-in-progress.component';
 import { PetalsMenuViewComponent } from './petals-menu-view/petals-menu-view.component';
 
 @NgModule({
   imports: [SharedModule],
-  declarations: [PetalsMenuViewComponent, BusesInProgressComponent],
+  declarations: [PetalsMenuViewComponent],
   exports: [PetalsMenuViewComponent],
 })
 export class PetalsMenuModule {}

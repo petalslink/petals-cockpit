@@ -54,25 +54,7 @@ export interface IBusInProgressBackend extends IBusInProgressBackendCommon {}
 
 export interface IBusBackendDetails extends IBusBackendDetailsCommon {}
 
-interface IImportBusFormSecureParts {
-  ip: string;
-  port: string;
-  username: string;
-}
-
 export abstract class BusesService {
-  /**
-   * the 2 following methods are useful to discard and retry a bus import
-   * before discarding, just backup the data
-   * then discard
-   * and finally navigate to buses-in-progress URL where
-   * you can get getImportBusFormSecureParts
-   */
-  abstract setImportBusFormSecureParts(
-    importBusFormSecureParts: IImportBusFormSecureParts
-  ): void;
-  abstract getImportBusFormSecureParts(): IImportBusFormSecureParts;
-
   abstract postBus(
     idWorkspace: string,
     bus: IBusImport
@@ -88,28 +70,8 @@ export abstract class BusesService {
 
 @Injectable()
 export class BusesServiceImpl extends BusesService {
-  private importBusFormSecureParts: IImportBusFormSecureParts;
-
   constructor(private http: HttpClient) {
     super();
-  }
-
-  setImportBusFormSecureParts(
-    importBusFormSecureParts: IImportBusFormSecureParts
-  ): void {
-    this.importBusFormSecureParts = importBusFormSecureParts;
-  }
-
-  getImportBusFormSecureParts(): IImportBusFormSecureParts {
-    const importBusFormSecureParts = this.importBusFormSecureParts;
-
-    if (!importBusFormSecureParts) {
-      return { ip: '', port: '', username: '' };
-    }
-
-    this.importBusFormSecureParts = undefined;
-
-    return importBusFormSecureParts;
   }
 
   postBus(idWorkspace: string, bus: IBusImport) {

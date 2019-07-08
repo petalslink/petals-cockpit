@@ -258,10 +258,6 @@ app-services-service-overview > .mat-list > .mat-list-item > .item-namespace {
 }
 
 // all items elements in petals and services menu view
-app-buses-in-progress
-  > .nav-list-imports-in-progress
-  > .item-list
-  > .mat-list-item,
 app-material-tree > .nav-list-tree > .item-list > .mat-list-item,
 app-material-tree
   > .nav-list-tree
@@ -390,24 +386,6 @@ app-material-tree > .nav-list-tree > .item-list {
     > .item-content
     > .item-name {
     max-width: $sidebar-width - 122px;
-  }
-}
-
-// all items ip/port in imports in progress
-app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
-  // customize active elements
-  .active-link,
-  .active-link:hover {
-    .mat-list-item-content,
-    .mat-list-item-content:hover {
-      @extend .color-primary-bold;
-    }
-  }
-
-  // customize tree elements
-  .mat-list-item > .mat-list-item-content:hover,
-  .mat-list-item > .mat-list-item-content:focus {
-    @extend .color-primary-light-bold;
   }
 }
 

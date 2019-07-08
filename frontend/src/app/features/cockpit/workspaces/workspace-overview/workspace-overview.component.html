@@ -183,7 +183,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             *ngIf="buses.list.length; else noBuses"
             fxLayout="row wrap" 
             fxLayout.lt-sm="column"
-            fxLayoutGap="24px" 
+            fxLayoutGap="24px grid"
             fxLayoutAlign="flex-start"
             class="bus-grid-item"
           >
@@ -258,49 +258,170 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             ></app-message>
           </ng-template>
         </mat-card-content>
+        
+        <form class="bus-import-form" novalidate (ngSubmit)="onSubmit(busImportForm)" [formGroup]="busImportForm">
+          <div *ngIf="!(buses$ | async).isBusSelectedForDetachment && isEditingImportBus" class="margin-top-x2">
+            <mat-card-title class="light-bold">Import bus details</mat-card-title>
 
+            <mat-card-content>
 
-        <mat-card-actions fxFill fxLayoutAlign="end center">
-          <button
-            *ngIf="!isEditingBusList && buses.list.length && !isBusDetaching(); else detachBusBtnEdit"
-            mat-raised-button
-            type="button"
-            color="accent"
-            class="btn-detach-bus margin-right-x1 text-upper"
-            (click)="editDetachBus()"
-          >
-            <span fxLayout="row" fxLayoutAlign="start center">
-              <fa-icon class="margin-right-x1 icon-x2" icon="unlink"></fa-icon>
-              <span class="detach-bus-text-btn">Detach Bus</span>
-            </span>
-          </button>
-          <ng-template #detachBusBtnEdit>
-            <button
-              *ngIf="isEditingBusList" 
-              mat-button
-              type="button"
-              color="primary"
-              class="btn-cancel-detach-bus text-upper margin-right-x1"
-              (click)="cancelDetachBus()"
+              <div 
+                fxLayout="row wrap" 
+                fxLayout.lt-sm="column" 
+                fxLayoutGap="24px grid" 
+                fxLayoutGap.xs="0 grid"
+                class="bus-import-edit"
               >
-                Cancel
-            </button>
-            <button 
-              *ngIf="isEditingBusList" 
+                <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="ip-form-field">
+                  <mat-label>IP or hostname</mat-label>
+                  <input type="text" placeholder="{{formDefault.ip}}" matInput appFocusInputIfLargeScreen formControlName="ip">
+                  <span matPrefix>
+                    <fa-icon icon="map-marker-alt" class="icon-x2"></fa-icon>
+                  </span>
+                </mat-form-field>
+              
+                <mat-form-field appearance="outline" floatLabel="always" fxFlex="28%" class="port-form-field">
+                  <mat-label>Port</mat-label>
+                  <input type="text" placeholder="{{formDefault.port}}" matInput formControlName="port" [errorStateMatcher]="importBusMatcher">
+                  <span matPrefix>
+                    <fa-icon icon="ethernet" class="icon-x2"></fa-icon>
+                  </span>
+                  <mat-error *ngIf="formErrors.port">
+                    {{ formErrors.port }}
+                  </mat-error>
+                </mat-form-field>
+              
+                <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="username-form-field">
+                  <mat-label>Username</mat-label>
+                  <input type="text" placeholder="{{formDefault.username}}" matInput formControlName="username">
+                  <span matPrefix>
+                    <fa-icon icon="id-badge" class="icon-x2"></fa-icon>
+                  </span>
+                </mat-form-field>
+              
+                <mat-form-field 
+                  [ngClass.gt-xs]="'pwd-form-field'" 
+                  appearance="outline" 
+                  floatLabel="always" 
+                  fxFlex="36%"
+                  class="pwd-form-field"
+                >
+                  <mat-label>Password</mat-label>
+                  <input type="password" placeholder="{{formDefault.password}}" matInput formControlName="password">
+                  <span matPrefix>
+                    <fa-icon icon="key" class="icon-x2"></fa-icon>
+                  </span>
+                </mat-form-field>
+              
+                <mat-form-field 
+                  [ngClass.gt-xs]="'passphrase-form-field'" 
+                  appearance="outline" 
+                  floatLabel="always" 
+                  fxFlex="64%"
+                  class="passphrase-form-field"
+                >
+                  <mat-label>Topology passphrase</mat-label>
+                  <input type="password" placeholder="{{formDefault.passphrase}}" matInput formControlName="passphrase">
+                  <span matPrefix>
+                    <fa-icon icon="shield-alt" class="icon-x2"></fa-icon>
+                  </span>
+                </mat-form-field>
+              </div>
+
+              <app-message class="error-import-details" type="error" [msg]="getError()"></app-message>
+
+            </mat-card-content>
+          </div>
+    
+          <mat-card-actions fxFill fxLayoutAlign="end center">
+            <!-- Attach Bus -->
+            <button
+              *ngIf="!isEditingImportBus && !isEditingBusList; else attachBusBtnEdit"
               mat-raised-button
               type="button"
               color="primary"
-              class="btn-open-detach-bus-dialog text-upper"
-              (click)="openDetachBusDialog()"
-              [disabled]="disabledDetachBtn || !isBusSelectedForDetachment()"
+              class="btn-import-bus margin-right-x1 text-upper"
+              (click)="editAttachBus()"
               >
               <span fxLayout="row" fxLayoutAlign="start center">
-                <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
-                <span class="text-upper detach-bus-text-btn">Detach</span>
+                <fa-icon class="margin-right-x1 icon-x1" icon="link"></fa-icon>
+                <span class="attach-bus-text-btn">Attach Bus</span>
               </span>
             </button>
-          </ng-template>
-        </mat-card-actions>
+            <ng-template #attachBusBtnEdit>
+              <button
+                *ngIf="isEditingImportBus" 
+                mat-button
+                type="button"
+                color="primary"
+                [disabled]="disabledCancelBtn || isImportingBus || importBusId"
+                class="btn-cancel-attach-bus text-upper margin-right-x1"
+                (click)="cancelAttachBus()"
+                >
+                  Cancel
+              </button>
+              <button 
+                *ngIf="isEditingImportBus" 
+                mat-raised-button
+                type="submit"
+                color="primary"
+                [disabled]="disabledAttachBtn || busImportForm.invalid || isImportingBus || importBusId"
+                class="btn-import-new-bus text-upper"
+                >
+                <span *ngIf="isImportingBus; else canImport" fxLayout="row" fxLayoutAlign="start center">
+                  <mat-spinner class="margin-right-x1" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+                  Importing
+                </span>
+
+                <ng-template #canImport>
+                  <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
+                  <span class="text-upper import-bus-text-btn">Import</span>
+                </ng-template>
+              </button>
+            </ng-template>
+
+            <!-- Detach Bus -->
+            <button
+              *ngIf="!isEditingBusList && !isEditingImportBus && buses.list.length && !isBusDetaching(); else detachBusBtnEdit"
+              mat-raised-button
+              type="button"
+              color="accent"
+              class="btn-detach-bus margin-right-x1 text-upper"
+              (click)="editDetachBus()"
+            >
+              <span fxLayout="row" fxLayoutAlign="start center">
+                <fa-icon class="margin-right-x1 icon-x1" icon="unlink"></fa-icon>
+                <span class="detach-bus-text-btn">Detach Bus</span>
+              </span>
+            </button>
+            <ng-template #detachBusBtnEdit>
+              <button
+                *ngIf="isEditingBusList" 
+                mat-button
+                type="button"
+                color="primary"
+                class="btn-cancel-detach-bus text-upper margin-right-x1"
+                (click)="cancelDetachBus()"
+                >
+                  Cancel
+              </button>
+              <button 
+                *ngIf="isEditingBusList" 
+                mat-raised-button
+                type="button"
+                color="primary"
+                class="btn-open-detach-bus-dialog text-upper"
+                (click)="openDetachBusDialog()"
+                [disabled]="disabledDetachBtn || !isBusSelectedForDetachment()"
+                >
+                <span fxLayout="row" fxLayoutAlign="start center">
+                  <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
+                  <span class="text-upper detach-bus-text-btn">Detach</span>
+                </span>
+              </button>
+            </ng-template>
+          </mat-card-actions>
+        </form>
 
       </mat-card>
 

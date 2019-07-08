@@ -17,7 +17,6 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -33,10 +32,10 @@ import {
 import { environment } from '@env/environment';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { toJsTable } from '@shared/helpers/jstable.helper';
+import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { BusesService } from '@shared/services/buses.service';
 import { SseActions } from '@shared/services/sse.service';
 import { IStore } from '@shared/state/store.interface';
-import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
 import { Components } from '@wks/state/components/components.actions';
 import { Containers } from '@wks/state/containers/containers.actions';
 import { Endpoints } from '@wks/state/endpoints/endpoints.actions';
@@ -53,9 +52,10 @@ export class BusesEffects {
     private actions$: Actions,
     private store$: Store<IStore>,
     private busesService: BusesService,
-    private router: Router,
     private notifications: NotificationsService
   ) {}
+
+  // BUS
 
   @Effect()
   watchDeleted$: Observable<Action> = this.actions$.pipe(
@@ -96,21 +96,10 @@ export class BusesEffects {
         `The import of the bus ${bus.name} succeeded`
       );
 
-      if (state.busesInProgress.selectedBusInProgressId === bus.id) {
-        this.router.navigate([
-          '/workspaces',
-          state.workspaces.selectedWorkspaceId,
-          'petals',
-          'buses',
-          bus.id,
-        ]);
-      }
-
       return batchActions([
         new Endpoints.Clean(),
         new Interfaces.Clean(),
         new Services.Clean(),
-        new BusesInProgress.Removed(bus),
         new Buses.Added(buses),
         new Containers.Added(toJsTable(data.containers)),
         new Components.Added(toJsTable(data.components)),
@@ -172,6 +161,69 @@ export class BusesEffects {
           }
 
           return of(new Buses.DetachError(action.payload));
+        })
+      )
+    )
+  );
+
+  // BUS IN PROGRESS
+
+  @Effect()
+  watchBusImportError$: Observable<Action> = this.actions$.pipe(
+    ofType<SseActions.BusImportError>(SseActions.BusImportErrorType),
+    map(action => {
+      const busInError = action.payload;
+      this.notifications.alert(
+        `Bus import error`,
+        `The import of a bus from the IP ${busInError.ip}:${
+          busInError.port
+        } failed`
+      );
+
+      return new Buses.UpdateError(busInError);
+    })
+  );
+
+  @Effect()
+  postBus$: Observable<Action> = this.actions$.pipe(
+    ofType<Buses.Post>(Buses.PostType),
+    withLatestFrom(
+      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
+    ),
+    switchMap(([action, idWorkspace]) =>
+      this.busesService.postBus(idWorkspace, action.payload).pipe(
+        map(bip => new Buses.PostSuccess(bip)),
+        catchError((err: HttpErrorResponse) => {
+          return of(
+            new Buses.PostError({
+              importBusError: getErrorMessage(err),
+            })
+          );
+        })
+      )
+    )
+  );
+
+  @Effect()
+  deleteBusInProgress$: Observable<Action> = this.actions$.pipe(
+    ofType<Buses.CancelImport>(Buses.CancelImportType),
+    withLatestFrom(
+      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
+    ),
+    switchMap(([action, idWorkspace]) =>
+      this.busesService.detachBus(idWorkspace, action.payload.id).pipe(
+        map(_ => new Buses.CanceledImport(action.payload)),
+        catchError((err: HttpErrorResponse) => {
+          if (environment.debug) {
+            console.group();
+            console.warn(
+              'Error catched in buses.effects: ofType(Buses.Delete)'
+            );
+            console.error(err);
+            console.groupEnd();
+          }
+
+          return of(new Buses.CancelImportError(action.payload));
         })
       )
     )

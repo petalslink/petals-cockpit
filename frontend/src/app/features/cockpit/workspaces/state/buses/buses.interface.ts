@@ -45,6 +45,12 @@ export interface IBus
 
 export interface IBusesCommon {
   selectedBusId: string;
+
+  importBusId: string;
+  isImportingBus: boolean;
+  isCancelingImportBus: boolean;
+  importBusError: string;
+  importError: string;
 }
 
 export interface IBusesTable extends IBusesCommon, JsTable<IBusRow> {}
@@ -72,5 +78,11 @@ export function busesTableFactory(): IBusesTable {
   return {
     ...emptyJsTable<IBusRow>(),
     selectedBusId: '',
+
+    importBusId: '',
+    isImportingBus: false,
+    isCancelingImportBus: false,
+    importBusError: '',
+    importError: '',
   };
 }

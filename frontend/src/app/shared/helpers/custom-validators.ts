@@ -41,4 +41,8 @@ export class CustomValidators {
           },
         };
   }
+
+  static isPortOrNull(c: AbstractControl) {
+    return !c.value || CustomValidators.isPort(c);
+  }
 }

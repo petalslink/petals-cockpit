@@ -25,47 +25,55 @@
     }
   }
 
-  mat-card.bus-list > mat-card-content > div.bus-grid-item > div.bus-item {
-    a.bus-link {
-      div.bus-svg-content:hover {
-        background-color: mat-color($mat-grey, 400);
-        mat-icon {
-          color: mat-color($primary, 900);
-        }
-      }
-      div.bus-footer {
-        background-color: mat-color($mat-grey, 100);
-        color: mat-color($mat-grey, 900);
+  mat-card.bus-list {
+    mat-form-field {
+      span > fa-icon {
+        color: mat-color($mat-grey, 600);
       }
     }
-    a.bus-detach {
-      div.bus-svg-content {
-        background-color: mat-color($mat-grey, 200);
-        mat-icon {
-          color: mat-color($primary, 700);
-        }
-        fa-icon {
-          color: mat-color($mat-grey, 50);
-        }
-        &.active {
-          background-color: mat-color($primary, 700);
+
+    mat-card-content > div.bus-grid-item > div.bus-item {
+      a.bus-link {
+        div.bus-svg-content:hover {
+          background-color: mat-color($mat-grey, 400);
           mat-icon {
             color: mat-color($primary, 900);
+          }
+        }
+        div.bus-footer {
+          background-color: mat-color($mat-grey, 100);
+          color: mat-color($mat-grey, 900);
+        }
+      }
+      a.bus-detach {
+        div.bus-svg-content {
+          background-color: mat-color($mat-grey, 200);
+          mat-icon {
+            color: mat-color($primary, 700);
           }
           fa-icon {
             color: mat-color($mat-grey, 50);
           }
+          &.active {
+            background-color: mat-color($primary, 700);
+            mat-icon {
+              color: mat-color($primary, 900);
+            }
+            fa-icon {
+              color: mat-color($mat-grey, 50);
+            }
+          }
         }
-      }
-      div.bus-svg-content:hover:not(.active) {
-        background-color: mat-color($mat-grey, 400);
-        fa-icon {
-          color: mat-color($mat-grey, 100);
+        div.bus-svg-content:hover:not(.active) {
+          background-color: mat-color($mat-grey, 400);
+          fa-icon {
+            color: mat-color($mat-grey, 100);
+          }
         }
-      }
-      div.bus-footer {
-        background-color: mat-color($mat-grey, 100);
-        color: mat-color($mat-grey, 900);
+        div.bus-footer {
+          background-color: mat-color($mat-grey, 100);
+          color: mat-color($mat-grey, 900);
+        }
       }
     }
   }

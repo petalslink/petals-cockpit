@@ -28,8 +28,6 @@ import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
 import { IUi } from '@shared/state/ui.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
-import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
-import { getBusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.selectors';
 import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
 import { getAllEndpoints } from '@wks/state/endpoints/endpoints.selectors';
 import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
@@ -57,7 +55,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ui$: Observable<IUi>;
   workspacesIdsNames$: Observable<{ list: IWorkspacesIdsNames[] }>;
   workspace$: Observable<IWorkspaceRow>;
-  busesInProgress$: Observable<IBusInProgress[]>;
   interfaces$: Observable<IInterfaceRow[]>;
   endpoints$: Observable<IEndpointRow[]>;
   services$: Observable<IServiceRow[]>;
@@ -91,8 +88,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.ui$ = this.store$.pipe(select(state => state.ui));
 
     this.workspace$ = this.store$.pipe(select(getCurrentWorkspace));
-
-    this.busesInProgress$ = this.store$.pipe(select(getBusesInProgress));
 
     this.interfaces$ = this.store$.pipe(
       select(getAllInterfaces),

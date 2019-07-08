@@ -94,7 +94,6 @@ export namespace SseActions {
       public readonly payload: {
         workspace: IWorkspaceBackend;
         users: { [key: string]: IUserBackend };
-        busesInProgress: { [key: string]: IBusInProgressBackend };
         buses: { [key: string]: IBusBackendSSE };
         containers: { [key: string]: IContainerBackendSSE };
         components: { [key: string]: IComponentBackendSSE };

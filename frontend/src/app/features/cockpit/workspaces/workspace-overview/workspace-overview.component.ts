@@ -34,7 +34,14 @@ import { Observable, Subject } from 'rxjs';
 import { combineLatest } from 'rxjs';
 import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import { FormErrorStateMatcher } from '@shared/helpers/form.helper';
+import { CustomValidators } from '@shared/helpers/custom-validators';
+import {
+  disableAllFormFields,
+  enableAllFormFields,
+  FormErrorStateMatcher,
+  getFormErrors,
+} from '@shared/helpers/form.helper';
+import { IBusImport } from '@shared/services/buses.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
@@ -42,7 +49,11 @@ import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { IBusRow } from '@wks/state/buses/buses.interface';
-import { getBuses } from '@wks/state/buses/buses.selectors';
+import {
+  getBuses,
+  getBusImportProgressStatus,
+  getImportBusError,
+} from '@wks/state/buses/buses.selectors';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
@@ -60,36 +71,58 @@ import {
 export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  buses$: Observable<{ list: IBusRow[] }>;
-
+  // delete workspace
   workspace$: Observable<IWorkspaceRow>;
-  users$: Observable<IUserRow[]>;
-
-  currentUserId$: Observable<string>;
-  appUsers$: Observable<string[]>;
-
-  busSelected: IBusRow;
-  buses: IBusRow[];
-  disabledDetachBtn = false;
-
   isRemoving = false;
-  isDetaching = false;
 
+  // workspace descriptions
+  isFocusShortDescriptionTextarea = false;
+  shortDescription: string = null;
+  description: string = null;
   isEditingDescriptions = false;
   isSettingDescriptions = false;
 
+  // buses
+  buses$: Observable<{ list: IBusRow[] }>;
+  buses: IBusRow[];
+
+  // import/attach bus
+  busImportForm: FormGroup;
+  importBusMatcher = new FormErrorStateMatcher();
+  isEditingImportBus = false;
+  isImportingBus = false;
+  disabledCancelBtn = false;
+  disabledAttachBtn = false;
+  formErrors = {
+    ip: '',
+    port: '',
+    username: '',
+    password: '',
+    passphrase: '',
+  };
+  importBusId: string;
+  importBusError: string = null;
+  importError: string = null;
+  formDefault = {
+    ip: 'localhost',
+    port: 7700,
+    username: 'petals',
+    password: 'petals',
+    passphrase: 'petals',
+  };
+
+  // edit/detach bus
+  busSelected: IBusRow;
   isEditingBusList = false;
-  isSettingBusList = false;
+  isDetaching = false;
+  disabledDetachBtn = false;
 
-  isFocusShortDescriptionTextarea = false;
-
-  shortDescription: string = null;
-  description: string = null;
-
-  addUserFormGroup: FormGroup;
+  // workspace users management
+  users$: Observable<IUserRow[]>;
+  currentUserId$: Observable<string>;
+  appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
-
-  matcher = new FormErrorStateMatcher();
+  addUserFormGroup: FormGroup;
 
   constructor(
     private fb: FormBuilder,
@@ -185,21 +218,83 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         tap(_ => this.addUserFormGroup.reset())
       )
       .subscribe();
+
+    this.createFormImportBus();
+
+    this.store$
+      .pipe(
+        select(getImportBusError),
+        takeUntil(this.onDestroy$),
+        tap(error => {
+          if (error.importBusError) {
+            this.importBusError = error.importBusError;
+          } else if (error.importError) {
+            this.importError = error.importError;
+          }
+          enableAllFormFields(this.busImportForm);
+          this.disabledCancelBtn = false;
+          this.disabledAttachBtn = false;
+        })
+      )
+      .subscribe();
+
+    this.store$
+      .pipe(
+        select(state => state.buses.isImportingBus),
+        takeUntil(this.onDestroy$),
+        tap(isImportingBus => {
+          this.isImportingBus = isImportingBus;
+          if (isImportingBus) {
+            disableAllFormFields(this.busImportForm);
+          } else {
+            enableAllFormFields(this.busImportForm);
+          }
+        })
+      )
+      .subscribe();
+
+    this.store$
+      .pipe(
+        select(getBusImportProgressStatus),
+        takeUntil(this.onDestroy$),
+        tap(dialogImportBus => {
+          if (dialogImportBus.importBusId) {
+            this.dialog
+              .open(BusImportDialogComponent, {
+                disableClose: true,
+              })
+              .afterOpen();
+          } else {
+            this.disabledCancelBtn = false;
+            this.disabledAttachBtn = false;
+          }
+        })
+      )
+      .subscribe();
+
+    // when a new bus is attached to the workspace
+    this.actions$
+      .pipe(
+        ofType(Buses.AddedType),
+        takeUntil(this.onDestroy$),
+        // reset the form and close attach bus part
+        tap(_ => this.cancelAttachBus())
+      )
+      .subscribe();
   }
 
-  filterUsers(search: string, users: string[]) {
-    return !!search ? users.filter(user => user.includes(search)) : users;
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+
+    if (this.busSelected) {
+      this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+    }
   }
 
-  addUser() {
-    const id = this.addUserFormGroup.get('userSearchCtrl').value;
-    this.store$.dispatch(new Workspaces.AddUser({ id }));
-  }
-
-  removeUser(id: string) {
-    this.store$.dispatch(new Workspaces.DeleteUser({ id }));
-  }
-
+  /**
+   * All functions used for the management part of the current workspace (edit workspace descriptions).
+   */
   editDescriptions() {
     this.isEditingDescriptions = true;
     this.workspace$
@@ -243,6 +338,57 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
   }
 
+  /**
+   * All functions used for the users management part in the current workspace (add, remove user).
+   */
+  filterUsers(search: string, users: string[]) {
+    return search ? users.filter(user => user.includes(search)) : users;
+  }
+
+  addUser() {
+    const id = this.addUserFormGroup.get('userSearchCtrl').value;
+    this.store$.dispatch(new Workspaces.AddUser({ id }));
+  }
+
+  removeUser(id: string) {
+    this.store$.dispatch(new Workspaces.DeleteUser({ id }));
+  }
+
+  trackByUser(i: number, user: IUserRow) {
+    return user.id;
+  }
+
+  /**
+   * All functions used for the management part of the current workspace (delete workspace).
+   */
+  openDeletionDialog() {
+    this.isRemoving = true;
+
+    this.workspace$
+      .pipe(
+        first(),
+        switchMap(wks =>
+          this.dialog
+            .open(WorkspaceDeleteDialogComponent, {
+              data: { name: wks.name },
+            })
+            .beforeClose()
+            .pipe(
+              map(res => !!res),
+              tap(result => (this.isRemoving = result)),
+              filter(result => result),
+              tap(_ => {
+                this.store$.dispatch(new Workspaces.Delete({ id: wks.id }));
+              })
+            )
+        )
+      )
+      .subscribe();
+  }
+
+  /**
+   * All functions used for the bus list management part in the current workspace (detach bus).
+   */
   toggleSelectDetachBus(id: string) {
     this.buses.map((bus: IBusRow) => {
       if (bus.id === id) {
@@ -285,7 +431,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   editDetachBus() {
-    this.isSettingBusList = false;
     this.isEditingBusList = true;
     this.disabledDetachBtn = true;
   }
@@ -297,7 +442,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     if (this.busSelected) {
       this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
       this.busSelected = null;
-      this.isSettingBusList = true;
     }
   }
 
@@ -320,52 +464,94 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         tap(_ => {
           this.store$.dispatch(new Buses.Detach({ id: this.busSelected.id }));
           this.isEditingBusList = false;
-          this.isSettingBusList = true;
           this.busSelected = null;
         })
       )
       .subscribe();
   }
 
-  openDeletionDialog() {
-    this.isRemoving = true;
+  /**
+   * All functions used for the bus list management part in the current workspace (attach bus).
+   */
+  createFormImportBus() {
+    this.busImportForm = this.fb.group({
+      ip: '',
+      port: ['', CustomValidators.isPortOrNull],
+      username: '',
+      password: '',
+      passphrase: '',
+    });
 
-    this.workspace$
+    this.busImportForm.valueChanges
       .pipe(
-        first(),
-        switchMap(wks =>
-          this.dialog
-            .open(WorkspaceDeleteDialogComponent, {
-              data: { name: wks.name },
-            })
-            .beforeClose()
-            .pipe(
-              map(res => !!res),
-              tap(result => (this.isRemoving = result)),
-              filter(result => result),
-              tap(_ => {
-                this.store$.dispatch(new Workspaces.Delete({ id: wks.id }));
-              })
-            )
-        )
+        takeUntil(this.onDestroy$),
+        tap(() => {
+          this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
+        })
       )
       .subscribe();
   }
 
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+  resetFormImportBus() {
+    this.busImportForm.reset();
+    this.store$.dispatch(new Buses.CleanImport());
 
-    if (this.busSelected) {
-      this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+    this.importError = null;
+    this.importBusError = null;
+  }
+
+  editAttachBus() {
+    this.isEditingImportBus = true;
+  }
+
+  cancelAttachBus() {
+    this.isEditingImportBus = false;
+    this.disabledAttachBtn = false;
+
+    this.resetFormImportBus();
+  }
+
+  getError() {
+    // post bus error
+    if (this.importError) {
+      return this.importError;
+      // sse bus import error
+    } else if (this.importBusError) {
+      return this.importBusError;
+    } else {
+      return undefined;
     }
   }
 
-  trackByUser(i: number, user: IUserRow) {
-    return user.id;
+  /**
+   * [mat-form-field] does not remove mat-form-field-invalid class on FormGroup reset.
+   * Use (click) instead (ngSubmit) to call onSubmit method solved the problem.
+   * Use also type="reset" instead type="submit" solved the invalid form after getting error
+   * from sse and cancel import bus overview.
+   * See https://github.com/angular/components/issues/4190
+   */
+  onSubmit({ value }: { value: IBusImport; valid: boolean }) {
+    this.disabledCancelBtn = true;
+    this.disabledAttachBtn = true;
+
+    const importBusDefault: IBusImport = {
+      ip: value.ip ? value.ip : this.formDefault.ip,
+      port: value.port ? value.port : this.formDefault.port,
+      username: value.username ? value.username : this.formDefault.username,
+      password: value.password ? value.password : this.formDefault.password,
+      passphrase: value.passphrase
+        ? value.passphrase
+        : this.formDefault.passphrase,
+    };
+
+    this.store$.dispatch(new Buses.Post(importBusDefault));
   }
 }
 
+/**
+ * This dialog component is required to inform user of irreversible deletion of the current
+ * workspace (confirm delete bus).
+ **/
 @Component({
   selector: 'app-workspace-deletion-dialog',
   template: `
@@ -408,6 +594,10 @@ export class WorkspaceDeleteDialogComponent {
   }
 }
 
+/**
+ * This dialog component is required to inform user of the bus detachment in the current workspace
+ * (confirm detach bus).
+ **/
 @Component({
   selector: 'app-bus-detach-dialog',
   template: `
@@ -446,5 +636,88 @@ export class BusDetachDialogComponent {
 
   detach() {
     this.dialogRef.close(true);
+  }
+}
+
+/**
+ * This dialog component is required to inform user of the new bus attachment in the current
+ * workspace (confirm attach bus).
+ **/
+@Component({
+  selector: 'app-bus-import-dialog',
+  template: `
+    <div fxLayout="column" class="content">
+      <div class="central-content">
+        <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
+          <span fxLayoutAlign="start center">
+            <span class="warning-title">Import bus in progress...</span>
+          </span>
+        </div>
+        <mat-dialog-content>
+          <mat-progress-bar *ngIf="importBusId" mode="indeterminate"></mat-progress-bar>
+        </mat-dialog-content>
+
+        <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+          <button 
+            mat-button 
+            color="primary" 
+            [matDialogClose]="importBusId" 
+            [disabled]="isCancelingImportBus" 
+            (click)="cancel()" 
+            class="btn-cancel-import-bus-dialog text-upper"
+          >
+            <span *ngIf="isCancelingImportBus; else canCancel" fxLayout="row" fxLayoutAlign="start center">
+              Canceling <mat-spinner class="margin-left-x1" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+            </span>
+            
+            <ng-template #canCancel>
+              <span class="text-upper cancel-bus-text-btn">Cancel</span>
+            </ng-template>
+          </button>
+        </mat-dialog-actions>
+      </div>
+    </div>
+  `,
+  styles: ['.central-content { padding: 24px; }'],
+})
+export class BusImportDialogComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
+  public importBusId: string;
+  public isCancelingImportBus: boolean;
+
+  constructor(
+    private store$: Store<IStore>,
+    public dialogRef: MatDialogRef<BusImportDialogComponent>
+  ) {}
+
+  ngOnInit() {
+    this.store$
+      .pipe(
+        select(getBusImportProgressStatus),
+        takeUntil(this.onDestroy$),
+        tap(dialogImportBus => {
+          if (!dialogImportBus.importBusId) {
+            this.close();
+          } else {
+            this.importBusId = dialogImportBus.importBusId;
+            this.isCancelingImportBus = dialogImportBus.isCancelingImportBus;
+          }
+        })
+      )
+      .subscribe();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
+
+  close() {
+    this.dialogRef.close();
+  }
+
+  cancel() {
+    this.store$.dispatch(new Buses.CancelImport({ id: this.importBusId }));
   }
 }

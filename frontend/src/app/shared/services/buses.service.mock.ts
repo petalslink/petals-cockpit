@@ -23,6 +23,9 @@ import { environment } from '@env/environment';
 import {
   errorBackend,
   errorBackendLongText,
+  FAST_IMPORT_ERROR_IP,
+  FAST_IMPORT_OK_IP,
+  IMPORT_CANCEL_IP,
   IMPORT_HTTP_ERROR_IP,
   IMPORT_HTTP_ERROR_IP_LONG_TEXT,
 } from '@mocks/backend-mock';
@@ -37,6 +40,8 @@ import { UsersServiceMock } from '@shared/services/users.service.mock';
 
 @Injectable()
 export class BusesServiceMock extends BusesServiceImpl {
+  importWillCancel = false;
+
   constructor(
     http: HttpClient,
     private sseService: SseService,
@@ -55,18 +60,30 @@ export class BusesServiceMock extends BusesServiceImpl {
 
     const newBus = workspacesService.get(idWorkspace).tryAddBus(bus);
 
-    let event: string;
-    if (newBus.eventData.importError) {
-      event = SseActions.BusImportErrorSse;
-    } else {
-      event = SseActions.BusImportOkSse;
-    }
-
     const detailsBus = {
       ...bus,
       id: newBus.id,
       importError: '',
+      content: {
+        endpoints: {},
+        interfaces: {},
+        services: {},
+      },
     };
+
+    let event: string;
+    let additionalDelay = 0;
+    if (newBus.eventData.importError) {
+      event = SseActions.BusImportErrorSse;
+    } else if (bus.ip === IMPORT_CANCEL_IP) {
+      // sending cancel import bus
+      event = SseActions.BusDetachedSse;
+      this.importWillCancel = true;
+      newBus.eventData = detailsBus;
+      additionalDelay = 3500;
+    } else {
+      event = SseActions.BusImportOkSse;
+    }
 
     return helper.responseBody(detailsBus).pipe(
       tap(_ => {
@@ -83,7 +100,7 @@ export class BusesServiceMock extends BusesServiceImpl {
                 event,
                 newBus.eventData
               ),
-            environment.mock.sseDelay
+            environment.mock.sseDelay + additionalDelay
           );
         }, environment.mock.sseDelay);
       })
@@ -91,6 +108,10 @@ export class BusesServiceMock extends BusesServiceImpl {
   }
 
   detachBus(_idWorkspace: string, id: string) {
+    if (this.importWillCancel) {
+      return helper.response(204);
+    }
+
     return helper.response(204).pipe(
       tap(_ => {
         // simulate the backend sending the answer on the SSE

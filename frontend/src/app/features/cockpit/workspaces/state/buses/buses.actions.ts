@@ -21,9 +21,11 @@ import { JsTable } from '@shared/helpers/jstable.helper';
 import {
   IBusBackendDetails,
   IBusBackendSSE,
+  IBusImport,
 } from '@shared/services/buses.service';
 
 export namespace Buses {
+  // BUSES
   export const FetchedType = '[Buses] Fetched';
   export class Fetched implements Action {
     readonly type = FetchedType;
@@ -121,5 +123,59 @@ export namespace Buses {
   export class Detached implements Action {
     readonly type = DetachedType;
     constructor(public readonly payload: { id: string }) {}
+  }
+
+  // BUS IN PROGRESS
+  export const CleanImportType = '[Bus In Progress] Clean Import';
+  export class CleanImport implements Action {
+    readonly type = CleanImportType;
+    constructor() {}
+  }
+
+  export const PostType = '[Bus In Progress] Post';
+  export class Post implements Action {
+    readonly type = PostType;
+    constructor(public readonly payload: IBusImport) {}
+  }
+
+  export const PostErrorType = '[Bus In Progress] Post error';
+  export class PostError implements Action {
+    readonly type = PostErrorType;
+    constructor(public readonly payload: { importBusError: string }) {}
+  }
+
+  export const PostSuccessType = '[Bus In Progress] Post success';
+  export class PostSuccess implements Action {
+    readonly type = PostSuccessType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  /**
+   * Note: while delete bus concerns deleting an imported bus, cancel concerns cancelling an import in progress.
+   * Both are DELETE operation on BUS ressource.
+   */
+
+  export const CancelImportType = '[Bus In Progress] Cancel import';
+  export class CancelImport implements Action {
+    readonly type = CancelImportType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const CancelImportErrorType = '[Bus In Progress] Cancel import error';
+  export class CancelImportError implements Action {
+    readonly type = CancelImportErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const CanceledImportType = '[Bus In Progress] Canceled import';
+  export class CanceledImport implements Action {
+    readonly type = CanceledImportType;
+    constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const UpdateErrorType = '[Bus In Progress] Update error';
+  export class UpdateError implements Action {
+    readonly type = UpdateErrorType;
+    constructor(public readonly payload: { id: string; importError: string }) {}
   }
 }

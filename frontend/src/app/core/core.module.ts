@@ -28,7 +28,6 @@ import { GuardLoginService } from '@shared/services/guard-login.service';
 import { metaReducers, reducers } from '@shared/state/root.reducer';
 import { UiEffects } from '@shared/state/ui.effects';
 import { UsersEffects } from '@shared/state/users.effects';
-import { BusesInProgressEffects } from '@wks/state/buses-in-progress/buses-in-progress.effects';
 import { BusesEffects } from '@wks/state/buses/buses.effects';
 import { ComponentsEffects } from '@wks/state/components/components.effects';
 import { ContainersEffects } from '@wks/state/containers/containers.effects';
@@ -56,10 +55,9 @@ export const providers: Provider[] = [
     StoreModule.forRoot(reducers, { metaReducers }),
     // Note: the order of declaration is important for batch actions
     // all the sub-actions will be triggered first on WorkspacesEffects,
-    // then BusesInProgressEffects, and so on!
+    // then UsersEffects, and so on!
     EffectsModule.forRoot([
       WorkspacesEffects,
-      BusesInProgressEffects,
       UsersEffects,
       UiEffects,
       BusesEffects,

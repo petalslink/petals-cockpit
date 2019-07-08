@@ -21,26 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <span matPrefix><mat-icon color="primary">search</mat-icon></span>
       </mat-form-field>
     </form>
-
-    <a mat-mini-fab class="btn-add-bus" color="primary" matTooltip="Import a bus" matTooltipPosition="below"
-      [routerLink]="['/workspaces', workspaceId, 'petals', 'buses-in-progress']" (click)="closeSidenavOnSmallScreen()">
-      <mat-icon>add</mat-icon>
-    </a>
-  </div>
-
-  <div class="pnl-title" *ngIf="busesInProgress.length > 0">
-    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <mat-icon class="margin-right-x1" color="primary">import_export</mat-icon>
-      <span class="text-upper title" fxFlex>Imports in progress</span>
-    </div>
-  </div>
-  <app-buses-in-progress [busesInProgress]="busesInProgress" [workspaceId]="workspaceId"></app-buses-in-progress>
-
-  <div class="pnl-title" *ngIf="busesInProgress.length > 0">
-    <div class="margin-left-x1" fxLayout="row" fxLayoutAlign="start center">
-      <mat-icon class="margin-right-x1" color="primary">star</mat-icon>
-      <span class="text-upper title" fxFlex>Buses</span>
-    </div>
   </div>
 
   <app-material-tree

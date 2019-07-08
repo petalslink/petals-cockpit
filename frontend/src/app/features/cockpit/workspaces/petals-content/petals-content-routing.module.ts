@@ -25,12 +25,6 @@ const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'buses-in-progress',
-  },
-  {
-    path: 'buses-in-progress',
-    loadChildren:
-      './petals-bus-in-progress-view/petals-bus-in-progress-view.module#PetalsBusInProgressViewModule',
   },
   {
     path: 'buses/:busId',

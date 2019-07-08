@@ -65,26 +65,6 @@
     }
   }
 
-  // all items ip/port in imports in progress
-  app-buses-in-progress > .nav-list-imports-in-progress > .item-list {
-    .mat-list-item-content:hover {
-      background-color: mat-color($primary, 50);
-    }
-
-    // customize active elements
-    .active-link,
-    .active-link:hover {
-      .mat-list-item-content {
-        background-color: mat-color($primary, 50);
-        border-left-color: mat-color($primary, 600);
-        color: mat-color($primary, 600);
-        &:hover {
-          color: mat-color($primary, 800);
-        }
-      }
-    }
-  }
-
   // use in all administration component
   .user-management-page > .user-management-panels {
     .pnl-add-user

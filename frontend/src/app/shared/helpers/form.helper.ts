@@ -31,6 +31,7 @@ interface IValidationMessages {
   port?: {
     required: string;
     isPort: string;
+    isPortOrNull: string;
   };
   username?: {
     required: string;
@@ -59,7 +60,8 @@ const validationMessages: IValidationMessages = {
   },
   port: {
     required: 'Required!',
-    isPort: 'Invalid port format: expected 0 <= port <= 65535',
+    isPort: 'Must be between 0 and 65535',
+    isPortOrNull: 'Must be between 0 and 65535',
   },
   username: {
     required: 'Required!',
