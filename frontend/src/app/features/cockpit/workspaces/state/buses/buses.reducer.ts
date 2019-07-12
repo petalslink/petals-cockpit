@@ -272,10 +272,20 @@ export namespace BusesReducer {
     }
   ) {
     if (!table.importBusId && !(table.importBusError || table.importError)) {
-      return {
-        ...table,
-        importBusId: payload.id,
-      };
+      if (table.byId[payload.id]) {
+        return {
+          ...table,
+          importBusId: '',
+          isImportingBus: false,
+          importError: '',
+          importBusError: '',
+        };
+      } else {
+        return {
+          ...table,
+          importBusId: payload.id,
+        };
+      }
     } else {
       return table;
     }

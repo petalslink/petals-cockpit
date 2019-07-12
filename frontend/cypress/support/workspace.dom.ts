@@ -22,6 +22,7 @@ const bsWksDeletedDiag = `app-workspace-deleted-dialog`;
 const bsWksElement = `app-workspace-element`;
 const bsWksOverview = `app-workspace-overview`;
 const bsWksBusDetachDiag = `app-bus-detach-dialog`;
+const bsWksBusImportDiag = `app-bus-import-dialog`;
 
 export const WORKSPACE_DOM = {
   buttons: {
@@ -71,10 +72,26 @@ export const WORKSPACE_OVERVIEW_DOM = {
     editDetachBus: `${bsWksOverview} .btn-detach-bus`,
     cancelDetachBus: `${bsWksOverview} .btn-cancel-detach-bus`,
     openDialogDetachBus: `${bsWksOverview} .btn-open-detach-bus-dialog`,
+    editImportBus: `${bsWksOverview} .btn-import-bus`,
+    cancelAttachBus: `${bsWksOverview} .btn-cancel-attach-bus`,
+    importNewBus: `${bsWksOverview} .btn-import-new-bus`,
   },
   formFields: {
     shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
     descriptionFormField: `${bsWksOverview} .workspace-description-edit .description-form-field`,
+
+    ipFormField: `${bsWksOverview} .bus-import-edit .ip-form-field`,
+    portFormField: `${bsWksOverview} .bus-import-edit .port-form-field`,
+    usernameFormField: `${bsWksOverview} .bus-import-edit .username-form-field`,
+    passwordFormField: `${bsWksOverview} .bus-import-edit .pwd-form-field`,
+    passphraseFormField: `${bsWksOverview} .bus-import-edit .passphrase-form-field`,
+  },
+  inputs: {
+    ip: `${bs} input[formcontrolname="ip"]`,
+    port: `${bs} input[formcontrolname="port"]`,
+    username: `${bs} input[formcontrolname="username"]`,
+    password: `${bs} input[formcontrolname="password"]`,
+    passphrase: `${bs} input[formcontrolname="passphrase"]`,
   },
   listGridItem: {
     itemBus: `${bsWksOverview} .bus-grid-item .bus-item .bus-link`,
@@ -105,5 +122,15 @@ export const WORKSPACE_BUS_DETACH_DIALOG_DOM = {
   texts: {
     infoTitle: `${bsWksBusDetachDiag} .mat-dialog-title span span`,
     description: `${bsWksBusDetachDiag} .mat-dialog-content p`,
+  },
+};
+
+export const WORKSPACE_BUS_IMPORT_DIALOG_DOM = {
+  buttons: {
+    cancel: `${bsWksBusImportDiag} .btn-cancel-import-bus-dialog`,
+  },
+  dialog: { dialogImportBus: `${bsWksBusImportDiag}` },
+  texts: {
+    infoTitle: `${bsWksBusImportDiag} .mat-dialog-title span span`,
   },
 };

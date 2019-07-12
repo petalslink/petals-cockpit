@@ -50,12 +50,49 @@ export class BusesServiceMock extends BusesServiceImpl {
     super(http);
   }
 
+  postFastBus(idWorkspace: string, bus: IBusImport) {
+    const newBus = workspacesService.get(idWorkspace).tryAddBus(bus);
+    let detailsBus = {
+      ...bus,
+      id: newBus.id,
+      importError: '',
+    };
+
+    const sseServiceMock = this.sseService as SseServiceMock;
+
+    sseServiceMock.triggerSseEvent(SseActions.BusImportSse, detailsBus);
+
+    if (bus.ip === FAST_IMPORT_ERROR_IP) {
+      const ipPort = `${bus.ip}:${bus.port}`;
+
+      detailsBus = {
+        ...detailsBus,
+        importError: `Can't connect to ${ipPort}`,
+      };
+      // sending error
+      sseServiceMock.triggerSseEvent(SseActions.BusImportErrorSse, detailsBus);
+    } else {
+      // sending new bus
+      sseServiceMock.triggerSseEvent(
+        SseActions.BusImportOkSse,
+        newBus.eventData
+      );
+    }
+
+    return helper.responseBody(detailsBus);
+  }
+
   postBus(idWorkspace: string, bus: IBusImport) {
     // only used by the tests to verify an error coming from the backend...
     if (bus.ip === IMPORT_HTTP_ERROR_IP) {
       return helper.errorBackend(errorBackend, 500);
     } else if (bus.ip === IMPORT_HTTP_ERROR_IP_LONG_TEXT) {
       return helper.errorBackend(errorBackendLongText, 500);
+    } else if (
+      bus.ip === FAST_IMPORT_ERROR_IP ||
+      bus.ip === FAST_IMPORT_OK_IP
+    ) {
+      return this.postFastBus(idWorkspace, bus);
     }
 
     const newBus = workspacesService.get(idWorkspace).tryAddBus(bus);
@@ -74,6 +111,7 @@ export class BusesServiceMock extends BusesServiceImpl {
     let event: string;
     let additionalDelay = 0;
     if (newBus.eventData.importError) {
+      // sending error
       event = SseActions.BusImportErrorSse;
     } else if (bus.ip === IMPORT_CANCEL_IP) {
       // sending cancel import bus
@@ -82,6 +120,7 @@ export class BusesServiceMock extends BusesServiceImpl {
       newBus.eventData = detailsBus;
       additionalDelay = 3500;
     } else {
+      // sending new bus
       event = SseActions.BusImportOkSse;
     }
 
