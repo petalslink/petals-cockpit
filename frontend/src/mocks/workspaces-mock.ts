@@ -73,10 +73,6 @@ export class Workspace {
 
     // by default add 1 bus
     this.addBus();
-
-    // and 2 buses in progress
-    this.addBusInProgress();
-    this.addBusInProgress();
   }
 
   deleteUser(id: string) {
@@ -180,10 +176,6 @@ export class Workspace {
 
   getBuses() {
     return Array.from(this.buses.values());
-  }
-
-  getBusesInProgress() {
-    return Array.from(this.busesInProgress.values());
   }
 
   private addBusInProgress(importData?: IBusImport) {
@@ -533,7 +525,6 @@ export class Workspace {
 
     return {
       ...this.getDetails(),
-      busesInProgress: toObj(this.getBusesInProgress()),
       buses: toObj(buses),
       containers: toObj(containers),
       components: toObj(components),

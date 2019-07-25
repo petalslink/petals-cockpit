@@ -37,6 +37,7 @@ import {
 
 export namespace BusesReducer {
   type All =
+    // BUS
     | Buses.Fetched
     | Buses.Added
     | Buses.SetCurrent
@@ -52,6 +53,15 @@ export namespace BusesReducer {
     | Buses.DetachSuccess
     | Buses.DetachError
     | Buses.Detached
+    // BUS IN PROGRESS
+    | Buses.CleanImport
+    | Buses.Post
+    | Buses.PostError
+    | Buses.PostSuccess
+    | Buses.CancelImport
+    | Buses.CancelImportError
+    | Buses.CanceledImport
+    | Buses.UpdateError
     | Workspaces.Clean;
 
   export function reducer(
@@ -59,6 +69,7 @@ export namespace BusesReducer {
     action: All
   ): IBusesTable {
     switch (action.type) {
+      // BUS
       case Buses.FetchedType: {
         return fetched(table, action.payload);
       }
@@ -104,6 +115,31 @@ export namespace BusesReducer {
       case Buses.DetachedType: {
         return detached(table, action.payload);
       }
+      // BUS IN PROGRESS
+      case Buses.CleanImportType: {
+        return cleanImport(table);
+      }
+      case Buses.PostType: {
+        return post(table);
+      }
+      case Buses.PostErrorType: {
+        return postError(table, action.payload);
+      }
+      case Buses.PostSuccessType: {
+        return postSuccess(table, action.payload);
+      }
+      case Buses.CancelImportType: {
+        return cancelImport(table, action.payload);
+      }
+      case Buses.CancelImportErrorType: {
+        return cancelImportError(table, action.payload);
+      }
+      case Buses.CanceledImportType: {
+        return canceledImport(table, action.payload);
+      }
+      case Buses.UpdateErrorType: {
+        return updateError(table, action.payload);
+      }
       case Workspaces.CleanType: {
         return busesTableFactory();
       }
@@ -111,13 +147,26 @@ export namespace BusesReducer {
         return table;
     }
   }
-
+  // BUS
   function fetched(table: IBusesTable, payload: JsTable<IBusBackendSSE>) {
     return mergeOnly(table, payload, busRowFactory);
   }
 
   function added(table: IBusesTable, payload: JsTable<IBusBackendSSE>) {
-    return putAll(table, payload, busRowFactory);
+    if (table.importBusId === payload.allIds[0]) {
+      return putAll(
+        {
+          ...table,
+          importBusId: '',
+          isImportingBus: false,
+          isCancelingImportBus: false,
+        },
+        payload,
+        busRowFactory
+      );
+    } else {
+      return putAll(table, payload, busRowFactory);
+    }
   }
 
   function setCurrent(
@@ -178,5 +227,132 @@ export namespace BusesReducer {
 
   function detachError(table: IBusesTable, payload: { id: string }) {
     return updateById(table, payload.id, { isDetaching: false });
+  }
+
+  // BUS IN PROGRESS
+  function cleanImport(table: IBusesTable): IBusesTable {
+    return {
+      ...table,
+      isImportingBus: false,
+      importError: '',
+      importBusError: '',
+    };
+  }
+
+  function post(table: IBusesTable): IBusesTable {
+    return {
+      ...table,
+      isImportingBus: true,
+      importError: '',
+      importBusError: '',
+    };
+  }
+
+  // once the http request is done but failed
+  function postError(
+    table: IBusesTable,
+    payload: { importBusError: string }
+  ): IBusesTable {
+    if (table.isImportingBus) {
+      return {
+        ...table,
+        isImportingBus: false,
+        importBusError: payload.importBusError,
+        importError: '',
+      };
+    } else {
+      return table;
+    }
+  }
+
+  function postSuccess(
+    table: IBusesTable,
+    payload: {
+      id: string;
+    }
+  ) {
+    if (!table.importBusId && !(table.importBusError || table.importError)) {
+      if (table.byId[payload.id]) {
+        return {
+          ...table,
+          importBusId: '',
+          isImportingBus: false,
+          importError: '',
+          importBusError: '',
+        };
+      } else {
+        return {
+          ...table,
+          importBusId: payload.id,
+        };
+      }
+    } else {
+      return table;
+    }
+  }
+
+  function cancelImport(table: IBusesTable, payload: { id: string }) {
+    if (table.importBusId === payload.id) {
+      return {
+        ...table,
+        isCancelingImportBus: true,
+      };
+    } else {
+      return updateById(table, payload.id, {
+        isDetaching: true,
+      });
+    }
+  }
+
+  function cancelImportError(
+    table: IBusesTable,
+    payload: { id: string }
+  ): IBusesTable {
+    if (table.importBusId === payload.id) {
+      return {
+        ...table,
+        importBusId: '',
+        isCancelingImportBus: false,
+        isImportingBus: false,
+      };
+    } else {
+      return updateById(table, payload.id, {
+        isDetaching: false,
+      });
+    }
+  }
+
+  function canceledImport(
+    table: IBusesTable,
+    payload: { id: string }
+  ): IBusesTable {
+    if (table.importBusId === payload.id) {
+      return {
+        ...table,
+        importBusId: '',
+        isCancelingImportBus: false,
+        isImportingBus: false,
+      };
+    } else {
+      return removeById(table, payload.id);
+    }
+  }
+
+  function updateError(
+    table: IBusesTable,
+    payload: { id: string; importError: string }
+  ): IBusesTable {
+    if (table.importBusId === payload.id || !table.importBusId) {
+      return {
+        ...table,
+        importBusId: '',
+        importError: payload.importError,
+        importBusError: '',
+        isImportingBus: false,
+        isCancelingImportBus: false,
+      };
+    } else {
+      return table;
+    }
   }
 }

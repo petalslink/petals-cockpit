@@ -71,6 +71,30 @@ declare namespace Cypress {
       hintLabel?: string,
       errorLabel?: string
     ): any;
+    expectBusImportFields(): any;
+    addBusImportInformations(
+      ip: string,
+      port: string,
+      username: string,
+      password: string,
+      passphrase: string
+    ): any;
+    importBusAndCheck(
+      ip: string,
+      port: string,
+      username: string,
+      password: string,
+      passphrase: string,
+      shouldSuccess?: boolean
+    ): any;
+    cancelImportBusAndCheck(
+      ip: string,
+      port: string,
+      username: string,
+      password: string,
+      passphrase: string,
+      shouldCancel?: boolean
+    ): any;
 
     // menu.commands
     expectWorkspacesListMenuToBe(list: string[]): any;
@@ -89,24 +113,6 @@ declare namespace Cypress {
     clickElementInTree(expPanel: string, name: string): any;
     triggerSSEForComp(name: string, id: string): any;
     triggerSSEForWks(name: string, id: string): any;
-
-    // import-bus.commands
-    expectBusImportFields(): any;
-    addBusImportInformations(
-      ip: string,
-      port: string,
-      username: string,
-      password: string,
-      passphrase: string
-    ): any;
-    importBusAndCheck(
-      ip: string,
-      port: string,
-      username: string,
-      password: string,
-      passphrase: string,
-      shouldSuccess?: boolean
-    ): any;
 
     // components.commands
     getActionStateInLifecycleComponent(name: string): any;

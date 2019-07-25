@@ -18,7 +18,7 @@
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
-import { BIP_DOM, PETALS_DOM, PETALS_TREE_DOM } from '../../support/petals.dom';
+import { PETALS_DOM, PETALS_TREE_DOM } from '../../support/petals.dom';
 import { WORKSPACE_DOM } from '../../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
 
@@ -182,19 +182,6 @@ describe(`Petals`, () => {
     cy.expectPetalsTreeToBe(expectedTreeNames);
   });
 
-  it(`should contain the correct buses in progress`, () => {
-    cy.login('admin', 'admin');
-
-    cy.get(BIP_DOM.navList.navListBipPetals);
-
-    const busesInProgress = cy.get(BIP_DOM.texts.ipPort);
-    const expectedBusesInProgress = [`192.168.0.1:7700`, `192.168.0.2:7700`];
-
-    busesInProgress.each((_, index) =>
-      cy.contains(expectedBusesInProgress[index])
-    );
-  });
-
   it(`should filter by bus, container, component, su and categories when searching in Petals menu`, () => {
     // we set a size to avoid clicking on invisible element in tree view
     cy.viewport(1920, 1200);
@@ -241,16 +228,6 @@ describe(`Petals`, () => {
     cy.foldElementInTree(`category-service-assemblies`, `Service Assemblies`);
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
-  });
-
-  it(`should redirect to the bus import page`, () => {
-    cy.login('admin', 'admin');
-
-    cy.expectLocationToBe(`/workspaces/idWks0`);
-
-    cy.get(PETALS_DOM.buttons.addBus).click();
-
-    cy.expectLocationToBe(`/workspaces/idWks0/petals/buses-in-progress`);
   });
 
   const treeWithCont0Folded = [

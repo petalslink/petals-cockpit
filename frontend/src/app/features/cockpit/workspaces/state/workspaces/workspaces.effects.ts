@@ -41,7 +41,6 @@ import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
 import { Users } from '@shared/state/users.actions';
-import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { Components } from '@wks/state/components/components.actions';
 import { Containers } from '@wks/state/containers/containers.actions';
@@ -177,7 +176,6 @@ export class WorkspacesEffects {
         new Ui.OpenSidenav(),
         new Workspaces.FetchSuccess(data.workspace),
         new Users.Fetched(toJsTable(data.users)),
-        new BusesInProgress.Fetched(toJsTable(data.busesInProgress)),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),
         new Components.Fetched(toJsTable(data.components)),

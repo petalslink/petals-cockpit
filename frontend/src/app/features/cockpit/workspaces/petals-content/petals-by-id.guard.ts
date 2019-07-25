@@ -26,11 +26,9 @@ import { Action, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
-import { environment } from '@env/environment';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { JsTable } from '@shared/helpers/jstable.helper';
 import { IStore } from '@shared/state/store.interface';
-import { BusesInProgress } from '@wks/state/buses-in-progress/buses-in-progress.actions';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { getCurrentBus } from '@wks/state/buses/buses.selectors';
 import { Components } from '@wks/state/components/components.actions';
@@ -120,24 +118,9 @@ export class PetalsByIdGuard implements CanActivateChild {
         new ServiceUnits.FetchDetails({ id }),
       ];
       this.previousDestroyAction = new ServiceUnits.SetCurrent({ id: '' });
-    } else if ((id = route.params['busInProgressId'])) {
-      resourceState = state => state.busesInProgress;
-      initActions = state => [new BusesInProgress.SetCurrent({ id })];
-      this.previousDestroyAction = new BusesInProgress.SetCurrent({ id: '' });
     } else {
       if (destroyAction) {
         this.store$.dispatch(destroyAction);
-      }
-
-      // bus-in-progress without an id is also valid in this context...
-      if (!rstate.url.endsWith('buses-in-progress')) {
-        const msg =
-          'Impossible, the resolver is setup on the wrong url or something...';
-        if (environment.strictCoherence) {
-          throw new Error(msg);
-        } else if (environment.debug) {
-          console.error(msg);
-        }
       }
 
       return true;

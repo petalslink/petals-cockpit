@@ -77,3 +77,25 @@ export function getBuses(
     })
   );
 }
+
+export const getBusImportProgressStatus = createSelector(
+  (state: IStore) => state.buses.importBusId,
+  (state: IStore) => state.buses.isCancelingImportBus,
+  (
+    importBusId,
+    isCancelingImportBus
+  ): { importBusId: string; isCancelingImportBus: boolean } => {
+    return { importBusId, isCancelingImportBus };
+  }
+);
+
+export const getImportBusError = createSelector(
+  (state: IStore) => state.buses.importBusError,
+  (state: IStore) => state.buses.importError,
+  (
+    importBusError,
+    importError
+  ): { importBusError: string; importError: string } => {
+    return { importBusError, importError };
+  }
+);

@@ -37,7 +37,6 @@ import './administration.commands';
 import './component.commands';
 import './endpoint.commands';
 import './helper.commands';
-import './import-bus.commands';
 import './interface.commands';
 import './login.commands';
 import './menu.commands';

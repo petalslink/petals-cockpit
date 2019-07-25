@@ -22,7 +22,6 @@ import { getMultipleElementsTexts, urlToMatch, waitAndClick } from '../utils';
 import { BusPage } from './bus.po';
 import { ComponentOverviewPage } from './component.po';
 import { ContainerOverviewPage } from './container.po';
-import { BusInProgressPage, ImportBusPage } from './import-bus.po';
 import { MessageComponentPage } from './message-component.po';
 import { ServiceAssemblyOverviewPage } from './service-assembly.po';
 import { ServiceUnitOverviewPage } from './service-unit.po';
@@ -49,16 +48,6 @@ export abstract class WorkspacePage {
       EC.stalenessOf(this.component.$('mat-toolbar mat-spinner')),
       waitTimeout
     );
-  }
-
-  openImportBus() {
-    waitAndClick(this.addBusButton);
-    return ImportBusPage.waitAndGet();
-  }
-
-  openBusInProgress(index: number) {
-    waitAndClick(this.busesInProgress.get(index));
-    return BusInProgressPage.waitAndGet();
   }
 
   treeElement(identifier: string | number, type: string) {

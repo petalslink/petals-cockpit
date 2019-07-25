@@ -29,7 +29,6 @@ import { debounceTime, map, tap } from 'rxjs/operators';
 
 import { IStore } from '@shared/state/store.interface';
 import { Ui } from '@shared/state/ui.actions';
-import { IBusInProgress } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { Components } from '@wks/state/components/components.actions';
 import { Containers } from '@wks/state/containers/containers.actions';
@@ -50,7 +49,6 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
 
   @Input() workspaceId: string;
   @Input() tree: WorkspaceElement[];
-  @Input() busesInProgress: IBusInProgress[];
 
   searchForm: FormGroup;
   search = '';

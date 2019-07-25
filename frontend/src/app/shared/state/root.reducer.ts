@@ -24,7 +24,6 @@ import { initStateFromLocalStorage } from '@shared/helpers/local-storage.helper'
 import { IStore } from '@shared/state/store.interface';
 import { UiReducer } from '@shared/state/ui.reducer';
 import { UsersReducer } from '@shared/state/users.reducer';
-import { BusesInProgressReducer } from '@wks/state/buses-in-progress/buses-in-progress.reducer';
 import { BusesReducer } from '@wks/state/buses/buses.reducer';
 import { ComponentsReducer } from '@wks/state/components/components.reducer';
 import { ContainersReducer } from '@wks/state/containers/containers.reducer';
@@ -41,7 +40,6 @@ export const reducers: ActionReducerMap<IStore> = {
   users: UsersReducer.reducer,
   workspaces: WorkspacesReducer.reducer,
   buses: BusesReducer.reducer,
-  busesInProgress: BusesInProgressReducer.reducer,
   containers: ContainersReducer.reducer,
   components: ComponentsReducer.reducer,
   endpoints: EndpointsReducer.reducer,

@@ -20,6 +20,14 @@ export const GONE_SETUP_TOKEN = 'GONE_SETUP_TOKEN';
 export const BAD_SETUP_USER = 'BAD_SETUP_USER';
 
 export const ADD_WKS_HTTP_ERROR_BACKEND = 'ADD_WKS_HTTP_ERROR_BACKEND';
+
+export const FAST_IMPORT_OK_IP = 'FAST_IMPORT_OK_IP';
+export const FAST_IMPORT_ERROR_IP = 'FAST_IMPORT_ERROR_IP';
+
+export const IMPORT_OK_IP = 'IMPORT_OK_IP';
+export const IMPORT_ERROR_IP = 'IMPORT_ERROR_IP';
+export const IMPORT_CANCEL_IP = 'IMPORT_CANCEL_IP';
+
 export const IMPORT_HTTP_ERROR_IP = 'IMPORT_HTTP_ERROR_IP';
 export const IMPORT_HTTP_ERROR_IP_LONG_TEXT = 'IMPORT_HTTP_ERROR_IP_LONG_TEXT';
 export const errorBackend = `Error backend`;
@@ -28,4 +36,10 @@ export const errorActualBackendLongText = `org.ow2.petals.jmx.api.api.exception.
 export const errorBackendTroncateTxt = `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec qu...`;
 
 // buses that can be imported
-export const validContainers = ['192.168.0.1:7700'];
+export const validContainers = [
+  '192.168.0.1:7700',
+  'localhost:7700',
+  `${IMPORT_CANCEL_IP}:7700`,
+  `${FAST_IMPORT_OK_IP}:7700`,
+  `${IMPORT_OK_IP}:7700`,
+];

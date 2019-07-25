@@ -17,6 +17,7 @@
 
 import {
   WORKSPACE_BUS_DETACH_DIALOG_DOM,
+  WORKSPACE_BUS_IMPORT_DIALOG_DOM,
   WORKSPACE_DELETED_DIALOG_DOM,
   WORKSPACE_DELETION_DIALOG_DOM,
   WORKSPACE_OVERVIEW_DOM,
@@ -100,7 +101,9 @@ Cypress.Commands.add('expectBusListToBe', listGridItemBusNames => {
   const busNames = cy.get(WORKSPACE_OVERVIEW_DOM.texts.busNames);
 
   busNames.should('have.length', listGridItemBusNames.length);
-  busNames.each((_, index) => busNames.contains(listGridItemBusNames[index]));
+  busNames.each(($item, index) =>
+    cy.wrap($item).contains(listGridItemBusNames[index])
+  );
 });
 
 Cypress.Commands.add('expectDetachBusListToBe', listGridItemDetachBusNames => {
@@ -163,3 +166,63 @@ Cypress.Commands.add('updateDescription', (descriptionText, hintLabel?) => {
     .should('be.enabled')
     .click();
 });
+
+Cypress.Commands.add('expectBusImportFields', () => {
+  cy
+    .get(
+      `${WORKSPACE_OVERVIEW_DOM.inputs.ip},
+       ${WORKSPACE_OVERVIEW_DOM.inputs.port},
+       ${WORKSPACE_OVERVIEW_DOM.inputs.username},
+       ${WORKSPACE_OVERVIEW_DOM.inputs.password},
+       ${WORKSPACE_OVERVIEW_DOM.inputs.passphrase}`
+    )
+    .should('have.length', 5);
+});
+
+Cypress.Commands.add(
+  'addBusImportInformations',
+  (ip, port, username, password, passphrase) => {
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.ip).type(ip);
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.port).type(port);
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.username).type(username);
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.password).type(password);
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.passphrase).type(passphrase);
+  }
+);
+
+Cypress.Commands.add(
+  'importBusAndCheck',
+  (ip, port, username, password, passphrase, shouldSuccess = true) => {
+    cy.addBusImportInformations(ip, port, username, password, passphrase);
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).click();
+
+    cy
+      .get(WORKSPACE_BUS_IMPORT_DIALOG_DOM.dialog.dialogImportBus)
+      .should('not.be.visible');
+
+    if (shouldSuccess) {
+      cy.get('.error-import-details').should('not.be.visible');
+
+      cy.expectNotification(
+        'success',
+        'Bus import success',
+        /^The import of the bus .* succeeded$/
+      );
+    }
+  }
+);
+
+Cypress.Commands.add(
+  'cancelImportBusAndCheck',
+  (ip, port, username, password, passphrase) => {
+    cy.addBusImportInformations(ip, port, username, password, passphrase);
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).click();
+    cy.get(WORKSPACE_BUS_IMPORT_DIALOG_DOM.buttons.cancel).click();
+
+    cy
+      .get(WORKSPACE_BUS_IMPORT_DIALOG_DOM.dialog.dialogImportBus)
+      .should('not.be.visible');
+  }
+);

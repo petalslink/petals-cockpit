@@ -22,6 +22,7 @@ import { SharedModule } from '@shared/shared.module';
 
 import {
   BusDetachDialogComponent,
+  BusImportDialogComponent,
   WorkspaceDeleteDialogComponent,
   WorkspaceOverviewComponent,
 } from './workspace-overview.component';
@@ -32,7 +33,12 @@ import {
     WorkspaceOverviewComponent,
     WorkspaceDeleteDialogComponent,
     BusDetachDialogComponent,
+    BusImportDialogComponent,
   ],
-  entryComponents: [WorkspaceDeleteDialogComponent, BusDetachDialogComponent],
+  entryComponents: [
+    WorkspaceDeleteDialogComponent,
+    BusDetachDialogComponent,
+    BusImportDialogComponent,
+  ],
 })
 export class WorkspaceOverviewModule {}

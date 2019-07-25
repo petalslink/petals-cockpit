@@ -16,7 +16,6 @@
  */
 
 import { IUi } from '@shared/state/ui.interface';
-import { IBusesInProgressTable } from '@wks/state/buses-in-progress/buses-in-progress.interface';
 import { IBusesTable } from '@wks/state/buses/buses.interface';
 import { IComponentsTable } from '@wks/state/components/components.interface';
 import { IContainersTable } from '@wks/state/containers/containers.interface';
@@ -34,7 +33,6 @@ export interface IStore {
   users: IUsersTable;
   workspaces: IWorkspacesTable;
   buses: IBusesTable;
-  busesInProgress: IBusesInProgressTable;
   containers: IContainersTable;
   components: IComponentsTable;
   interfaces: IInterfacesTable;

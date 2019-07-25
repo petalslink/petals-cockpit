@@ -46,7 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     >
       <mat-tab label="Petals">
         <app-petals-menu-view
-          [busesInProgress]="busesInProgress$ | async"
           [tree]="tree$ | async"
           [workspaceId]="workspace.id">
         </app-petals-menu-view>
