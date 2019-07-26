@@ -5,7 +5,15 @@
     "no-empty-interface": false,
     "no-use-before-declare": false,
     "no-unused-variable": [true, { "ignore-pattern": "^_" }],
-    "ban": [true, ["fit"], ["fdescribe"], ["xit"], ["xdescribe"]],
+    "ban": [
+      true,
+      ["fit"],
+      ["fdescribe"],
+      ["xit"],
+      ["xdescribe"],
+      ["it", "only"],
+      ["describe", "only"]
+    ],
     "banana-in-box": true,
     "templates-no-negated-async": true,
     "ordered-imports": [true],
