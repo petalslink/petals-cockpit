@@ -1,0 +1,94 @@
+<!-- Copyright (C) 2017-2019 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" fxFlex class="services-menu-view mat-typography">
+  <div fxLayout="row" class="wrapper-search-services">
+    <form [formGroup]="searchForm" fxFlex>
+      <mat-form-field appearance="outline" fxFlex="280px">
+        <input appFocusInputIfLargeScreen matInput placeholder="Search by name" formControlName="search" class="search">
+        <span matPrefix>
+          <fa-icon icon="search" class="icon-x2"></fa-icon>
+        </span>
+      </mat-form-field>
+    </form>
+
+    <button
+      mat-mini-fab
+      color="primary"
+      matTooltip="Refresh services"
+      matTooltipPosition="below"
+      (click)="refreshServices()"
+      [disabled]="isFetchingServices$ | async"
+      class="btn-refresh-services"
+    >
+      <mat-spinner
+        *ngIf="isFetchingServices$ | async; else default"
+        [diameter]="24"
+        [strokeWidth]="2"
+        color="primary"
+      ></mat-spinner>
+      <ng-template #default>
+        <mat-icon>refresh</mat-icon>
+      </ng-template>
+    </button>
+  </div>
+
+  <div class="pnl-services-trees">
+    <mat-accordion displayMode="flat" [multi]="true">
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-interfaces-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="interface"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Interface Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-interfaces-list
+          [interfacesTree]="interfacesTree$ | async"
+          [search]="search"
+        ></app-interfaces-list>
+
+      </mat-expansion-panel>
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-services-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="service"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Service Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-services-list
+          [servicesTree]="servicesTree$ | async"
+          [search]="search"
+        ></app-services-list>
+
+      </mat-expansion-panel>
+      <mat-expansion-panel fxLayout="column" class="exp-pnl-endpoints-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
+        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
+          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+            <mat-icon class="margin-right-x1" color="primary" svgIcon="endpoint"></mat-icon>
+            <span class="text-upper pnl-title light-bold">Endpoint Names</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <app-endpoints-list
+          [endpointsTree]="endpointsTree$ | async"
+          [search]="search"
+        ></app-endpoints-list>
+
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

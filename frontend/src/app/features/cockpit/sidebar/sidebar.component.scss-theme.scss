@@ -28,6 +28,20 @@
         .btn-logo {
           border-bottom-color: mat-color($primary, default-contrast);
         }
+        .btn-topology {
+          &.active {
+            border-left-color: mat-color($accent);
+            color: mat-color($primary, default-contrast);
+            background-color: mat-color($primary, 900);
+          }
+        }
+        .btn-services {
+          &.active {
+            border-left-color: mat-color($accent);
+            color: mat-color($primary, default-contrast);
+            background-color: mat-color($primary, 900);
+          }
+        }
       }
       .sidebar-bottom {
         color: mat-color($primary, default-contrast);

@@ -17,31 +17,20 @@
 
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action, Store } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { filter, map, tap, withLatestFrom } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
-import { IStore } from '@shared/state/store.interface';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Ui } from './ui.actions';
 import { SETTINGS_THEME_KEY } from './ui.interface';
-import { isSmallScreen } from './ui.selectors';
 
 @Injectable()
 export class UiEffects {
   constructor(
     private actions$: Actions,
-    private store$: Store<IStore>,
     private localStorageService: LocalStorageService
   ) {}
-
-  @Effect()
-  closeSidenavOnSmallScreen$: Observable<Action> = this.actions$.pipe(
-    ofType(Ui.CloseSidenavOnSmallScreenType),
-    withLatestFrom(this.store$.pipe(isSmallScreen)),
-    filter(([_, ss]) => ss),
-    map(_ => new Ui.CloseSidenav())
-  );
 
   @Effect({ dispatch: false })
   changeTheme$: Observable<Action> = this.actions$.pipe(

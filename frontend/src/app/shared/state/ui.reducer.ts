@@ -20,25 +20,10 @@ import { IUi, ScreenSize, uiFactory } from './ui.interface';
 import { Users } from './users.actions';
 
 export namespace UiReducer {
-  type All =
-    | Ui.OpenSidenav
-    | Ui.CloseSidenav
-    | Ui.ToggleSidenav
-    | Ui.ChangeScreenSize
-    | Ui.ChangeTheme
-    | Users.Disconnected;
+  type All = Ui.ChangeScreenSize | Ui.ChangeTheme | Users.Disconnected;
 
   export function reducer(table = uiFactory(), action: All): IUi {
     switch (action.type) {
-      case Ui.OpenSidenavType: {
-        return openSidenav(table);
-      }
-      case Ui.CloseSidenavType: {
-        return closeSidenav(table);
-      }
-      case Ui.ToggleSidenavType: {
-        return toggleSidenav(table);
-      }
       case Ui.ChangeScreenSizeType: {
         return changeScreenSize(table, action.payload);
       }
@@ -55,27 +40,6 @@ export namespace UiReducer {
       default:
         return table;
     }
-  }
-
-  function toggleSidenav(ui: IUi): IUi {
-    return {
-      ...ui,
-      isSidenavVisible: !ui.isSidenavVisible,
-    };
-  }
-
-  function openSidenav(ui: IUi): IUi {
-    return {
-      ...ui,
-      isSidenavVisible: true,
-    };
-  }
-
-  function closeSidenav(ui: IUi): IUi {
-    return {
-      ...ui,
-      isSidenavVisible: false,
-    };
   }
 
   function changeTheme(ui: IUi, payload: { theme: string }): IUi {

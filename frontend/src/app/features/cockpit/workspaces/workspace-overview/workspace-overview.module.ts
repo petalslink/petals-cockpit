@@ -18,14 +18,13 @@
 import { NgModule } from '@angular/core';
 import { MarkdownToHtmlModule } from 'markdown-to-html-pipe';
 
-import { SharedModule } from '@shared/shared.module';
-
 import {
   BusDetachDialogComponent,
   BusImportDialogComponent,
   WorkspaceDeleteDialogComponent,
   WorkspaceOverviewComponent,
-} from './workspace-overview.component';
+} from '@feat/cockpit/workspaces/workspace-overview/workspace-overview.component';
+import { SharedModule } from '@shared/shared.module';
 
 @NgModule({
   imports: [SharedModule, MarkdownToHtmlModule],

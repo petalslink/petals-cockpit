@@ -20,28 +20,18 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
-import { LocalStorageService } from 'ngx-webstorage';
 import { Observable, Subject } from 'rxjs';
 import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
+import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { IUi } from '@shared/state/ui.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
-import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
-import { getAllEndpoints } from '@wks/state/endpoints/endpoints.selectors';
-import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
-import { getAllInterfaces } from '@wks/state/interfaces/interfaces.selectors';
-import { IServiceRow } from '@wks/state/services/services.interface';
-import { getAllServices } from '@wks/state/services/services.selectors';
-import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
   getCurrentWorkspace,
-  getCurrentWorkspaceTree,
   getWorkspacesIdsNames,
   IWorkspacesIdsNames,
-  WorkspaceElement,
 } from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
@@ -55,25 +45,14 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ui$: Observable<IUi>;
   workspacesIdsNames$: Observable<{ list: IWorkspacesIdsNames[] }>;
   workspace$: Observable<IWorkspaceRow>;
-  interfaces$: Observable<IInterfaceRow[]>;
-  endpoints$: Observable<IEndpointRow[]>;
-  services$: Observable<IServiceRow[]>;
-  tree$: Observable<WorkspaceElement[]>;
-
-  sidenavMode$: Observable<string>;
-
   isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
   isOnWorkspace$: Observable<boolean>;
-  sidenavVisible$: Observable<boolean>;
-
-  retrievedSelectedIndex: number;
 
   constructor(
     private store$: Store<IStore>,
     private router: Router,
-    private dialog: MatDialog,
-    private storage: LocalStorageService
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -88,27 +67,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.ui$ = this.store$.pipe(select(state => state.ui));
 
     this.workspace$ = this.store$.pipe(select(getCurrentWorkspace));
-
-    this.interfaces$ = this.store$.pipe(
-      select(getAllInterfaces),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.services$ = this.store$.pipe(
-      select(getAllServices),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.endpoints$ = this.store$.pipe(
-      select(getAllEndpoints),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTree));
-
-    this.retrievedSelectedIndex = this.storage.retrieve(
-      'left-menu-selected-index'
-    );
 
     // open deleted warning if the workspace has been deleted
     this.store$
@@ -140,23 +98,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
+    // the workspaces action clean is used to reinitialize the store when we are no longer in a workspace
     this.store$.dispatch(new Workspaces.Clean());
-  }
-
-  goToWorkspacesList() {
-    this.router.navigate(['/workspaces'], { queryParams: { page: 'list' } });
-  }
-
-  closeSidenav() {
-    this.store$.dispatch(new Ui.CloseSidenav());
-  }
-
-  closeSidenavOnSmallScreen() {
-    this.store$.dispatch(new Ui.CloseSidenavOnSmallScreen());
-  }
-
-  saveCurrentTab(tabIndex: number) {
-    this.storage.store('left-menu-selected-index', tabIndex);
   }
 }
 

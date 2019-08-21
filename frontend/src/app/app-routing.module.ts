@@ -21,9 +21,12 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { environment } from '@env/environment';
 import { GuardLoginService } from '@shared/services/guard-login.service';
 
-export const routes: Routes = [
+const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'login' },
-  { path: 'setup', loadChildren: './features/setup/setup.module#SetupModule' },
+  {
+    path: 'setup',
+    loadChildren: './features/setup/setup.module#SetupModule',
+  },
   {
     path: 'login',
     canActivate: [GuardLoginService],
@@ -32,9 +35,12 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [GuardLoginService],
+
     loadChildren: './features/cockpit/cockpit.module#CockpitModule',
   },
 ];
+
+export { routes };
 
 @NgModule({
   imports: [

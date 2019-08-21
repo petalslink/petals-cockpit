@@ -33,10 +33,18 @@ import { getCurrentUser } from '@shared/state/users.selectors';
 export class CockpitComponent implements OnInit, OnDestroy {
   user$: Observable<ICurrentUser>;
   isDisconnecting$: Observable<boolean>;
+  isOnWorkspace$: Observable<boolean>;
+  workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.workspaceId$ = this.store$.pipe(
+      select(state => state.workspaces.selectedWorkspaceId)
+    );
+    this.isOnWorkspace$ = this.store$.pipe(
+      select(state => !!state.workspaces.selectedWorkspaceId)
+    );
     this.user$ = this.store$.pipe(getCurrentUser);
     this.isDisconnecting$ = this.store$.pipe(
       select(state => state.users.isDisconnecting)

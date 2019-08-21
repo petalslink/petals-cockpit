@@ -34,8 +34,13 @@ app-root {
 
 $sidebar-width: 360px;
 
-mat-sidenav {
-  width: $sidebar-width;
+mat-sidenav-container > mat-sidenav.mat-drawer-side {
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+
+mat-sidenav-container > mat-sidenav-content.mat-drawer-content {
+  margin-left: $sidebar-width;
 }
 
 app-material-tree {
@@ -176,22 +181,6 @@ div > .mat-dialog-container {
 .prefix-toolbar-title {
   width: 20px;
   text-align: center;
-}
-
-// temporary fix https://github.com/angular/material2/issues/2829
-app-workspace
-  > .mat-sidenav-container
-  > .mat-sidenav
-  > .mat-tab-group
-  > .mat-tab-header
-  > .mat-tab-label-container
-  > .mat-tab-list
-  > .mat-tab-labels {
-  .mat-tab-label {
-    min-width: 72px;
-    text-transform: uppercase;
-    opacity: 1 !important;
-  }
 }
 
 .wrapper-content
