@@ -7,12 +7,17 @@
     "proxy": "ng serve --proxy-config proxy.conf.json -c dev-nomock",
     "test": "ng test --browsers=ChromiumHeadlessCustom",
     "test:ci": "yarn run test --watch=false --progress=false",
-    "check": "yarn run tslint-config-prettier-check ./tslint.json && yarn run lint:check && yarn run copyrights:check && yarn run prettier:check",
-    "check:fix": "yarn run lint:fix; yarn run copyrights:fix; yarn run prettier:fix",
-    "lint:check": "ng lint --type-check petals-cockpit petals-cockpit-e2e petals-cockpit-actual-e2e",
-    "lint:fix": "yarn run lint:check --fix",
-    "copyrights:fix": "node generate-headers.js",
+    "check": "tslint-config-prettier-check ./tslint.json && yarn run nglint:check && yarn run tslint:check && yarn run copyrights:check && yarn run prettier:check",
+    "check:fix": "yarn run nglint:fix; yarn run tslint:fix; yarn run copyrights:fix; yarn run prettier:fix",
+    "nglint:check": "ng lint --type-check petals-cockpit petals-cockpit-e2e petals-cockpit-actual-e2e",
+    "nglint:fix": "yarn run nglint:check --fix",
+    "tslint:check": "tslint --project ./tsconfig.json",
+    "tslint:fix": "yarn run tslint:check --fix",
+    "prettier:base-files": "yarn run prettier --single-quote --trailing-comma es5 './{e2e,src,cypress}/**/*.{js,scss,ts}'",
+    "prettier:check": "yarn run prettier:base-files --list-different",
+    "prettier:fix": "yarn run prettier:base-files --write",
     "copyrights:check": "yarn run copyrights:fix --dry",
+    "copyrights:fix": "node generate-headers.js",
     "e2e": "ng e2e -c dev-e2e petals-cockpit-e2e",
     "e2e:ci": "ng e2e -c prod-e2e-ci petals-cockpit-e2e",
     "e2e:product": "ng e2e petals-cockpit-actual-e2e",
@@ -28,20 +33,17 @@
     "build:ldap:ci": "yarn run build:ldap --progress=false",
     "build:no-ldap": "yarn run build -c prod-e2e",
     "build:no-ldap:ci": "yarn run build:no-ldap --progress=false",
-    "postbuild": "gulp compress",
-    "prettier:base": "yarn run prettier --single-quote --trailing-comma es5",
-    "prettier:base-files": "yarn run prettier:base './{e2e,src,cypress}/**/*.{js,scss,ts}'",
-    "prettier:fix": "yarn run prettier:base-files --write",
-    "prettier:check": "yarn run prettier:base-files -l",
-    "precommit": "lint-staged",
-    "prepush": "yarn run lint:check && yarn run copyrights:check"
+    "postbuild": "gulp compress"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "yarn run check"
+    }
   },
   "lint-staged": {
-    "linters": {
-      "*.{js,ts,scss}": [
-        "yarn run prettier:base -l"
-      ]
-    }
+    "*.{js,ts,scss}": "yarn run prettier:base -l",
+    "*.ts": "tslint"
   },
   "private": true,
   "engines": {
@@ -110,7 +112,7 @@
     "cypress-pipe": "1.4.0",
     "gulp": "3.9.1",
     "gulp-gzip": "1.4.0",
-    "husky": "0.14.3",
+    "husky": "3.0.1",
     "jasmine-core": "3.1.0",
     "jasmine-marbles": "0.3.1",
     "jasmine-spec-reporter": "4.2.1",
@@ -123,7 +125,7 @@
     "karma-jasmine-html-reporter": "1.1.0",
     "karma-remap-istanbul": "0.6.0",
     "karma-scss-preprocessor": "3.0.0",
-    "lint-staged": "7.1.2",
+    "lint-staged": "9.2.1",
     "lodash": "4.17.4",
     "prettier": "1.11.1",
     "protractor": "5.3.2",

@@ -90,9 +90,9 @@ build-backend:
     # ensure they are the same in the other jobs
     - maven -pl backend -am versions:lock-snapshots
     # deploy to the staging directory
-    # ignore liquibase info logs flooding (to prevent gitlab log size hitting its default limit) 
+    # ignore liquibase info logs flooding (to prevent gitlab log size hitting its default limit)
     # See issue https://gitlab.com/linagora/petals-cockpit/issues/544
-    - maven_build -pl backend -am deploy | grep -vE "^INFO  \[.*\] liquibase.*$"     
+    - maven_build -pl backend -am deploy | grep -vE "^INFO  \[.*\] liquibase.*$"
     # build the docs
     - maven -pl backend -am com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
   artifacts:
@@ -103,6 +103,20 @@ build-backend:
   tags:
     - docker
 
+check-frontend:
+  <<: *node-java-yarn
+  stage: build
+  except:
+    - tags
+    # we don't want to check the frontend in back/* and product/*
+    - /^back\/.*$/
+    - /^product\/.*$/
+  script:
+    - cd frontend
+    # copyright and lint
+    - time yarn run check
+  tags:
+    - docker
 
 test-frontend:
   <<: *node-java-yarn
@@ -114,8 +128,6 @@ test-frontend:
     - /^product\/.*$/
   script:
     - cd frontend
-    # copyright and lint
-    - time yarn run check
     # unit tests
     - time yarn run test:ci
     # e2e
