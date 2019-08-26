@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
-import { HEADER_DOM } from '../../support/header.dom';
-import {
-  expectedEndpointsTreeWks0,
-  expectedInterfacesTreeWks0,
-  expectedServicesTreeWks0,
-} from '../../support/helper.const';
+// import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
+// import { HEADER_DOM } from '../../support/header.dom';
+// import {
+//   expectedEndpointsTreeWks0,
+//   expectedInterfacesTreeWks0,
+//   expectedServicesTreeWks0,
+// } from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import {
   WORKSPACE_BUS_DETACH_DIALOG_DOM,
   WORKSPACE_BUS_IMPORT_DIALOG_DOM,
-  WORKSPACE_DOM,
+  // WORKSPACE_DOM,
   WORKSPACE_OVERVIEW_DOM,
 } from '../../support/workspace.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
@@ -104,27 +104,27 @@ describe('Workspace', () => {
     cy.expectNotification('success', 'Log out !', `You're now disconnected.`);
   });
 
-  it('should active the tab petals', () => {
-    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
-    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
-    cy
-      .get(WORKSPACE_DOM.tabs)
-      .contains(`Petals`)
-      .click()
-      .parent()
-      .should(`have.class`, `mat-tab-label-active`);
-  });
+  // it('should active the tab petals', () => {
+  //   cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
+  //   cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+  //   cy
+  //     .get(WORKSPACE_DOM.tabs)
+  //     .contains(`Petals`)
+  //     .click()
+  //     .parent()
+  //     .should(`have.class`, `mat-tab-label-active`);
+  // });
 
-  it('should active the tab services', () => {
-    cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
-    cy.get(WORKSPACE_DOM.menu.workspaceMenu);
-    cy
-      .get(WORKSPACE_DOM.tabs)
-      .contains(`Services`)
-      .click()
-      .parent()
-      .should(`have.class`, `mat-tab-label-active`);
-  });
+  // it('should active the tab services', () => {
+  //   cy.get(WORKSPACE_DOM.sidenav.workspaceSidenav);
+  //   cy.get(WORKSPACE_DOM.menu.workspaceMenu);
+  //   cy
+  //     .get(WORKSPACE_DOM.tabs)
+  //     .contains(`Services`)
+  //     .click()
+  //     .parent()
+  //     .should(`have.class`, `mat-tab-label-active`);
+  // });
 
   describe('Menu', () => {
     beforeEach(() => {
@@ -315,110 +315,110 @@ describe('Workspace', () => {
       cy.url().should('include', '?page=create');
     });
 
-    it('should show the workspace name in the header and active link when the route match with workspace overview', () => {
-      // check if header and nav are visible
-      cy.get(HEADER_DOM.toolbar).should('be.visible');
-      cy.get(BREADCRUMB_DOM.nav).should('be.visible');
+    // it('should show the workspace name in the header and active link when the route match with workspace overview', () => {
+    //   // check if header and nav are visible
+    //   cy.get(HEADER_DOM.toolbar).should('be.visible');
+    //   cy.get(BREADCRUMB_DOM.nav).should('be.visible');
 
-      // expect to have workspace name
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
-      // expect to have router link active
-      cy
-        .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
-        .should('have.class', 'active-link');
+    //   // expect to have workspace name
+    //   cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    //   // expect to have router link active
+    //   cy
+    //     .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+    //     .should('have.class', 'active-link');
 
-      // open menu
-      cy
-        .get(MENU_DOM.buttons.toggleMenu)
-        .should('be.visible')
-        .click();
+    //   // open menu
+    //   cy
+    //     .get(MENU_DOM.buttons.toggleMenu)
+    //     .should('be.visible')
+    //     .click();
 
-      // check if Workspace 0 is selected in the menu
-      cy
-        .get(`.item-list .menu-item-wks-name`)
-        .first()
-        .should('have.class', 'active')
-        .and('have.attr', 'disabled', 'disabled')
-        .find(MENU_DOM.texts.wksNames)
-        .should('contain', `Workspace 0`)
-        .and('be.visible');
+    //   // check if Workspace 0 is selected in the menu
+    //   cy
+    //     .get(`.item-list .menu-item-wks-name`)
+    //     .first()
+    //     .should('have.class', 'active')
+    //     .and('have.attr', 'disabled', 'disabled')
+    //     .find(MENU_DOM.texts.wksNames)
+    //     .should('contain', `Workspace 0`)
+    //     .and('be.visible');
 
-      // close menu
-      cy.get(`.cdk-overlay-container`).click(600, 600);
+    //   // close menu
+    //   cy.get(`.cdk-overlay-container`).click(600, 600);
 
-      // expect to have the menu closed
-      cy
-        .get(
-          `.menu + * .cdk-overlay-pane > div.mat-menu-panel > div.mat-menu-content`
-        )
-        .should('not.be.visible');
+    //   // expect to have the menu closed
+    //   cy
+    //     .get(
+    //       `.menu + * .cdk-overlay-pane > div.mat-menu-panel > div.mat-menu-content`
+    //     )
+    //     .should('not.be.visible');
 
-      // go to the child view
-      cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
+    //   // go to the child view
+    //   cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
 
-      cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+    //   cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
 
-      // open menu
-      cy
-        .get(MENU_DOM.buttons.toggleMenu)
-        .should('be.visible')
-        .click();
+    //   // open menu
+    //   cy
+    //     .get(MENU_DOM.buttons.toggleMenu)
+    //     .should('be.visible')
+    //     .click();
 
-      // check if Workspace 0 is always selected in the menu
-      cy
-        .get(`.item-list .menu-item-wks-name`)
-        .first()
-        .should('have.class', 'active')
-        .and('have.attr', 'disabled', 'disabled')
-        .find(MENU_DOM.texts.wksNames)
-        .should('contain', `Workspace 0`)
-        .and('be.visible');
+    //   // check if Workspace 0 is always selected in the menu
+    //   cy
+    //     .get(`.item-list .menu-item-wks-name`)
+    //     .first()
+    //     .should('have.class', 'active')
+    //     .and('have.attr', 'disabled', 'disabled')
+    //     .find(MENU_DOM.texts.wksNames)
+    //     .should('contain', `Workspace 0`)
+    //     .and('be.visible');
 
-      // close menu
-      cy.get(`.cdk-overlay-backdrop`).click();
+    //   // close menu
+    //   cy.get(`.cdk-overlay-backdrop`).click();
 
-      // expect to have workspace name
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
-      // expect to have router link inactive
-      cy
-        .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
-        .should('not.have.class', 'active-link')
-        .click();
+    //   // expect to have workspace name
+    //   cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    //   // expect to have router link inactive
+    //   cy
+    //     .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+    //     .should('not.have.class', 'active-link')
+    //     .click();
 
-      cy.expectLocationToBe(`/workspaces/idWks0`);
+    //   cy.expectLocationToBe(`/workspaces/idWks0`);
 
-      // expect to have router link active
-      cy
-        .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
-        .should('have.class', 'active-link');
+    //   // expect to have router link active
+    //   cy
+    //     .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+    //     .should('have.class', 'active-link');
 
-      // open menu
-      cy
-        .get(MENU_DOM.buttons.toggleMenu)
-        .should('be.visible')
-        .click();
+    //   // open menu
+    //   cy
+    //     .get(MENU_DOM.buttons.toggleMenu)
+    //     .should('be.visible')
+    //     .click();
 
-      // go back to workspaces list
-      cy
-        .get(`.menu-item-back-wks-list`)
-        .find(MENU_DOM.texts.itemNameWksList)
-        .should('contain', `Back to Workspaces`)
-        .and('be.visible')
-        .click();
+    //   // go back to workspaces list
+    //   cy
+    //     .get(`.menu-item-back-wks-list`)
+    //     .find(MENU_DOM.texts.itemNameWksList)
+    //     .should('contain', `Back to Workspaces`)
+    //     .and('be.visible')
+    //     .click();
 
-      // go back to the same workspace we had just left before
-      cy
-        .get(WORKSPACES_LIST_DOM.listItem.itemWorkspaces)
-        .eq(0)
-        .click();
+    //   // go back to the same workspace we had just left before
+    //   cy
+    //     .get(WORKSPACES_LIST_DOM.listItem.itemWorkspaces)
+    //     .eq(0)
+    //     .click();
 
-      cy.expectLocationToBe('/workspaces/idWks0');
+    //   cy.expectLocationToBe('/workspaces/idWks0');
 
-      // expect to have router link active again
-      cy
-        .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
-        .should('have.class', 'active-link');
-    });
+    //   // expect to have router link active again
+    //   cy
+    //     .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+    //     .should('have.class', 'active-link');
+    // });
 
     it('should have the workspaces names list sorted by name', () => {
       cy
@@ -658,68 +658,68 @@ describe('Workspace', () => {
         );
     });
 
-    it('should have info messages when no descriptions', () => {
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-        .find(`.edit-text-btn`)
-        .should('contain', 'Edit')
-        .and('be.visible')
-        .click();
+    // it('should have info messages when no descriptions', () => {
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+    //     .find(`.edit-text-btn`)
+    //     .should('contain', 'Edit')
+    //     .and('be.visible')
+    //     .click();
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-        .should('have.value', `This is short description for the Workspace 0.`)
-        .and('be.enabled');
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+    //     .should('have.value', `This is short description for the Workspace 0.`)
+    //     .and('be.enabled');
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
-        .should(
-          'have.value',
-          `You can import a bus from the container **192.168.0.1:7700** to get a mock bus.`
-        )
-        .and('be.enabled');
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+    //     .should(
+    //       'have.value',
+    //       `You can import a bus from the container **192.168.0.1:7700** to get a mock bus.`
+    //     )
+    //     .and('be.enabled');
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-        .clear()
-        .should('be.empty')
-        .and(
-          'have.attr',
-          'placeholder',
-          `Add short description to the current workspace`
-        )
-        .and('be.enabled');
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+    //     .clear()
+    //     .should('be.empty')
+    //     .and(
+    //       'have.attr',
+    //       'placeholder',
+    //       `Add short description to the current workspace`
+    //     )
+    //     .and('be.enabled');
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
-        .clear()
-        .should('be.empty');
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+    //     .clear()
+    //     .should('be.empty');
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
-        .should('be.enabled')
-        .click();
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+    //     .should('be.enabled')
+    //     .click();
 
-      cy.get('.wrapper-content').scrollTo('top');
+    //   cy.get('.wrapper-content').scrollTo('top');
 
-      cy.expectMessageToBe(
-        `.info-no-short-description`,
-        'info',
-        `This workspace doesn't have any short description.`
-      );
+    //   cy.expectMessageToBe(
+    //     `.info-no-short-description`,
+    //     'info',
+    //     `This workspace doesn't have any short description.`
+    //   );
 
-      cy.expectMessageToBe(
-        `.info-no-description`,
-        'info',
-        `This workspace doesn't have any description.`
-      );
+    //   cy.expectMessageToBe(
+    //     `.info-no-description`,
+    //     'info',
+    //     `This workspace doesn't have any description.`
+    //   );
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-        .find(`.add-text-btn`)
-        .should('contain', 'Add')
-        .and('be.visible');
-    });
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+    //     .find(`.add-text-btn`)
+    //     .should('contain', 'Add')
+    //     .and('be.visible');
+    // });
   });
 
   describe('Buses', () => {
@@ -911,54 +911,54 @@ describe('Workspace', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).should('be.enabled');
     });
 
-    it('should update buses info like buses and services list when attaching bus', () => {
-      cy
-        .get(WORKSPACE_DOM.tabs)
-        .contains(`Services`)
-        .click();
+    // it('should update buses info like buses and services list when attaching bus', () => {
+    //   cy
+    //     .get(WORKSPACE_DOM.tabs)
+    //     .contains(`Services`)
+    //     .click();
 
-      cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+    //   cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
 
-      cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+    //   cy.expectServicesTreeToBe(expectedServicesTreeWks0);
 
-      cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+    //   cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
 
-      cy
-        .get(WORKSPACE_DOM.tabs)
-        .contains(`Petals`)
-        .click();
+    //   cy
+    //     .get(WORKSPACE_DOM.tabs)
+    //     .contains(`Petals`)
+    //     .click();
 
-      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).click();
+    //   cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).click();
 
-      cy.importBusAndCheck(
-        'IMPORT_OK_IP',
-        '7700',
-        'admin',
-        'password',
-        'passphrase',
-        true
-      );
+    //   cy.importBusAndCheck(
+    //     'IMPORT_OK_IP',
+    //     '7700',
+    //     'admin',
+    //     'password',
+    //     'passphrase',
+    //     true
+    //   );
 
-      cy.expectBusListToBe([`Bus 0`, `Bus 2`]);
+    //   cy.expectBusListToBe([`Bus 0`, `Bus 2`]);
 
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus)
-        .contains(`Bus 2`)
-        .click();
+    //   cy
+    //     .get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus)
+    //     .contains(`Bus 2`)
+    //     .click();
 
-      cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus2`);
+    //   cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus2`);
 
-      cy
-        .get(WORKSPACE_DOM.tabs)
-        .contains(`Services`)
-        .click();
+    //   cy
+    //     .get(WORKSPACE_DOM.tabs)
+    //     .contains(`Services`)
+    //     .click();
 
-      cy.expectInterfacesTreeToBe(expectedInterfacesTreeUpdatedWks0);
+    //   cy.expectInterfacesTreeToBe(expectedInterfacesTreeUpdatedWks0);
 
-      cy.expectServicesTreeToBe(expectedServicesTreeUpdatedWks0);
+    //   cy.expectServicesTreeToBe(expectedServicesTreeUpdatedWks0);
 
-      cy.expectEndpointsTreeToBe(expectedEndpointsTreeUpdatedWks0);
-    });
+    //   cy.expectEndpointsTreeToBe(expectedEndpointsTreeUpdatedWks0);
+    // });
 
     it('should show POST import error', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).click();
@@ -1187,61 +1187,61 @@ describe('Workspace', () => {
       cy.expectBusListToBe([`Bus 0`, `Bus 2`]);
     });
 
-    const expectedInterfacesTreeUpdatedWks0 = [
-      `http://namespace-example.fr/interface/technique/version/1.0`,
-      `Interface-Localpart0`,
-      `Interface-Localpart1`,
-      `http://namespace-example.fr/interface/technique/version/2.0`,
-      `Interface-Localpart2`,
-      `http://namespace-example.fr/interface/technique/version/3.0`,
-      `Interface-Localpart3`,
-      `Interface-Localpart4`,
-      `http://namespace-example.fr/interface/technique/version/14.0`,
-      `Interface-Localpart14`,
-      `http://namespace-example.fr/interface/technique/version/15.0`,
-      `Interface-Localpart15`,
-      `http://namespace-example.fr/interface/technique/version/16.0`,
-      `Interface-Localpart16`,
-      `http://namespace-example.fr/interface/technique/version/17.0`,
-      `Interface-Localpart17`,
-      `http://namespace-example.fr/interface/technique/version/18.0`,
-      `Interface-Localpart18`,
-      `http://namespace-example.fr/interface/technique/version/19.0`,
-      `Interface-Localpart19`,
-    ];
+    // const expectedInterfacesTreeUpdatedWks0 = [
+    //   `http://namespace-example.fr/interface/technique/version/1.0`,
+    //   `Interface-Localpart0`,
+    //   `Interface-Localpart1`,
+    //   `http://namespace-example.fr/interface/technique/version/2.0`,
+    //   `Interface-Localpart2`,
+    //   `http://namespace-example.fr/interface/technique/version/3.0`,
+    //   `Interface-Localpart3`,
+    //   `Interface-Localpart4`,
+    //   `http://namespace-example.fr/interface/technique/version/14.0`,
+    //   `Interface-Localpart14`,
+    //   `http://namespace-example.fr/interface/technique/version/15.0`,
+    //   `Interface-Localpart15`,
+    //   `http://namespace-example.fr/interface/technique/version/16.0`,
+    //   `Interface-Localpart16`,
+    //   `http://namespace-example.fr/interface/technique/version/17.0`,
+    //   `Interface-Localpart17`,
+    //   `http://namespace-example.fr/interface/technique/version/18.0`,
+    //   `Interface-Localpart18`,
+    //   `http://namespace-example.fr/interface/technique/version/19.0`,
+    //   `Interface-Localpart19`,
+    // ];
 
-    const expectedServicesTreeUpdatedWks0 = [
-      `http://namespace-example.fr/service/technique/version/1.0`,
-      `Localpart0`,
-      `Localpart1`,
-      `http://namespace-example.fr/service/technique/version/2.0`,
-      `Localpart2`,
-      `http://namespace-example.fr/service/technique/version/3.0`,
-      `Localpart3`,
-      `Localpart4`,
-      `http://namespace-example.fr/service/technique/version/14.0`,
-      `Localpart14`,
-      `http://namespace-example.fr/service/technique/version/15.0`,
-      `Localpart15`,
-      `http://namespace-example.fr/service/technique/version/16.0`,
-      `Localpart16`,
-      `http://namespace-example.fr/service/technique/version/17.0`,
-      `Localpart17`,
-      `http://namespace-example.fr/service/technique/version/18.0`,
-      `Localpart18`,
-      `http://namespace-example.fr/service/technique/version/19.0`,
-      `Localpart19`,
-    ];
+    // const expectedServicesTreeUpdatedWks0 = [
+    //   `http://namespace-example.fr/service/technique/version/1.0`,
+    //   `Localpart0`,
+    //   `Localpart1`,
+    //   `http://namespace-example.fr/service/technique/version/2.0`,
+    //   `Localpart2`,
+    //   `http://namespace-example.fr/service/technique/version/3.0`,
+    //   `Localpart3`,
+    //   `Localpart4`,
+    //   `http://namespace-example.fr/service/technique/version/14.0`,
+    //   `Localpart14`,
+    //   `http://namespace-example.fr/service/technique/version/15.0`,
+    //   `Localpart15`,
+    //   `http://namespace-example.fr/service/technique/version/16.0`,
+    //   `Localpart16`,
+    //   `http://namespace-example.fr/service/technique/version/17.0`,
+    //   `Localpart17`,
+    //   `http://namespace-example.fr/service/technique/version/18.0`,
+    //   `Localpart18`,
+    //   `http://namespace-example.fr/service/technique/version/19.0`,
+    //   `Localpart19`,
+    // ];
 
-    const expectedEndpointsTreeUpdatedWks0 = [
-      `edpt-89p82661-test-31o4-l391-00`,
-      `edpt-89p82661-test-31o4-l391-01`,
-      `edpt-89p82661-test-31o4-l391-02`,
-      `edpt-89p82661-test-31o4-l391-03`,
-      `edpt-89p82661-test-31o4-l391-04`,
-      `edpt-69f52660-test-19e9-a769-14`,
-      `edpt-69f52660-test-19e9-a769-15`,
-    ];
+    // const expectedEndpointsTreeUpdatedWks0 = [
+    //   `edpt-89p82661-test-31o4-l391-00`,
+    //   `edpt-89p82661-test-31o4-l391-01`,
+    //   `edpt-89p82661-test-31o4-l391-02`,
+    //   `edpt-89p82661-test-31o4-l391-03`,
+    //   `edpt-89p82661-test-31o4-l391-04`,
+    //   `edpt-69f52660-test-19e9-a769-14`,
+    //   `edpt-69f52660-test-19e9-a769-15`,
+    // ];
 
     const postImportErrorTroncateTxt = `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec qu...`;
 
