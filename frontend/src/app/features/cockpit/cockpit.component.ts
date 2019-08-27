@@ -37,7 +37,6 @@ import { getCurrentUser } from '@shared/state/users.selectors';
 export class CockpitComponent implements OnInit, OnDestroy {
   user$: Observable<ICurrentUser>;
   isDisconnecting$: Observable<boolean>;
-  isOnWorkspace$: Observable<boolean>;
   workspaceId$: Observable<string>;
   tree$: Observable<WorkspaceElement[]>;
 
@@ -46,9 +45,6 @@ export class CockpitComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
-    );
-    this.isOnWorkspace$ = this.store$.pipe(
-      select(state => !!state.workspaces.selectedWorkspaceId)
     );
     this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTree));
     this.user$ = this.store$.pipe(getCurrentUser);

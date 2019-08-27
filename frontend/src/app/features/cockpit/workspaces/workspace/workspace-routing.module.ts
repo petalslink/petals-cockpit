@@ -18,8 +18,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-// import { NotFound404Component } from '@shared/components/not-found-404/not-found-404.component';
-
 import { WorkspaceOverviewComponent } from '@feat/cockpit/workspaces/workspace-overview/workspace-overview.component';
 import { WorkspaceComponent } from './workspace.component';
 

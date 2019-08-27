@@ -47,8 +47,6 @@ const routes: Routes = [
   },
 ];
 
-export { routes };
-
 @NgModule({
   imports: [
     RouterModule.forChild([

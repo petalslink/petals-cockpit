@@ -658,68 +658,68 @@ describe('Workspace', () => {
         );
     });
 
-    // it('should have info messages when no descriptions', () => {
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-    //     .find(`.edit-text-btn`)
-    //     .should('contain', 'Edit')
-    //     .and('be.visible')
-    //     .click();
+    it('should have info messages when no descriptions', () => {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .find(`.edit-text-btn`)
+        .should('contain', 'Edit')
+        .and('be.visible')
+        .click();
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-    //     .should('have.value', `This is short description for the Workspace 0.`)
-    //     .and('be.enabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+        .should('have.value', `This is short description for the Workspace 0.`)
+        .and('be.enabled');
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
-    //     .should(
-    //       'have.value',
-    //       `You can import a bus from the container **192.168.0.1:7700** to get a mock bus.`
-    //     )
-    //     .and('be.enabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+        .should(
+          'have.value',
+          `You can import a bus from the container **192.168.0.1:7700** to get a mock bus.`
+        )
+        .and('be.enabled');
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-    //     .clear()
-    //     .should('be.empty')
-    //     .and(
-    //       'have.attr',
-    //       'placeholder',
-    //       `Add short description to the current workspace`
-    //     )
-    //     .and('be.enabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+        .clear()
+        .should('be.empty')
+        .and(
+          'have.attr',
+          'placeholder',
+          `Add short description to the current workspace`
+        )
+        .and('be.enabled');
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
-    //     .clear()
-    //     .should('be.empty');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+        .clear()
+        .should('be.empty');
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
-    //     .should('be.enabled')
-    //     .click();
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+        .should('be.enabled')
+        .click();
 
-    //   cy.get('.wrapper-content').scrollTo('top');
+      // cy.get('.wrapper-content').scrollIntoView();
 
-    //   cy.expectMessageToBe(
-    //     `.info-no-short-description`,
-    //     'info',
-    //     `This workspace doesn't have any short description.`
-    //   );
+      cy.expectMessageToBe(
+        `.info-no-short-description`,
+        'info',
+        `This workspace doesn't have any short description.`
+      );
 
-    //   cy.expectMessageToBe(
-    //     `.info-no-description`,
-    //     'info',
-    //     `This workspace doesn't have any description.`
-    //   );
+      cy.expectMessageToBe(
+        `.info-no-description`,
+        'info',
+        `This workspace doesn't have any description.`
+      );
 
-    //   cy
-    //     .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-    //     .find(`.add-text-btn`)
-    //     .should('contain', 'Add')
-    //     .and('be.visible');
-    // });
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .find(`.add-text-btn`)
+        .should('contain', 'Add')
+        .and('be.visible');
+    });
   });
 
   describe('Buses', () => {

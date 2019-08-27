@@ -47,7 +47,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   workspace$: Observable<IWorkspaceRow>;
   isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
-  isOnWorkspace$: Observable<boolean>;
 
   constructor(
     private store$: Store<IStore>,
@@ -59,10 +58,6 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.workspacesIdsNames$ = this.store$.pipe(getWorkspacesIdsNames);
 
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
-
-    this.isOnWorkspace$ = this.store$.pipe(
-      select(state => !!state.workspaces.selectedWorkspaceId)
-    );
 
     this.ui$ = this.store$.pipe(select(state => state.ui));
 

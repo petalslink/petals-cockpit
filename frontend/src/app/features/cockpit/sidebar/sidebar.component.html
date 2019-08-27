@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-icon class="icon-petals icon-x5" svgIcon="petals"></mat-icon>
       </button>
       <button 
-        *ngIf="isOnWorkspace && tree.length" 
+        *ngIf="workspaceId && tree.length" 
         mat-button 
         matTooltip="Topology" 
         matTooltipPosition="right"
@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <fa-icon class="icon-topology icon-x2" icon="network-wired"></fa-icon>
       </button>
       <button 
-        *ngIf="isOnWorkspace && tree.length" 
+        *ngIf="workspaceId && tree.length" 
         mat-button 
         matTooltip="Services" 
         matTooltipPosition="right"

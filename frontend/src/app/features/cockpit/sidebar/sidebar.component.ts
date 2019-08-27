@@ -35,7 +35,6 @@ import { ICurrentUser } from '@shared/state/users.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SidebarComponent implements OnInit {
-  @Input() isOnWorkspace: boolean;
   @Input() user: ICurrentUser;
   @Input() tree: WorkspaceElement[];
   @Input() isDisconnecting: boolean;
