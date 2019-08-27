@@ -53,6 +53,7 @@ Cypress.Commands.add('uploadFile', (fileName, selector) => {
 Cypress.Commands.add('expectMessageToBe', (element, type, message) => {
   cy
     .get(element)
+    .scrollIntoView()
     .should('be.visible')
     .contains(message)
     .parent()

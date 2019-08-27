@@ -40,8 +40,6 @@ export interface ISettings {
 export interface IUi {
   screenSize: ScreenSize;
   settings: ISettings;
-  // workspace
-  isSidenavVisible: boolean;
 }
 
 export const settings: ISettings = {
@@ -50,7 +48,6 @@ export const settings: ISettings = {
 
 export function uiFactory(): IUi {
   return {
-    isSidenavVisible: true,
     settings: settings,
     screenSize: '',
   };

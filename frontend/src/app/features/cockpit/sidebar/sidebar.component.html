@@ -19,6 +19,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <button mat-button disabled class="btn-logo" >
         <mat-icon class="icon-petals icon-x5" svgIcon="petals"></mat-icon>
       </button>
+      <button 
+        *ngIf="workspaceId && tree.length" 
+        mat-button 
+        matTooltip="Topology" 
+        matTooltipPosition="right"
+        routerLinkActive="active"
+        [routerLink]="['/workspaces', workspaceId, 'petals']"
+        class="btn-topology" 
+        >
+        <fa-icon class="icon-topology icon-x2" icon="network-wired"></fa-icon>
+      </button>
+      <button 
+        *ngIf="workspaceId && tree.length" 
+        mat-button 
+        matTooltip="Services" 
+        matTooltipPosition="right"
+        routerLinkActive="active"
+        [routerLink]="['/workspaces', workspaceId, 'services']"
+        class="btn-services" 
+        >
+        <fa-icon class="icon-services icon-x2" icon="cogs"></fa-icon>
+      </button>
     </div>
     
     <div fxFlex fxLayout="column" fxLayoutAlign="end center" class="sidebar-bottom">

@@ -39,7 +39,6 @@ import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
-import { Ui } from '@shared/state/ui.actions';
 import { Users } from '@shared/state/users.actions';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { Components } from '@wks/state/components/components.actions';
@@ -173,7 +172,6 @@ export class WorkspacesEffects {
 
       return batchActions([
         new Workspaces.Clean(),
-        new Ui.OpenSidenav(),
         new Workspaces.FetchSuccess(data.workspace),
         new Users.Fetched(toJsTable(data.users)),
         new Buses.Fetched(toJsTable(data.buses)),

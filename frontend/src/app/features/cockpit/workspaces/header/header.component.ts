@@ -34,7 +34,6 @@ import { IWorkspacesIdsNames } from '@wks/state/workspaces/workspaces.selectors'
 })
 export class HeaderComponent implements OnInit {
   @Input() isLargeScreen: boolean;
-  @Input() isOnWorkspace: boolean;
   @Input() ui: IUi;
   @Input() workspace: IWorkspace;
   @Input() workspacesIdsNames: { list: IWorkspacesIdsNames[] };

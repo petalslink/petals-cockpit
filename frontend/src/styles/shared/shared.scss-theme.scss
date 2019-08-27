@@ -27,6 +27,10 @@
     background-color: mat-color($accent, 500);
   }
 
+  mat-sidenav-container > mat-sidenav.mat-drawer-side {
+    border-right-color: mat-color($mat-grey, 300);
+  }
+
   // all items elements in petals tree
   app-material-tree > .nav-list-tree > .item-list {
     .item-localpart,

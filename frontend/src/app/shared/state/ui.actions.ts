@@ -20,31 +20,6 @@ import { Action } from '@ngrx/store';
 import { ScreenSize } from './ui.interface';
 
 export namespace Ui {
-  export const OpenSidenavType = '[UI] Open sidenav';
-  export class OpenSidenav implements Action {
-    readonly type = OpenSidenavType;
-    constructor() {}
-  }
-
-  export const CloseSidenavType = '[UI] Close sidenav';
-  export class CloseSidenav implements Action {
-    readonly type = CloseSidenavType;
-    constructor() {}
-  }
-
-  export const ToggleSidenavType = '[UI] Toggle sidenav';
-  export class ToggleSidenav implements Action {
-    readonly type = ToggleSidenavType;
-    constructor() {}
-  }
-
-  export const CloseSidenavOnSmallScreenType =
-    '[UI] Close sidenav on small screen';
-  export class CloseSidenavOnSmallScreen implements Action {
-    readonly type = CloseSidenavOnSmallScreenType;
-    constructor() {}
-  }
-
   export const ChangeScreenSizeType = '[UI] Change screen size';
   export class ChangeScreenSize implements Action {
     readonly type = ChangeScreenSizeType;

@@ -14,53 +14,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-header 
-  *ngIf="isOnWorkspace$ | async" 
   [isLargeScreen]="isLargeScreen$ | async" 
-  [isOnWorkspace]="isOnWorkspace$ | async"
   [ui]="ui$ | async" 
   [workspace]="workspace$ | async"
   [workspacesIdsNames]="workspacesIdsNames$ | async"
 ></app-header>
 
-<mat-sidenav-container 
+<div 
   fxLayout="column" 
   fxFlex 
-  (backdropClick)="closeSidenav()" 
-  (disableClose)="true" 
   [style.display]="!(isFetchingWorkspace$ | async) ? null : 'none'"
-  >
-  <mat-sidenav 
-    *ngIf="workspace$ | async as workspace"
-    fxLayout="column"
-    class="workspace-sidenav"
-    mode="side" 
-    opened
-    [disableClose]="true"
-  >
-    <mat-tab-group
-      mat-stretch-tabs
-      fxFlex="0px"
-      [selectedIndex]="retrievedSelectedIndex"
-      (selectedIndexChange)="saveCurrentTab($event)"
-      class="workspace-menu"
-    >
-      <mat-tab label="Petals">
-        <app-petals-menu-view
-          [tree]="tree$ | async"
-          [workspaceId]="workspace.id">
-        </app-petals-menu-view>
-      </mat-tab>
-
-      <mat-tab label="Services">
-        <app-services-menu-view
-          [interfaces]="interfaces$ | async"
-          [services]="services$ | async"
-          [endpoints]="endpoints$ | async"
-          [workspaceId]="workspace.id">
-        </app-services-menu-view>
-      </mat-tab>
-    </mat-tab-group>
-  </mat-sidenav>
-
-  <router-outlet></router-outlet>
-</mat-sidenav-container>
+  class="page-workspace"
+  ><router-outlet></router-outlet></div>

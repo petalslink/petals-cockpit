@@ -14,9 +14,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div class="page-cockpit" fxLayout="column" fxFill>
-
-  <app-sidebar [user]="user$ | async" [isDisconnecting]="isDisconnecting$ | async"></app-sidebar>
+  <app-sidebar 
+    [workspaceId]="workspaceId$ | async" 
+    [tree]="tree$ | async" 
+    [user]="user$ | async" 
+    [isDisconnecting]="isDisconnecting$ | async">
+  </app-sidebar>
 
   <router-outlet></router-outlet>
-  
 </div>

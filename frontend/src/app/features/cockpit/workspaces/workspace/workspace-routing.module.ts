@@ -18,8 +18,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { NotFound404Component } from '@shared/components/not-found-404/not-found-404.component';
-import { WorkspaceOverviewComponent } from '@wks/workspace-overview/workspace-overview.component';
+import { WorkspaceOverviewComponent } from '@feat/cockpit/workspaces/workspace-overview/workspace-overview.component';
 import { WorkspaceComponent } from './workspace.component';
 
 const routes: Routes = [
@@ -33,18 +32,18 @@ const routes: Routes = [
         component: WorkspaceOverviewComponent,
       },
       {
-        path: 'not-found',
-        component: NotFound404Component,
-      },
-      {
         path: 'petals',
         loadChildren:
-          '@wks/petals-content/petals-content.module#PetalsContentModule',
+          '@wks/topology-view/topology-view.module#TopologyViewModule',
       },
       {
         path: 'services',
         loadChildren:
-          '@wks/services-content/services-content.module#ServicesContentModule',
+          '@wks/services-view/services-view.module#ServicesViewModule',
+      },
+      {
+        path: '**',
+        redirectTo: '',
       },
     ],
   },
