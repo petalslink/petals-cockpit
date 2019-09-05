@@ -13,13 +13,83 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="bus$" deletedMessage="This bus has been removed" #we>
+<div *ngIf="workspaceId$ | async as workspaceId" fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+  <div fxFlex class="content">
+    <div fxLayout="column" fxLayoutGap="10px">
+      <mat-card>
+        <mat-card-title class="light-bold">Description</mat-card-title>
+        
+        <mat-card-content fxLayout="column" class="bus-description">
+          <!-- TODO: feat(frontend): get bus description -->
+          <app-message
+            type="info"
+            msg="This topology doesn't have any description."
+            [isClosable]="false"
+            class="info-no-bus-description"
+          ></app-message>
+        </mat-card-content>
+      </mat-card>
 
-  <app-petals-bus-overview
-    *appWorkspaceElementTab="'Overview'"
-    [bus]="we.resource"
-    [workspaceId]="workspaceId$ | async"
-    fxFill
-  ></app-petals-bus-overview>
+      <mat-card fxLayout="column" class="bus-containers margin-top-x1">
+        <mat-card-title fxLayout="row" class="light-bold">Petals Containers</mat-card-title>
 
-</app-workspace-element>
+        <div class="wrapper-table">
+          <mat-progress-bar mode="indeterminate" color="primary" *ngIf="(bus$ | async).isFetchingDetails; else displayBusContainers"></mat-progress-bar>
+  
+          <ng-template #displayBusContainers>
+            <table 
+              mat-table 
+              matSort
+              [dataSource]="dataSource" 
+              [matSortActive]="sortableColumn"
+              [matSortDirection]="sortDirection"
+              matSortDisableClear
+              class="bus-containers-table"
+            >
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="25" fxLayout="row" fxLayoutAlign="start center">Name</th>
+                <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center start" class="cell-name">
+                  <a [routerLink]="['/workspaces', workspaceId, 'petals','containers', container.id]" class="mat-row-link">
+                    <span fxLayout="row" fxLayoutAlign="start center">
+                      <fa-icon class="icon-x2 margin-right-x1" icon="server"></fa-icon>
+                      <span class="container-name">{{ container.name }}</span>
+                    </span>
+                  </a>
+                </td>
+              </ng-container>
+            
+              <!-- IP Column -->
+              <ng-container matColumnDef="ip">
+                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Ip</th>
+                <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center">{{ container.ip }}</td>
+              </ng-container>
+            
+              <!-- Port Column -->
+              <ng-container matColumnDef="port">
+                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Port</th>
+                <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center">{{ container.port }}</td>
+              </ng-container>
+  
+              <!-- Reachable Column -->
+              <ng-container matColumnDef="reachable">
+                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Reachable</th>
+                <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center" class="cell-reachable">
+                  <app-led *ngIf="container.isReachable; else unreachable" color="green" matTooltip="Reachable" matTooltipPosition="after"></app-led>
+                  <ng-template #unreachable>
+                    <app-led color="red" matTooltip="Unreachable" matTooltipPosition="after"></app-led>
+                  </ng-template>
+                </td>
+              </ng-container>
+            
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </ng-template>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>
+  

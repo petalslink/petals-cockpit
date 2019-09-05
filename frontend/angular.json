@@ -31,13 +31,11 @@
             ],
             "styles": [
               "node_modules/material-design-icons-iconfont/dist/material-design-icons.css",
-              "node_modules/swiper/dist/css/swiper.min.css",
               "src/styles.scss"
             ],
             "scripts": [
               "node_modules/jdenticon/dist/jdenticon.min.js",
-              "node_modules/js-md5/build/md5.min.js",
-              "node_modules/swiper/dist/js/swiper.min.js"
+              "node_modules/js-md5/build/md5.min.js"
             ],
             "polyfills": "src/polyfills.ts",
             "optimization": false,
