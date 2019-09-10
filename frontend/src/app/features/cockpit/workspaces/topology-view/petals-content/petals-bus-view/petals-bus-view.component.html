@@ -62,19 +62,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             
               <!-- IP Column -->
               <ng-container matColumnDef="ip">
-                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Ip</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Ip</th>
                 <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center">{{ container.ip }}</td>
               </ng-container>
             
               <!-- Port Column -->
               <ng-container matColumnDef="port">
-                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Port</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Port</th>
                 <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center">{{ container.port }}</td>
               </ng-container>
   
               <!-- Reachable Column -->
               <ng-container matColumnDef="reachable">
-                <th mat-header-cell *matHeaderCellDef fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Reachable</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header fxFlex="25" fxLayout="row" fxLayoutAlign="center center">Reachable</th>
                 <td mat-cell *matCellDef="let container" fxFlex="25" fxLayout="column" fxLayoutAlign="center center" class="cell-reachable">
                   <app-led *ngIf="container.isReachable; else unreachable" color="green" matTooltip="Reachable" matTooltipPosition="after"></app-led>
                   <ng-template #unreachable>

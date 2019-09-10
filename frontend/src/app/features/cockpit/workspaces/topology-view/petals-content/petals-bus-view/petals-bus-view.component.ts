@@ -58,8 +58,21 @@ export class PetalsBusViewComponent implements OnInit {
         if (data) {
           this.dataSource.data = data.containers;
           this.dataSource.sort = this.sort;
+          this.getSortingDataOfReachability();
         }
       })
     );
+  }
+
+  getSortingDataOfReachability() {
+    this.dataSource.sortingDataAccessor = (cont: any, property: string) => {
+      switch (property) {
+        case 'reachable': {
+          return String(cont.isReachable);
+        }
+        default:
+          return cont[property];
+      }
+    };
   }
 }
