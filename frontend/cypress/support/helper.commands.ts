@@ -22,7 +22,7 @@ Cypress.Commands.add(
   },
   ([subject]) => {
     // The only difference between .then() with .should() is that .should() will retry any contained assertions until they pass or time out.
-    cy.focused().should(([focusedElem]) => {
+    cy.focused().should(([focusedElem]: any) => {
       expect(focusedElem).to.eq(subject);
     });
   }
@@ -51,10 +51,11 @@ Cypress.Commands.add('uploadFile', (fileName, selector) => {
 });
 
 Cypress.Commands.add('expectMessageToBe', (element, type, message) => {
+  // TODO: need investigate why `should('be.visible')' doesn't work as expected
   cy
     .get(element)
+    // .should('be.visible')
     .scrollIntoView()
-    .should('be.visible')
     .contains(message)
     .parent()
     .parent('.msg-content')

@@ -45,6 +45,7 @@ import './petals.commands';
 import './service.commands';
 import './services.commands';
 import './setup.commands';
+import './topology.commands';
 import './workspace.commands';
 import './workspaces.commands';
 

@@ -15,151 +15,115 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// import { PETALS_DOM } from '../../support/petals.dom';
-// import { WORKSPACE_DOM } from '../../support/workspace.dom';
+import { TOPOLOGY_DOM } from '../../support/topology.dom';
+import { WORKSPACE_OVERVIEW_DOM } from '../../support/workspace.dom';
 
-// describe('Buses', () => {
-//   beforeEach(() => {
-//     cy.visit(`/login`);
+describe('Buses', () => {
+  beforeEach(() => {
+    cy.visit(`/login`);
 
-//     cy.login('admin', 'admin');
-//   });
+    cy.login('admin', 'admin');
 
-// TODO: add new tests for the list of containers in bus overview.
+    cy.expectLocationToBe(`/workspaces/idWks0`);
 
-// This test is commented because it must be reworked.
-// Deleting or importing a bus will be done from the workspace overview.
-// it('should clean services on bus deletion', () => {
-//   cy.get(PETALS_DOM.buttons.addBus).click();
+    cy.expectBusListToBe([`Bus 0`]);
 
-//   cy.importBusAndCheck(
-//     '192.168.0.1',
-//     '7700',
-//     'admin',
-//     'password',
-//     'passphrase'
-//   );
+    cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus).click();
 
-//   cy
-//     .get(WORKSPACE_DOM.tabs)
-//     .contains(`Services`)
-//     .click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
+  });
 
-//   cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
+  it('should have info message when no description', () => {
+    // TODO: complete this test when 'feat(frontend): get bus description' will be merged
+    cy.expectMessageToBe(
+      `.info-no-bus-description`,
+      'info',
+      `This topology doesn't have any description.`
+    );
+  });
 
-//   cy.expectServicesTreeToBe(expectedServicesTreeWks0);
+  it('should have container list', () => {
+    // expect to have 4 columns
+    cy
+      .get('.bus-containers-table')
+      .find('th')
+      .should('have.length', 4);
 
-//   cy.expectEndpointsTreeToBe(expectedEndpointsTreeWks0);
+    // expect to have 2 containers present on the list
+    cy.get(TOPOLOGY_DOM.table.rowNames).should('have.length', 2);
 
-//   cy
-//     .get(WORKSPACE_DOM.tabs)
-//     .contains(`Petals`)
-//     .click();
+    // expect to have names, ip, port for all containers sorted in asc order
+    cy.expectContainerListToBe(expectedContainerListSortedInAscOrder);
 
-//   cy
-//     .get('.item-name')
-//     .contains('Bus 6')
-//     .click();
+    // expect to have reachable information present for all containers
+    cy
+      .get('.bus-containers-table')
+      .find('app-led')
+      .should('have.length', 2)
+      .and('have.attr', 'color', 'green');
+  });
 
-//   cy.get('.btn-delete-bus').click();
+  it('should navigate to the selected container page from the container list', () => {
+    cy
+      .get('td.cell-name')
+      .find('.mat-row-link')
+      .contains(`Cont 0`)
+      .click({ force: true });
 
-//   cy.get('.btn-confirm-delete-bus').click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
+  });
 
-//   cy
-//     .get(WORKSPACE_DOM.tabs)
-//     .contains(`Services`)
-//     .click();
+  it('should sort container list by name', () => {
+    // expect to have 4 columns
+    cy
+      .get('.bus-containers-table')
+      .find('th')
+      .should('have.length', 4);
 
-//   cy.expectInterfacesTreeToBe(expectedInterfacesTreeUpdatedWks0);
+    // expect to have 2 containers present on the list
+    cy.get(TOPOLOGY_DOM.table.rowNames).should('have.length', 2);
 
-//   cy.expectServicesTreeToBe(expectedServicesTreeUpdatedWks0);
+    // expect to have names, ip, port for all containers sorted in asc order
+    cy.expectContainerListToBe(expectedContainerListSortedInAscOrder);
 
-//   cy.expectEndpointsTreeToBe(expectedEndpointsTreeUpdatedWks0);
-// });
+    cy
+      .get('.bus-containers-table')
+      .find('app-led')
+      .should('have.length', 2)
+      .and('have.attr', 'color', 'green');
 
-// const expectedInterfacesTreeWks0 = [
-//   `http://namespace-example.fr/interface/technique/version/1.0`,
-//   `Interface-Localpart0`,
-//   `Interface-Localpart1`,
-//   `http://namespace-example.fr/interface/technique/version/2.0`,
-//   `Interface-Localpart2`,
-//   `http://namespace-example.fr/interface/technique/version/3.0`,
-//   `Interface-Localpart3`,
-//   `Interface-Localpart4`,
-//   `http://namespace-example.fr/interface/technique/version/14.0`,
-//   `Interface-Localpart14`,
-//   `http://namespace-example.fr/interface/technique/version/15.0`,
-//   `Interface-Localpart15`,
-//   `http://namespace-example.fr/interface/technique/version/16.0`,
-//   `Interface-Localpart16`,
-//   `http://namespace-example.fr/interface/technique/version/17.0`,
-//   `Interface-Localpart17`,
-//   `http://namespace-example.fr/interface/technique/version/18.0`,
-//   `Interface-Localpart18`,
-//   `http://namespace-example.fr/interface/technique/version/19.0`,
-//   `Interface-Localpart19`,
-// ];
+    cy
+      .get('.bus-containers-table')
+      .find(`th>.mat-sort-header-container`)
+      .first()
+      .click({ force: true });
 
-// const expectedServicesTreeWks0 = [
-//   `http://namespace-example.fr/service/technique/version/1.0`,
-//   `Localpart0`,
-//   `Localpart1`,
-//   `http://namespace-example.fr/service/technique/version/2.0`,
-//   `Localpart2`,
-//   `http://namespace-example.fr/service/technique/version/3.0`,
-//   `Localpart3`,
-//   `Localpart4`,
-//   `http://namespace-example.fr/service/technique/version/14.0`,
-//   `Localpart14`,
-//   `http://namespace-example.fr/service/technique/version/15.0`,
-//   `Localpart15`,
-//   `http://namespace-example.fr/service/technique/version/16.0`,
-//   `Localpart16`,
-//   `http://namespace-example.fr/service/technique/version/17.0`,
-//   `Localpart17`,
-//   `http://namespace-example.fr/service/technique/version/18.0`,
-//   `Localpart18`,
-//   `http://namespace-example.fr/service/technique/version/19.0`,
-//   `Localpart19`,
-// ];
+    // expect to have names, ip, port for all containers sorted in desc order
+    cy.expectContainerListToBe(expectedSortContainerListSortedInDescOrder);
 
-// const expectedEndpointsTreeWks0 = [
-//   `edpt-89p82661-test-31o4-l391-00`,
-//   `edpt-89p82661-test-31o4-l391-01`,
-//   `edpt-89p82661-test-31o4-l391-02`,
-//   `edpt-89p82661-test-31o4-l391-03`,
-//   `edpt-89p82661-test-31o4-l391-04`,
-//   `edpt-69f52660-test-19e9-a769-14`,
-//   `edpt-69f52660-test-19e9-a769-15`,
-// ];
+    // expect to have reachable information present for all containers
+    cy
+      .get('.bus-containers-table')
+      .find('app-led')
+      .should('have.length', 2)
+      .and('have.attr', 'color', 'green');
+  });
 
-// const expectedInterfacesTreeUpdatedWks0 = [
-//   `http://namespace-example.fr/interface/technique/version/1.0`,
-//   `Interface-Localpart0`,
-//   `Interface-Localpart1`,
-//   `http://namespace-example.fr/interface/technique/version/2.0`,
-//   `Interface-Localpart2`,
-//   `http://namespace-example.fr/interface/technique/version/3.0`,
-//   `Interface-Localpart3`,
-//   `Interface-Localpart4`,
-// ];
+  const expectedContainerListSortedInAscOrder = [
+    `Cont 0`,
+    `192.168.0.0`,
+    `7700`,
+    `Cont 1`,
+    `192.168.0.1`,
+    `7700`,
+  ];
 
-// const expectedServicesTreeUpdatedWks0 = [
-//   `http://namespace-example.fr/service/technique/version/1.0`,
-//   `Localpart0`,
-//   `Localpart1`,
-//   `http://namespace-example.fr/service/technique/version/2.0`,
-//   `Localpart2`,
-//   `http://namespace-example.fr/service/technique/version/3.0`,
-//   `Localpart3`,
-//   `Localpart4`,
-// ];
-
-// const expectedEndpointsTreeUpdatedWks0 = [
-//   `edpt-89p82661-test-31o4-l391-00`,
-//   `edpt-89p82661-test-31o4-l391-01`,
-//   `edpt-89p82661-test-31o4-l391-02`,
-//   `edpt-89p82661-test-31o4-l391-03`,
-//   `edpt-89p82661-test-31o4-l391-04`,
-// ];
-// });
+  const expectedSortContainerListSortedInDescOrder = [
+    `Cont 1`,
+    `192.168.0.1`,
+    `7700`,
+    `Cont 0`,
+    `192.168.0.0`,
+    `7700`,
+  ];
+});

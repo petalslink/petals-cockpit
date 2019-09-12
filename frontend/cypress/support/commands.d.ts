@@ -96,6 +96,9 @@ declare namespace Cypress {
       shouldCancel?: boolean
     ): any;
 
+    // buses.commands
+    expectContainerListToBe(expectedContainerList: string[]): any;
+
     // menu.commands
     expectWorkspacesListMenuToBe(list: string[]): any;
 

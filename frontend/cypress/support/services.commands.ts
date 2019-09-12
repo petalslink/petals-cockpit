@@ -19,7 +19,6 @@ import { BREADCRUMB_DOM } from './breadcrumb.dom';
 import { COMPONENT_DOM } from './component.dom';
 import { MENU_DOM } from './menu.dom';
 import { SERVICES_TREE_DOM } from './services.dom';
-import { WORKSPACE_DOM } from './workspace.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
 
 Cypress.Commands.add('expectInterfacesTreeToBe', tree => {
@@ -64,9 +63,11 @@ Cypress.Commands.add('clickElementInTree', (expPanel, name) => {
 
 Cypress.Commands.add('triggerSSEForComp', (name, id) => {
   cy
-    .get(WORKSPACE_DOM.tabs)
-    .contains(`Petals`)
+    .get('app-sidebar')
+    .find('.btn-topology')
     .click();
+
+  cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
   cy.getElementInPetalsTree(`component`, name).click();
 
@@ -75,25 +76,29 @@ Cypress.Commands.add('triggerSSEForComp', (name, id) => {
   // TODO: we should check the state of the component when we migrate the component tests made with Protractor
 
   cy
-    .get(WORKSPACE_DOM.tabs)
-    .contains(`Services`)
-    .click();
-
-  cy
     .get(COMPONENT_DOM.tabs)
     .contains(`Operations`)
     .click();
 
   cy.getActionStateInLifecycleComponent(`Stop`).click();
 
+  cy
+    .get('app-sidebar')
+    .find('.btn-services')
+    .click();
+
+  cy.expectLocationToBe(`/workspaces/idWks0/services`);
+
   // TODO: we should check the state of the component when we migrate the component tests made with Protractor
 });
 
 Cypress.Commands.add('triggerSSEForWks', (name, id) => {
   cy
-    .get(WORKSPACE_DOM.tabs)
-    .contains(`Services`)
+    .get('app-sidebar')
+    .find('.btn-services')
     .click();
+
+  cy.expectLocationToBe(`/workspaces/idWks0/services`);
 
   // open menu
   cy
@@ -123,4 +128,11 @@ Cypress.Commands.add('triggerSSEForWks', (name, id) => {
 
   // expect to have workspace name
   cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 1');
+
+  cy
+    .get('app-sidebar')
+    .find('.btn-services')
+    .click();
+
+  cy.expectLocationToBe(`/workspaces/idWks1/services`);
 });

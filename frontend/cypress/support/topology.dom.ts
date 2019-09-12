@@ -15,32 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-describe('Shared Library', () => {
-  beforeEach(() => {
-    cy.visit(`/login`);
+// base selector
+const bs = `app-petals-bus-view`;
 
-    cy.login('admin', 'admin');
-
-    cy.expectLocationToBe(`/workspaces/idWks0`);
-
-    cy
-      .get('app-sidebar')
-      .find('.btn-topology')
-      .click();
-
-    cy.expectLocationToBe(`/workspaces/idWks0/petals`);
-  });
-
-  it('should show name and version in overview', () => {
-    cy
-      .get('.mat-list-item-content')
-      .contains('SL 0')
-      .click();
-
-    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
-
-    cy.get('.workspace-element .title').should('contain', 'SL 0');
-
-    cy.get('.workspace-element .sl-version').should('contain', '1.0.0');
-  });
-});
+export const TOPOLOGY_DOM = {
+  table: {
+    rowNames: `${bs} .mat-row`,
+  },
+  texts: {
+    containerNames: `${bs} .container-name`,
+  },
+};
