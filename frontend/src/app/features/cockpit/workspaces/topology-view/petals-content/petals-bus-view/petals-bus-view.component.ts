@@ -15,15 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { MatSort } from '@angular/material/sort';
+import { IContainerRow } from '@feat/cockpit/workspaces/state/containers/containers.interface';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentBus,
   IBusWithContainers,
 } from '@wks/state/buses/buses.selectors';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-bus-view',
@@ -31,8 +35,15 @@ import {
   styleUrls: ['./petals-bus-view.component.scss'],
 })
 export class PetalsBusViewComponent implements OnInit {
-  public workspaceId$: Observable<string>;
-  public bus$: Observable<IBusWithContainers>;
+  workspaceId$: Observable<string>;
+  bus$: Observable<IBusWithContainers>;
+
+  dataSource = new MatTableDataSource<IContainerRow>([]);
+  displayedColumns: string[] = ['name', 'ip', 'port', 'reachable'];
+  sortDirection = 'asc';
+  sortableColumn = 'name';
+
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -41,6 +52,27 @@ export class PetalsBusViewComponent implements OnInit {
       select(state => state.workspaces.selectedWorkspaceId)
     );
 
-    this.bus$ = this.store$.pipe(select(getCurrentBus));
+    this.bus$ = this.store$.pipe(
+      select(getCurrentBus),
+      tap(data => {
+        if (data) {
+          this.dataSource.data = data.containers;
+          this.dataSource.sort = this.sort;
+          this.getSortingDataOfReachability();
+        }
+      })
+    );
+  }
+
+  getSortingDataOfReachability() {
+    this.dataSource.sortingDataAccessor = (cont: any, property: string) => {
+      switch (property) {
+        case 'reachable': {
+          return String(cont.isReachable);
+        }
+        default:
+          return cont[property];
+      }
+    };
   }
 }

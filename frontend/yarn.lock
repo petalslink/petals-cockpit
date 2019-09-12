@@ -577,10 +577,6 @@
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-7.0.0.tgz#84e707e157ec17d3e4c2a137f41fc3f416c0551e"
 
-"@types/swiper@^3.4.4":
-  version "3.4.7"
-  resolved "https://registry.yarnpkg.com/@types/swiper/-/swiper-3.4.7.tgz#45eb676328208883dca9247a7efc46720394d952"
-
 "@types/uuid@3.4.3":
   version "3.4.3"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-3.4.3.tgz#121ace265f5569ce40f4f6d0ff78a338c732a754"
@@ -834,12 +830,6 @@ amqplib@^0.5.2:
 angular2-notifications@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/angular2-notifications/-/angular2-notifications-1.0.2.tgz#93b6c6838dc582c3838d46d03a21adc333056059"
-
-angular2-useful-swiper@5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/angular2-useful-swiper/-/angular2-useful-swiper-5.0.1.tgz#fc87fe59cb1129b8175004aa4fa239e5f5da35f0"
-  dependencies:
-    "@types/swiper" "^3.4.4"
 
 ansi-escapes@^1.0.0:
   version "1.4.0"
@@ -3050,12 +3040,6 @@ dom-serializer@0:
   dependencies:
     domelementtype "~1.1.1"
     entities "~1.1.1"
-
-dom7@^2.0.1:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/dom7/-/dom7-2.0.6.tgz#ea9f187de68635783cd5985fde52842763632903"
-  dependencies:
-    ssr-window "^1.0.0"
 
 domain-browser@^1.1.1:
   version "1.2.0"
@@ -8794,10 +8778,6 @@ sshpk@^1.7.0:
     jsbn "~0.1.0"
     tweetnacl "~0.14.0"
 
-ssr-window@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/ssr-window/-/ssr-window-1.0.0.tgz#8ed1b6beaa0a371ba7e74d6515d584c3f1cf973c"
-
 ssri@^5.2.4:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/ssri/-/ssri-5.3.0.tgz#ba3872c9c6d33a0704a7d71ff045e5ec48999d06"
@@ -9039,12 +9019,6 @@ supports-color@^5.1.0, supports-color@^5.3.0, supports-color@^5.4.0:
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.4.0.tgz#1c6b337402c2137605efe19f10fec390f6faab54"
   dependencies:
     has-flag "^3.0.0"
-
-swiper@4.0.7:
-  version "4.0.7"
-  resolved "https://registry.yarnpkg.com/swiper/-/swiper-4.0.7.tgz#89175c2a23d86622eda8344740c24a3701a6b270"
-  dependencies:
-    dom7 "^2.0.1"
 
 symbol-observable@^1.1.0, symbol-observable@^1.2.0:
   version "1.2.0"

@@ -16,37 +16,36 @@
  */
 
 // all types of leds
-@mixin led($bg, $shadow1, $shadow2) {
+@mixin led($bg) {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background-color: $bg;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 -1px 3px 1px, inset $shadow1 0 -1px 3px,
-    $shadow2 0 1px 3px;
 }
 
+// material palette color: 400
 .led {
   &.green {
-    @include led(#abff00, #304701, #89ff00);
+    @include led(#66bb6a);
   }
 
   &.red {
-    @include led(#f00, #441313, rgba(255, 0, 0, 0.5));
+    @include led(#ef5350);
   }
 
   &.yellow {
-    @include led(#ff0, #808002, #ff0);
+    @include led(#ffee58);
   }
 
   &.grey {
-    @include led(#ddd, #444, #ddd);
+    @include led(#bdbdbd);
   }
 
   &.black {
-    @include led(#000000, #ddd, #ddd);
+    @include led(#000000);
   }
 
   &.white {
-    @include led(#ddd, #ddd, #000000);
+    @include led(#fff);
   }
 }

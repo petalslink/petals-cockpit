@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,19 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+@mixin custom-bus-view-theme($theme) {
+  $primary: map-get($theme, primary);
 
-import { PetalsBusViewComponent } from './petals-bus-view.component';
+  td > a.mat-row-link {
+    color: mat-color($primary, 700);
+  }
 
-const routes: Routes = [
-  {
-    path: '',
-    component: PetalsBusViewComponent,
-  },
-];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-})
-export class PetalsBusViewRoutingModule {}
+  .mat-row:hover {
+    background-color: mat-color($mat-grey, 200);
+  }
+}

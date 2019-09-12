@@ -14,3 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+:host {
+  height: 100%;
+  overflow: auto;
+}
+
+table.bus-containers-table {
+  width: 100%;
+  min-width: 500px;
+}
+
+.wrapper-table {
+  overflow-x: scroll;
+}
+
+.mat-card-title {
+  font-size: 16px;
+}
+
+td > a.mat-row-link {
+  text-decoration: none;
+}
