@@ -34,11 +34,11 @@ describe(`Workspaces`, () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
+
+    cy.expectLocationToBe('/workspaces/idWks0');
   });
 
   it(`should not show the header in workspaces view`, () => {
-    cy.expectLocationToBe('/workspaces/idWks0');
-
     // expect to have header and nav visible
     cy.get(HEADER_DOM.toolbar).should('be.visible');
     cy.get(BREADCRUMB_DOM.nav).should('be.visible');
@@ -288,8 +288,6 @@ describe(`Workspaces`, () => {
   });
 
   it('should display message when there is only one workspace in the list', () => {
-    cy.expectLocationToBe('/workspaces/idWks0');
-
     cy.openDialogToDeleteWks();
 
     cy.deleteWks();
@@ -304,8 +302,6 @@ describe(`Workspaces`, () => {
   });
 
   it('should display empty list message when there are no workspaces', () => {
-    cy.expectLocationToBe('/workspaces/idWks0');
-
     cy.openDialogToDeleteWks();
 
     cy.deleteWks();
@@ -422,8 +418,6 @@ describe(`Workspaces`, () => {
   });
 
   it(`should not reopen the workspace list after logout and re-login`, () => {
-    cy.expectLocationToBe('/workspaces/idWks0');
-
     // open menu
     cy
       .get(MENU_DOM.buttons.toggleMenu)

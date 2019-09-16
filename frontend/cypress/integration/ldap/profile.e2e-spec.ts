@@ -26,11 +26,11 @@ describe(`Profile`, () => {
     cy.login('admin', 'admin');
 
     cy.get(PETALS_COCKPIT_DOM.buttons.goToProfilePage).click();
+
+    cy.expectLocationToBe(`/profile`);
   });
 
   it(`should open the profile page`, () => {
-    cy.expectLocationToBe(`/profile`);
-
     // check if the name of current user is displayed in toolbar
     cy
       .get(`mat-toolbar`)
@@ -40,8 +40,6 @@ describe(`Profile`, () => {
   });
 
   it(`should navigate to the workspaces page from the menu profile`, () => {
-    cy.expectLocationToBe(`/profile`);
-
     // open menu
     cy
       .get(MENU_DOM.buttons.toggleMenu)
