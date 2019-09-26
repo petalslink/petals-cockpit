@@ -33,19 +33,13 @@ export function buildVisNetworkData(container: IContainerWithSiblings) {
 function node(container: IContainerRow) {
   return (currentContainer: IContainerRow) => ({
     id: currentContainer.id,
-    label: currentContainer.name,
+    label:
+      currentContainer.name +
+      '\n' +
+      currentContainer.ip +
+      ':' +
+      currentContainer.port,
     fixed: true,
-    title: `
-      <b>IP :</b>
-      <span class="ip">
-        ${currentContainer.ip}
-      </span><br>
-
-      <b>Port :</b>
-      <span class="port">
-        ${currentContainer.port}
-      </span>
-    `,
     image: currentContainer.isReachable
       ? 'assets/img/network-container.png'
       : 'assets/img/network-container-no-reachable.png',
@@ -96,6 +90,7 @@ export const containerNetworkOptions: VisNetworkOptions = {
       align: 'top',
     },
     color: 'gray', // default
+    labelHighlightBold: true,
     shadow: true,
     smooth: {
       enabled: true,

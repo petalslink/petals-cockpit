@@ -14,15 +14,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-workspace-element [resourceObservable]="container$" deletedMessage="This container has been removed" #we>
-  <!-- within ngIf we also check the ip otherwise the message
-  is shown and hidden during a little time for reachable containers -->
-  <app-message
-    appWorkspaceElementHeaderExtra
-    *ngIf="!!we.resource.ip && !we.resource.isReachable"
-    type="warning"
-    [isClosable]="false"
-    msg="Unreachable"
-  ></app-message>
 
   <app-petals-container-overview
     *appWorkspaceElementTab="'Overview'"

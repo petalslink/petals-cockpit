@@ -23,7 +23,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
 
 import {
   VisEdges,
@@ -32,11 +31,9 @@ import {
   VisNetworkService,
   VisNodes,
 } from 'ngx-vis';
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, filter, map, takeUntil, tap } from 'rxjs/operators';
 
-import { IStore } from '@shared/state/store.interface';
-import { isLargeScreen } from '@shared/state/ui.selectors';
 import { IContainerRow } from '@wks/state/containers/containers.interface';
 import { IContainerWithSiblings } from '@wks/state/containers/containers.selectors';
 import {
@@ -57,7 +54,6 @@ class NetworkData implements VisNetworkData {
 export class PetalsContainerOverviewComponent
   implements OnInit, OnDestroy, OnChanges {
   private onDestroy$ = new Subject<void>();
-  public btnByScreenSize$: Observable<string>;
 
   @Input() container: IContainerWithSiblings;
   @Input() workspaceId: string;
@@ -67,10 +63,7 @@ export class PetalsContainerOverviewComponent
   visNetworkOptions: VisNetworkOptions = containerNetworkOptions;
   selectedContainer: IContainerRow;
 
-  constructor(
-    private visNetworkService: VisNetworkService,
-    private store$: Store<IStore>
-  ) {}
+  constructor(private visNetworkService: VisNetworkService) {}
 
   ngOnChanges(_changes: SimpleChanges) {
     if (this.container && this.container.reachabilities.length > 0) {
@@ -94,11 +87,6 @@ export class PetalsContainerOverviewComponent
         })
       )
       .subscribe();
-
-    this.btnByScreenSize$ = this.store$.pipe(
-      isLargeScreen,
-      map(ls => (ls ? `mat-raised-button` : `mat-mini-fab`))
-    );
   }
 
   networkInitialized() {
