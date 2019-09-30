@@ -76,9 +76,14 @@ export class Bus extends BusBase {
   constructor(workspace: Workspace) {
     super(workspace);
 
-    // by default add 2 containers
-    this.addContainer();
-    this.addContainer();
+    // workspace called 'Min Workspace' should contain only 1 bus and 1 container
+    if (workspace.name === 'Min Workspace') {
+      this.addContainer();
+    } else {
+      // by default add 2 containers
+      this.addContainer();
+      this.addContainer();
+    }
   }
 
   getContainers() {
