@@ -19,25 +19,17 @@ import { NgModule } from '@angular/core';
 import { VisModule } from 'ngx-vis';
 
 import { SharedModule } from '@shared/shared.module';
-import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
 
-import { PetalsContainerOperationsComponent } from './petals-container-operations/petals-container-operations.component';
-import { SharedLibrariesOverrideComponent } from './petals-container-operations/shared-libraries-override/shared-libraries-override.component';
-import { PetalsContainerOverviewComponent } from './petals-container-overview/petals-container-overview.component';
+import { ArtifactsDeploymentComponent } from './artifacts-deployment/artifacts-deployment.component';
+import { SharedLibrariesOverrideComponent } from './artifacts-deployment/shared-libraries-override/shared-libraries-override.component';
 import { PetalsContainerViewComponent } from './petals-container-view.component';
 
 @NgModule({
-  imports: [
-    SharedModule,
-    PetalsContainerViewRoutingModule,
-    VisModule,
-    WorkspaceSharedModule,
-  ],
+  imports: [SharedModule, PetalsContainerViewRoutingModule, VisModule],
   declarations: [
     PetalsContainerViewComponent,
-    PetalsContainerOverviewComponent,
-    PetalsContainerOperationsComponent,
+    ArtifactsDeploymentComponent,
     SharedLibrariesOverrideComponent,
   ],
 })

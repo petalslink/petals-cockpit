@@ -18,12 +18,11 @@
 import { NgModule } from '@angular/core';
 
 import { SharedModule } from '@shared/shared.module';
-import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsBusViewRoutingModule } from './petals-bus-view-routing.module';
 import { PetalsBusViewComponent } from './petals-bus-view.component';
 
 @NgModule({
-  imports: [SharedModule, WorkspaceSharedModule, PetalsBusViewRoutingModule],
+  imports: [SharedModule, PetalsBusViewRoutingModule],
   declarations: [PetalsBusViewComponent],
 })
 export class PetalsBusViewModule {}

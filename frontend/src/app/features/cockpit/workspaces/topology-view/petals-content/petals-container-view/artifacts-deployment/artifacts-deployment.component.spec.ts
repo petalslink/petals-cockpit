@@ -39,15 +39,15 @@ import {
 import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
 import { SharedLibrariesService } from '@shared/services/shared-libraries.service';
 import { metaReducers, reducers } from '@shared/state/root.reducer';
-import { PetalsContainerOperationsComponent } from './petals-container-operations.component';
+import { ArtifactsDeploymentComponent } from './artifacts-deployment.component';
 
-describe(`Petals container operations`, () => {
-  let pcoFixture: ComponentFixture<PetalsContainerOperationsComponent>;
-  let pcoComponent: PetalsContainerOperationsComponent;
+describe(`Artifacts deployment`, () => {
+  let pcoFixture: ComponentFixture<ArtifactsDeploymentComponent>;
+  let pcoComponent: ArtifactsDeploymentComponent;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [PetalsContainerOperationsComponent],
+      declarations: [ArtifactsDeploymentComponent],
       imports: [
         StoreModule.forRoot(reducers, {
           metaReducers,
@@ -76,7 +76,7 @@ describe(`Petals container operations`, () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
 
-    pcoFixture = TestBed.createComponent(PetalsContainerOperationsComponent);
+    pcoFixture = TestBed.createComponent(ArtifactsDeploymentComponent);
     pcoComponent = pcoFixture.componentInstance;
     pcoComponent.sharedLibrariesByNameAndVersion = {
       '{"name":"sl 0","version":"1.0.0"}': true,

@@ -15,46 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.mat-card-title {
-  font-size: 16px;
+mat-list[dense] {
+  padding-top: 0;
 }
 
-.container-system-info {
-  white-space: pre-line;
+.item-list > .mat-list-item {
+  height: 24px;
 }
 
-.container-infos {
-  padding: 24px;
+.sl-version {
+  margin-left: 10px;
+  font-weight: bold;
 }
 
-.network-canvas {
-  width: 100%;
-  height: 100%;
-}
-
-.loading-graph {
-  align-items: center;
-  justify-content: center;
-}
-
-.title-containers-wrapper {
-  border-bottom-width: 0.5px;
-  border-bottom-style: solid;
-  .title-containers {
-    margin: 24px 0 24px 24px;
-  }
-}
-
-.flex-100 {
-  flex-direction: row;
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 0%;
-}
-
-.flex-35 {
-  flex-direction: row;
-  box-sizing: border-box;
-  display: flex;
-  flex: 0 1 35%;
+.wrapper-artifact-deployment {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: minmax(100px, auto);
+  grid-column-gap: 10px;
 }
