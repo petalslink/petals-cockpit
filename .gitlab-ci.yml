@@ -45,7 +45,8 @@ variables:
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
-    - yarn run webdriver-manager update --versions.chrome=2.45
+    - yarn run webdriver-manager update --versions.chrome=73.0.3683.68
+    - ./node_modules/protractor/bin/webdriver-manager update --versions.chrome=73.0.3683.68
     - du -hs node_modules || true
     - cd ..
   cache:
