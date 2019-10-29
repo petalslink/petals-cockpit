@@ -13,27 +13,22 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+<div fxLayout="column" fxFill class="wrapper-content mat-typography">
   <div fxLayout="column" class="content">
-    <div *ngIf="container$ | async as container" fxLayout="column" fxLayout.gt-md="row" fxLayoutGap="10px" fxFlex>
+    <div *ngIf="container$ | async as container" fxLayout="column" fxLayoutGap="20px" fxFlex>
 
       <mat-card 
-        [ngClass.gt-md]="{
-          'flex-100': container.isReachable && container.reachabilities.length, 
-          'flex-35': !container.isReachable && !container.reachabilities.length
-        }"
-        class="margin-x0 padding-x0"
+        fxLayout="column"
+        fxFlex
+        [fxFlex.gt-md]="container.isReachable && container.reachabilities.length ? '100' : '35'"
+        class="padding-x0 card-container-reachabilities"
       >
         <div fxLayout="column" fxLayout.gt-md="row" fxFlexFill>
           <div 
             fxLayout="column" 
-            ngClass="flex-35"
-            [ngClass.gt-md]="{
-              'flex-100': !container.isReachable && !container.reachabilities.length, 
-              'flex-35': container.isReachable && container.reachabilities.length
-            }"
+            [fxFlex.gt-md]="!container.isReachable && !container.reachabilities.length ? '100' : '35'"
             class="container-infos"
-          >
+            >
             <div class="title-about-wrapper">
               <mat-card-title class="light-bold title-about">About {{ container.name }}</mat-card-title>
             </div>
@@ -110,10 +105,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </div>
       </mat-card>
-    </div>
 
-    <div fxLayout="column" class="margin-top-x1">
-      <app-artifacts-deployment     
+      <app-artifacts-deployment
         [container]="container$ | async"
         [componentsByName]="componentsOfCurrentContainerByName$ | async"
         [sharedLibrariesByNameAndVersion]="sharedLibrariesOfCurrentContainerByNameAndVersion$ | async"

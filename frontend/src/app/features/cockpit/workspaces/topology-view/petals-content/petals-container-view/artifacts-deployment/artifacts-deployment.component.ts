@@ -23,7 +23,6 @@ import {
   OnInit,
   SimpleChange,
   SimpleChanges,
-  TemplateRef,
   ViewChild,
 } from '@angular/core';
 import {
@@ -34,9 +33,11 @@ import {
   FormGroupDirective,
   NgForm,
   ValidatorFn,
+  Validators,
 } from '@angular/forms';
 
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
 import { Actions, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -44,7 +45,6 @@ import { EMPTY, Subject } from 'rxjs';
 import {
   catchError,
   filter,
-  map,
   switchMap,
   take,
   takeUntil,
@@ -53,21 +53,23 @@ import {
 import { v4 as uuid } from 'uuid';
 
 import { ErrorStateMatcher } from '@angular/material/core';
-import { UploadComponent } from '@shared/components/upload/upload.component';
-import { ComponentsService } from '@shared/services/components.service';
+import {
+  SnackBarDeploymentProgressComponent,
+  UploadComponent,
+} from '@shared/components/upload/upload.component';
+import {
+  ContainersService,
+  IArtifactInformations,
+} from '@shared/services/containers.service';
 import {
   HttpProgress,
   HttpProgressType,
 } from '@shared/services/http-progress-tracker.service';
-import { ServiceAssembliesService } from '@shared/services/service-assemblies.service';
-import { SharedLibrariesService } from '@shared/services/shared-libraries.service';
 import { IStore } from '@shared/state/store.interface';
 import { SharedValidator } from '@shared/validators/shared.validator';
-
 import { Containers } from '@wks/state/containers/containers.actions';
 import { IContainerRow } from '@wks/state/containers/containers.interface';
 import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
-import { SharedLibrariesOverrideComponent } from './shared-libraries-override/shared-libraries-override.component';
 
 @Component({
   selector: 'app-artifacts-deployment',
@@ -75,10 +77,18 @@ import { SharedLibrariesOverrideComponent } from './shared-libraries-override/sh
   styleUrls: ['./artifacts-deployment.component.scss'],
 })
 export class ArtifactsDeploymentComponent
-  implements OnInit, OnChanges, OnDestroy {
+  implements OnInit, OnDestroy, OnChanges {
   private onDestroy$ = new Subject<void>();
+  private percentage$ = new Subject<number>();
+
+  // should not be used on template
+  // not edit by default
+  private _currentSlBeingEdited = -1;
+
+  private snackRef: MatSnackBarRef<SnackBarDeploymentProgressComponent>;
 
   @Input() container: IContainerRow;
+
   @Input()
   componentsByName: {
     [name: string]: boolean;
@@ -92,17 +102,40 @@ export class ArtifactsDeploymentComponent
     [name: string]: boolean;
   };
 
-  overrideSlDialog: MatDialogRef<any>;
-  @ViewChild('overrideSlTemplate') overrideSlModal: TemplateRef<any>;
-  @ViewChild('slOverrideComp') slOverrideComp: SharedLibrariesOverrideComponent;
+  get currentSlBeingEdited(): number {
+    return this._currentSlBeingEdited;
+  }
 
-  @ViewChild('deployComponent') deployComponent: UploadComponent;
-  @ViewChild('deployServiceAssembly') deployServiceAssembly: UploadComponent;
-  @ViewChild('deploySharedLibrary') deploySharedLibrary: UploadComponent;
+  set currentSlBeingEdited(newSl: number) {
+    this._currentSlBeingEdited = newSl;
+    this.updateArtifactCompNameFieldStatus();
+  }
+
+  @ViewChild('deployArtifact') deployArtifact: UploadComponent;
 
   updateComponentDeployInfoFormGroup: FormGroup;
   updateServiceAssemblyDeployInfoFormGroup: FormGroup;
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
+
+  compErrorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (
+      control: FormControl,
+      form: FormGroupDirective | NgForm
+    ): boolean =>
+      this.updateComponentDeployInfoFormGroup
+        .get('name')
+        .hasError('isKeyPresentInObject'),
+  };
+
+  saErrorStateMatcher: ErrorStateMatcher = {
+    isErrorState: (
+      control: FormControl,
+      form: FormGroupDirective | NgForm
+    ): boolean =>
+      this.updateServiceAssemblyDeployInfoFormGroup
+        .get('name')
+        .hasError('isKeyPresentInObject'),
+  };
 
   slErrorStateMatcher: ErrorStateMatcher = {
     isErrorState: (
@@ -114,62 +147,47 @@ export class ArtifactsDeploymentComponent
       ),
   };
 
-  isUploadingComponent: boolean;
-  uploadComponentStatus: {
-    percentage: number;
-  };
-  uploadServiceAssemblyStatus: {
-    percentage: number;
-  };
-  uploadSharedLibraryStatus: {
-    percentage: number;
-  };
+  dataSource: MatTableDataSource<ISharedLibrarySimplified> | null;
+  displayedColumns: string[] = ['name', 'version', 'status', 'actions'];
 
-  cpNameReadFromZip: string;
-  saNameReadFromZip: string;
-  slNameReadFromZip: string;
-  slVersionReadFromZip: string;
+  canFocus = true;
+  isFileParsed = false;
 
-  slsInfoReadFromZip: ISharedLibrarySimplified[] = null;
   slIsInCurrentContainer: boolean[] = null;
-  nbSlsReadFromZipNotInContainer: number;
-  overrideSl: boolean;
+
+  currentSl: { name: string; version: string };
+
+  artifactUploadProgress: {
+    percentage: number;
+  };
+
+  countSlsNotInContainer: number;
+
+  artifact: IArtifactInformations = { name: '', version: '', type: '' };
 
   constructor(
     private fb: FormBuilder,
     private store$: Store<IStore>,
     private actions$: Actions,
     private notifications: NotificationsService,
-    private componentsService: ComponentsService,
-    private sharedLibrariesService: SharedLibrariesService,
-    private serviceAssembliesService: ServiceAssembliesService,
-    private matDialogService: MatDialog
+    private containersService: ContainersService,
+    private snackBar: MatSnackBar
   ) {}
-
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
-  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (hasContainerIdChanged(changes.container)) {
-      this.deployComponent.reset();
-      this.deployServiceAssembly.reset();
-      this.deploySharedLibrary.reset();
-
-      this.uploadComponentStatus = undefined;
-      this.uploadServiceAssemblyStatus = undefined;
-      this.uploadSharedLibraryStatus = undefined;
+      this.deployArtifact.reset();
     }
   }
 
   ngOnInit() {
-    this.overrideSl = false;
     this.updateComponentDeployInfoFormGroup = this.fb.group({
       name: [
         '',
         [SharedValidator.isKeyPresentInObject(() => this.componentsByName)],
       ],
+      slName: ['', Validators.required],
+      slVersion: ['', Validators.required],
     });
 
     this.updateSharedLibraryDeployInfoFormGroup = this.fb.group(
@@ -192,193 +210,218 @@ export class ArtifactsDeploymentComponent
     });
   }
 
-  updateSlsInfoReadFromZip(
-    sharedLibraries: ISharedLibrarySimplified[],
-    override: boolean
-  ) {
-    this.slsInfoReadFromZip = [...sharedLibraries];
-    this.slIsInCurrentContainer = sharedLibraries.map(
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
+
+  getTitle() {
+    if (!this.isFileParsed) {
+      return 'Artifact Deployment';
+    }
+    switch (this.artifact.type) {
+      case 'component':
+        return 'Component Deployment';
+      case 'service-assembly':
+        return 'Service Assembly Deployment';
+      case 'shared-library':
+        return 'Shared Library Deployment';
+    }
+  }
+
+  updateArtifactCompNameFieldStatus() {
+    if (this.isEditingSl()) {
+      this.updateComponentDeployInfoFormGroup.get('name').disable();
+      this.canFocus = false;
+    } else {
+      this.updateComponentDeployInfoFormGroup.get('name').enable();
+      this.canFocus = true;
+    }
+  }
+
+  isEditingSl() {
+    return this.currentSlBeingEdited !== -1;
+  }
+
+  updateSlsStatus() {
+    this.slIsInCurrentContainer = this.dataSource.data.map(
       sl =>
         !!this.sharedLibrariesByNameAndVersion[JSON.stringify(sl).toLowerCase()]
     );
-    this.nbSlsReadFromZipNotInContainer = this.slIsInCurrentContainer.filter(
+    this.countSlsNotInContainer = this.slIsInCurrentContainer.filter(
       is => !is
     ).length;
-
-    if (override) {
-      this.overrideSl = true;
-    }
+    this.clearSlValidators();
   }
 
-  fileSelected(
-    type: 'component' | 'service-assembly' | 'shared-library',
-    file: File
-  ) {
-    switch (type) {
-      case 'component': {
-        // when using mat-error with material, if there's an error it'll be display
-        // only when the control is set to touched and thus we won't have a
-        // "real time" feedback, especially when there's only one input
-        this.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
+  fileSelected(file: File) {
+    this.containersService
+      .getArtifactFromZipFile(file)
+      .pipe(
+        takeUntil(this.onDestroy$),
+        tap(artifactFromZip => {
+          this.artifact = artifactFromZip;
 
-        // reset the following in case the user selects a file and then cancel
-        // otherwise we would still have a bad nbSlsReadFromZipNotInContainer
-        // and and a bad slsInfoReadFromZip IF the reading from zip fails
-        this.nbSlsReadFromZipNotInContainer = null;
-        this.slsInfoReadFromZip = null;
-
-        this.componentsService
-          .getComponentInformationFromZipFile(file)
-          .pipe(
-            takeUntil(this.onDestroy$),
-            tap(componentFromZip => {
-              this.cpNameReadFromZip = componentFromZip.name;
+          switch (artifactFromZip.type) {
+            case 'component':
+              // when using mat-error with material, if there's an error it'll be display
+              // only when the control is set to touched and thus we won't have a
+              // "real time" feedback, especially when there's only one input
               this.updateComponentDeployInfoFormGroup
                 .get('name')
-                .setValue(componentFromZip.name);
+                .markAsTouched();
 
-              this.updateSlsInfoReadFromZip(
-                componentFromZip.sharedLibraries,
-                false
-              );
-            }),
-            catchError(err => {
-              this.notifications.warn(
-                'File error',
-                `An error occurred while trying to read the component name from this zip file`
-              );
+              this.updateComponentDeployInfoFormGroup
+                .get('name')
+                .setValue(artifactFromZip.name);
 
-              return EMPTY;
-            })
-          )
-          .subscribe();
-        break;
-      }
+              this.countSlsNotInContainer = null;
+              this.slIsInCurrentContainer = null;
 
-      case 'service-assembly': {
-        this.updateServiceAssemblyDeployInfoFormGroup
-          .get('name')
-          .markAsTouched();
+              this.dataSource = new MatTableDataSource<
+                ISharedLibrarySimplified
+              >(artifactFromZip.sharedLibraries);
 
-        this.serviceAssembliesService
-          .getServiceAssemblyNameFromZipFile(file)
-          .pipe(
-            takeUntil(this.onDestroy$),
-            tap(serviceAssemblyFromZip => {
-              this.saNameReadFromZip = serviceAssemblyFromZip;
+              this.updateSlsStatus();
+
+              this.updateComponentDeployInfoFormGroup.setValue({
+                name: this.artifact.name,
+                slName: null,
+                slVersion: null,
+              });
+
+              this.isFileParsed = true;
+              break;
+            case 'service-assembly':
               this.updateServiceAssemblyDeployInfoFormGroup
                 .get('name')
-                .setValue(serviceAssemblyFromZip);
-            }),
-            catchError(err => {
-              this.notifications.warn(
-                'File error',
-                `An error occurred while trying to read the service assembly name from this zip file`
+                .markAsTouched();
+
+              this.updateServiceAssemblyDeployInfoFormGroup
+                .get('name')
+                .setValue(artifactFromZip.name);
+
+              this.isFileParsed = true;
+              this.canFocus = true;
+              break;
+            case 'shared-library':
+              ['name', 'version'].forEach(attr =>
+                this.updateSharedLibraryDeployInfoFormGroup
+                  .get(attr)
+                  .markAsTouched()
               );
 
-              return EMPTY;
-            })
-          )
-          .subscribe();
-        break;
-      }
-
-      case 'shared-library': {
-        ['name', 'version'].forEach(attr =>
-          this.updateSharedLibraryDeployInfoFormGroup.get(attr).markAsTouched()
-        );
-
-        this.sharedLibrariesService
-          .getSharedLibraryInformationFromZipFile(file)
-          .pipe(
-            takeUntil(this.onDestroy$),
-            map(sharedLibraryFromZip => {
-              this.slNameReadFromZip = sharedLibraryFromZip.name;
               this.updateSharedLibraryDeployInfoFormGroup
                 .get('name')
-                .setValue(sharedLibraryFromZip.name);
+                .setValue(artifactFromZip.name);
 
-              this.slVersionReadFromZip = sharedLibraryFromZip.version;
               this.updateSharedLibraryDeployInfoFormGroup
                 .get('version')
-                .setValue(sharedLibraryFromZip.version);
-            }),
-            catchError(err => {
-              this.notifications.warn(
-                'File error',
-                `An error occurred while trying to read the shared library information from this zip file`
-              );
+                .setValue(artifactFromZip.version);
 
-              return EMPTY;
-            })
-          )
-          .subscribe();
-        break;
-      }
+              this.isFileParsed = true;
+              this.canFocus = true;
+              break;
+
+            default:
+              break;
+          }
+        }),
+        catchError(err => {
+          this.notifications.warn(
+            'File error',
+            `An error occurred while trying to read the artifact zip file.`
+          );
+
+          this.isFileParsed = false;
+          this.deployArtifact.reset();
+
+          return EMPTY;
+        })
+      )
+      .subscribe();
+  }
+
+  isDeployingArtifact(type: string) {
+    if (type) {
+      // to capitalize the first character of every types
+      const titleArtifactType = type.replace(
+        /(^\w{1})|(\s{1}\w{1})/,
+        (match: string) => match.toUpperCase()
+      );
+      this.openSnackBarDeployment(titleArtifactType);
     }
   }
 
-  deploy(
-    whatToDeploy: 'component' | 'service-assembly' | 'shared-library',
-    file: File
-  ) {
+  openSnackBarDeployment(titleArtifactType: string) {
+    this.snackRef = this.snackBar.openFromComponent(
+      SnackBarDeploymentProgressComponent,
+      {
+        verticalPosition: 'top',
+        horizontalPosition: 'center',
+        data: {
+          titleArtifactType,
+          uploadProgress$: this.percentage$.asObservable(),
+        },
+      }
+    );
+
+    this.percentage$.next(0);
+  }
+
+  deploy(file: File) {
     let deployActions: {
       onProgressUpdate: (percentage: number) => void;
       onComplete: () => void;
       actionToDispatch: Action;
     };
-
     const correlationId = uuid();
 
-    if (whatToDeploy === 'component') {
-      deployActions = {
-        onProgressUpdate: percentage => {
-          this.uploadComponentStatus = { percentage };
-          this.isUploadingComponent = true;
-        },
-        onComplete: () => {
-          this.deployComponent.reset();
-          this.isUploadingComponent = false;
-        },
-        actionToDispatch: new Containers.DeployComponent({
+    this.isDeployingArtifact(this.artifact.type);
+
+    let actionToDispatch: Action = null;
+
+    switch (this.artifact.type) {
+      case 'component':
+        actionToDispatch = new Containers.DeployComponent({
           correlationId,
           id: this.container.id,
           file,
           name: this.updateComponentDeployInfoFormGroup.get('name').value,
-          sharedLibraries: this.overrideSl ? this.slsInfoReadFromZip : null,
-        }),
-      };
-    } else if (whatToDeploy === 'service-assembly') {
-      deployActions = {
-        onProgressUpdate: percentage =>
-          (this.uploadServiceAssemblyStatus = {
-            percentage,
-          }),
-        onComplete: () => this.deployServiceAssembly.reset(),
-        actionToDispatch: new Containers.DeployServiceAssembly({
+          sharedLibraries: this.dataSource.data,
+        });
+        break;
+      case 'service-assembly':
+        actionToDispatch = new Containers.DeployServiceAssembly({
           correlationId,
           id: this.container.id,
           file,
           name: this.updateServiceAssemblyDeployInfoFormGroup.get('name').value,
-        }),
-      };
-    } else if (whatToDeploy === 'shared-library') {
-      deployActions = {
-        onProgressUpdate: percentage =>
-          (this.uploadSharedLibraryStatus = {
-            percentage,
-          }),
-        onComplete: () => this.deploySharedLibrary.reset(),
-        actionToDispatch: new Containers.DeploySharedLibrary({
+        });
+        break;
+      case 'shared-library':
+        actionToDispatch = new Containers.DeploySharedLibrary({
           correlationId,
           id: this.container.id,
           file,
           name: this.updateSharedLibraryDeployInfoFormGroup.get('name').value,
           version: this.updateSharedLibraryDeployInfoFormGroup.get('version')
             .value,
-        }),
-      };
+        });
+        break;
     }
+
+    deployActions = {
+      onProgressUpdate: percentage => {
+        this.artifactUploadProgress = { percentage };
+        this.percentage$.next(percentage);
+        this.deployArtifact.reset();
+      },
+      onComplete: () => {
+        this.snackRef.dismiss();
+      },
+      actionToDispatch,
+    };
 
     this.actions$
       .pipe(
@@ -398,20 +441,75 @@ export class ArtifactsDeploymentComponent
     this.store$.dispatch(deployActions.actionToDispatch);
   }
 
-  openOverrideSlDialog() {
-    this.overrideSlDialog = this.matDialogService.open(this.overrideSlModal, {
-      disableClose: true,
-      autoFocus: false,
+  getArtifactDeploymentError() {
+    switch (this.artifact.type) {
+      case 'component':
+        return this.container.errorDeploymentComponent;
+      case 'service-assembly':
+        return this.container.errorDeploymentServiceAssembly;
+      case 'shared-library':
+        return this.container.errorDeploymentSharedLibrary;
+    }
+  }
+
+  isDisabledDeployArtifact() {
+    switch (this.artifact.type) {
+      case 'component':
+        return (
+          this.updateComponentDeployInfoFormGroup.invalid || this.isEditingSl()
+        );
+      case 'service-assembly':
+        return this.updateServiceAssemblyDeployInfoFormGroup.invalid;
+      case 'shared-library':
+        return this.updateSharedLibraryDeployInfoFormGroup.invalid;
+    }
+  }
+
+  cancelSelectedFile() {
+    this.isFileParsed = false;
+    this.canFocus = false;
+
+    switch (this.artifact.type) {
+      case 'component':
+        this.updateComponentDeployInfoFormGroup.reset();
+        this.cancelOverrideSl();
+        break;
+      case 'service-assembly':
+        this.updateServiceAssemblyDeployInfoFormGroup.reset();
+        break;
+      case 'shared-library':
+        this.updateSharedLibraryDeployInfoFormGroup.reset();
+        break;
+    }
+  }
+
+  resetForm() {
+    this.updateComponentDeployInfoFormGroup.reset({
+      name: this.updateComponentDeployInfoFormGroup.get('name').value,
+      slName: this.currentSl ? this.currentSl.name : '',
+      slVersion: this.currentSl ? this.currentSl.version : '',
     });
   }
 
-  closeOverrideSlDialog() {
-    this.overrideSlDialog.close();
+  clearSlValidators() {
+    this.updateComponentDeployInfoFormGroup.controls[
+      'slName'
+    ].clearValidators();
+    this.updateComponentDeployInfoFormGroup.controls[
+      'slVersion'
+    ].clearValidators();
   }
 
-  saveOverrideSl(sharedLibraries: ISharedLibrarySimplified[]) {
-    this.updateSlsInfoReadFromZip(sharedLibraries, true);
-    this.overrideSlDialog.close();
+  cancelOverrideSl() {
+    this.currentSl = this.dataSource.data[this.currentSlBeingEdited];
+
+    if (this.currentSl === null) {
+      this.deleteSharedLibrary(this.currentSlBeingEdited);
+      this.resetForm();
+    }
+    this.clearSlValidators();
+
+    this.currentSlBeingEdited = -1;
   }
 
   slNameAndVersionChecker(): ValidatorFn {
@@ -431,6 +529,48 @@ export class ArtifactsDeploymentComponent
       }
       return null;
     };
+  }
+
+  deleteSharedLibrary(index: number) {
+    this.dataSource.data = this.dataSource.data.filter((el, i) => i !== index);
+
+    this.updateSlsStatus();
+  }
+
+  editSharedLibrary(index: number) {
+    this.currentSlBeingEdited = index;
+
+    this.currentSl = {
+      name: this.dataSource.data[index].name,
+      version: this.dataSource.data[index].version,
+    };
+  }
+
+  updateSharedLibrary() {
+    this.dataSource.data = [
+      ...this.dataSource.data.slice(0, this.currentSlBeingEdited),
+      this.currentSl,
+      ...this.dataSource.data.slice(this.currentSlBeingEdited + 1),
+    ];
+
+    this.currentSl = null;
+
+    this.currentSlBeingEdited = -1;
+    this.updateSlsStatus();
+  }
+
+  addNewSharedLibrary() {
+    this.currentSlBeingEdited = this.dataSource.data.length;
+
+    this.currentSl = {
+      name: '',
+      version: '',
+    };
+
+    this.dataSource.data = [...this.dataSource.data, null];
+
+    this.resetForm();
+    this.clearSlValidators();
   }
 }
 

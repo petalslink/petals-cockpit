@@ -17,12 +17,22 @@
 
 :host {
   height: 100%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-bus-description,
+.card-bus-containers {
+  min-width: 500px;
+}
+
+.card-bus-description,
+.card-bus-containers {
+  min-width: 500px;
 }
 
 table.bus-containers-table {
   width: 100%;
-  min-width: 500px;
 }
 
 .wrapper-table {

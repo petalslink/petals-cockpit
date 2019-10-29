@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .container-system-info {
   white-space: pre-line;
 }
@@ -43,16 +49,6 @@
   }
 }
 
-.flex-100 {
-  flex-direction: row;
-  box-sizing: border-box;
-  display: flex;
-  flex: 1 1 0%;
-}
-
-.flex-35 {
-  flex-direction: row;
-  box-sizing: border-box;
-  display: flex;
-  flex: 0 1 35%;
+.card-container-reachabilities {
+  min-width: 500px;
 }

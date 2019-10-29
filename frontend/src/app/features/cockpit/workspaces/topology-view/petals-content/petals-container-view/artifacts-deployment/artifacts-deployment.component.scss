@@ -15,22 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-list[dense] {
-  padding-top: 0;
-}
-
-.item-list > .mat-list-item {
-  height: 24px;
-}
-
 .sl-version {
-  margin-left: 10px;
   font-weight: bold;
+  word-break: break-word;
 }
 
-.wrapper-artifact-deployment {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: minmax(100px, auto);
-  grid-column-gap: 10px;
+.sl-name {
+  word-break: break-word;
+}
+
+input {
+  text-overflow: ellipsis;
+}
+
+.wrapper-table {
+  overflow-x: scroll;
+}
+
+.card-artifact-deployment {
+  min-width: 500px;
+}
+
+.override-sl-name-form-field,
+.override-sl-version-form-field {
+  margin-bottom: 8px;
+  padding: 4%;
+  width: 100%;
 }

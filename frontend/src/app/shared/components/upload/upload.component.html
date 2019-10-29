@@ -13,90 +13,97 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-mat-card-toolbar [title]="title" titleIcon="file_upload">
-  <mat-card-content>
-    <div *ngIf="!selectedFileInformation">
-      <input
-        type="file"
-        name="choose-file-hidden"
-        #selectFile
-        [accept]="acceptedFileType"
-        (change)="fileChange($event)"
+<div fxLayout="column">
+  <div class="title-about-wrapper margin-bottom-x1">
+    <mat-card-title class="light-bold title-about">{{ title }}</mat-card-title>
+  </div>
+
+  <ng-template #aboutDeployment>
+    <div fxLayout="column">
+      <mat-card-content fxLayout="column">
+        <p>{{ message }}</p>
+      </mat-card-content>
+    </div>
+  
+    <mat-card-actions 
+      fxFill 
+      fxLayoutAlign="end center" 
+      class="wrapper-btn-select-file"
+    >
+      <input 
+        #selectFile 
+        type="file" 
+        name="choose-file-hidden" 
+        [accept]="acceptedFileType" 
+        (change)="fileChange($event)" 
         required
       >
-
       <button
-        class="btn-choose-file text-upper"
         mat-raised-button
-        [disabled]="disabled"
+        color="primary"
+        [disabled]="(percentage < 100 && !error) || (selectedFileInformation && !isFileParsed)" 
         (click)="selectFile.click()"
+        class="btn-choose-file text-upper"
       >
-        <mat-icon color="primary">attach_file</mat-icon>
-        <span class="choose-file">Choose a file...</span>
-        <span [hidden]="!selectFile?.required">*</span>
+        <span fxLayout="row" fxLayoutAlign="center center">
+          <fa-icon icon="folder-open" class="icon-x1 margin-right-x1"></fa-icon>
+          <span class="choose-file">BROWSE...</span>
+          <span [hidden]="!selectFile?.required">*</span>
+          <span *ngIf="selectedFileInformation && !isFileParsed" class="margin-left-x1">
+            <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
+          </span>
+        </span>
       </button>
-    </div>
+    </mat-card-actions>
+  </ng-template>
 
-    <div
-      class="when-selected-file"
-      *ngIf="selectedFileInformation"
-    >
-      <div
-        class="selected-file"
-        fxLayout="column"
-      >
-        <mat-chip-list fxLayout="row">
-          <mat-chip class="selected-file-name margin-bottom-x1" color="accent" selected="true" fxLayoutAlign="center start">
+  <div *ngIf="selectedFileInformation && isFileParsed; else aboutDeployment" fxLayout="column" class="when-selected-file">
+    <mat-card-content fxLayout="column" class="card-content-selected-file-info">
+      <div fxLayout="column" class="comp-file-info">
+        <p fxLayout="column">
+          <span class="mat-body-2">File informations</span>
+          <span fxLayout="row" fxLayoutAlign="start center" class="wrapper-file-name">
             <span class="file-name">{{ selectedFileInformation.file.name }}</span>
-            <mat-icon class="cancel-file" matChipRemove (click)="cancelFile()">cancel</mat-icon>
-          </mat-chip>
-        </mat-chip-list>
-
-        <div fxFlex.lt-md></div>
-
-        <div
-          class="edit-information margin-top-x1"
-          *ngIf="updateFileInformation"
-          fxFlex
-        >
-          <app-mat-card-toolbar [title]="'Edit information'" titleIcon="mode_edit">
-            <ng-container [ngTemplateOutlet]="updateFileInformation.templateRef"></ng-container>
-          </app-mat-card-toolbar>
-        </div>
-
-        <div
-          class="upload-actions"
-          *ngIf="!isUploading"
-          fxLayout="row"
-          fxLayoutAlign="center center"
-        >
-          <button mat-button class="btn-cancel-file margin-right-x1 text-upper" (click)="cancelFile()">
-            <span class="clear-name">Cancel</span>
-          </button>
-
-          <button mat-raised-button class="btn-upload text-upper" color="primary" (click)="uploadFile()" [disabled]="disabled">
-            <mat-icon>file_upload</mat-icon>
-            <span>Upload</span>
-          </button>
-        </div>
+            <button mat-icon-button matTooltip="Cancel" (click)="cancelFile()" class="btn-cancel-file-name margin-right-x1">
+              <fa-icon icon="times-circle" class="icon-x1"></fa-icon>
+            </button>
+          </span>
+        </p>
       </div>
 
-      <div fxLayout="column" fxLayoutAlign="center center" *ngIf="isUploading">
-        <p>Uploading the file...</p>
-
-        <mat-progress-bar
-          color="primary"
-          mode="determinate"
-          [value]="percentage"
-          >
-        </mat-progress-bar>
+      <div *ngIf="updateFileInformation" fxLayout="column" fxFlex class="edit-information">
+        <ng-container [ngTemplateOutlet]="updateFileInformation.templateRef"></ng-container>
       </div>
-    </div>
+    </mat-card-content>
 
-    <app-message
-      class="error-upload"
-      type="error"
-      [msg]="error"
-    ></app-message>
-  </mat-card-content>
-</app-mat-card-toolbar>
+    <mat-card-actions fxFill fxLayoutAlign="end center" class="deploy-actions">
+      <button
+        mat-button
+        type="button"
+        color="primary"
+        (click)="cancelFile()"
+        class="btn-cancel-file text-upper margin-right-x1"
+      >
+        Cancel
+      </button>
+      <button
+        mat-raised-button
+        type="button"
+        color="primary"
+        [disabled]="disabled"
+        (click)="uploadFile()"
+        class="btn-deploy text-upper"
+        >
+        <span fxLayout="row" fxLayoutAlign="start center">
+          <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
+          <span class="text-upper import-bus-text-btn">Deploy</span>
+        </span>
+      </button>
+    </mat-card-actions>
+  </div>
+
+  <div *ngIf="error" class="margin-top-x1">
+    <app-message type="error" [msg]="error" class="error-upload"></app-message>
+  </div>
+
+</div>

@@ -51,12 +51,39 @@ mat-card-title.mat-card-title {
   font-size: 17px;
 }
 
+// with mat-table of material lib, the td padding is too high
+// to reduce space, we prefer to use 12px rather than 24px
+table.mat-table {
+  tr > td.mat-cell:first-child,
+  tr > td.mat-footer-cell:first-child,
+  th.mat-header-cell:first-child {
+    padding-left: 12px;
+  }
+  td.mat-cell:last-child,
+  td.mat-footer-cell:last-child,
+  th.mat-header-cell:last-child {
+    padding-right: 12px;
+  }
+}
+
 .mat-body-2 {
   margin-bottom: 4px;
 }
 
+.mat-snack-bar-container .wrapper-progress-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
 body .text-upper {
   text-transform: uppercase;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-auto-size {

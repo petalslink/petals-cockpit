@@ -18,11 +18,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
-import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
-import * as xmltojson from 'xmltojson';
 
 export enum ESharedLibraryState {
   Loaded = 'Loaded',
@@ -59,10 +56,6 @@ export abstract class SharedLibrariesService {
     id: string;
     state: SharedLibraryState;
   }>;
-
-  abstract getSharedLibraryInformationFromZipFile(
-    file: File
-  ): Observable<{ name: string; version: string }>;
 }
 
 @Injectable()
@@ -87,32 +80,5 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
       }/workspaces/${workspaceId}/sharedlibraries/${id}`,
       { state }
     );
-  }
-
-  getSharedLibraryInformationFromZipFile(file: File) {
-    return loadFilesContentFromZip(file, filePath =>
-      filePath.includes('jbi.xml')
-    ).pipe(
-      map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
-    );
-  }
-
-  private getInformationFromXml(
-    xml: string
-  ): { name: string; version: string } {
-    const json: any = xmltojson.parseString(xml, {});
-    let name = '';
-    let version = '';
-
-    try {
-      const sl = json.jbi[0]['shared-library'][0];
-
-      name = sl.identification[0].name[0]._text;
-      version = sl._attr.version._value;
-    } catch (err) {
-      throw new Error('Getting information from XML failed');
-    }
-
-    return { name, version };
   }
 }

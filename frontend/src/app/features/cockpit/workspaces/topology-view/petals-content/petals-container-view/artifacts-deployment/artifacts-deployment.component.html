@@ -13,258 +13,351 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxFill ngClass.gt-md="wrapper-artifact-deployment">
-  <div class="margin-bottom-x1">
-    <ngx-hover-opacity
-      [isHoverVisible]="!container.isReachable"
-      class="deploy-component"
+<mat-card fxLayout="column" fxFlex class="card-artifact-deployment">
+  <ngx-hover-opacity [isHoverVisible]="!container.isReachable" class="deploy-artifact">
+    <app-upload
+      #deployArtifact
+      acceptedFileType=".zip"
+      [title]="getTitle()"
+      [message]="'Choose artifact (Component, Service Assembly or Shared Library):'"
+      [uploadStatus]="artifactUploadProgress"
+      [error]="getArtifactDeploymentError()"
+      [disabled]="isDisabledDeployArtifact()"
+      [isFileParsed]="isFileParsed"
+      (evtUploadFile)="deploy($event.selectedFileInformation.file)"
+      (evtFileSelected)="fileSelected($event.file)"
+      (evtResetFile)="cancelSelectedFile()"
       >
-      <app-upload
-        #deployComponent
-        acceptedFileType=".zip"
-        [title]="'Component deployment'"
-        [uploadStatus]="uploadComponentStatus"
-        [error]="container.errorDeploymentComponent"
-        [disabled]="updateComponentDeployInfoFormGroup.invalid"
-        (evtUploadFile)="deploy('component', $event.selectedFileInformation.file)"
-        (evtFileSelected)="fileSelected('component', $event.file)"
-        (evtResetFile)="updateComponentDeployInfoFormGroup.reset()"
-      >
-        <ng-template updateFileInformation>
-          <form fxLayout="column" novalidate [formGroup]="updateComponentDeployInfoFormGroup">
-            <div>
-              <mat-form-field fxFlex fxFlex.gt-md="50">
-  
-                <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name">
-  
+      <ng-template updateFileInformation>
+        <form 
+          *ngIf="artifact.type === 'component'" 
+          novalidate 
+          [formGroup]="updateComponentDeployInfoFormGroup"
+        >
+          <div fxLayout="column" fxLayout.gt-md="row" fxLayoutAlign.gt-md="start center">
+            <div fxFlex.gt-md="49" fxFlex="100">
+              <mat-form-field appearance="outline" floatLabel="always" fxFill class="comp-name-form-field">
+                <mat-label>Name</mat-label>
+                <input 
+                  type="text" 
+                  matInput 
+                  placeholder="{{artifact.name}}"
+                  formControlName="name" 
+                  [appFocusInputIfLargeScreen]="canFocus" 
+                  [errorStateMatcher]="compErrorStateMatcher"
+                >
                 <button
                   *ngIf="updateComponentDeployInfoFormGroup.get('name')"
                   matSuffix
-                  color="primary"
                   mat-icon-button
+                  color="primary"
                   aria-label="Clear"
-                  (click)="updateComponentDeployInfoFormGroup.get('name').setValue('')"
+                  [disabled]="isEditingSl()"
+                  (click)="this.updateComponentDeployInfoFormGroup.get('name').setValue('')"
                 >
                   <mat-icon>close</mat-icon>
                 </button>
-  
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
-                >
-                  You can't upload a component with a name that already exists in this container
+
+                <mat-error class="error-name-input">
+                  This name already exists in {{container.name}}
                 </mat-error>
               </mat-form-field>
             </div>
-  
-            <div class="margin-top-x1" fxLayout="row" *ngIf="!slsInfoReadFromZip; else slsTemplate">
-              <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
-              Parsing shared libraries
-            </div>
-  
-            <ng-template #slsTemplate>
-              <mat-card-subtitle class="margin-top-x1" fxLayoutAlign="start center">
-                <span fxFlex>Shared libraries</span>
-                <button
-                  class="override-sl"
-                  matTooltip="Override Shared Libraries"
-                  matTooltipPosition="before"
-                  mat-mini-fab
-                  color="primary"
-                  (click)="openOverrideSlDialog()"
-                  [disabled]="isUploadingComponent"
-                >
-                  <mat-icon svgIcon="sl-overview"></mat-icon>
-                </button>
-                <ng-template #overrideSlTemplate>
-                  <app-shared-libraries-override
-                    #slOverrideComp
-                    [initialSharedLibraries]="slsInfoReadFromZip"
-                    (cancel)="closeOverrideSlDialog()"
-                    (save)="saveOverrideSl($event)"
-                  ></app-shared-libraries-override>
-                </ng-template>
-              </mat-card-subtitle>
-  
-              <app-message
-                *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer > 0"
-                type="warning"
-                [isClosable]="false"
-                class="warning-red-cross"
-                msg="Shared libraries with a red cross are not in this container."
-              ></app-message>
-  
-              <app-message
-                *ngIf="slsInfoReadFromZip.length > 0 && nbSlsReadFromZipNotInContainer === 0"
-                type="success"
-                [isClosable]="false"
-                class="success-all-sls"
-                msg="All the shared libraries are in this container."
-              ></app-message>
-  
-              <app-message
-                *ngIf="slsInfoReadFromZip.length === 0"
-                type="info"
-                [isClosable]="false"
-                class="info-no-sls"
-                msg="No shared libraries have been detected in this zip file."
-              ></app-message>
-  
-              <mat-list dense>
-                <div class="item-list">
-                  <mat-list-item
-                    *ngFor="let slInfo of slsInfoReadFromZip; index as i"
-                    fxLayout="row"
-                    fxLayoutAlign="start center"
-                    matLine
+          </div>
+
+          <p fxLayout="column">
+            <span class="mat-body-2">About component dependencies</span>
+          </p>
+
+          <div *ngIf="dataSource !== null && isFileParsed" class="wrapper-table-sls">
+            <app-message
+              *ngIf="dataSource.data.length > 0 && countSlsNotInContainer > 0 && !isEditingSl()"
+              type="warning"
+              msg="Shared libraries with a red led are not in this container."
+              [isClosable]="false"
+              class="warning-red-led"
+            ></app-message>
+
+            <app-message
+              *ngIf="dataSource.data.length > 0 && countSlsNotInContainer === 0 && !isEditingSl()"
+              type="success"
+              msg="All the shared libraries are in this container."
+              [isClosable]="false"
+              class="success-all-sls"
+            ></app-message>
+
+            <app-message
+              *ngIf="dataSource.data.length === 0"
+              type="info"
+              msg="There are no shared libraries."
+              [isClosable]="false"
+              class="info-no-sls"
+            ></app-message>
+
+            <ngx-hover-opacity
+              [isHoverVisible]="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+              class="already-in-container"
+            >
+              <table 
+                *ngIf="dataSource.data.length"
+                mat-table 
+                fxLayout="column" 
+                [dataSource]="dataSource" 
+                class="comp-shared-libraries-table"
+              >
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th 
+                    mat-header-cell 
+                    *matHeaderCellDef 
+                    fxFlex="35" 
+                    fxFlex.gt-md="25" 
+                    fxLayout="row" 
+                    fxLayoutAlign="start center" 
                   >
-                    <mat-icon mat-list-icon *ngIf="slIsInCurrentContainer[i]" class="color-green-light-bold">
-                      done
-                    </mat-icon>
-  
-                    <mat-icon mat-list-icon *ngIf="!slIsInCurrentContainer[i]" class="color-red-light-bold">
-                      clear
-                    </mat-icon>
-  
-                    <span class="sl-name">{{ slInfo.name }}</span>
-                    <span class="sl-version">{{ slInfo.version }}</span>
-                  </mat-list-item>
-                </div>
-              </mat-list>
-            </ng-template>
-          </form>
-        </ng-template>
-      </app-upload>
-    </ngx-hover-opacity>
-  </div>
+                    Name
+                  </th>
+                  <td mat-cell *matCellDef="let sl; let i = index" fxFlex="35" fxFlex.gt-md="25" fxLayout="row" fxLayoutAlign="start center" class="cell-name">
+                    <span *ngIf="currentSlBeingEdited !== i; else slNameEdit" fxFlexFill fxLayout="row" fxLayoutAlign="start center">
+                      <mat-icon color="primary" svgIcon="sl" fxFlex="10" class="margin-right-x1"></mat-icon>
+                      <span class="sl-name ellipsis" title="{{ sl.name }}">{{ sl.name }}</span>
+                    </span>
 
-  <div class="margin-bottom-x1">
-    <ngx-hover-opacity
-      [isHoverVisible]="!container.isReachable"
-      class="deploy-service-assembly"
-    >
-      <app-upload
-        #deployServiceAssembly
-        acceptedFileType=".zip"
-        [title]="'Service assembly deployment'"
-        [uploadStatus]="uploadServiceAssemblyStatus"
-        [error]="container.errorDeploymentServiceAssembly"
-        [disabled]="updateServiceAssemblyDeployInfoFormGroup.invalid"
-        (evtUploadFile)="deploy('service-assembly', $event.selectedFileInformation.file)"
-        (evtFileSelected)="fileSelected('service-assembly', $event.file)"
-        (evtResetFile)="updateServiceAssemblyDeployInfoFormGroup.reset()"
-      >
-        <ng-template updateFileInformation>
-          <form fxLayout="column" novalidate [formGroup]="updateServiceAssemblyDeployInfoFormGroup">
-            <div>
-              <mat-form-field fxFlex fxFlex.gt-md="50">
-                <input
-                  type="text"
-                  matInput
-                  placeholder="Name"
-                  autocomplete="off"
-                  formControlName="name"
-                >
-                <button
-                  *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+                    <ng-template #slNameEdit>                      
+                      <mat-form-field class="override-sl-name-form-field ellipsis">
+                        <input
+                          type="text"
+                          matInput
+                          formControlName="slName"
+                          [ngModel]="currentSl.name" 
+                          (ngModelChange)="currentSl.name = $event"
+                          required
+                        >
+                        <mat-error>Required!</mat-error>
+                      </mat-form-field>
+                    </ng-template>
+                  </td>
+                </ng-container>
+              
+                <!-- Version Column -->
+                <ng-container matColumnDef="version">
+                  <th 
+                    mat-header-cell 
+                    *matHeaderCellDef 
+                    fxFlex="25" 
+                    fxLayout="row" 
+                    fxLayoutAlign="center center"
+                  >
+                    Version
+                  </th>
+                  <td mat-cell *matCellDef="let sl; let i = index" fxFlex="25" fxLayout="row" fxLayoutAlign="center center">
+                    <span *ngIf="currentSlBeingEdited !== i; else slVersionEdit" title="{{ sl.version }}" class="sl-version ellipsis">
+                      {{ sl.version }}
+                    </span>
 
-                <mat-hint *ngIf="!updateServiceAssemblyDeployInfoFormGroup.get('name').value && !!saNameReadFromZip">
-                  Default {{ saNameReadFromZip }}
-                </mat-hint>
+                    <ng-template #slVersionEdit>
+                      <mat-form-field class="override-sl-version-form-field ellipsis">
+                        <input 
+                          type="text" 
+                          matInput 
+                          formControlName="slVersion" 
+                          [ngModel]="currentSl.version"
+                          (ngModelChange)="currentSl.version = $event" 
+                          required
+                        >
+                        <mat-error>Required!</mat-error>
+                      </mat-form-field>
+                    </ng-template>
+                  </td>
+                </ng-container>
+              
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th 
+                    mat-header-cell 
+                    *matHeaderCellDef 
+                    fxFlex="15" 
+                    fxFlex.gt-md="25" 
+                    fxLayout="row" 
+                    fxLayoutAlign="center center"
+                  >
+                    Status
+                  </th>
+                  <td mat-cell *matCellDef="let sl; let i = index" fxFlex="15" fxFlex.gt-md="25" fxLayout="column" fxLayoutAlign="center center" class="cell-status">
+                    <div *ngIf="currentSlBeingEdited !== i">
+                      <app-led *ngIf="slIsInCurrentContainer[i]; else uninstalled" color="green" matTooltip="Installed" matTooltipPosition="after"></app-led>
 
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
+                      <ng-template #uninstalled>
+                        <app-led color="red" matTooltip="Uninstalled" matTooltipPosition="after"></app-led>
+                      </ng-template>
+                    </div>
+                  </td>
+                </ng-container>
+          
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th 
+                    mat-header-cell 
+                    *matHeaderCellDef
+                    fxFlex="25" 
+                    fxLayout="row" 
+                    fxLayoutAlign="end center" 
+                  >
+                    Actions
+                  </th>
+                  <td mat-cell *matCellDef="let sl; let i = index" fxFlex="25" fxLayout="column" fxLayoutAlign="center end">
+                    <span *ngIf="!isEditingSl(); else slActionsEdit" fxLayout="row" fxLayoutAlign="end center">
+                      <button mat-icon-button matTooltip="Edit" (click)="editSharedLibrary(i)" class="btn-edit-sl">
+                        <fa-icon icon="pencil-alt" class="icon-x1"></fa-icon>
+                      </button>
+                      <button mat-icon-button matTooltip="Delete" (click)="deleteSharedLibrary(i)" class="btn-delete-sl">
+                        <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
+                      </button>
+                    </span>
+                    <ng-template #slActionsEdit>
+                      <span *ngIf="currentSlBeingEdited === i">
+                        <button 
+                          *ngIf="updateComponentDeployInfoFormGroup.valid" 
+                          mat-icon-button 
+                          matTooltip="Save" 
+                          (click)="updateSharedLibrary()" 
+                          class="btn-save-sl"
+                          >
+                          <fa-icon icon="check" class="icon-x1"></fa-icon>
+                        </button>
+                        <button mat-icon-button matTooltip="Cancel" (click)="cancelOverrideSl()" class="btn-cancel-sl">
+                          <fa-icon icon="times" class="icon-x1"></fa-icon>
+                        </button>
+                      </span>
+                    </ng-template>
+                    
+                  </td>
+                </ng-container>
+              
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+            </ngx-hover-opacity>
+
+            <div fxLayout="row" class="margin-top-x1">
+              <button
+                mat-button
+                type="button"
+                color="primary"
+                [disabled]="isDisabledDeployArtifact()"
+                (click)="addNewSharedLibrary()"
+                class="btn-add-row text-upper"
                 >
-                  You can't upload a service assembly with a name that already exists in this container
-                </mat-error>
-              </mat-form-field>
+                <span fxLayout="row" fxLayoutAlign="start center">
+                  <fa-icon class="margin-right-x1 icon-x1" icon="plus"></fa-icon>
+                  <span class="text-upper add-row-text-btn">Add shared library</span>
+                </span>
+              </button>
             </div>
-          </form>
-        </ng-template>
-      </app-upload>
-    </ngx-hover-opacity>
-  </div>
 
-  <div>
-    <ngx-hover-opacity
-      [isHoverVisible]="!container.isReachable"
-      class="deploy-shared-library"
-    >
-      <app-upload
-        #deploySharedLibrary
-        acceptedFileType=".zip"
-        [title]="'Shared library deployment'"
-        [uploadStatus]="uploadSharedLibraryStatus"
-        [error]="container.errorDeploymentSharedLibrary"
-        [disabled]="updateSharedLibraryDeployInfoFormGroup.invalid"
-        (evtUploadFile)="deploy('shared-library', $event.selectedFileInformation.file)"
-        (evtFileSelected)="fileSelected('shared-library', $event.file)"
-        (evtResetFile)="updateSharedLibraryDeployInfoFormGroup.reset()"
-      >
-        <ng-template updateFileInformation>
-          <form fxLayout="column" [formGroup]="updateSharedLibraryDeployInfoFormGroup">
-            <div>
-              <mat-form-field fxFlex fxFlex.gt-md="50">
-                <input type="text" matInput placeholder="Name" autocomplete="off" formControlName="name" [errorStateMatcher]="slErrorStateMatcher">
-                <button
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+          </div>
+        </form>
 
-                <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('name').value && !!slNameReadFromZip">
-                  Default {{ slNameReadFromZip }}
-                </mat-hint>
+        <form 
+          *ngIf="artifact.type === 'service-assembly'" 
+          fxLayout="column" 
+          fxLayout.gt-md="row"
+          fxLayoutAlign.gt-md="start center" 
+          novalidate 
+          [formGroup]="updateServiceAssemblyDeployInfoFormGroup"
+        >
+          <div fxFlex.gt-md="49" fxFlex="100">
+            <mat-form-field appearance="outline" floatLabel="always" fxFill class="sa-name-form-field">
+              <mat-label>Name</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                placeholder="{{artifact.name}}"
+                formControlName="name" 
+                [appFocusInputIfLargeScreen]="canFocus" 
+                [errorStateMatcher]="saErrorStateMatcher"
+              >
+              <button
+                *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
+                matSuffix
+                mat-icon-button
+                color="primary"
+                aria-label="Clear"
+                (click)="this.updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
 
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
-                  A shared library with this name and version already exists in this container
-                </mat-error>
-              </mat-form-field>
-            </div>
-            <div>
-              <mat-form-field fxFlex fxFlex.gt-md="50">
-                <input type="text" matInput placeholder="Version" autocomplete="off" formControlName="version" [errorStateMatcher]="slErrorStateMatcher">
-                <button
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
-                  matSuffix
-                  color="primary"
-                  mat-icon-button
-                  aria-label="Clear"
-                  (click)="updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
-                >
-                  <mat-icon>close</mat-icon>
-                </button>
+              <mat-error class="error-name-input">
+                This name already exists in {{container.name}}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </form>
 
-                <mat-hint *ngIf="!updateSharedLibraryDeployInfoFormGroup.get('version').value && !!slVersionReadFromZip">
-                  Default {{ slVersionReadFromZip }}
-                </mat-hint>
+        <form 
+          *ngIf="artifact.type === 'shared-library'" 
+          fxLayout="column" 
+          fxLayout.gt-md="row"
+          fxLayoutAlign.gt-md="space-between center" 
+          novalidate 
+          [formGroup]="updateSharedLibraryDeployInfoFormGroup"
+        >
+          <div fxFlex.gt-md="49" fxFlex="100">
+            <mat-form-field appearance="outline" floatLabel="always" fxFill class="sl-name-form-field">
+              <mat-label>Name</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                placeholder="{{artifact.name}}"
+                formControlName="name" 
+                [appFocusInputIfLargeScreen]="canFocus" 
+                [errorStateMatcher]="slErrorStateMatcher"
+              >
+              <button
+                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('name')"
+                matSuffix
+                mat-icon-button
+                color="primary"
+                aria-label="Clear"
+                (click)="this.updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
 
-                <mat-error
-                  class="error-name-input"
-                  *ngIf="updateSharedLibraryDeployInfoFormGroup.hasError('alreadyInContainer')">
-                  A shared library with this name and version already exists in this container
-                </mat-error>
-              </mat-form-field>
-            </div>
-          </form>
-        </ng-template>
-      </app-upload>
-    </ngx-hover-opacity>
-  </div>
-</div>
+              <mat-error class="error-name-input">
+                This name already exists in {{container.name}}
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex.gt-md="49" fxFlex="100">
+            <mat-form-field appearance="outline" floatLabel="always" fxFill class="sl-version-form-field">
+              <mat-label>Version</mat-label>
+              <input 
+                type="text" 
+                matInput 
+                placeholder="{{artifact.version}}"
+                formControlName="version" 
+                [errorStateMatcher]="slErrorStateMatcher"
+              >
+              <button
+                *ngIf="updateSharedLibraryDeployInfoFormGroup.get('version')"
+                matSuffix
+                mat-icon-button
+                color="primary"
+                aria-label="Clear"
+                (click)="this.updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+
+              <mat-error class="error-version-input">
+                This version already exists in {{container.name}}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </form>
+      </ng-template>
+    </app-upload>
+  </ngx-hover-opacity>
+</mat-card>
