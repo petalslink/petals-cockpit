@@ -64,17 +64,17 @@ import { SharedLibrariesService } from '@shared/services/shared-libraries.servic
 import { IStore } from '@shared/state/store.interface';
 import { SharedValidator } from '@shared/validators/shared.validator';
 
-import { SharedLibrariesOverrideComponent } from '@feat/cockpit/workspaces/topology-view/petals-content/petals-container-view/petals-container-operations/shared-libraries-override/shared-libraries-override.component';
 import { Containers } from '@wks/state/containers/containers.actions';
 import { IContainerRow } from '@wks/state/containers/containers.interface';
 import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { SharedLibrariesOverrideComponent } from './shared-libraries-override/shared-libraries-override.component';
 
 @Component({
-  selector: 'app-petals-container-operations',
-  templateUrl: './petals-container-operations.component.html',
-  styleUrls: ['./petals-container-operations.component.scss'],
+  selector: 'app-artifacts-deployment',
+  templateUrl: './artifacts-deployment.component.html',
+  styleUrls: ['./artifacts-deployment.component.scss'],
 })
-export class PetalsContainerOperationsComponent
+export class ArtifactsDeploymentComponent
   implements OnInit, OnChanges, OnDestroy {
   private onDestroy$ = new Subject<void>();
 

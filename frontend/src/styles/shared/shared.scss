@@ -47,6 +47,14 @@ app-material-tree {
   max-width: $sidebar-width;
 }
 
+mat-card-title.mat-card-title {
+  font-size: 17px;
+}
+
+.mat-body-2 {
+  margin-bottom: 4px;
+}
+
 body .text-upper {
   text-transform: uppercase;
 }

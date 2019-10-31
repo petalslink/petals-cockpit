@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,15 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-list[dense] {
-  padding-top: 0;
-}
+@mixin custom-container-view-theme($theme) {
+  $primary: map-get($theme, primary);
 
-.item-list > .mat-list-item {
-  height: 24px;
-}
+  .container-list-graph {
+    background-color: mat-color($mat-grey, 100, 0.5);
+  }
 
-.sl-version {
-  margin-left: 10px;
-  font-weight: bold;
+  .title-containers-wrapper {
+    border-color: mat-color($mat-grey, 200);
+  }
 }
