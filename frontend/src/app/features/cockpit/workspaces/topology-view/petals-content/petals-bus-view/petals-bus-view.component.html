@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspaceId$ | async as workspaceId" fxLayout="column" fxFill class="wrapper-content mat-typography">
+<div *ngIf="workspaceId$ | async as workspaceId" fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
   <div class="content">
     <div fxLayout="column" fxLayoutGap="20px" fxFlex>
       <mat-card class="card-bus-description">
@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card fxLayout="column" class="card-bus-containers">
         <mat-card-title fxLayout="row" class="light-bold">Petals Containers</mat-card-title>
 
-        <div class="wrapper-table">
+        <div class="wrapper-table-containers">
           <mat-progress-bar mode="indeterminate" color="primary" *ngIf="(bus$ | async).isFetchingDetails; else displayBusContainers"></mat-progress-bar>
   
           <ng-template #displayBusContainers>

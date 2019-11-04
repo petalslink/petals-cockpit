@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </div>
   
     <mat-card-actions 
-      fxFill 
+      fxFlexFill 
       fxLayoutAlign="end center" 
       class="wrapper-btn-select-file"
     >
@@ -71,12 +71,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </p>
       </div>
 
-      <div *ngIf="updateFileInformation" fxLayout="column" fxFlex class="edit-information">
+      <div *ngIf="updateFileInformation" fxLayout="column" class="edit-information">
         <ng-container [ngTemplateOutlet]="updateFileInformation.templateRef"></ng-container>
       </div>
     </mat-card-content>
 
-    <mat-card-actions fxFill fxLayoutAlign="end center" class="deploy-actions">
+    <mat-card-actions fxFlexFill fxLayoutAlign="end center" class="deploy-actions">
       <button
         mat-button
         type="button"
