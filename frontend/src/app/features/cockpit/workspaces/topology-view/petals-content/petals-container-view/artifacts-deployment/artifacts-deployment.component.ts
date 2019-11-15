@@ -267,6 +267,8 @@ export class ArtifactsDeploymentComponent
               // when using mat-error with material, if there's an error it'll be display
               // only when the control is set to touched and thus we won't have a
               // "real time" feedback, especially when there's only one input
+              this.updateComponentDeployInfoFormGroup.get('name').enable();
+
               this.updateComponentDeployInfoFormGroup
                 .get('name')
                 .markAsTouched();
@@ -483,7 +485,7 @@ export class ArtifactsDeploymentComponent
     }
   }
 
-  resetForm() {
+  resetCompForm() {
     this.updateComponentDeployInfoFormGroup.reset({
       name: this.updateComponentDeployInfoFormGroup.get('name').value,
       slName: this.currentSl ? this.currentSl.name : '',
@@ -505,7 +507,7 @@ export class ArtifactsDeploymentComponent
 
     if (this.currentSl === null) {
       this.deleteSharedLibrary(this.currentSlBeingEdited);
-      this.resetForm();
+      this.resetCompForm();
     }
     this.clearSlValidators();
 
@@ -569,7 +571,7 @@ export class ArtifactsDeploymentComponent
 
     this.dataSource.data = [...this.dataSource.data, null];
 
-    this.resetForm();
+    this.resetCompForm();
     this.clearSlValidators();
   }
 }

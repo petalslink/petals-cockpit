@@ -19,12 +19,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </div>
 
   <ng-template #aboutDeployment>
-    <div fxLayout="column">
-      <mat-card-content fxLayout="column">
-        <p>{{ message }}</p>
+    <div fxLayout="column" class="when-no-file-selected">
+      <mat-card-content fxLayout="column" class="card-content-no-selected-info">
+        <p class="msg-about-upload">{{ message }}</p>
+        <app-message *ngIf="error" type="error" [msg]="error" class="error-upload"></app-message>
       </mat-card-content>
     </div>
-  
+
     <mat-card-actions 
       fxFlexFill 
       fxLayoutAlign="end center" 
@@ -96,14 +97,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         >
         <span fxLayout="row" fxLayoutAlign="start center">
           <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
-          <span class="text-upper import-bus-text-btn">Deploy</span>
+          <span class="text-upper deploy-artifact-text-btn">Deploy</span>
         </span>
       </button>
     </mat-card-actions>
   </div>
-
-  <div *ngIf="error" class="margin-top-x1">
-    <app-message type="error" [msg]="error" class="error-upload"></app-message>
-  </div>
-
 </div>

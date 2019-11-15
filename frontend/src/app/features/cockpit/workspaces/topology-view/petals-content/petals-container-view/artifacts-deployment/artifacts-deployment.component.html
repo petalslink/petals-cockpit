@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card fxLayout="column" fxFlex class="card-artifact-deployment">
+<mat-card fxLayout="column" fxFlex class="card-artifact-deployment margin-bottom-x2">
   <ngx-hover-opacity [isHoverVisible]="!container.isReachable" class="deploy-artifact">
     <app-upload
       #deployArtifact
@@ -54,11 +54,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   aria-label="Clear"
                   [disabled]="isEditingSl()"
                   (click)="this.updateComponentDeployInfoFormGroup.get('name').setValue('')"
+                  class="btn-clear-comp-name"
                 >
                   <mat-icon>close</mat-icon>
                 </button>
 
-                <mat-error class="error-name-input">
+                <mat-error class="error-comp-name-input">
                   This name already exists in {{container.name}}
                 </mat-error>
               </mat-form-field>
@@ -284,11 +285,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 color="primary"
                 aria-label="Clear"
                 (click)="this.updateServiceAssemblyDeployInfoFormGroup.get('name').setValue('')"
+                class="btn-clear-sa-name"
               >
                 <mat-icon>close</mat-icon>
               </button>
 
-              <mat-error class="error-name-input">
+              <mat-error class="error-sa-name-input">
                 This name already exists in {{container.name}}
               </mat-error>
             </mat-form-field>
@@ -321,11 +323,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 color="primary"
                 aria-label="Clear"
                 (click)="this.updateSharedLibraryDeployInfoFormGroup.get('name').setValue('')"
+                class="btn-clear-sl-name"
               >
                 <mat-icon>close</mat-icon>
               </button>
 
-              <mat-error class="error-name-input">
+              <mat-error class="error-sl-name-input">
                 This name already exists in {{container.name}}
               </mat-error>
             </mat-form-field>
@@ -347,11 +350,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 color="primary"
                 aria-label="Clear"
                 (click)="this.updateSharedLibraryDeployInfoFormGroup.get('version').setValue('')"
+                class="btn-clear-sl-version"
               >
                 <mat-icon>close</mat-icon>
               </button>
 
-              <mat-error class="error-version-input">
+              <mat-error class="error-sl-version-input">
                 This version already exists in {{container.name}}
               </mat-error>
             </mat-form-field>

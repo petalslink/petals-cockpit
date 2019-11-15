@@ -132,9 +132,9 @@ export class UploadComponent {
   selector: 'app-snackbar-deployment-progress',
   template: `
     <div class="mat-typography">
-      <h3>{{ data.titleArtifactType }} deployment in progress...</h3>
+      <h3 class="title">{{ data.titleArtifactType }} deployment in progress...</h3>
       <div class="wrapper-progress-bar" *ngIf="data.uploadProgress$ | async as uploadProgress">
-        <span>{{ uploadProgress }}%</span>
+        <span class="progress-value">{{ uploadProgress }}%</span>
         <mat-progress-bar mode="determinate" [value]="uploadProgress" class="margin-left-x1 margin-right-x1"></mat-progress-bar>
         <button mat-button color="accent" (click)="dismiss()" class="btn-dismiss text-upper">
           <span class="dismiss-snackbar-deployment-progress-text-btn">Dismiss</span>

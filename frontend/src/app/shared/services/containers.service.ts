@@ -239,7 +239,7 @@ export class ContainersServiceImpl extends ContainersService {
     );
   }
 
-  private getInformationFromXml(xml: string): IArtifactInformations {
+  getInformationFromXml(xml: string): IArtifactInformations {
     const json: any = xmltojson.parseString(xml, {});
     const artifact: IArtifactInformations = {
       type: '',
