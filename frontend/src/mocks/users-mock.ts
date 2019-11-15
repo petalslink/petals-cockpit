@@ -73,17 +73,27 @@ export class BackendUser {
     if (this.users.has(user.username)) {
       return null;
     } else {
-      const u = new BackendUser(user.username, user.name, user.password);
+      const u = new BackendUser(
+        user.username,
+        user.name,
+        user.password,
+        user.isAdmin
+      );
       BackendUser.users.set(user.username, u);
       return u;
     }
   }
 
-  private constructor(username?: string, name?: string, password?: string) {
+  private constructor(
+    username?: string,
+    name?: string,
+    password?: string,
+    isAdmin?: boolean
+  ) {
     this.id = username ? username : `idUser${BackendUser.cpt++}`;
     this.password = password ? password : this.id;
     this.name = name ? name : username;
-    this.isAdmin = false;
+    this.isAdmin = isAdmin ? isAdmin : false;
     this.isFromLdap = false;
   }
 
@@ -98,7 +108,9 @@ export class BackendUser {
   }
 
   toObj(): { [id: string]: IUserBackend } {
-    return { [this.id]: { id: this.id, name: this.name } };
+    return {
+      [this.id]: { id: this.id, name: this.name, isAdmin: this.isAdmin },
+    };
   }
 }
 

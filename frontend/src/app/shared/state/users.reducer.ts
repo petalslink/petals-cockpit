@@ -1,3 +1,4 @@
+import { IUsersTable } from './users.interface';
 /**
  * Copyright (C) 2017-2019 Linagora
  *
@@ -33,7 +34,6 @@ import { Users } from './users.actions';
 import {
   IUserLDAP,
   IUserRow,
-  IUsersTable,
   userRowFactory,
   usersTableFactory,
 } from './users.interface';
@@ -234,11 +234,21 @@ export namespace UsersReducer {
   function modifySuccess(
     table: IUsersTable,
     payload: { id: string; changes: Partial<IUserBackend> }
-  ) {
-    return updateById(table, payload.id, {
-      ...payload.changes,
-      isModifying: false,
-    });
+  ): IUsersTable {
+    return {
+      ...updateById(table, payload.id, {
+        ...payload.changes,
+        isModifying: false,
+      }),
+      connectedUser:
+        payload.id === table.connectedUser.id
+          ? {
+              ...table.connectedUser,
+              isAdmin: payload.changes.isAdmin,
+              name: payload.changes.name,
+            }
+          : table.connectedUser,
+    };
   }
 
   function modifyError(table: IUsersTable, payload: { id: string }) {
@@ -263,6 +273,7 @@ export namespace UsersReducer {
         id: payload.value.username,
         password: payload.value.password,
         name: payload.value.name,
+        isAdmin: payload.value.isAdmin,
       },
       isSettingUp: false,
       validSetupUser: payload.validSetupUser,

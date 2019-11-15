@@ -15,14 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-form-field [matprefix] {
-  margin-right: 10px;
+.central-content {
+  padding: 24px;
 }
 
-mat-icon {
-  padding-right: 10px;
-}
-
-mat-slide-toggle {
-  margin-bottom: 10px;
+span.data-msg {
+  white-space: pre;
 }

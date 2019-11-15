@@ -30,9 +30,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
 import { getFormErrors } from '@shared/helpers/form.helper';
 import { IUserNew } from '@shared/services/users.service';
-import { IUser } from '@shared/state/users.interface';
+import { ICurrentUser, IUser } from '@shared/state/users.interface';
 
 @Component({
   selector: 'app-add-edit-user',
@@ -44,14 +46,18 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   onDestroy$ = new Subject<void>();
 
   @Input() user?: IUser;
+  @Input() currentUser?: ICurrentUser;
+  @Input() isLastAdmin?: boolean;
   @Input() canDelete = false;
 
   @Output()
   evtSubmit = new EventEmitter<
-    IUserNew | { name?: string; password?: string }
+    IUserNew | { name?: string; password?: string; isAdmin?: boolean }
   >();
   @Output() evtDelete = new EventEmitter<void>();
   @Output() evtCancel = new EventEmitter<void>();
+
+  isModifyingAdministrator: boolean;
 
   userManagementForm: FormGroup;
 
@@ -59,15 +65,17 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     username: '',
     name: '',
     password: '',
+    isAdmin: false,
   };
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.userManagementForm = this.fb.group({
       username: ['', Validators.required],
       name: ['', Validators.required],
       password: '',
+      isAdmin: false,
     });
 
     this.reset();
@@ -113,6 +121,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
       username: this.user ? this.user.id : '',
       name: this.user ? this.user.name : '',
       password: '',
+      isAdmin: this.user ? this.user.isAdmin : false,
     });
   }
 
@@ -124,15 +133,45 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   doSubmit() {
     const value: IUserNew = this.userManagementForm.value;
     if (this.user) {
-      const u: { name?: string; password?: string } = {};
+      const u: { name?: string; password?: string; isAdmin?: boolean } = {};
       if (value.name !== this.user.name) {
         u.name = value.name;
       }
       if (value.password && value.password !== '') {
         u.password = value.password;
       }
-      if (u.name || u.password) {
-        this.evtSubmit.emit(u);
+      if (value.isAdmin !== this.user.isAdmin) {
+        u.isAdmin = value.isAdmin;
+      }
+      if (u.name || u.password || u.isAdmin === value.isAdmin) {
+        if (this.currentUser.id === this.user.id && !value.isAdmin) {
+          this.isModifyingAdministrator = true;
+          this.dialog
+            .open(ConfirmMessageDialogComponent, {
+              data: {
+                title: 'Remove admin role?',
+                message:
+                  'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+              },
+            })
+            .beforeClose()
+            .pipe(
+              tap(result => {
+                if (
+                  result &&
+                  (u.name || u.password || u.isAdmin === value.isAdmin)
+                ) {
+                  this.evtSubmit.emit(u);
+                } else {
+                  this.evtCancel.emit();
+                  this.isModifyingAdministrator = false;
+                }
+              })
+            )
+            .subscribe();
+        } else {
+          this.evtSubmit.emit(u);
+        }
       } else {
         this.evtCancel.emit();
       }

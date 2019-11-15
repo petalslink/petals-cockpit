@@ -43,6 +43,9 @@ describe('Administration edit user', () => {
     get passwordInpt() {
       return getInput('password');
     },
+    get adminInpt() {
+      return getInput('isAdmin');
+    },
     get addUserFormBtn() {
       return getBtn('btn-add-user-form');
     },
@@ -137,6 +140,7 @@ describe('Administration edit user', () => {
     component.user = {
       id: 'usr1',
       name: 'User 1',
+      isAdmin: false,
     };
 
     fixture.detectChanges();
@@ -151,6 +155,7 @@ describe('Administration edit user', () => {
     component.user = {
       id: 'usr1',
       name: 'User 1',
+      isAdmin: false,
     };
 
     fixture.detectChanges();
@@ -177,6 +182,7 @@ describe('Administration edit user', () => {
     component.user = {
       id: 'usr1',
       name: 'User 1',
+      isAdmin: false,
     };
 
     fixture.detectChanges();
@@ -188,6 +194,7 @@ describe('Administration edit user', () => {
     component.user = {
       id: 'usr1',
       name: 'User 1',
+      isAdmin: false,
     };
     fixture.detectChanges();
 
@@ -205,6 +212,7 @@ describe('Administration edit user', () => {
     component.user = {
       id: 'usr1',
       name: 'User 1',
+      isAdmin: false,
     };
     component.canDelete = true;
     fixture.detectChanges();

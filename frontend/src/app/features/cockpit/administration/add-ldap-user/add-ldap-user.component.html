@@ -59,7 +59,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <mat-option 
                 class="option-ldap-user-content"
                 *ngFor="let user of filteredUsers$ | async" 
-                (onSelectionChange)="userSearchInput.value != '' && doSubmit(user.username, user.name)"
+                (onSelectionChange)="userSearchInput.value != '' && doSubmit(user.username, user.name, false)"
               >
                 <div fxLayout="row" class="ldap-user">
                   <span

@@ -32,9 +32,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <div class="margin-right-x1">
                 <mat-spinner 
                   *ngIf="isFetchingUsers$ | async; else usersFetched"
-                  class="margin-right-x1" 
                   [diameter]="16" 
                   [strokeWidth]="1" 
+                  class="margin-right-x1" 
                 ></mat-spinner>
                 <ng-template #usersFetched>
                   <span class="color-primary-light-bold" *ngIf="users.length > 0" matLine>
@@ -100,7 +100,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 [ngClass]="'exp-pnl-user-'+user.id"
                 (closed)="onResetEditUserForm(i)"
               >
-                <mat-expansion-panel-header class="mat-body" fxLayout="row">
+                <mat-expansion-panel-header (click)='isAdministratorChecked = user.isAdmin' fxLayout="row" class="mat-body" >
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
@@ -119,6 +119,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     #editUser
                     [canDelete]="user.id !== currentUser.id && !user.isDeleting"
                     [user]="user"
+                    [currentUser]="currentUser"
+                    [isLastAdmin]="isLastAdmin"
                     (evtSubmit)="onSave(user.id, $event); el.close()"
                     (evtDelete)="onDelete(user.id); el.close()"
                     (evtCancel)="el.close()"
@@ -142,27 +144,53 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                       <span class="user-name">{{ user.name }}</span>
                     </div>
                   </div>
-                  <mat-action-row 
-                    class="pnl-actions-user-management" 
-                    fxLayoutAlign="center center" 
-                    fxLayout.lt-md="column wrap" 
+                  <!-- Todo : remove the slide toggle animation while switching between users -->
+                  <div 
+                    fxLayout="row" 
+                    fxLayoutGap="20px" 
+                    fxLayoutAlign.md="center center"
+                    fxLayoutAlign.lt-md="start center"
+                    class="margin-top-x1"
                   >
-                    <button 
-                      mat-raised-button 
-                      type="button" 
-                      class="btn-delete-form text-upper" 
-                      (click)="onDelete(user.id)"
-                      *ngIf="user.id !== currentUser.id && !user.isDeleting"
+                    <mat-slide-toggle
+                      color="primary"
+                      [disabled]="isModifyingAdministrator || (isLastAdmin && currentUser.id === user.id)"
+                      [checked]="isAdministratorChecked"
+                      (change)="doSubmitAdministrator(user.id,$event.checked)"
+                      class="user-admin"
                     >
-                      <mat-icon color="warn">delete</mat-icon>
-                      <span class="delete-name">Delete</span>
-                    </button>
+                    Administrator
+                    </mat-slide-toggle>
+                  </div>
+                  <app-message
+                    *ngIf="isLastAdmin && (currentUser.id === user.id)"
+                    class="info-admin-edit"
+                    type="info"
+                    msg="You are the last administrator remaining."
+                    [isClosable]="false"
+                ></app-message>
+                  <mat-action-row 
+                    fxLayoutAlign="center center" 
+                    fxLayout.lt-md="column wrap"
+                    fxLayoutGap="10px" 
+                    class="pnl-actions-user-management" 
+                  >
+                  <button 
+                    *ngIf="user.id !== currentUser.id && !user.isDeleting"
+                    mat-raised-button 
+                    type="button" 
+                    (click)="onDelete(user.id)"
+                    class="btn-delete-form text-upper" 
+                  >
+                    <mat-icon color="warn">delete</mat-icon>
+                    <span class="delete-name">Delete</span>
+                  </button>
                   </mat-action-row>
                 </div>
 
               </mat-expansion-panel>
             </mat-accordion>
-            <mat-progress-bar mode="indeterminate" color="primary" *ngIf="isFetchingUsers$ | async"></mat-progress-bar>
+            <mat-progress-bar *ngIf="isFetchingUsers$ | async" mode="indeterminate" color="primary"></mat-progress-bar>
           </div>
         </div>
 

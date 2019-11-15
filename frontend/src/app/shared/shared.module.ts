@@ -28,6 +28,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -42,6 +43,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
@@ -55,12 +57,14 @@ import { SimpleNotificationsModule } from 'angular2-notifications';
 import { NgxHoverOpacityModule } from 'ngx-hover-opacity';
 import { NgPipesModule } from 'ngx-pipes';
 
+import { ConfirmMessageDialogComponent } from './components/confirm-message-dialog/confirm-message-dialog.component';
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { MessageComponent } from './components/message/message.component';
+
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { SettingsThemeColorComponent } from './components/settings-theme-color/settings-theme-color.component';
 import { UpdateFileInformationDirective } from './components/upload/update-file-information.directive';
@@ -80,6 +84,7 @@ export const MaterialModules = [
   MatBadgeModule,
   MatButtonModule,
   MatCardModule,
+  MatSlideToggleModule,
   MatChipsModule,
   MatIconModule,
   MatInputModule,
@@ -97,6 +102,7 @@ export const MaterialModules = [
   MatSnackBarModule,
   MatSortModule,
   MatTableModule,
+  MatCheckboxModule,
   MatTabsModule,
   MatToolbarModule,
   MatTooltipModule,
@@ -204,6 +210,7 @@ export const declarations = [
   SettingsThemeColorComponent,
   MenuComponent,
   SnackBarDeploymentProgressComponent,
+  ConfirmMessageDialogComponent,
 ];
 
 export const exportss = [
@@ -222,7 +229,10 @@ export const exportss = [
   imports,
   exports: exportss,
   declarations,
-  entryComponents: [SnackBarDeploymentProgressComponent],
+  entryComponents: [
+    SnackBarDeploymentProgressComponent,
+    ConfirmMessageDialogComponent
+  ],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {

@@ -27,6 +27,8 @@ import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { filter, first, map, tap } from 'rxjs/operators';
 
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
 import { IUserNew } from '@shared/services/users.service';
 import { IStore } from '@shared/state/store.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
@@ -44,6 +46,9 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   currentUser: ICurrentUser;
+  isAdministratorChecked: boolean;
+  isModifyingAdministrator = false;
+  isLastAdmin: boolean;
 
   users$: Observable<IUser[]>;
   user$: Observable<ICurrentUser>;
@@ -53,7 +58,7 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   @ViewChildren('editUser') children: QueryList<AddEditUserComponent>;
   @ViewChild('addUser') child: AddEditUserComponent;
 
-  constructor(private store$: Store<IStore>) {}
+  constructor(private store$: Store<IStore>, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.users$ = this.store$.pipe(
@@ -73,6 +78,15 @@ export class AdministrationComponent implements OnInit, OnDestroy {
         first(),
         filter(u => u.isAdmin),
         tap(() => this.store$.dispatch(new Users.FetchAll()))
+      )
+      .subscribe();
+
+    this.users$
+      .pipe(
+        tap(users => {
+          const count = users.filter(user => user.isAdmin).length;
+          this.isLastAdmin = count === 1;
+        })
       )
       .subscribe();
 
@@ -100,7 +114,10 @@ export class AdministrationComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Users.Add(user));
   }
 
-  onSave(id: string, changes: { name?: string; password?: string }) {
+  onSave(
+    id: string,
+    changes: { name?: string; password?: string; isAdmin?: boolean }
+  ) {
     this.store$.dispatch(new Users.Modify({ id, changes }));
   }
 
@@ -110,5 +127,37 @@ export class AdministrationComponent implements OnInit, OnDestroy {
 
   trackByUser(i: number, user: IUser) {
     return user.id;
+  }
+
+  doSubmitAdministrator(id: string, isAdmin: boolean) {
+    this.isAdministratorChecked = isAdmin;
+    const changes: { isAdmin: boolean } = {
+      isAdmin,
+    };
+    if (this.currentUser.id === id && !isAdmin) {
+      this.isModifyingAdministrator = true;
+      this.dialog
+        .open(ConfirmMessageDialogComponent, {
+          data: {
+            title: 'Remove admin role?',
+            message:
+              'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+          },
+        })
+        .beforeClose()
+        .pipe(
+          tap(result => {
+            if (result) {
+              this.store$.dispatch(new Users.Modify({ id, changes }));
+            } else {
+              this.isAdministratorChecked = true;
+              this.isModifyingAdministrator = false;
+            }
+          })
+        )
+        .subscribe();
+    } else {
+      this.store$.dispatch(new Users.Modify({ id, changes }));
+    }
   }
 }
