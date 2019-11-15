@@ -15,11 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// base selector
-const bs = `app-petals-bus-view`;
+import { ARTIFACT_DEPLOYMENT_DOM } from './container.dom';
 
-export const TOPOLOGY_DOM = {
-  table: {
-    rowNames: `${bs} .mat-row`,
-  },
-};
+Cypress.Commands.add('expectSlListToBe', slList => {
+  const cellNamesVersions = cy
+    .get(ARTIFACT_DEPLOYMENT_DOM.table.slsTable)
+    .find('td.cell-status')
+    .prevAll();
+
+  cellNamesVersions.should('have.length', slList.length);
+  cellNamesVersions.each(($cell, index) =>
+    cy.wrap($cell).contains(slList[index])
+  );
+});
