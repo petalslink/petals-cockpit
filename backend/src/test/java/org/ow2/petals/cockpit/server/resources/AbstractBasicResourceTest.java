@@ -29,7 +29,7 @@ public class AbstractBasicResourceTest extends AbstractCockpitResourceTest {
 
     @Before
     public void setUpUser() {
-        resource.setCurrentProfile(new CockpitProfile(ADMIN, true));
         addUser(ADMIN, true);
+        resource.setCurrentProfile(new CockpitProfile(ADMIN, resource.db().configuration()));
     }
 }

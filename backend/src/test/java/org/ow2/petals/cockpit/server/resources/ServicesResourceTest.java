@@ -35,7 +35,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingServiceForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/services/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -43,7 +43,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingEndpointForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/endpoints/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -51,7 +51,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingInterfaceForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/interfaces/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);

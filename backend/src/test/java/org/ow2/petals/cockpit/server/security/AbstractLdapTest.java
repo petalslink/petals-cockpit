@@ -48,8 +48,8 @@ public class AbstractLdapTest extends AbstractTest {
     @SuppressWarnings("null")
     public static final NewUser USER_LDAP_NODB = MockLdapServer.LDAP_USER2;
 
-    public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user");
-    public static final NewUser USER_NOLDAP_NODB = new NewUser("unknownUser", "userpass123", "Unknown user");
+    public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user", false);
+    public static final NewUser USER_NOLDAP_NODB = new NewUser("unknownUser", "userpass123", "Unknown user", false);
 
     public static final LdapUser USER1 = convertToLdapUser(MockLdapServer.LDAP_USER1);
     public static final LdapUser USER2 = convertToLdapUser(MockLdapServer.LDAP_USER2);
@@ -80,13 +80,13 @@ public class AbstractLdapTest extends AbstractTest {
     }
 
     protected void addUser(String username) {
-        addUser(new NewUser(username, username, "..."), false);
+        addUser(new NewUser(username, username, "...", false));
     }
 
-    protected void addUser(NewUser user, boolean isAdmin) {
+    protected void addUser(NewUser user) {
         final String password = user.password;
         assert password != null && user.name != null;
-        appLdap.db().executeInsert(new UsersRecord(user.username, "ldap", user.name, null, isAdmin, true));
+        appLdap.db().executeInsert(new UsersRecord(user.username, "ldap", user.name, null, user.isAdmin, true));
     }
 
     protected boolean userIsInDb(String username) {

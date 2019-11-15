@@ -33,17 +33,24 @@ import org.ow2.petals.admin.topology.Container;
 import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import javaslang.Tuple;
 
-public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasicResourceTest {
 
+public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasicResourceTest {
     protected static final String SYSINFO = "WORKSPACE TEST SYSINFO";
 
-    protected final String anotherUser = "anotheruser";
+    protected final String ANOTHERUSER = "anotheruser";
+
+    protected final String ADMINWORKSPACEUSER = "adminwsuser";
+
+    protected final String DEPLOYUSER = "deployuser";
+
+    protected final String LIFECYCLEUSER = "lifecycleuser";
 
     protected final Domain domain = new Domain("dom");
 
@@ -104,17 +111,24 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
         resource.petals.registerArtifact(sharedLibrary, container1);
         resource.petals.registerEndpoints(referenceEndpoints);
 
-        addUser(anotherUser);
-
+        addUser(ANOTHERUSER, false);
+        addUser(ADMINWORKSPACEUSER, false);
+        addUser(DEPLOYUSER, false);
+        addUser(LIFECYCLEUSER, false);
         // forbidden workspace (it is NOT registered in petals admin)
         fDomain.addContainers(fContainer);
         fContainer.addComponent(fComponent);
         fContainer.addServiceAssembly(fServiceAssembly);
         fContainer.addSharedLibrary(fSharedLibrary);
-        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), anotherUser);
+        setupWorkspace(2, "test2", Arrays.asList(Tuple.of(fDomain, "passphrase")), ANOTHERUSER, ADMINWORKSPACEUSER, DEPLOYUSER, LIFECYCLEUSER);
 
         // test workspace
         setupWorkspace(1, "test", Arrays.asList(Tuple.of(domain, "phrase")), ADMIN);
+        addPermissions(1L, ADMIN, true, true, true);
+        addPermissions(2L, ANOTHERUSER, false, true, true);
+        addPermissions(2L, ADMINWORKSPACEUSER, true, false, false);
+        addPermissions(2L, DEPLOYUSER, false, true, false);
+        addPermissions(2L, LIFECYCLEUSER, false, false, true);
     }
 
     private List<Endpoint> makeEndpoints() {
@@ -131,6 +145,18 @@ public abstract class AbstractDefaultWorkspaceResourceTest extends AbstractBasic
         e.add(new Endpoint("edp4b", type, "cont1", "comp", "serv2b", Arrays.asList("int2")));
 
         return e;
+    }
+
+    public void addUsersToWorkspace(long wsId, String... username) {
+        for (String user : username) {
+            resource.db().executeInsert(new UsersWorkspacesRecord(wsId, user, false, false, false));
+        }
+    }
+
+    public void addPermissions(long wsId, String username, boolean adminWs, boolean deployPermission,
+            boolean lifecyclePermission) {
+        resource.db().executeUpdate(
+                new UsersWorkspacesRecord(wsId, username, adminWs, deployPermission, lifecyclePermission));
     }
 
 }

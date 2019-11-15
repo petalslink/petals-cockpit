@@ -33,28 +33,28 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class AbstractSecurityTest extends AbstractTest {
 
-    public static final NewUser ADMIN = new NewUser("admin", "adminpass", "Administrator");
+    public static final NewUser ADMIN = new NewUser("admin", "adminpass", "Administrator", true);
 
-    public static final NewUser USER = new NewUser("user", "userpass", "Normal user");
+    public static final NewUser USER = new NewUser("user", "userpass", "Normal user", false);
 
     @Rule
     public final CockpitApplicationRule app = new CockpitApplicationRule("application-tests.yml");
 
     protected void addUser(String username) {
-        addUser(new NewUser(username, username, "..."), false);
+        addUser(new NewUser(username, username, "...", false));
     }
 
-    protected void addUser(NewUser user, boolean isAdmin) {
+    protected void addUser(NewUser user) {
         final String password = user.password;
         assert password != null;
         app.db().executeInsert(new UsersRecord(user.username, new BCryptPasswordEncoder().encode(password),
-                user.name, null, isAdmin, false));
+                user.name, null, user.isAdmin, false));
     }
 
     @Before
     public void setUpDb() {
-        addUser(ADMIN, true);
-        addUser(USER, false);
+        addUser(ADMIN);
+        addUser(USER);
     }
 
     protected Response login(NewUser user) {

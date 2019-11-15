@@ -67,7 +67,7 @@ public class CockpitProfile extends CommonProfile {
 
     public void updatePermissions(Configuration jooq) {
         DSL.using(jooq).transaction(conf -> {
-            this.permissions = getPermissionsHashMap(conf, this.getId());
+            this.permissions = getPermissionsMap(conf, this.getId());
             boolean admin = DSL.using(conf).select(USERS.ADMIN).from(USERS).where(USERS.USERNAME.eq(this.getId()))
                     .fetchOptional().orElseThrow(() -> new NoDataFoundException("Admin field is missing !"))
                     .into(Boolean.class).booleanValue();
@@ -79,7 +79,7 @@ public class CockpitProfile extends CommonProfile {
         });
     }
 
-    private Map<Long, Set<String>> getPermissionsHashMap(Configuration jooq, String username) {
+    private Map<Long, Set<String>> getPermissionsMap(Configuration jooq, String username) {
         return DSL.using(jooq).transactionResult(conf -> {
             Map<Long, Set<String>> permissionsMap = new HashMap<>();
             Result<UsersWorkspacesRecord> permRow = DSL.using(jooq).selectFrom(USERS_WORKSPACES)

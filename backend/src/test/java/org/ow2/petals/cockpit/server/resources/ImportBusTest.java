@@ -99,7 +99,7 @@ public class ImportBusTest extends AbstractBasicResourceTest {
 
         resource.db().transaction(conf -> {
             DSL.using(conf).executeInsert(new WorkspacesRecord(1L, "test", "", ""));
-            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN));
+            DSL.using(conf).executeInsert(new UsersWorkspacesRecord(1L, ADMIN, false, false, false));
         });
     }
 

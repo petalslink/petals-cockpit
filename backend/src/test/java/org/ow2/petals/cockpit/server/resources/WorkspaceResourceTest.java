@@ -238,7 +238,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(add3.getStatus()).isEqualTo(409);
 
         // the other workspace wasn't touched
-        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
 
@@ -249,7 +249,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         Response add = resource.target("/workspaces/2/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(403);
 
-        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
 
@@ -265,7 +265,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void deleteUserFromExistingWorkspace() {
         addUser("user1");
 
-        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1", false, false, false));
 
         Response add = resource.target("/workspaces/1/users/user1").request().delete();
         assertThat(add.getStatus()).isEqualTo(204);
@@ -282,7 +282,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(add3.getStatus()).isEqualTo(204);
 
         // the other workspace wasn't touched
-        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
 
@@ -297,7 +297,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         Response add = resource.target("/workspaces/2/users/anotheruser").request().delete();
         assertThat(add.getStatus()).isEqualTo(403);
 
-        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(1)
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
     }
 
