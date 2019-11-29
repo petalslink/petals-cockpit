@@ -57,10 +57,7 @@ import {
   SnackBarDeploymentProgressComponent,
   UploadComponent,
 } from '@shared/components/upload/upload.component';
-import {
-  ContainersService,
-  IArtifactInformations,
-} from '@shared/services/containers.service';
+import { ContainersService } from '@shared/services/containers.service';
 import {
   HttpProgress,
   HttpProgressType,
@@ -163,7 +160,7 @@ export class ArtifactsDeploymentComponent
 
   countSlsNotInContainer: number;
 
-  artifact: IArtifactInformations = { name: '', version: '', type: '' };
+  artifact: DeploymentArtifact;
 
   constructor(
     private fb: FormBuilder,
@@ -218,14 +215,8 @@ export class ArtifactsDeploymentComponent
   getTitle() {
     if (!this.isFileParsed) {
       return 'Artifact Deployment';
-    }
-    switch (this.artifact.type) {
-      case 'component':
-        return 'Component Deployment';
-      case 'service-assembly':
-        return 'Service Assembly Deployment';
-      case 'shared-library':
-        return 'Shared Library Deployment';
+    } else {
+      return this.artifact.getTitle();
     }
   }
 
@@ -260,74 +251,29 @@ export class ArtifactsDeploymentComponent
       .pipe(
         takeUntil(this.onDestroy$),
         tap(artifactFromZip => {
-          this.artifact = artifactFromZip;
-
           switch (artifactFromZip.type) {
             case 'component':
-              // when using mat-error with material, if there's an error it'll be display
-              // only when the control is set to touched and thus we won't have a
-              // "real time" feedback, especially when there's only one input
-              this.updateComponentDeployInfoFormGroup.get('name').enable();
-
-              this.updateComponentDeployInfoFormGroup
-                .get('name')
-                .markAsTouched();
-
-              this.updateComponentDeployInfoFormGroup
-                .get('name')
-                .setValue(artifactFromZip.name);
-
-              this.countSlsNotInContainer = null;
-              this.slIsInCurrentContainer = null;
-
-              this.dataSource = new MatTableDataSource<
-                ISharedLibrarySimplified
-              >(artifactFromZip.sharedLibraries);
-
-              this.updateSlsStatus();
-
-              this.updateComponentDeployInfoFormGroup.setValue({
-                name: this.artifact.name,
-                slName: null,
-                slVersion: null,
-              });
-
-              this.isFileParsed = true;
+              this.artifact = new Comp(
+                this,
+                artifactFromZip.name,
+                artifactFromZip.sharedLibraries
+              );
               break;
             case 'service-assembly':
-              this.updateServiceAssemblyDeployInfoFormGroup
-                .get('name')
-                .markAsTouched();
-
-              this.updateServiceAssemblyDeployInfoFormGroup
-                .get('name')
-                .setValue(artifactFromZip.name);
-
-              this.isFileParsed = true;
-              this.canFocus = true;
+              this.artifact = new Sa(this, artifactFromZip.name);
               break;
             case 'shared-library':
-              ['name', 'version'].forEach(attr =>
-                this.updateSharedLibraryDeployInfoFormGroup
-                  .get(attr)
-                  .markAsTouched()
+              this.artifact = new Sl(
+                this,
+                artifactFromZip.name,
+                artifactFromZip.version
               );
-
-              this.updateSharedLibraryDeployInfoFormGroup
-                .get('name')
-                .setValue(artifactFromZip.name);
-
-              this.updateSharedLibraryDeployInfoFormGroup
-                .get('version')
-                .setValue(artifactFromZip.version);
-
-              this.isFileParsed = true;
-              this.canFocus = true;
               break;
 
             default:
               break;
           }
+          this.artifact.init();
         }),
         catchError(err => {
           this.notifications.warn(
@@ -372,49 +318,17 @@ export class ArtifactsDeploymentComponent
   }
 
   deploy(file: File) {
-    let deployActions: {
-      onProgressUpdate: (percentage: number) => void;
-      onComplete: () => void;
-      actionToDispatch: Action;
-    };
     const correlationId = uuid();
 
     this.isDeployingArtifact(this.artifact.type);
 
-    let actionToDispatch: Action = null;
+    const actionToDispatch: Action = this.artifact.fetchActionToDispatch(
+      file,
+      correlationId
+    );
 
-    switch (this.artifact.type) {
-      case 'component':
-        actionToDispatch = new Containers.DeployComponent({
-          correlationId,
-          id: this.container.id,
-          file,
-          name: this.updateComponentDeployInfoFormGroup.get('name').value,
-          sharedLibraries: this.dataSource.data,
-        });
-        break;
-      case 'service-assembly':
-        actionToDispatch = new Containers.DeployServiceAssembly({
-          correlationId,
-          id: this.container.id,
-          file,
-          name: this.updateServiceAssemblyDeployInfoFormGroup.get('name').value,
-        });
-        break;
-      case 'shared-library':
-        actionToDispatch = new Containers.DeploySharedLibrary({
-          correlationId,
-          id: this.container.id,
-          file,
-          name: this.updateSharedLibraryDeployInfoFormGroup.get('name').value,
-          version: this.updateSharedLibraryDeployInfoFormGroup.get('version')
-            .value,
-        });
-        break;
-    }
-
-    deployActions = {
-      onProgressUpdate: percentage => {
+    const deployActions = {
+      onProgressUpdate: (percentage: number) => {
         this.artifactUploadProgress = { percentage };
         this.percentage$.next(percentage);
         this.deployArtifact.reset();
@@ -444,26 +358,14 @@ export class ArtifactsDeploymentComponent
   }
 
   getArtifactDeploymentError() {
-    switch (this.artifact.type) {
-      case 'component':
-        return this.container.errorDeploymentComponent;
-      case 'service-assembly':
-        return this.container.errorDeploymentServiceAssembly;
-      case 'shared-library':
-        return this.container.errorDeploymentSharedLibrary;
+    if (this.artifact) {
+      return this.artifact.getArtifactDeploymentError();
     }
   }
 
   isDisabledDeployArtifact() {
-    switch (this.artifact.type) {
-      case 'component':
-        return (
-          this.updateComponentDeployInfoFormGroup.invalid || this.isEditingSl()
-        );
-      case 'service-assembly':
-        return this.updateServiceAssemblyDeployInfoFormGroup.invalid;
-      case 'shared-library':
-        return this.updateSharedLibraryDeployInfoFormGroup.invalid;
+    if (this.artifact) {
+      return this.artifact.isDisabledDeployArtifact();
     }
   }
 
@@ -471,17 +373,8 @@ export class ArtifactsDeploymentComponent
     this.isFileParsed = false;
     this.canFocus = false;
 
-    switch (this.artifact.type) {
-      case 'component':
-        this.updateComponentDeployInfoFormGroup.reset();
-        this.cancelOverrideSl();
-        break;
-      case 'service-assembly':
-        this.updateServiceAssemblyDeployInfoFormGroup.reset();
-        break;
-      case 'shared-library':
-        this.updateSharedLibraryDeployInfoFormGroup.reset();
-        break;
+    if (this.artifact) {
+      this.artifact.cancelSelectedFile();
     }
   }
 
@@ -585,4 +478,190 @@ function hasContainerIdChanged(containerChanges: SimpleChange) {
   }
 
   return oldContainer.id !== newContainer.id;
+}
+
+abstract class DeploymentArtifact {
+  protected constructor(
+    readonly parent: ArtifactsDeploymentComponent,
+    readonly type: string,
+    protected name: string
+  ) {}
+  abstract init(): void;
+  abstract getTitle(): string;
+  abstract getArtifactDeploymentError(): string;
+  abstract isDisabledDeployArtifact(): boolean;
+  abstract cancelSelectedFile(): void;
+  abstract fetchActionToDispatch(file: File, correlationId: string): Action;
+}
+
+class Comp extends DeploymentArtifact {
+  constructor(
+    parent: ArtifactsDeploymentComponent,
+    name: string,
+    protected sharedLibraries: ISharedLibrarySimplified[]
+  ) {
+    super(parent, 'component', name);
+  }
+
+  init() {
+    // when using mat-error with material, if there's an error it'll be display
+    // only when the control is set to touched and thus we won't have a
+    // "real time" feedback, especially when there's only one input
+    this.parent.updateComponentDeployInfoFormGroup.get('name').enable();
+
+    this.parent.updateComponentDeployInfoFormGroup.get('name').markAsTouched();
+
+    this.parent.updateComponentDeployInfoFormGroup
+      .get('name')
+      .setValue(this.name);
+
+    this.parent.countSlsNotInContainer = null;
+    this.parent.slIsInCurrentContainer = null;
+
+    this.parent.dataSource = new MatTableDataSource<ISharedLibrarySimplified>(
+      this.sharedLibraries
+    );
+
+    this.parent.updateSlsStatus();
+
+    this.parent.updateComponentDeployInfoFormGroup.setValue({
+      name: this.name,
+      slName: null,
+      slVersion: null,
+    });
+
+    this.parent.isFileParsed = true;
+  }
+
+  getTitle() {
+    return 'Component Deployment';
+  }
+
+  getArtifactDeploymentError() {
+    return this.parent.container.errorDeploymentComponent;
+  }
+
+  isDisabledDeployArtifact() {
+    return (
+      this.parent.updateComponentDeployInfoFormGroup.invalid ||
+      this.parent.isEditingSl()
+    );
+  }
+
+  cancelSelectedFile() {
+    this.parent.updateComponentDeployInfoFormGroup.reset();
+    this.parent.cancelOverrideSl();
+  }
+
+  fetchActionToDispatch(file: File, correlationId: string) {
+    return new Containers.DeployComponent({
+      correlationId,
+      id: this.parent.container.id,
+      file,
+      name: this.parent.updateComponentDeployInfoFormGroup.get('name').value,
+      sharedLibraries: this.parent.dataSource.data,
+    });
+  }
+}
+
+class Sa extends DeploymentArtifact {
+  constructor(parent: ArtifactsDeploymentComponent, name: string) {
+    super(parent, 'service-assembly', name);
+  }
+
+  init() {
+    this.parent.updateServiceAssemblyDeployInfoFormGroup
+      .get('name')
+      .markAsTouched();
+
+    this.parent.updateServiceAssemblyDeployInfoFormGroup
+      .get('name')
+      .setValue(this.name);
+
+    this.parent.isFileParsed = true;
+    this.parent.canFocus = true;
+  }
+
+  getTitle() {
+    return 'Service Assembly Deployment';
+  }
+
+  getArtifactDeploymentError() {
+    return this.parent.container.errorDeploymentServiceAssembly;
+  }
+
+  isDisabledDeployArtifact() {
+    return this.parent.updateServiceAssemblyDeployInfoFormGroup.invalid;
+  }
+
+  cancelSelectedFile() {
+    this.parent.updateServiceAssemblyDeployInfoFormGroup.reset();
+  }
+
+  fetchActionToDispatch(file: File, correlationId: string) {
+    return new Containers.DeployServiceAssembly({
+      correlationId,
+      id: this.parent.container.id,
+      file,
+      name: this.parent.updateServiceAssemblyDeployInfoFormGroup.get('name')
+        .value,
+    });
+  }
+}
+
+class Sl extends DeploymentArtifact {
+  constructor(
+    parent: ArtifactsDeploymentComponent,
+    name: string,
+    protected version: string
+  ) {
+    super(parent, 'shared-library', name);
+  }
+
+  init() {
+    ['name', 'version'].forEach(attr =>
+      this.parent.updateSharedLibraryDeployInfoFormGroup
+        .get(attr)
+        .markAsTouched()
+    );
+
+    this.parent.updateSharedLibraryDeployInfoFormGroup
+      .get('name')
+      .setValue(this.name);
+
+    this.parent.updateSharedLibraryDeployInfoFormGroup
+      .get('version')
+      .setValue(this.version);
+
+    this.parent.isFileParsed = true;
+    this.parent.canFocus = true;
+  }
+
+  getTitle() {
+    return 'Shared Library Deployment';
+  }
+
+  getArtifactDeploymentError() {
+    return this.parent.container.errorDeploymentSharedLibrary;
+  }
+
+  isDisabledDeployArtifact() {
+    return this.parent.updateSharedLibraryDeployInfoFormGroup.invalid;
+  }
+
+  cancelSelectedFile() {
+    this.parent.updateSharedLibraryDeployInfoFormGroup.reset();
+  }
+
+  fetchActionToDispatch(file: File, correlationId: string) {
+    return new Containers.DeploySharedLibrary({
+      correlationId,
+      id: this.parent.container.id,
+      file,
+      name: this.parent.updateSharedLibraryDeployInfoFormGroup.get('name')
+        .value,
+      version: this.parent.updateSharedLibraryDeployInfoFormGroup.get('version')
+        .value,
+    });
+  }
 }
