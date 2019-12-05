@@ -1,6 +1,36 @@
-<a name="1.00.0"></a>
+<a name="1.1.0"></a>
+# [1.1.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.27.0...v1.1.0) (2019-12-05)
 
-* **product:** Released **beta version 1.00.0** Based of version 0.27.0
+### General
+* **frontend:** We took some time to refactor almost all of the frontend user interface. Bus elements overview (like component, SA, SU, SL) and services views remain to be done. **But we are back in sprint mode !**
+
+### Bug Fixes
+
+* **frontend:** display containers graph even with a single container ([f5f2632](https://gitlab.com/linagora/petals-cockpit/commit/f5f2632))
+* **frontend:** fix color theme reset after logout ([2d54005](https://gitlab.com/linagora/petals-cockpit/commit/2d54005)), closes [#495](https://gitlab.com/linagora/petals-cockpit/issues/495)
+
+
+### Features
+
+* **backend:** add default description to workspace at creation ([e41e95a](https://gitlab.com/linagora/petals-cockpit/commit/e41e95a)), closes [#523](https://gitlab.com/linagora/petals-cockpit/issues/523)
+* **backend:** enforce workspace name uniqueness ([e11d143](https://gitlab.com/linagora/petals-cockpit/commit/e11d143)), closes [#541](https://gitlab.com/linagora/petals-cockpit/issues/541)
+* **frontend:** add workspace name to the breadcrumb ([3349726](https://gitlab.com/linagora/petals-cockpit/commit/3349726)), closes [#534](https://gitlab.com/linagora/petals-cockpit/issues/534)
+* **frontend:** attach bus from workspace overview ([b4d9c2f](https://gitlab.com/linagora/petals-cockpit/commit/b4d9c2f)), closes [#554](https://gitlab.com/linagora/petals-cockpit/issues/554)
+* **frontend:** detach bus from workspace overview ([4965f8b](https://gitlab.com/linagora/petals-cockpit/commit/4965f8b))
+* **frontend:** sort columns of container list ([041ecec](https://gitlab.com/linagora/petals-cockpit/commit/041ecec))
+* **frontend:** sort workspaces by name ([af0baa1](https://gitlab.com/linagora/petals-cockpit/commit/af0baa1)), closes [#539](https://gitlab.com/linagora/petals-cockpit/issues/539)
+* **frontend:** sort workspaces by name in workspaces list ([9e5c1ed](https://gitlab.com/linagora/petals-cockpit/commit/9e5c1ed)), closes [#540](https://gitlab.com/linagora/petals-cockpit/issues/540)
+* **frontend:** toggle visibility of password ([865e9fe](https://gitlab.com/linagora/petals-cockpit/commit/865e9fe))
+
+
+
+
+<a name="1.00.0-beta"></a>
+# [1.00.0-beta](https://gitlab.com/linagora/petals-cockpit/compare/v1.00.0-beta...v0.27.0) (2018-09-07)
+
+### General
+
+* **product:** Released **beta version 1.00.0** (Based of version 0.27.0)
 
 <a name="0.27.0"></a>
 # [0.27.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.26.0...v0.27.0) (2018-09-07)
