@@ -35,6 +35,7 @@ import 'cypress-pipe';
 // LDAP
 import './administration.commands';
 import './component.commands';
+import './container.commands';
 import './endpoint.commands';
 import './helper.commands';
 import './interface.commands';

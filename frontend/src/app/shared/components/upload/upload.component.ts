@@ -19,9 +19,16 @@ import {
   Component,
   ContentChild,
   EventEmitter,
+  Inject,
   Input,
+  OnInit,
   Output,
 } from '@angular/core';
+import {
+  MAT_SNACK_BAR_DATA,
+  MatSnackBarRef,
+} from '@angular/material/snack-bar';
+import { Observable } from 'rxjs';
 
 import { UpdateFileInformationDirective } from './update-file-information.directive';
 import {
@@ -35,10 +42,12 @@ import {
   styleUrls: ['./upload.component.scss'],
 })
 export class UploadComponent {
-  @Input() title = `Upload a file`;
+  @Input() title: string;
+  @Input() message: string;
   @Input() acceptedFileType?: string;
   @Input() error?: string;
-  @Input() disabled = false;
+  @Input() disabled: boolean;
+  @Input() isFileParsed: boolean;
   @Input()
   set uploadStatus(uploadStatus: { percentage: number }) {
     if (!!uploadStatus && typeof uploadStatus.percentage === 'number') {
@@ -113,5 +122,40 @@ export class UploadComponent {
       fileName,
       fileExtension,
     };
+  }
+}
+
+/**
+ * This snackBar component is required to inform user of the new deployment in the current container.
+ **/
+@Component({
+  selector: 'app-snackbar-deployment-progress',
+  template: `
+    <div class="mat-typography">
+      <h3 class="title">{{ data.titleArtifactType }} deployment in progress...</h3>
+      <div class="wrapper-progress-bar" *ngIf="data.uploadProgress$ | async as uploadProgress">
+        <span class="progress-value">{{ uploadProgress }}%</span>
+        <mat-progress-bar mode="determinate" [value]="uploadProgress" class="margin-left-x1 margin-right-x1"></mat-progress-bar>
+        <button mat-button color="accent" (click)="dismiss()" class="btn-dismiss text-upper">
+          <span class="dismiss-snackbar-deployment-progress-text-btn">Dismiss</span>
+        </button>
+      </div>
+    </div>
+  `,
+})
+export class SnackBarDeploymentProgressComponent implements OnInit {
+  constructor(
+    public snackRef: MatSnackBarRef<SnackBarDeploymentProgressComponent>,
+    @Inject(MAT_SNACK_BAR_DATA)
+    public data: {
+      titleArtifactType: string;
+      uploadProgress$: Observable<number>;
+    }
+  ) {}
+
+  ngOnInit() {}
+
+  dismiss() {
+    this.snackRef.dismiss();
   }
 }

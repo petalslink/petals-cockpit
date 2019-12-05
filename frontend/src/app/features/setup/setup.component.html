@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
   
       <div fxFlex class="margin-top-x1">
-        <mat-form-field appearance="outline" fxFill class="token-form-field">
+        <mat-form-field appearance="outline" fxFlexFill class="token-form-field">
           <mat-label>Token</mat-label>
           <input matInput [appFocusInputIfLargeScreen]="focusTokenInput" type="text" formControlName="token" [errorStateMatcher]="matcher" required>
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="ticket-alt"></fa-icon></mat-icon></span>
@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
       
       <div fxFlex>
-        <mat-form-field appearance="outline" fxFill class="username-form-field">
+        <mat-form-field appearance="outline" fxFlexFill class="username-form-field">
           <mat-label>Username</mat-label>
           <input matInput [appFocusInputIfLargeScreen]="focusUsernameInput" type="text" formControlName="username" [errorStateMatcher]="matcher" required>
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="user-astronaut"></fa-icon></mat-icon></span>
@@ -42,7 +42,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
       
       <div fxFlex *ngIf="!status.isLdapMode">
-        <mat-form-field appearance="outline" fxFill class="pwd-form-field">
+        <mat-form-field appearance="outline" fxFlexFill class="pwd-form-field">
           <mat-label>Password</mat-label>
           <input matInput [type]="show ? 'text' : 'password'" formControlName="password" [errorStateMatcher]="matcher" required >
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
@@ -62,7 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </div>
 
       <div fxFlex *ngIf="!status.isLdapMode">
-        <mat-form-field appearance="outline" fxFill class="name-form-field">
+        <mat-form-field appearance="outline" fxFlexFill class="name-form-field">
           <mat-label>Name</mat-label>
           <input matInput type="text" formControlName="name" [errorStateMatcher]="matcher" required>
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="id-badge"></fa-icon></mat-icon></span>

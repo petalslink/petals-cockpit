@@ -117,6 +117,9 @@ declare namespace Cypress {
     triggerSSEForComp(name: string, id: string): any;
     triggerSSEForWks(name: string, id: string): any;
 
+    // containers.commands
+    expectSlListToBe(expectedSlList: string[]): any;
+
     // components.commands
     getActionStateInLifecycleComponent(name: string): any;
     checkOverrideSharedLibrariesInputs(expectedSharedLibraries: string[]): any;

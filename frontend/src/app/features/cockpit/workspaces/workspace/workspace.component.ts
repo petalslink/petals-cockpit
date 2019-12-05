@@ -110,7 +110,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           </span>
         </div>
         <mat-dialog-content>
-          <div fxLayout="column" fxFill>
+          <div fxLayout="column" fxFlexFill>
               <p class="mat-body-1">This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
           </div>
         </mat-dialog-content>

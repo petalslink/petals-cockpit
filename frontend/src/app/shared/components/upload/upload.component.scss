@@ -15,26 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-app-mat-card-toolbar {
+.wrapper-btn-select-file {
   input[type='file'] {
     display: none;
     text-transform: lowercase;
   }
+}
 
-  app-message.error-upload {
-    margin-top: 10px;
-  }
+span.wrapper-file-name {
+  margin-top: -10px;
+}
 
-  .when-selected-file {
-    .selected-file {
-      border: 2px dotted #e8e8e8;
-      padding: 10px;
+mat-card-actions.mat-card-actions > .mat-raised-button {
+  margin: 0;
+}
 
-      .edit-information {
-        margin-top: 15px;
-        margin-bottom: 15px;
-        width: 100%;
-      }
-    }
-  }
+mat-card-content.card-content-selected-file-info {
+  margin-bottom: -10px;
 }

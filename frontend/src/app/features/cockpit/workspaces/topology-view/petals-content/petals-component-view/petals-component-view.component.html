@@ -15,8 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-workspace-element [resourceObservable]="component$" deletedMessage="This component has been removed" #we>
 
-  <app-petals-component-overview *appWorkspaceElementTab="'Overview'" [component]="we.resource" [workspaceId]="workspaceId$ | async" fxFill></app-petals-component-overview>
+  <app-petals-component-overview *appWorkspaceElementTab="'Overview'" [component]="we.resource" [workspaceId]="workspaceId$ | async"></app-petals-component-overview>
 
-  <app-petals-component-operations *appWorkspaceElementTab="'Operations'" [component]="we.resource" fxFill></app-petals-component-operations>
+  <app-petals-component-operations *appWorkspaceElementTab="'Operations'" [component]="we.resource"></app-petals-component-operations>
 
 </app-workspace-element>

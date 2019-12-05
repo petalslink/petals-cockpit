@@ -22,11 +22,14 @@ import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
 import { streamHttpProgressAndSuccess } from '@shared/helpers/shared.helper';
+import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { IComponentBackendSSE } from '@shared/services/components.service';
 import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
 import { ISharedLibraryBackendSSE } from '@shared/services/shared-libraries.service';
 import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
+import { map } from 'rxjs/operators';
+import * as xmltojson from 'xmltojson';
 
 export interface IContainerBackendSSECommon {
   id: string;
@@ -92,6 +95,10 @@ export abstract class ContainersService {
     progress$: Observable<number>;
     result$: Observable<JsTable<ISharedLibraryBackendSSE>>;
   };
+
+  abstract getArtifactFromZipFile(
+    file: File
+  ): Observable<IArtifactInformations>;
 }
 
 @Injectable()
@@ -223,4 +230,59 @@ export class ContainersServiceImpl extends ContainersService {
       JsTable<ISharedLibraryBackendSSE>
     >(this.http.request(req), result => toJsTable(result.sharedLibraries));
   }
+
+  getArtifactFromZipFile(file: File) {
+    return loadFilesContentFromZip(file, filePath =>
+      filePath.includes('jbi.xml')
+    ).pipe(
+      map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
+    );
+  }
+
+  getInformationFromXml(xml: string): IArtifactInformations {
+    const json: any = xmltojson.parseString(xml, {});
+    const artifact: IArtifactInformations = {
+      type: '',
+      name: '',
+    };
+
+    try {
+      const types = ['component', 'service-assembly', 'shared-library'];
+      for (const typeSelected of types) {
+        if (json.jbi[0].hasOwnProperty(typeSelected)) {
+          artifact.type = typeSelected;
+          break;
+        }
+      }
+
+      artifact.name =
+        json.jbi[0][artifact.type][0].identification[0].name[0]._text;
+
+      if (artifact.type === 'component') {
+        if (json.jbi[0][artifact.type][0]['shared-library']) {
+          artifact.sharedLibraries = json.jbi[0][artifact.type][0][
+            'shared-library'
+          ].map((el: any) => ({
+            name: el._text,
+            version: el._attr.version._value,
+          }));
+        }
+      }
+
+      if (artifact.type === 'shared-library') {
+        artifact.version = json.jbi[0][artifact.type][0]._attr.version._value;
+      }
+    } catch (err) {
+      throw new Error('Getting informations from XML failed');
+    }
+
+    return artifact;
+  }
+}
+
+export interface IArtifactInformations {
+  type: string;
+  name: string;
+  version?: string;
+  sharedLibraries?: ISharedLibrarySimplified[];
 }

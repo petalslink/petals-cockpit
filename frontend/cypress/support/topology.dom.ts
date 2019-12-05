@@ -22,7 +22,4 @@ export const TOPOLOGY_DOM = {
   table: {
     rowNames: `${bs} .mat-row`,
   },
-  texts: {
-    containerNames: `${bs} .container-name`,
-  },
 };

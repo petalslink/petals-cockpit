@@ -40,6 +40,6 @@ Running test will dump cockpit backend output and logs in`e2e/logs`. They will b
 * *cockpit-e2e-run.requests.log* : REST requests logs
 * *cockpit-e2e-run.err.log* : Errors log
 
-> Note: these logs can also be dowloaded from gitlab as `e2e-product` artefact.
+> Note: these logs can also be downloaded from gitlab as `e2e-product` artifact.
 
 DB files are generated in `./e2e/`: `e2e/cockpit.mv.db` and `e2e/cockpit.trace.db`, they can be explored using [h2 console](http://www.h2database.com/html/quickstart.html)

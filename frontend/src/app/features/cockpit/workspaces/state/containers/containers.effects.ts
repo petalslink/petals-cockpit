@@ -17,9 +17,10 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from '@env/environment';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
-import { NotificationsService } from 'angular2-notifications';
 import { Observable, of } from 'rxjs';
 import {
   catchError,
@@ -31,11 +32,13 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { environment } from '@env/environment';
-import { getErrorMessage } from '@shared/helpers/shared.helper';
-import { httpResponseWithProgress } from '@shared/helpers/shared.helper';
+import {
+  getErrorMessage,
+  httpResponseWithProgress,
+} from '@shared/helpers/shared.helper';
 import { ContainersService } from '@shared/services/containers.service';
 import { IStore } from '@shared/state/store.interface';
+import { NotificationsService } from 'angular2-notifications';
 import { Containers } from './containers.actions';
 
 @Injectable()
@@ -44,7 +47,8 @@ export class ContainersEffects {
     private store$: Store<IStore>,
     private actions$: Actions,
     private containersService: ContainersService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private snackBar: MatSnackBar
   ) {}
 
   @Effect()
@@ -114,6 +118,9 @@ export class ContainersEffects {
             'Component Deployment Failed',
             `An error occurred while deploying ${action.payload.file.name}`
           );
+
+          // dismiss the currently-visible snack bar
+          this.snackBar.dismiss();
 
           return of(
             new Containers.DeployComponentError({
@@ -190,6 +197,9 @@ export class ContainersEffects {
             `An error occurred while deploying ${action.payload.file.name}`
           );
 
+          // dismiss the currently-visible snack bar
+          this.snackBar.dismiss();
+
           return of(
             new Containers.DeployServiceAssemblyError({
               correlationId: action.payload.correlationId,
@@ -258,6 +268,9 @@ export class ContainersEffects {
             'Shared Library Deployment Failed',
             `An error occurred while deploying ${action.payload.file.name}`
           );
+
+          // dismiss the currently-visible snack bar
+          this.snackBar.dismiss();
 
           return of(
             new Containers.DeploySharedLibraryError({

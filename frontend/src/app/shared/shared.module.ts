@@ -42,6 +42,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -58,13 +59,15 @@ import { GenerateIconComponent } from './components/generate-icon/generate-icon.
 import { LedComponent } from './components/led/led.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
-import { MdCardToolbarComponent } from './components/md-card-toolbar/md-card-toolbar.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { MessageComponent } from './components/message/message.component';
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { SettingsThemeColorComponent } from './components/settings-theme-color/settings-theme-color.component';
 import { UpdateFileInformationDirective } from './components/upload/update-file-information.directive';
-import { UploadComponent } from './components/upload/upload.component';
+import {
+  SnackBarDeploymentProgressComponent,
+  UploadComponent,
+} from './components/upload/upload.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
 import { FocusInputIfLargeScreenDirective } from './directives/focus-input-based-on-screen-size.directive';
 import { FocusInputDirective } from './directives/focus-input.directive';
@@ -91,6 +94,7 @@ export const MaterialModules = [
   MatProgressSpinnerModule,
   MatSidenavModule,
   MatSelectModule,
+  MatSnackBarModule,
   MatSortModule,
   MatTableModule,
   MatTabsModule,
@@ -117,6 +121,8 @@ import {
   faLink,
   faMapMarkerAlt,
   faNetworkWired,
+  faPencilAlt,
+  faPlus,
   faPlusCircle,
   faSearch,
   faServer,
@@ -124,6 +130,9 @@ import {
   faSignInAlt,
   faSignOutAlt,
   faTicketAlt,
+  faTimes,
+  faTimesCircle,
+  faTrashAlt,
   faUnlink,
   faUserAstronaut,
   faUserCircle,
@@ -148,6 +157,8 @@ library.add(
   faLink,
   faMapMarkerAlt,
   faNetworkWired,
+  faPencilAlt,
+  faPlus,
   faPlusCircle,
   faSearch,
   faServer,
@@ -155,6 +166,9 @@ library.add(
   faSignInAlt,
   faSignOutAlt,
   faTicketAlt,
+  faTimes,
+  faTimesCircle,
+  faTrashAlt,
   faUnlink,
   faUserAstronaut,
   faUserCircle,
@@ -183,13 +197,13 @@ export const declarations = [
   FocusInputDirective,
   FocusInputIfLargeScreenDirective,
   MessageComponent,
-  MdCardToolbarComponent,
   UploadComponent,
   UpdateFileInformationDirective,
   MaterialTreeComponent,
   TruncateStringPipe,
   SettingsThemeColorComponent,
   MenuComponent,
+  SnackBarDeploymentProgressComponent,
 ];
 
 export const exportss = [
@@ -208,6 +222,7 @@ export const exportss = [
   imports,
   exports: exportss,
   declarations,
+  entryComponents: [SnackBarDeploymentProgressComponent],
 })
 export class SharedModule {
   static forRoot(): ModuleWithProviders {

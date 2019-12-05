@@ -248,12 +248,7 @@ describe(`Endpoint`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
 
-    // TODO: Re-add this lines from step 3 of refactoring of the container view (artifact deployment)
-    // cy
-    //   .get(`app-workspace-element .mat-tab-body-content:first`)
-    //   .scrollTo('bottom');
-
-    // cy.get(`.vis-network`).should('be.visible');
+    cy.get(`.vis-network`).should('be.visible');
   });
 
   it(`should go to details of Component from the view of a selected Endpoint`, () => {

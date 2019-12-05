@@ -15,13 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
   <div fxFlex class="content">
-    <div fxLayout="column" fxLayoutGap="10px">
+    <div fxLayout="column" fxLayoutGap="20px">
 
       <mat-card>
         <mat-card-title class="light-bold">Short Description</mat-card-title>
         
         <mat-card-content *ngIf="!isEditingDescriptions; else shortDescriptionEdit" fxLayout="column" class="workspace-short-description">
-          <div *ngIf="workspace.shortDescription; else noShortDescription" fxFill class="short-description">
+          <div *ngIf="workspace.shortDescription; else noShortDescription" fxFlexFill class="short-description">
             <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
           </div>   
           <ng-template #noShortDescription>
@@ -36,8 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <ng-template #shortDescriptionEdit>
           <mat-card-content fxLayout="column">
-            <div fxFill class="workspace-short-description-edit">
-              <mat-form-field appearance="outline" fxFill class="short-description-form-field">
+            <div fxFlexFill class="workspace-short-description-edit">
+              <mat-form-field appearance="outline" fxFlexFill class="short-description-form-field">
                 <textarea 
                   #txtShortDescription
                   matInput 
@@ -61,7 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-card-title class="light-bold margin-top-x1">Description</mat-card-title>
 
         <mat-card-content *ngIf="!isEditingDescriptions; else descriptionEdit" fxLayout="column" class="workspace-description">
-          <div *ngIf="workspace.description; else noDescription" fxFill class="description">
+          <div *ngIf="workspace.description; else noDescription" fxFlexFill class="description">
             <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
           </div>
           <ng-template #noDescription>
@@ -76,8 +76,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <ng-template #descriptionEdit>
           <mat-card-content fxLayout="column">
-            <div fxFill class="workspace-description-edit">
-              <mat-form-field appearance="outline" fxFill class="description-form-field">
+            <div fxFlexFill class="workspace-description-edit">
+              <mat-form-field appearance="outline" fxFlexFill class="description-form-field">
                 <textarea 
                   matInput 
                   matTextareaAutosize
@@ -89,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <mat-hint>Supports Standard Markdown Syntax</mat-hint>
               </mat-form-field>
               
-              <div fxFill>
+              <div fxFlexFill>
                 <span 
                   *ngIf="description; else nothingToPreview"
                   fxFlex 
@@ -97,7 +97,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   class="workspace-description-preview padding-x1">
                 </span>
                 <ng-template #nothingToPreview>
-                  <div fxFill fxFlex class="msg-no-description padding-x1">Nothing to preview</div>
+                  <div fxFlexFill fxFlex class="msg-no-description padding-x1">Nothing to preview</div>
                 </ng-template>
               </div>
             </div>
@@ -106,7 +106,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-card-actions 
           *ngIf="!isEditingDescriptions; else descriptionsBtnEdit"
-          fxFill
+          fxFlexFill
           fxLayoutAlign="end center"
         >
           <button 
@@ -147,7 +147,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-card-actions>
 
         <ng-template #descriptionsBtnEdit>
-          <mat-card-actions *ngIf="isEditingDescriptions" fxFill fxLayoutAlign="end center">
+          <mat-card-actions *ngIf="isEditingDescriptions" fxFlexFill fxLayoutAlign="end center">
             <button
               mat-button
               type="button"
@@ -333,7 +333,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </mat-card-content>
           </div>
     
-          <mat-card-actions fxFill fxLayoutAlign="end center">
+          <mat-card-actions fxFlexFill fxLayoutAlign="end center">
             <!-- Attach Bus -->
             <button
               *ngIf="!isEditingImportBus && !isEditingBusList; else attachBusBtnEdit"

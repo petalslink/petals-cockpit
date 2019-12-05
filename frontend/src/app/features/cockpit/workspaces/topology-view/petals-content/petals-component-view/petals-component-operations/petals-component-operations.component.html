@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFill class="content">
+<div fxLayout="column" fxFlexFill class="content">
   <div class="central-content">
     <div fxLayout="column" fxLayoutGap="10px" #top>
 
@@ -81,7 +81,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       </mat-card>
 
-      <app-upload
+      <!-- <app-upload
         fxFlexAlign="{{deployServiceUnit.selectedFileInformation ? 'stretch' : 'start'}}"
         class="deploy-service-unit"
         fxFlex
@@ -92,7 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [disabled]="component.isUpdating || (component.state && component.state === 'Loaded')"
         [error]="component.deployError"
         (evtUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
-      ></app-upload>
+      ></app-upload> -->
     </div>
   </div>
 </div>

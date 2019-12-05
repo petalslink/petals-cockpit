@@ -18,15 +18,12 @@
 import { HttpClient, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, from, Observable, of } from 'rxjs';
-import { flatMap, last, map } from 'rxjs/operators';
-import * as xmltojson from 'xmltojson';
+import { flatMap, last } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
-import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
-import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
 
 export enum EComponentState {
   Started = 'Started',
@@ -86,13 +83,6 @@ export abstract class ComponentsService {
     componentId: string,
     parameters: { [key: string]: string }
   ): Observable<void>;
-
-  abstract getComponentInformationFromZipFile(
-    file: File
-  ): Observable<{
-    name: string;
-    sharedLibraries: ISharedLibrarySimplified[];
-  }>;
 
   abstract deploySu(
     workspaceId: string,
@@ -207,34 +197,5 @@ export class ComponentsServiceImpl extends ComponentsService {
         last()
       ),
     };
-  }
-
-  getComponentInformationFromZipFile(file: File) {
-    return loadFilesContentFromZip(file, filePath =>
-      filePath.includes('jbi.xml')
-    ).pipe(
-      map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
-    );
-  }
-
-  private getInformationFromXml(
-    xml: string
-  ): { name: string; sharedLibraries: ISharedLibrarySimplified[] } {
-    const json: any = xmltojson.parseString(xml, {});
-    let name = '';
-    let sharedLibraries = [];
-
-    try {
-      name = json.jbi[0].component[0].identification[0].name[0]._text;
-      if (json.jbi[0].component[0]['shared-library']) {
-        sharedLibraries = json.jbi[0].component[0]['shared-library'].map(
-          (el: any) => ({ name: el._text, version: el._attr.version._value })
-        );
-      }
-    } catch (err) {
-      throw new Error('Getting information from XML failed');
-    }
-
-    return { name, sharedLibraries };
   }
 }

@@ -92,7 +92,7 @@ export class PetalsComponentOperationsComponent
       )
     );
 
-    this.deployServiceUnit.reset();
+    // this.deployServiceUnit.reset();
   }
 
   getPossibleStateActions(state: ComponentState) {

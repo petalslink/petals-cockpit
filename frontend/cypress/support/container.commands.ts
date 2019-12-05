@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2018-2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input } from '@angular/core';
+import { ARTIFACT_DEPLOYMENT_DOM } from './container.dom';
 
-@Component({
-  selector: 'app-mat-card-toolbar',
-  templateUrl: './md-card-toolbar.component.html',
-  styleUrls: ['./md-card-toolbar.component.scss'],
-})
-export class MdCardToolbarComponent {
-  @Input() title: string;
-  @Input() titleIcon: string;
-}
+Cypress.Commands.add('expectSlListToBe', slList => {
+  const cellNamesVersions = cy
+    .get(ARTIFACT_DEPLOYMENT_DOM.table.slsTable)
+    .find('td.cell-status')
+    .prevAll();
+
+  cellNamesVersions.should('have.length', slList.length);
+  cellNamesVersions.each(($cell, index) =>
+    cy.wrap($cell).contains(slList[index])
+  );
+});

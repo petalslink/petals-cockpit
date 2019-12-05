@@ -15,8 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div *ngIf="workspaceId$ | async as workspaceId" fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
   <div class="content">
-    <div fxLayout="column" fxLayoutGap="10px" fxFlex>
-      <mat-card>
+    <div fxLayout="column" fxLayoutGap="20px" fxFlex>
+      <mat-card class="card-bus-description">
         <mat-card-title class="light-bold">Description</mat-card-title>
         
         <mat-card-content fxLayout="column" class="bus-description">
@@ -30,10 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-card-content>
       </mat-card>
 
-      <mat-card fxLayout="column" class="bus-containers margin-top-x1">
+      <mat-card fxLayout="column" class="card-bus-containers">
         <mat-card-title fxLayout="row" class="light-bold">Petals Containers</mat-card-title>
 
-        <div class="wrapper-table">
+        <div class="wrapper-table-containers">
           <mat-progress-bar mode="indeterminate" color="primary" *ngIf="(bus$ | async).isFetchingDetails; else displayBusContainers"></mat-progress-bar>
   
           <ng-template #displayBusContainers>

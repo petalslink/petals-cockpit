@@ -20,9 +20,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
-import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
-import { map } from 'rxjs/operators';
-import * as xmltojson from 'xmltojson';
 
 export enum EServiceAssemblyState {
   Started = 'Started',
@@ -64,8 +61,6 @@ export abstract class ServiceAssembliesService {
     id: string;
     state: ServiceAssemblyState;
   }>;
-
-  abstract getServiceAssemblyNameFromZipFile(file: File): Observable<string>;
 }
 
 @Injectable()
@@ -94,24 +89,5 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
       }/workspaces/${workspaceId}/serviceassemblies/${serviceAssemblyId}`,
       { state: newState }
     );
-  }
-
-  getServiceAssemblyNameFromZipFile(file: File) {
-    return loadFilesContentFromZip(file, filePath =>
-      filePath.includes('jbi.xml')
-    ).pipe(map(([firstFileContent]) => this.getNameFromXml(firstFileContent)));
-  }
-
-  private getNameFromXml(xml: string): string {
-    const json: any = xmltojson.parseString(xml, {});
-    let name = '';
-
-    try {
-      name = json.jbi[0]['service-assembly'][0].identification[0].name[0]._text;
-    } catch (err) {
-      throw new Error('Getting name from XML failed');
-    }
-
-    return name;
   }
 }

@@ -89,7 +89,7 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy$),
         tap(cont => {
           this.container = cont;
-          if (cont && cont.reachabilities.length > 0) {
+          if (cont) {
             this.visNetworkData = buildVisNetworkData(cont);
           }
         })

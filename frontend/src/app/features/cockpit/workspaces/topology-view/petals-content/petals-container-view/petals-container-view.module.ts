@@ -22,15 +22,10 @@ import { SharedModule } from '@shared/shared.module';
 import { PetalsContainerViewRoutingModule } from './petals-container-view-routing.module';
 
 import { ArtifactsDeploymentComponent } from './artifacts-deployment/artifacts-deployment.component';
-import { SharedLibrariesOverrideComponent } from './artifacts-deployment/shared-libraries-override/shared-libraries-override.component';
 import { PetalsContainerViewComponent } from './petals-container-view.component';
 
 @NgModule({
   imports: [SharedModule, PetalsContainerViewRoutingModule, VisModule],
-  declarations: [
-    PetalsContainerViewComponent,
-    ArtifactsDeploymentComponent,
-    SharedLibrariesOverrideComponent,
-  ],
+  declarations: [PetalsContainerViewComponent, ArtifactsDeploymentComponent],
 })
 export class PetalsContainerViewModule {}
