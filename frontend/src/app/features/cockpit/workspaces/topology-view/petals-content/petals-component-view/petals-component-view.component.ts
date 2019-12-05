@@ -15,24 +15,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+
+import { IStore } from '@shared/state/store.interface';
 
 import {
   getCurrentComponent,
-  IComponentWithSLsAndSUs,
+  IComponentWithSlsAndSus,
 } from '@feat/cockpit/workspaces/state/components/components.selectors';
-import { IStore } from '@shared/state/store.interface';
+import { stateNameToPossibleActionsComponent } from '@shared/helpers/component.helper';
+import { stateToLedColor } from '@shared/helpers/shared.helper';
+import { ComponentState } from '@shared/services/components.service';
+import { Components } from '@wks/state/components/components.actions';
+import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
+import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
+
+// import { UploadComponent } from '@shared/components/upload/upload.component';
 
 @Component({
   selector: 'app-petals-component-view',
   templateUrl: './petals-component-view.component.html',
   styleUrls: ['./petals-component-view.component.scss'],
 })
-export class PetalsComponentViewComponent implements OnInit {
-  public component$: Observable<IComponentWithSLsAndSUs>;
-  public workspaceId$: Observable<string>;
+export class PetalsComponentViewComponent
+  implements OnInit, OnChanges, OnDestroy {
+  component$: Observable<IComponentWithSlsAndSus>;
+  workspaceId$: Observable<string>;
+
+  onDestroy$ = new Subject<void>();
+
+  top: ElementRef;
+
+  parametersForm: FormGroup;
+
+  // deployServiceUnit: UploadComponent;
+
+  // uploadServiceUnitStatus: {
+  //   percentage: number;
+  // };
 
   constructor(private store$: Store<IStore>) {}
 
@@ -43,4 +73,109 @@ export class PetalsComponentViewComponent implements OnInit {
       select(state => state.workspaces.selectedWorkspaceId)
     );
   }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    // if an error happen, without that control the form will be reset to the values in store
+    if (
+      changes.component.previousValue &&
+      changes.component.previousValue.parameters ===
+        changes.component.currentValue.parameters
+    ) {
+      return;
+    }
+
+    const parameters = changes.component.currentValue.parameters;
+    const keysParameters = Object.keys(parameters);
+
+    this.parametersForm = new FormGroup(
+      keysParameters.reduce(
+        (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
+        {}
+      )
+    );
+
+    // this.deployServiceUnit.reset();
+  }
+
+  trackBySl(i: number, sl: ISharedLibraryRow) {
+    return sl.id;
+  }
+
+  trackBySu(i: number, su: IServiceUnitRow) {
+    return su.id;
+  }
+
+  getLedColorFromState(state: ComponentState) {
+    return stateToLedColor(state);
+  }
+
+  getPossibleStateActions(state: ComponentState) {
+    return stateNameToPossibleActionsComponent(state);
+  }
+
+  changeState(state: ComponentState, compId: string) {
+    this.store$.dispatch(
+      new Components.ChangeState({
+        id: compId,
+        state,
+      })
+    );
+  }
+
+  setParameters(compId: string) {
+    this.store$.dispatch(
+      new Components.SetParameters({
+        id: compId,
+        parameters: this.parametersForm.value,
+      })
+    );
+    // if it's succeeds, we want to go back to top to continue our business
+    // if it fails, we want to go back to top to see the error
+    this.top.nativeElement.scrollIntoView();
+  }
+
+  trackByComponentState(index: number, item: any) {
+    return item.actionName;
+  }
+
+  // deploy(file: File, serviceUnitName: string) {
+  //   const correlationId = uuid();
+
+  //   this.actions$
+  //     .pipe(
+  //       ofType<HttpProgress>(HttpProgressType),
+  //       takeUntil(this.onDestroy$),
+  //       filter(action => action.payload.correlationId === correlationId),
+  //       // we want 1 or 0 (first wants exactly one) because of takeUntil
+  //       take(1),
+  //       switchMap(action =>
+  //         action.payload.getProgress().pipe(
+  //           tap(
+  //             percentage =>
+  //               (this.uploadServiceUnitStatus = {
+  //                 percentage,
+  //               })
+  //           ),
+  //           tap({
+  //             complete: () => this.deployServiceUnit.reset(),
+  //           })
+  //         )
+  //       )
+  //     )
+  //     .subscribe();
+
+  //   this.store$.dispatch(
+  //     new Components.DeployServiceUnit({
+  //       id: this.component.id,
+  //       file,
+  //       serviceUnitName: serviceUnitName.trim(),
+  //       correlationId,
+  //     })
+  //   );
+  // }
 }

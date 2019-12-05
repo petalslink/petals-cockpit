@@ -29,7 +29,7 @@ import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { IStore } from '@shared/state/store.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
-import { IServiceUnitWithSAAndComponent } from '@wks/state/service-units/service-units.selectors';
+import { IServiceUnitWithSaAndComponent } from '@wks/state/service-units/service-units.selectors';
 
 @Component({
   selector: 'app-petals-service-unit-overview',
@@ -40,7 +40,7 @@ import { IServiceUnitWithSAAndComponent } from '@wks/state/service-units/service
 export class PetalsServiceUnitOverviewComponent implements OnInit {
   public btnByScreenSize$: Observable<string>;
 
-  @Input() serviceUnit: IServiceUnitWithSAAndComponent;
+  @Input() serviceUnit: IServiceUnitWithSaAndComponent;
   @Input() workspaceId: string;
 
   constructor(private store$: Store<IStore>) {}
