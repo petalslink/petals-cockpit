@@ -32,7 +32,7 @@ import org.ow2.petals.cockpit.server.resources.PermissionsResource.ViewPermissio
 
 public class PermissionsResourceTest extends AbstractDefaultWorkspaceResourceTest {
    
-	public PermissionsResourceTest() {
+    public PermissionsResourceTest() {
         super(PermissionsResource.class);
     }
 
@@ -40,26 +40,25 @@ public class PermissionsResourceTest extends AbstractDefaultWorkspaceResourceTes
     public void getAllPermissions() {
         addUsersToWorkspace(1L, ANOTHERUSER);
         addPermissions(1L, ANOTHERUSER, true, false, true);
-		ViewPermissions view = resource.target("/users/anotheruser/permissions").request()
-				.get(ViewPermissions.class);
-		assertThat(view).isNotNull();
-		assertThat(view.permissions.get(1L).adminWorkspace).isTrue();
-		assertThat(view.permissions.get(1L).deployArtifact).isFalse();
-		assertThat(view.permissions.get(1L).lifecycleArtifact).isTrue();
+        ViewPermissions view = resource.target("/users/anotheruser/permissions").request().get(ViewPermissions.class);
+        assertThat(view).isNotNull();
+        assertThat(view.permissions.get(1L).adminWorkspace).isTrue();
+        assertThat(view.permissions.get(1L).deployArtifact).isFalse();
+        assertThat(view.permissions.get(1L).lifecycleArtifact).isTrue();
 
-		assertThat(view.permissions.get(2L).adminWorkspace).isFalse();
-		assertThat(view.permissions.get(2L).deployArtifact).isTrue();
-		assertThat(view.permissions.get(2L).lifecycleArtifact).isTrue();
+        assertThat(view.permissions.get(2L).adminWorkspace).isFalse();
+        assertThat(view.permissions.get(2L).deployArtifact).isTrue();
+        assertThat(view.permissions.get(2L).lifecycleArtifact).isTrue();
     }
 
     @Test
     public void getPermissionsWithWorkspaceID() {
-		ViewPermissions view = resource.target("/users/anotheruser/permissions").queryParam("wsId", 2).request()
-				.get(ViewPermissions.class);
-		assertThat(view).isNotNull();
-		assertThat(view.permissions.get(2L).adminWorkspace).isFalse();
-		assertThat(view.permissions.get(2L).deployArtifact).isTrue();
-		assertThat(view.permissions.get(2L).lifecycleArtifact).isTrue();
+        ViewPermissions view = resource.target("/users/anotheruser/permissions").queryParam("wsId", 2).request()
+                .get(ViewPermissions.class);
+        assertThat(view).isNotNull();
+        assertThat(view.permissions.get(2L).adminWorkspace).isFalse();
+        assertThat(view.permissions.get(2L).deployArtifact).isTrue();
+        assertThat(view.permissions.get(2L).lifecycleArtifact).isTrue();
     }
 
     @Test

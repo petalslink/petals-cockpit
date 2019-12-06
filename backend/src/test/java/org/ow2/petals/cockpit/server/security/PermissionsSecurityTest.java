@@ -82,14 +82,14 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
         }
     }
 
-	private void isAllowed(NewUser user, String target, String method, @Nullable Entity<?> entity) {
-		assert user != null && user.username != null && user.password != null;
-		this.canAuth(new Authentication(user.username, user.password), target, method, entity, false);
-	}
-
-	private void isForbidden(NewUser user, String target, String method, @Nullable Entity<?> entity) {
+    private void isAllowed(NewUser user, String target, String method, @Nullable Entity<?> entity) {
         assert user != null && user.username != null && user.password != null;
-		this.canAuth(new Authentication(user.username, user.password), target, method, entity, true);
+        this.canAuth(new Authentication(user.username, user.password), target, method, entity, false);
+    }
+
+    private void isForbidden(NewUser user, String target, String method, @Nullable Entity<?> entity) {
+        assert user != null && user.username != null && user.password != null;
+        this.canAuth(new Authentication(user.username, user.password), target, method, entity, true);
     }
 
     @Before
@@ -105,158 +105,158 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
 
     @Test
     public void adminWorkspaceCanUpdateWorkspace() {
-		isAllowed(ADMINWORKSPACE, "/workspaces/1", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
+        isAllowed(ADMINWORKSPACE, "/workspaces/1", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
     }
 
     @Test
     public void adminWorkspaceCanNotUpdateOtherWorkspace() {
-		isForbidden(ADMINWORKSPACE, "/workspaces/2", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
+        isForbidden(ADMINWORKSPACE, "/workspaces/2", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
     }
 
     @Test
     public void notAdminWorkspaceCanNotUpdateWorkspace() {
-		isForbidden(DEPLOYPERMISSION, "/workspaces/1", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
+        isForbidden(DEPLOYPERMISSION, "/workspaces/1", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
     }
 
     @Test
     public void adminWorkspaceCanDeleteHisWorkspace() {
-		isAllowed(ADMINWORKSPACE, "/workspaces/1", HttpMethod.DELETE, null);
+        isAllowed(ADMINWORKSPACE, "/workspaces/1", HttpMethod.DELETE, null);
     }
 
     @Test
     public void adminWorkspaceCanNotDeleteOtherWorkspace() {
-		isForbidden(ADMINWORKSPACE, "/workspaces/2", HttpMethod.DELETE, null);
+        isForbidden(ADMINWORKSPACE, "/workspaces/2", HttpMethod.DELETE, null);
     }
 
     @Test
     public void notAdminWorkspaceCanNotDeleteWorkspace() {
-		isForbidden(DEPLOYPERMISSION, "/workspaces/1", HttpMethod.DELETE, null);
+        isForbidden(DEPLOYPERMISSION, "/workspaces/1", HttpMethod.DELETE, null);
     }
 
     @Test
     public void adminWorkspaceCanAddUsers() {
-		isAllowed(ADMINWORKSPACE, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
+        isAllowed(ADMINWORKSPACE, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
     }
 
     @Test
     public void adminWorkspaceCanNotAddUsersOnOtherWorkspace() {
-		isForbidden(ADMINWORKSPACE, "/workspaces/2/users", HttpMethod.POST, Entity.json(new AddUser("test")));
+        isForbidden(ADMINWORKSPACE, "/workspaces/2/users", HttpMethod.POST, Entity.json(new AddUser("test")));
     }
 
     @Test
     public void notAdminWorkspaceCanNotAddUsers() {
-		isForbidden(DEPLOYPERMISSION, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
+        isForbidden(DEPLOYPERMISSION, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
     }
 
     @Test
     public void adminWorkspaceCanDeleteUsers() {
-		isAllowed(ADMINWORKSPACE, "/workspaces/1/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
+        isAllowed(ADMINWORKSPACE, "/workspaces/1/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
     }
 
     @Test
     public void adminWorkspaceCanNotDeleteUsersOnOtherWorkspace() {
-		isForbidden(ADMINWORKSPACE, "/workspaces/2/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
+        isForbidden(ADMINWORKSPACE, "/workspaces/2/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
     }
 
     @Test
     public void notAdminWorkspaceCanNotDeleteUsers() {
-		isForbidden(DEPLOYPERMISSION, "/workspaces/1/users/test", HttpMethod.DELETE, null);
+        isForbidden(DEPLOYPERMISSION, "/workspaces/1/users/test", HttpMethod.DELETE, null);
     }
 
     @Test
     public void lifecyclePermissionCanChangeSLState() {
-		isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/sharedlibraries/1", HttpMethod.PUT,
-				Entity.json(new SLChangeState(SharedLibraryMin.State.Loaded)));
+        isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/sharedlibraries/1", HttpMethod.PUT,
+                Entity.json(new SLChangeState(SharedLibraryMin.State.Loaded)));
     }
 
     @Test
     public void notLifecycleCanNotChangeSLState() {
         isForbidden(DEPLOYPERMISSION, "/workspaces/1/sharedlibraries/1", HttpMethod.PUT,
-				Entity.json(new SLChangeState(SharedLibraryMin.State.Loaded)));
+                Entity.json(new SLChangeState(SharedLibraryMin.State.Loaded)));
     }
 
     @Test
     public void lifecyclePermissionCanChangeSAState() {
-		isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/serviceassemblies/1", HttpMethod.PUT,
-				Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)));
+        isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/serviceassemblies/1", HttpMethod.PUT,
+                Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)));
     }
 
     @Test
     public void notLifecyclePermissionCanNotChangeSAState() {
         isForbidden(DEPLOYPERMISSION, "/workspaces/1/serviceassemblies/1", HttpMethod.PUT,
-				Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)));
+                Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)));
     }
 
     @Test
     public void lifecyclePermissionCanChangeComponentState() {
-		isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/components/1", HttpMethod.PUT,
-				Entity.json(new ComponentChangeState(ComponentMin.State.Started)));
+        isAllowed(LIFECYCLEPERMISSION, "/workspaces/1/components/1", HttpMethod.PUT,
+                Entity.json(new ComponentChangeState(ComponentMin.State.Started)));
     }
 
     @Test
     public void notLifecyclePermissionCanNotChangeComponentState() {
         isForbidden(DEPLOYPERMISSION, "/workspaces/1/components/1", HttpMethod.PUT,
-				Entity.json(new ComponentChangeState(ComponentMin.State.Started)));
+                Entity.json(new ComponentChangeState(ComponentMin.State.Started)));
     }
 
     @Test
     public void deployPermissionCanChangeComponentParameters() {
-		isAllowed(DEPLOYPERMISSION, "/workspaces/1/components/1/parameters", HttpMethod.PUT,
-				Entity.json(new ComponentChangeParameters(new HashMap<String, String>())));
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/components/1/parameters", HttpMethod.PUT,
+                Entity.json(new ComponentChangeParameters(new HashMap<String, String>())));
     }
 
     @Test
     public void notDeployPermissionCanNotChangeComponentParameters() {
         isForbidden(LIFECYCLEPERMISSION, "/workspaces/1/components/1/parameters", HttpMethod.PUT,
-				Entity.json(new ComponentChangeParameters(new HashMap<String, String>())));
+                Entity.json(new ComponentChangeParameters(new HashMap<String, String>())));
     }
 
     @Test
     public void deployPermissionCanDeploySharedLibrary() {
-		isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/sharedlibraries", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/sharedlibraries", HttpMethod.POST,
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void notDeployPermissionCanNotDeploySharedLibrary() {
         isForbidden(LIFECYCLEPERMISSION, "/workspaces/1/containers/1/sharedlibraries", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void deployPermissionCanDeployServiceUnit() {
-		isAllowed(DEPLOYPERMISSION, "/workspaces/1/components/1/serviceunits", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/components/1/serviceunits", HttpMethod.POST,
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void notDeployPermissionCanNotDeployServiceUnit() {
         isForbidden(LIFECYCLEPERMISSION, "/workspaces/1/components/1/serviceunits", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void deployPermissionCanDeployComponent() {
-		isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/components", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/components", HttpMethod.POST,
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void notDeployPermissionCanNotDeployComponent() {
         isForbidden(LIFECYCLEPERMISSION, "/workspaces/1/containers/1/components", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void deployPermissionCanDeployServiceAssembly() {
-		isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/serviceassemblies", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/containers/1/serviceassemblies", HttpMethod.POST,
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
     @Test
     public void notDeployPermissionCanNotDeployServiceAssembly() {
         isForbidden(LIFECYCLEPERMISSION, "/workspaces/1/containers/1/serviceassemblies", HttpMethod.POST,
-				Entity.entity("", MediaType.MULTIPART_FORM_DATA));
+                Entity.entity("", MediaType.MULTIPART_FORM_DATA));
     }
 
 }

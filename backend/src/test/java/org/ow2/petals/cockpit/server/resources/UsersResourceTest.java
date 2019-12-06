@@ -205,7 +205,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         assertThat(view).isNotNull();
         assertThat(view.isAdmin).isTrue();
     }
-    
+
     @Test
     public void getNotAdmin() {
         UserMin view = resource.target("/users/user1/").request().get(UserMin.class);
@@ -225,7 +225,7 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
         assertThatDbUser("user2").value("admin").isEqualTo(false);
         assertThatDbUser("admin").value("admin").isEqualTo(true);
     }
-    
+
     @Test
     public void lastAdminCanNotBeDemoted() {
         Response put = resource.target("/users/admin").request().put(Entity.json(new UpdateUser(null, "admin", false)));

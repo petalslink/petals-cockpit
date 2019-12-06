@@ -288,7 +288,7 @@ public class WorkspaceResource {
             @NotNull @Valid ComponentChangeParameters action) {
         workspace.changeComponentParameters(compId, action);
     }
-    
+
     /**
      * @param containerId
      * @param file
@@ -531,12 +531,12 @@ public class WorkspaceResource {
     @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public void addUsers(@Valid AddUser userToAdd) {
         try {
-        	DSL.using(jooq).insertInto(USERS_WORKSPACES)
-			.set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
-			.set(USERS_WORKSPACES.USERNAME, userToAdd.id)
-			.set(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION, true)
-			.set(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION, true)
-			.set(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION, true).onDuplicateKeyIgnore().execute();
+            DSL.using(jooq).insertInto(USERS_WORKSPACES)
+                    .set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
+                    .set(USERS_WORKSPACES.USERNAME, userToAdd.id)
+                    .set(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION, true)
+                    .set(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION, true)
+                    .set(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION, true).onDuplicateKeyIgnore().execute();
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);

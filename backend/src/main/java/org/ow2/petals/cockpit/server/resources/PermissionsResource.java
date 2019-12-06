@@ -116,7 +116,7 @@ public class PermissionsResource {
     }
 
     @GET
-	public ViewPermissions getPermissions(@Nullable @QueryParam("wsId") Long wsId) {
+    public ViewPermissions getPermissions(@Nullable @QueryParam("wsId") Long wsId) {
         return DSL.using(jooq).transactionResult(conf -> {
             if (wsId != null) {
                 UsersWorkspacesRecord wsPermissions = DSL.using(jooq)
@@ -124,14 +124,13 @@ public class PermissionsResource {
                         .where(USERS_WORKSPACES.USERNAME.eq(username)
                         .and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)))
                         .fetchOptional().orElseThrow(() -> new NoDataFoundException("Workspace or username is incorrect !"));
-				return new ViewPermissions(wsPermissions);
+                return new ViewPermissions(wsPermissions);
             } else {
-				Map<Long, PermissionsMin> allPermissions = new HashMap<Long, PermissionsMin>();
-                Result<UsersWorkspacesRecord> permsRow = DSL.using(jooq)
-                        .selectFrom(USERS_WORKSPACES)
+                Map<Long, PermissionsMin> allPermissions = new HashMap<Long, PermissionsMin>();
+                Result<UsersWorkspacesRecord> permsRow = DSL.using(jooq).selectFrom(USERS_WORKSPACES)
                         .where(USERS_WORKSPACES.USERNAME.eq(username)).fetch();
-				permsRow.forEach((row) -> allPermissions.put(row.getWorkspaceId(), new PermissionsMin(row)));
-				return new ViewPermissions(allPermissions);
+                permsRow.forEach((row) -> allPermissions.put(row.getWorkspaceId(), new PermissionsMin(row)));
+                return new ViewPermissions(allPermissions);
             }
         });
     }
@@ -165,20 +164,20 @@ public class PermissionsResource {
         }
     }
 
-	public static class ViewPermissions {
+    public static class ViewPermissions {
 
-		@Valid
-		@JsonProperty
-		public final ImmutableMap<Long, PermissionsMin> permissions;
+        @Valid
+        @JsonProperty
+        public final ImmutableMap<Long, PermissionsMin> permissions;
 
-		@JsonCreator
-		public ViewPermissions(@Valid @JsonProperty("permissions") Map<Long, PermissionsMin> permissions) {
-			this.permissions = ImmutableMap.copyOf(permissions);
-		}
+        @JsonCreator
+        public ViewPermissions(@Valid @JsonProperty("permissions") Map<Long, PermissionsMin> permissions) {
+            this.permissions = ImmutableMap.copyOf(permissions);
+        }
 
-		public ViewPermissions(UsersWorkspacesRecord workspacePermissions) {
-			this.permissions = ImmutableMap.of(workspacePermissions.getWorkspaceId(),
-					new PermissionsMin(workspacePermissions));
-		}
-	}
+        public ViewPermissions(UsersWorkspacesRecord workspacePermissions) {
+            this.permissions = ImmutableMap.of(workspacePermissions.getWorkspaceId(),
+                    new PermissionsMin(workspacePermissions));
+        }
+    }
 }
