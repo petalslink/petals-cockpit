@@ -56,6 +56,8 @@ public class ChangeSLStateTest extends AbstractBasicResourceTest {
 
     private final SharedLibrary sl1 = new SharedLibrary("sl1", "1.0.0");
 
+    private final SharedLibrary sl1v2 = new SharedLibrary("sl1", "2.0.0");
+
     private final SharedLibrary sl2 = new SharedLibrary("sl2", "1.0.0");
 
     private final Component component = new Component("comp", ComponentType.SE, ArtifactState.State.STARTED,
@@ -70,6 +72,7 @@ public class ChangeSLStateTest extends AbstractBasicResourceTest {
         resource.petals.registerDomain(domain);
         resource.petals.registerContainer(container);
         resource.petals.registerArtifact(sl1, container);
+        resource.petals.registerArtifact(sl1v2, container);
         resource.petals.registerArtifact(sl2, container);
         resource.petals.registerArtifact(component, container);
 
