@@ -533,7 +533,8 @@ public class WorkspacesService {
                         .where(CONTAINERS.ID.eq(sl.getContainerId())).fetchOne();
                 assert cont != null;
 
-                petals.undeploySL(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(), sl.getName());
+                petals.undeploySL(cont.getIp(), cont.getPort(), cont.getUsername(), cont.getPassword(), sl.getName(),
+                        sl.getVersion());
 
                 SLStateChanged res = new SLStateChanged(sl.getId(), SharedLibraryMin.State.Unloaded);
 

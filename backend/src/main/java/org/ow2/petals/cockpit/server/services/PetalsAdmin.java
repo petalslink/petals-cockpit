@@ -115,10 +115,10 @@ public class PetalsAdmin {
         }
     }
 
-    public void undeploySL(String ip, int port, String username, String password, String slName) {
+    public void undeploySL(String ip, int port, String username, String password, String slName, String version) {
         try (PAC p = new PAC(ip, port, username, password)) {
             ArtifactAdministration aa = p.petals.newArtifactAdministration();
-            Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, null);
+            Artifact a = aa.getArtifact(SharedLibrary.TYPE, slName, version);
             assert a instanceof SharedLibrary;
             SharedLibrary sl = (SharedLibrary) a;
             p.petals.newArtifactLifecycleFactory().createSharedLibraryLifecycle(sl).undeploy();
