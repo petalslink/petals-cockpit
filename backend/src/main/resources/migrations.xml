@@ -381,5 +381,19 @@
   <changeSet id="v1.01.0-2" author="psouquet">
     <dropColumn tableName="buses" columnName="import_error"/>
   </changeSet>
+  
+  <changeSet id="v1.01.0-3" author="jkoune">
+    <addColumn tableName="users_workspaces">
+      <column name="admin_workspace_permission" type ="boolean" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="deploy_artifact_permission" type ="boolean" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+      <column name="lifecycle_artifact_permission" type ="boolean" defaultValueBoolean="false">
+        <constraints nullable="false"/>
+      </column>
+    </addColumn>
+  </changeSet>
 
 </databaseChangeLog>

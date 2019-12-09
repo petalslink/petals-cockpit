@@ -102,8 +102,7 @@ public class LdapAuthenticator extends LdapProfileService {
 
                 LOG.info("LDAP user {} was automatically inserted in DB.", username);
             }
-
-            credentials.setUserProfile(new CockpitProfile(username, user.getAdmin()));
+            credentials.setUserProfile(new CockpitProfile(username, conf));
             LOG.debug("LDAP user {} credentials validated.", username);
 
         } catch (TechnicalException e) {

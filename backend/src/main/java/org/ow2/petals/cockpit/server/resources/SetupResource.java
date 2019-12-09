@@ -44,7 +44,6 @@ import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.resources.LdapResource.LdapUser;
-import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 import org.ow2.petals.cockpit.server.services.LdapService;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -121,16 +120,29 @@ public class SetupResource {
         }
     }
 
-    public static class UserSetup extends NewUser {
+    public static class UserSetup {
 
+        @Nullable
+        @JsonProperty
+        public final String name;
+
+        @NotEmpty
+        @JsonProperty
+        public final String username;
+
+        @Nullable
+        @JsonProperty
+        public final String password;
         @NotEmpty
         @JsonProperty
         public final String token;
 
         public UserSetup(@JsonProperty("token") String token, @JsonProperty("username") String username,
                 @Nullable @JsonProperty("password") String password, @Nullable @JsonProperty("name") String name) {
-            super(username, password, name);
             this.token = token;
+            this.name = name;
+            this.username = username;
+            this.password = password;
         }
     }
 }

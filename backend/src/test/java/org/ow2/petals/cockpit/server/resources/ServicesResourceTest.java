@@ -35,7 +35,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingServiceForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/services/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -43,7 +43,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingEndpointForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/endpoints/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -51,7 +51,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     @Test
     public void getExistingInterfaceForbidden() {
-        resource.setCurrentProfile(new CockpitProfile(anotherUser, false));
+        resource.setCurrentProfile(new CockpitProfile(ANOTHERUSER, resource.db().configuration()));
         Response get = resource.target("/interfaces/1").request().get();
 
         assertThat(get.getStatus()).isEqualTo(403);
@@ -68,7 +68,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
         a.assertThat(get.endpoints).contains(
                 resource.getEndpoint("edp1a"), 
                 resource.getEndpoint("edp3a"));
-        
+
         a.assertThat(get.interfaces).size().isEqualTo(4);
         a.assertThat(get.interfaces).contains(
                 resource.getInterface("int1"),
@@ -85,7 +85,7 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
         SoftAssertions a = new SoftAssertions();
         a.assertThat(get.service).isEqualTo(resource.getService("serv1a"));
-        
+
         a.assertThat(get.interfaces).size().isEqualTo(3);
         a.assertThat(get.interfaces).contains(
                 resource.getInterface("int1"),
@@ -100,12 +100,12 @@ public class ServicesResourceTest extends AbstractDefaultWorkspaceResourceTest {
                 .get(InterfaceOverview.class);
 
         SoftAssertions a = new SoftAssertions();
-        
+
         a.assertThat(get.services).size().isEqualTo(2);
         a.assertThat(get.services).contains(
                 resource.getService("serv1a"),
                 resource.getService("serv1b"));
-        
+
         a.assertThat(get.endpoints).size().isEqualTo(3);
         a.assertThat(get.endpoints).contains(
                 resource.getEndpoint("edp1a"), 

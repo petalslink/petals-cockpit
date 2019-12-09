@@ -68,7 +68,7 @@ public class LdapSetupResourceTest extends AbstractLdapTest {
 
     @Test
     public void setupUserWithAdminInDb() {
-        addUser(MockLdapServer.LDAP_USER1, true);
+        addUser(MockLdapServer.LDAP_USER1);
         Response post = appLdap.target("/setup").request()
                 .post(Entity.json(new UserSetup(getTokenFromLogs(), MockLdapServer.LDAP_USER2.username, null, null)));
 

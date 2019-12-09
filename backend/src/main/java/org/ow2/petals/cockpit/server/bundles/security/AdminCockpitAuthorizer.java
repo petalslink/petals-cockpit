@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.resources;
+package org.ow2.petals.cockpit.server.bundles.security;
 
-import org.junit.Before;
-import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
+import java.util.List;
 
-public class AbstractBasicResourceTest extends AbstractCockpitResourceTest {
+import org.pac4j.core.authorization.authorizer.Authorizer;
+import org.pac4j.core.context.WebContext;
 
-    public static final String ADMIN = "admin";
+public class AdminCockpitAuthorizer<U extends CockpitProfile> implements Authorizer<U> {
 
-    public AbstractBasicResourceTest(Class<?>... ressources) {
-        super(ressources);
+    @Override
+    public boolean isAuthorized(WebContext context, List<U> profiles) {
+        return profiles.stream().anyMatch(profile -> profile.isAdmin());
     }
 
-    @Before
-    public void setUpUser() {
-        addUser(ADMIN, true);
-        resource.setCurrentProfile(new CockpitProfile(ADMIN, resource.db().configuration()));
-    }
 }

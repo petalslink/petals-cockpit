@@ -44,8 +44,8 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Before
     public void setUpDb() {
-        addUser(ADMIN_LDAP_DB, true);
-        addUser(USER_NOLDAP_DB, false);
+        addUser(ADMIN_LDAP_DB);
+        addUser(USER_NOLDAP_DB);
         login(ADMIN_LDAP_DB);
     }
 
@@ -100,7 +100,7 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapGetUsersNotAdminForbidden() {
-        addUser(USER_LDAP_NODB, false);
+        addUser(USER_LDAP_NODB);
         login(USER_LDAP_NODB);
         Response get = appLdap.target("/ldap/users?name=user").request().get();
         assertThat(get.getStatus()).isEqualTo(403); // Forbidden
@@ -125,7 +125,7 @@ public class LdapUserResourceTest extends AbstractLdapTest {
     public void ldapAddUserUsernameOnly() {
         final String username = USER_LDAP_NODB.username;
 
-        Response post = appLdap.target("/users").request().post(Entity.json(new NewUser(username, null, null)));
+        Response post = appLdap.target("/users").request().post(Entity.json(new NewUser(username, null, null, false)));
         assertThat(post.getStatus()).isEqualTo(204); // Success: No content
 
         assertThatDbUser(username);
@@ -152,7 +152,7 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapAddUserNonAdmin() {
-        addUser(USER_LDAP_NODB, false);
+        addUser(USER_LDAP_NODB);
         login(USER_LDAP_NODB);
 
         Response post = appLdap.target("/users").request().post(Entity.json(MockLdapServer.LDAP_USER3));
@@ -163,7 +163,7 @@ public class LdapUserResourceTest extends AbstractLdapTest {
 
     @Test
     public void ldapChangeUserForbidden() {
-        addUser(USER_LDAP_NODB, false);
+        addUser(USER_LDAP_NODB);
 
         final String username = USER_LDAP_NODB.username;
         final String name = USER_LDAP_NODB.name;
@@ -172,7 +172,7 @@ public class LdapUserResourceTest extends AbstractLdapTest {
         final String newPassword = "New Password";
 
         Response put = appLdap.target("/users/" + username).request()
-                .put(Entity.json(new UpdateUser(newPassword, newName)));
+                .put(Entity.json(new UpdateUser(newPassword, newName, false)));
         assertThat(put.getStatus()).isEqualTo(405); // Method not allowed
 
         assertThatDbUser(username);

@@ -47,7 +47,6 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
         this.canAuth(new Authentication(user.username, user.password), target, method, entity, expectedStatus);
     }
 
-
     @Test
     public void adminCanListAllUsers() {
         can(ADMIN, "/users", HttpMethod.GET, null, 200);
@@ -89,24 +88,24 @@ public class UsersResourceSecurityTest extends AbstractSecurityTest {
 
     @Test
     public void adminCanAddUsers() {
-        can(ADMIN, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 204);
+        can(ADMIN, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...", false)), 204);
     }
 
     @Test
     public void userCanNotAddUsers() {
-        can(USER, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...")), 403);
+        can(USER, "/users", HttpMethod.POST, Entity.json(new NewUser("user1", "...", "...", false)), 403);
     }
 
     @Test
     public void adminCanModifyUsers() {
         addUser("user1");
-        can(ADMIN, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 204);
+        can(ADMIN, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null, false)), 204);
     }
 
     @Test
     public void userCanNotModifyUsers() {
         addUser("user1");
-        can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null)), 403);
+        can(USER, "/users/user1", HttpMethod.PUT, Entity.json(new UpdateUser(null, null, false)), 403);
     }
 
     @Test

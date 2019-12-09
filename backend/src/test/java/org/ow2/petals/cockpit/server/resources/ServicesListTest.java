@@ -429,7 +429,7 @@ public class ServicesListTest extends AbstractBasicResourceTest {
 
         return e;
     }
-    
+
     private void addEndpointsToReference(int edpToAdd) {
         int target = edpToAdd + referenceEndpoints.size();
         for (int i = referenceEndpoints.size() + 1; i <= target; i++) {

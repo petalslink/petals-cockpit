@@ -43,10 +43,11 @@ public final class MockLdapServer {
     public final static String BIND_USERNAME = "bind";
     public final static String BIND_PASSWORD = "bindpass";
 
-    public final static NewUser ADMIN = new NewUser(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_NAME);
-    public final static NewUser LDAP_USER1 = new NewUser("user1", "password1", "Jean-Michel Bonsoir");
-    public final static NewUser LDAP_USER2 = new NewUser("user2", "password2", "Jean-Louis Bonjour");
-    public final static NewUser LDAP_USER3 = new NewUser("user3", "password3", "Marianne Adieu");
+    public final static NewUser ADMIN = new NewUser(ADMIN_USERNAME, ADMIN_PASSWORD, ADMIN_NAME, true);
+
+    public final static NewUser LDAP_USER1 = new NewUser("user1", "password1", "Jean-Michel Bonsoir", true);
+    public final static NewUser LDAP_USER2 = new NewUser("user2", "password2", "Jean-Louis Bonjour", false);
+    public final static NewUser LDAP_USER3 = new NewUser("user3", "password3", "Marianne Adieu", false);
 
     @Nullable
     private InMemoryDirectoryServer ds;

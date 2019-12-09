@@ -386,7 +386,7 @@ public class WorkspaceDbOperations {
     public void deleteBus(long busId, long WorkspaceId, Configuration conf) {
         DSL.using(conf).transaction(config -> {
             final DSLContext ctx = DSL.using(conf);
-            
+
             // First delete endpoints on this bus
             @SuppressWarnings("null")
             final SelectConditionStep<Record> selectedEndpoints = ctx.select().from(SERVICES)
@@ -544,7 +544,7 @@ public class WorkspaceDbOperations {
                     .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
                     .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                     .where(BUSES.ID.eq(busId)).and(SERVICES.NAME.eq(e.getServiceName())).fetchAny();
-            
+
             Record eIdRec = ctx.select().from(ENDPOINTS)
                     .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
                     .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
@@ -582,7 +582,7 @@ public class WorkspaceDbOperations {
                         .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                         .where(BUSES.ID.eq(busId)).and(INTERFACES.NAME.eq(interfaceName))
                         .fetchAny();
-                
+
                 InterfacesRecord iDb = new InterfacesRecord(null, interfaceName);
                 if (iIdRec == null) {
                     iDb.attach(conf);

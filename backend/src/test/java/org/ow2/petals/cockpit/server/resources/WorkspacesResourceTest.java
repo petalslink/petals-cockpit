@@ -115,10 +115,10 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
         addUser("userX");
         addUser("userY");
 
-        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "admin"));
-        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "userX"));
-        resource.db().executeInsert(new UsersWorkspacesRecord(2L, "userX"));
-        resource.db().executeInsert(new UsersWorkspacesRecord(3L, "admin"));
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "admin", false, false, false));
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "userX", false, false, false));
+        resource.db().executeInsert(new UsersWorkspacesRecord(2L, "userX", false, false, false));
+        resource.db().executeInsert(new UsersWorkspacesRecord(3L, "admin", false, false, false));
 
         WorkspacesContent ws = resource.target("/workspaces").request().get(WorkspacesContent.class);
 

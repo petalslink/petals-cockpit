@@ -49,15 +49,15 @@ public class LdapUserSessionTest extends AbstractLdapTest {
 
     @Before
     public void setUpDb() {
-        addUser(ADMIN_LDAP_DB, true);
-        addUser(USER_NOLDAP_DB, false);
+        addUser(ADMIN_LDAP_DB);
+        addUser(USER_NOLDAP_DB);
     }
 
     @Before
     public void safetySleep() {
         /*
          * Wait a bit to prevent a binding conflict.
-         * LDAPException(resultCode=82 (local error), errorMessage='An error occurred while attempting to 
+         * LDAPException(resultCode=82 (local error), errorMessage='An error occurred while attempting to
          * start listener 'mylistener': BindException(message='Address in use (Bind failed)',...)
          */
         try {
@@ -90,7 +90,7 @@ public class LdapUserSessionTest extends AbstractLdapTest {
 
     @Test
     public void ldapLoginNotAdmin() {
-        this.addUser(USER_LDAP_NODB, false);
+        this.addUser(USER_LDAP_NODB);
         final CurrentUser login = login(USER_LDAP_NODB).readEntity(CurrentUser.class);
         assertMatches(login, USER_LDAP_NODB, false);
     }

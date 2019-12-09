@@ -30,6 +30,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import java.io.File;
@@ -152,6 +153,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                 username, null, admin, false));
     }
 
+    protected void changePermissions(Long wsId, String username, boolean adminWs, boolean deploy, boolean lifeCycle) {
+        resource.db().executeUpdate(new UsersWorkspacesRecord(wsId, username, adminWs, deploy, lifeCycle));
+    }
+
     protected long getId(Object o) {
         return resource.getDbObjectId(o);
     }
@@ -233,6 +238,14 @@ public class AbstractCockpitResourceTest extends AbstractTest {
         return requestBy(WORKSPACES.ID, id);
     }
 
+    protected Request requestUsersWorkspaces(long wsId, String username) {
+        return new Request(resource.db.getDataSource(),
+                resource.db().selectFrom(USERS_WORKSPACES)
+                        .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId))
+                        .and(USERS_WORKSPACES.USERNAME.eq(username))
+                        .getSQL(ParamType.INLINED));
+    }
+
     protected Request requestUser(String username) {
         return requestBy(USERS.USERNAME, username);
     }
@@ -267,7 +280,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             DSL.using(conf).executeInsert(new WorkspacesRecord(wsId, wsName, "", ""));
 
             for (String user : users) {
-                DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsId, user));
+                DSL.using(conf).executeInsert(new UsersWorkspacesRecord(wsId, user, false, false, false));
             }
 
             for (Tuple2<Domain, String> d : data) {
