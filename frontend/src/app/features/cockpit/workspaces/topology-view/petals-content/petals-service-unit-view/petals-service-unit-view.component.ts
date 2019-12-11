@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceUnit,
-  IServiceUnitWithSAAndComponent,
+  IServiceUnitWithSaAndComponent,
 } from '@wks/state/service-units/service-units.selectors';
 
 @Component({
@@ -31,7 +31,7 @@ import {
   styleUrls: ['./petals-service-unit-view.component.scss'],
 })
 export class PetalsServiceUnitViewComponent implements OnInit {
-  serviceUnit$: Observable<IServiceUnitWithSAAndComponent>;
+  serviceUnit$: Observable<IServiceUnitWithSaAndComponent>;
   workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>) {}

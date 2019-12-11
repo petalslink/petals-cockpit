@@ -24,11 +24,11 @@ import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assem
 import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
 import { IServiceUnit, IServiceUnitRow } from './service-units.interface';
 
-export interface IServiceUnitWithSA extends IServiceUnit {
+export interface IServiceUnitWithSa extends IServiceUnit {
   serviceAssembly: IServiceAssemblyRow;
 }
 
-export interface IServiceUnitWithSAAndComponent extends IServiceUnit {
+export interface IServiceUnitWithSaAndComponent extends IServiceUnit {
   serviceAssembly: IServiceAssemblyRow;
   component: IComponentRow;
 }
@@ -51,7 +51,7 @@ export const getCurrentServiceUnit = createSelector(
   getSelectedServiceUnit,
   getServiceAssembliesById,
   getComponentsById,
-  (su, sas, components): IServiceUnitWithSAAndComponent => {
+  (su, sas, components): IServiceUnitWithSaAndComponent => {
     if (su) {
       return {
         ...su,

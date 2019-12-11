@@ -25,17 +25,17 @@ import { IStore } from '@shared/state/store.interface';
 import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
 import {
   getServiceUnitsById,
-  IServiceUnitWithSA,
+  IServiceUnitWithSa,
 } from '@wks/state/service-units/service-units.selectors';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 import { IComponentRow, IComponentUI } from './components.interface';
 
-export interface IComponentWithSLsAndSUs
+export interface IComponentWithSlsAndSus
   extends IComponentUI,
     IComponentBackendSSECommon,
     IComponentBackendDetailsCommon {
-  serviceUnits: IServiceUnitWithSA[];
+  serviceUnits: IServiceUnitWithSa[];
   sharedLibraries: ISharedLibraryRow[];
 }
 
@@ -58,7 +58,7 @@ export const getCurrentComponent = createSelector(
   getServiceUnitsById,
   getSharedLibrariesById,
   getServiceAssembliesById,
-  (component, sus, sls, sas): IComponentWithSLsAndSUs => {
+  (component, sus, sls, sas): IComponentWithSlsAndSus => {
     if (component) {
       return {
         ...component,
