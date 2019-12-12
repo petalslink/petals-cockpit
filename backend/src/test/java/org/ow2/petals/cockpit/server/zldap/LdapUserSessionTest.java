@@ -53,20 +53,6 @@ public class LdapUserSessionTest extends AbstractLdapTest {
         addUser(USER_NOLDAP_DB);
     }
 
-    @Before
-    public void safetySleep() {
-        /*
-         * Wait a bit to prevent a binding conflict.
-         * LDAPException(resultCode=82 (local error), errorMessage='An error occurred while attempting to
-         * start listener 'mylistener': BindException(message='Address in use (Bind failed)',...)
-         */
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            log.error("Safety thread sleep failed : {}", e.getMessage());
-        }
-    }
-
     @Test
     public void ldapProtectedUserSucceedAfterLogin() {
         final Response get = appLdap.target("/user").request().get();

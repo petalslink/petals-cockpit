@@ -20,6 +20,8 @@ import java.util.Collection;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
@@ -28,6 +30,9 @@ import com.unboundid.ldap.sdk.LDAPException;
 import com.unboundid.ldif.LDIFException;
 
 public final class MockLdapServer {
+
+    private static final int INIT_SLEEP_TIME = 200;
+    private static final int INIT_RETRIES = 5;
 
     public final static String BASE_DN = "dc=example,dc=com";
     public final static String BASE_PEOPLE_DN = "ou=people,dc=example,dc=com";
@@ -49,27 +54,45 @@ public final class MockLdapServer {
     public final static NewUser LDAP_USER2 = new NewUser("user2", "password2", "Jean-Louis Bonjour", false);
     public final static NewUser LDAP_USER3 = new NewUser("user3", "password3", "Marianne Adieu", false);
 
+    Logger log = LoggerFactory.getLogger(MockLdapServer.class);
+
     @Nullable
     private InMemoryDirectoryServer ds;
 
     public void start() {
-        try {
-            setDs(new InMemoryDirectoryServer(makeDSConfig()));
-            getDs().add("dn: " + BASE_DN, "objectClass: organizationalUnit", "objectClass: top");
-            getDs().add("dn: " + BASE_PEOPLE_DN, "objectClass: organizationalUnit");
+        int retry = INIT_RETRIES;
+        boolean initialized = false;
+        while (!initialized) {
 
-            this.addUser(ADMIN);
-            this.addUser(LDAP_USER1);
-            this.addUser(LDAP_USER2);
-            this.addUser(LDAP_USER3);
+            try {
+                initalize();
+                initialized = true;
+            } catch (final Exception e) {
 
-            // Debug.setEnabled(true);
-
-            getDs().startListening();
-
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
+                if (--retry < 0) {
+                    throw new RuntimeException(e);
+                } else {
+                    log.warn("Could not start MockLdapServer waiting {}ms, still {} retry left. Caused by {}",
+                            INIT_SLEEP_TIME, retry, e.getClass());
+                    sleep();
+                }
+            }
         }
+    }
+
+    private void initalize() throws LDAPException, LDIFException {
+        setDs(new InMemoryDirectoryServer(makeDSConfig()));
+        getDs().add("dn: " + BASE_DN, "objectClass: organizationalUnit", "objectClass: top");
+        getDs().add("dn: " + BASE_PEOPLE_DN, "objectClass: organizationalUnit");
+
+        this.addUser(ADMIN);
+        this.addUser(LDAP_USER1);
+        this.addUser(LDAP_USER2);
+        this.addUser(LDAP_USER3);
+
+        // Debug.setEnabled(true);
+
+        getDs().startListening();
     }
 
     public void stop() {
@@ -124,4 +147,11 @@ public final class MockLdapServer {
         this.ds = ds;
     }
 
+    private void sleep() {
+        try {
+            Thread.sleep(INIT_SLEEP_TIME);
+        } catch (InterruptedException e2) {
+            log.error("Safety thread sleep interrupted : {}", e2.getMessage());
+        }
+    }
 }
