@@ -44,15 +44,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div fxFlex *ngIf="!status.isLdapMode">
         <mat-form-field appearance="outline" fxFlexFill class="pwd-form-field">
           <mat-label>Password</mat-label>
-          <input matInput [type]="show ? 'text' : 'password'" formControlName="password" [errorStateMatcher]="matcher" required >
+          <input 
+            matInput 
+            formControlName="password" 
+            autocomplete="new-password"
+            [type]="show ? 'text' : 'password'" 
+            [errorStateMatcher]="matcher" 
+            required
+          >
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
           <span matSuffix>
             <mat-icon 
               *ngIf="!users.isSettingUp"
-              class="icon-x1 cursor-pointer icon-toggle-pwd" 
-              (click)="togglePassword()" 
-              [color]="show ? 'primary' : ''"
               matTooltip="Toggle Visibility"
+              [color]="show ? 'primary' : ''"
+              (click)="togglePassword()" 
+              class="icon-x1 cursor-pointer icon-toggle-pwd" 
             >
               <fa-icon [icon]="show ? 'eye' : 'eye-slash'"></fa-icon>
             </mat-icon>
