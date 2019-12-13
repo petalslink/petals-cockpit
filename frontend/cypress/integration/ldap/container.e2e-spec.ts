@@ -85,7 +85,7 @@ describe('Container', () => {
     cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=create');
 
-    cy.get(WORKSPACES_CREATE_DOM.inputs.name).expectFocused();
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).expectFocused();
 
     cy.addWorkspace('Min Workspace');
 

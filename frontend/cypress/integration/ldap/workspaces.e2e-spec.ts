@@ -82,7 +82,7 @@ describe(`Workspaces`, () => {
     cy.expectLocationToBe(`/workspaces`);
     cy.url().should('include', '?page=create');
 
-    cy.get(WORKSPACES_CREATE_DOM.inputs.name).should('be.empty');
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).should('be.empty');
     cy.get(WORKSPACES_CREATE_DOM.textArea.shortDescription).should('be.empty');
     cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
   });
@@ -142,7 +142,7 @@ describe(`Workspaces`, () => {
 
     cy.get(WORKSPACES_DOM.buttons.goToCreateWorkspace).click();
 
-    cy.get(WORKSPACES_CREATE_DOM.inputs.name).expectFocused();
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).expectFocused();
 
     cy.addWorkspace('Workspace 2');
 
@@ -268,7 +268,7 @@ describe(`Workspaces`, () => {
     cy.url().should('include', '?page=create');
 
     cy
-      .get(WORKSPACES_CREATE_DOM.inputs.name)
+      .get(WORKSPACES_CREATE_DOM.inputs.workspaceName)
       .should('have.value', 'ADD_WKS_HTTP_ERROR_BACKEND')
       .and('not.be.disabled')
       .clear()
@@ -279,6 +279,58 @@ describe(`Workspaces`, () => {
       .should('not.be.disabled')
       .and('be.empty');
 
+    cy
+      .get(WORKSPACES_CREATE_DOM.buttons.addWorkspace)
+      .should('not.be.disabled')
+      .click();
+
+    cy.expectLocationToBe('/workspaces/idWks2');
+  });
+
+  it('should not be able to create workspaces with similar names', () => {
+    const existingWorkspaceError = 'Existing workspace with similar name';
+
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+    cy.get(MENU_DOM.links.goToCreateWks).click();
+
+    cy.expectLocationToBe(`/workspaces`);
+    cy.url().should('include', '?page=create');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.workspaceName)
+      .should('not.be.visible');
+    cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
+
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).type('Workspace');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.workspaceName)
+      .should('not.be.visible');
+    cy
+      .get(WORKSPACES_CREATE_DOM.buttons.addWorkspace)
+      .should('not.be.disabled');
+
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).type(' 0');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.workspaceName)
+      .should('contain', existingWorkspaceError);
+    cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.inputs.workspaceName)
+      .type('-_@~!?,;.:^${}[]()=+#~²%§&|*\\/\'":° ');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.workspaceName)
+      .should('contain', existingWorkspaceError);
+    cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
+
+    cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).type('X');
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.messages.error.workspaceName)
+      .should('not.be.visible');
     cy
       .get(WORKSPACES_CREATE_DOM.buttons.addWorkspace)
       .should('not.be.disabled')

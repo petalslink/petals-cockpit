@@ -35,7 +35,7 @@ Cypress.Commands.add('expectWorkspacesListToBe', listItemWorkspacesDetails => {
 });
 
 Cypress.Commands.add('addWorkspace', (name, shortDescription?) => {
-  cy.get(WORKSPACES_CREATE_DOM.inputs.name).type(name);
+  cy.get(WORKSPACES_CREATE_DOM.inputs.workspaceName).type(name);
   if (shortDescription) {
     cy
       .get(WORKSPACES_CREATE_DOM.textArea.shortDescription)
@@ -50,7 +50,7 @@ Cypress.Commands.add(
     cy.get(WORKSPACES_CREATE_DOM.buttons.addWorkspace).should('be.disabled');
 
     cy
-      .get(WORKSPACES_CREATE_DOM.inputs.name)
+      .get(WORKSPACES_CREATE_DOM.inputs.workspaceName)
       .should('not.be.disabled')
       .type(name);
 

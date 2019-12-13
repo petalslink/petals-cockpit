@@ -57,16 +57,15 @@ export const WORKSPACES_LIST_DOM = {
 };
 
 export const WORKSPACES_CREATE_DOM = {
-  buttons: {
-    addWorkspace: `${bsCreate} .btn-add-workspace`,
+  buttons: { addWorkspace: `${bsCreate} .btn-add-workspace` },
+  inputs: {
+    workspaceName: `${bsCreate} input[formcontrolname="workspaceName"]`,
   },
-  inputs: { name: `${bsCreate} input[formcontrolname="name"]` },
   messages: {
     error: {
       addWksFailed: `${bs} .error-create-wks-details`,
+      workspaceName: `${bsCreate} .add-workspace-form-field .mat-error`,
     },
   },
-  textArea: {
-    shortDescription: `${bsCreate} textarea`,
-  },
+  textArea: { shortDescription: `${bsCreate} textarea` },
 };
