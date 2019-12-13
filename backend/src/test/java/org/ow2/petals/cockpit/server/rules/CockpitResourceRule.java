@@ -156,7 +156,7 @@ public class CockpitResourceRule implements TestRule {
     /**
      * This will change the profile used during the test, it will be reset to <code>null</code> after the test!
      */
-    public void setCurrentProfile(@Nullable CockpitProfile currentProfile) {
+    public void setCurrentProfile(CockpitProfile currentProfile) {
         this.currentProfile = currentProfile;
         this.currentProfile.updatePermissions(DSL.using(db.getConnectionJdbcUrl()).configuration());
         this.currentProfileManager = new ProfileManager<CommonProfile>(MockWebContext.create());

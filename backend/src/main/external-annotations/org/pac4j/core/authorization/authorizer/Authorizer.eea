@@ -1,0 +1,4 @@
+class org/pac4j/core/authorization/authorizer/Authorizer
+isAuthorized
+ (Lorg/pac4j/core/context/WebContext;Ljava/util/List<TU;>;)Z
+ (L1org/pac4j/core/context/WebContext;L1java/util/List<TU;>;)Z

@@ -2,3 +2,6 @@ class org/zapodot/junit/db/EmbeddedDatabaseRule
 builder
  ()Lorg/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
  ()L1org/zapodot/junit/db/EmbeddedDatabaseRule$Builder;
+getConnectionJdbcUrl
+ ()Ljava/lang/String;
+ ()L1java/lang/String;

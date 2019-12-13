@@ -1,0 +1,4 @@
+class org/jooq/Scope
+configuration
+ ()Lorg/jooq/Configuration;
+ ()L1org/jooq/Configuration;
