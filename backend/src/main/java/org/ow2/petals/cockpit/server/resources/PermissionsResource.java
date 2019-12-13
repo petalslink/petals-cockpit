@@ -43,7 +43,6 @@ import org.jooq.Configuration;
 import org.jooq.Result;
 import org.jooq.exception.NoDataFoundException;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.pac4j.core.profile.ProfileManager;
@@ -69,8 +68,7 @@ public class PermissionsResource {
 
     @Inject
     public PermissionsResource(@NotEmpty @PathParam("username") String username,
-            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager, Configuration jooq,
-            CockpitConfiguration config) {
+            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager, Configuration jooq) {
         this.profile = profileManager.get(true).orElseThrow(() -> new WebApplicationException(Status.UNAUTHORIZED));
         this.jooq = jooq;
         this.username = username;

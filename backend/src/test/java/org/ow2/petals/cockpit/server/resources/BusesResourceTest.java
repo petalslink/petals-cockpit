@@ -50,5 +50,7 @@ public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
     public void getExistingBus() {
         // TODO check assumptions
         BusOverview get = resource.target("/buses/" + getId(domain)).request().get(BusOverview.class);
+
+        assertThat(get).isNotNull();
     }
 }

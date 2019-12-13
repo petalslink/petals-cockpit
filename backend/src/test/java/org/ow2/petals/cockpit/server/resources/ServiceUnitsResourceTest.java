@@ -42,6 +42,8 @@ public class ServiceUnitsResourceTest extends AbstractDefaultWorkspaceResourceTe
         // TODO check assumptions
         ServiceUnitOverview get = resource.target("/serviceunits/" + getId(serviceUnit)).request()
                 .get(ServiceUnitOverview.class);
+
+        assertThat(get).isNotNull();
     }
 
     @Test

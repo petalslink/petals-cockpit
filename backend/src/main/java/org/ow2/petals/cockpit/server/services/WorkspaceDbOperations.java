@@ -257,38 +257,47 @@ public class WorkspaceDbOperations {
         }
     }
 
+    @SuppressWarnings("unused")
     public void busAdded(Domain bus, BusesRecord bDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void containerAdded(Container container, ContainersRecord cDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void componentAdded(Component component, ComponentsRecord compDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void sharedLibraryAdded(SharedLibrary sl, SharedlibrariesRecord slDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void serviceAssemblyAdded(ServiceAssembly sa, ServiceassembliesRecord saDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void serviceUnitAdded(ServiceUnit su, ServiceunitsRecord suDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void serviceAdded(ServicesRecord sDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void endpointAdded(EndpointsRecord sDb) {
         // NOP
     }
 
+    @SuppressWarnings("unused")
     public void interfaceAdded(InterfacesRecord sDb) {
         // NOP
     }
@@ -507,7 +516,7 @@ public class WorkspaceDbOperations {
                     instanceIdToDelete.size(), deletedInstances);
         }
 
-        //Elements can still be linked to other endpoints, must not delete these ! 
+        //Elements can still be linked to other endpoints, must not delete these !
         serviceIdToDelete.removeAll(ctx.fetchValues(EDP_INSTANCES.SERVICE_ID));
         endpointIdToDelete.removeAll(ctx.fetchValues(EDP_INSTANCES.ENDPOINT_ID));
         interfacesIdToDelete.removeAll(ctx.fetchValues(EDP_INSTANCES.INTERFACE_ID));

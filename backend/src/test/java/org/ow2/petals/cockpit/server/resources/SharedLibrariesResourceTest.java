@@ -40,6 +40,8 @@ public class SharedLibrariesResourceTest extends AbstractDefaultWorkspaceResourc
     public void getExistingSL() {
         SharedLibraryOverview get = resource.target("/sharedlibraries/" + getId(sharedLibrary)).request()
                 .get(SharedLibraryOverview.class);
+
+        assertThat(get).isNotNull();
     }
 
     @Test

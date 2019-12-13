@@ -42,6 +42,8 @@ public class ServiceAssembliesResourceTest extends AbstractDefaultWorkspaceResou
         // TODO check assumptions
         ServiceAssemblyOverview get = resource.target("/serviceassemblies/" + getId(serviceAssembly)).request()
                 .get(ServiceAssemblyOverview.class);
+
+        assertThat(get).isNotNull();
     }
 
     @Test
