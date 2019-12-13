@@ -128,6 +128,7 @@ import javaslang.Tuple2;
  * @author vnoel
  *
  */
+@SuppressWarnings("null")
 public class AbstractCockpitResourceTest extends AbstractTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCockpitResourceTest.class);
@@ -893,11 +894,10 @@ public class AbstractCockpitResourceTest extends AbstractTest {
             a.assertThat(interfaceIsContained(interface_, expectedEndpoints));
         });
 
-        assertWorkspaceContentServicesCount(a, content, wsId, expectedEndpoints);
+        assertWorkspaceContentServicesCount(a, content, expectedEndpoints);
     }
 
-    @SuppressWarnings("null")
-    private void assertWorkspaceContentServicesCount(SoftAssertions a, WorkspaceContent content, long wsId,
+    private void assertWorkspaceContentServicesCount(SoftAssertions a, WorkspaceContent content,
             List<Endpoint> expectedEndpoints) {
         Set<String> serviceCount = new HashSet<String>();
         Set<String> endpointCount = new HashSet<String>();

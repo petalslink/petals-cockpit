@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.BusesResource.BusOverview;
 
+@SuppressWarnings("null")
 public class BusesResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     public BusesResourceTest() {

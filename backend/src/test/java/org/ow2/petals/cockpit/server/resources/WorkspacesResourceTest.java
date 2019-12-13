@@ -32,6 +32,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource.NewWorkspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceMin;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesContent;
 
+@SuppressWarnings("null")
 public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
     public WorkspacesResourceTest() {

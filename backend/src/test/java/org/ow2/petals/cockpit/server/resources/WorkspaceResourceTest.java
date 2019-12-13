@@ -45,6 +45,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOvervi
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverviewContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate;
 
+@SuppressWarnings("null")
 public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
     public WorkspaceResourceTest() {
