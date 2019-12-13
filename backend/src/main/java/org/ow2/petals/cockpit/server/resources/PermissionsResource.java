@@ -22,7 +22,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,6 +36,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
