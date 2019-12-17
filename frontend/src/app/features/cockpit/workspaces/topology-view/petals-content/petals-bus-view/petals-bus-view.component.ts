@@ -16,18 +16,18 @@
  */
 
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-import { MatSort } from '@angular/material/sort';
 import { IContainerRow } from '@feat/cockpit/workspaces/state/containers/containers.interface';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentBus,
   IBusWithContainers,
 } from '@wks/state/buses/buses.selectors';
-import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-bus-view',
