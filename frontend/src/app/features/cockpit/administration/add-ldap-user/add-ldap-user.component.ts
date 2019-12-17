@@ -19,7 +19,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input,
   OnDestroy,
   OnInit,
   Output,
@@ -74,8 +73,6 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     '=1': '1 user is matching this search.',
     other: '# users are matching this search.',
   };
-
-  @Input() canAdd = false;
 
   @Output()
   evtSubmit = new EventEmitter<

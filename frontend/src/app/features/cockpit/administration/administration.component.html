@@ -196,7 +196,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <ng-template #isFromLdap>
           <app-add-ldap-user 
-            [canAdd]="!users.isAdding"
             (evtSubmit)="onAdd($event);"
           ></app-add-ldap-user>
         </ng-template>
