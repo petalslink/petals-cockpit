@@ -26,6 +26,7 @@ import {
   click,
   getButtonByClass,
   getInputByName,
+  getToggleSlideByName,
   setInputValue,
 } from '@testing/index';
 
@@ -43,8 +44,8 @@ describe('Administration edit user', () => {
     get passwordInpt() {
       return getInput('password');
     },
-    get adminInpt() {
-      return getInput('isAdmin');
+    get adminFormBtn() {
+      return getToggleSlide('isAdmin');
     },
     get addUserFormBtn() {
       return getBtn('btn-add-user-form');
@@ -61,6 +62,8 @@ describe('Administration edit user', () => {
 
   const getBtn = (className: string) => getButtonByClass(fixture, className);
 
+  const getToggleSlide = (name: string) => getToggleSlideByName(fixture, name);
+
   beforeEach(
     async(() => {
       TestBed.configureTestingModule({
@@ -74,6 +77,10 @@ describe('Administration edit user', () => {
     fixture = TestBed.createComponent(TestHostAddUserComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    fixture.destroy();
   });
 
   it(`should add a user only if username, name and password are defined`, () => {
@@ -148,7 +155,7 @@ describe('Administration edit user', () => {
     expect(DOM.usernameInpt).toBe(null);
   });
 
-  it(`should trigger an output to update a user only if the name has changed or new password`, () => {
+  it(`should disable the update button if the user has no change`, () => {
     spyOn(component, 'evtSubmit');
     spyOn(component, 'evtCancel');
 
@@ -161,16 +168,17 @@ describe('Administration edit user', () => {
     fixture.detectChanges();
 
     expect(DOM.nameInpt.value).toEqual('User 1');
+    expect(DOM.adminFormBtn.getAttribute('class').includes('mat-checked')).toBe(
+      false
+    );
 
     expect(component.evtSubmit).not.toHaveBeenCalled();
     expect(component.evtCancel).not.toHaveBeenCalled();
+    expect(DOM.addUserFormBtn.disabled).toBe(true);
 
-    expect(DOM.addUserFormBtn.disabled).toBe(false);
-    click(DOM.addUserFormBtn);
+    setInputValue(DOM.nameInpt, 'User 2');
     fixture.detectChanges();
-
-    expect(component.evtSubmit).not.toHaveBeenCalled();
-    expect(component.evtCancel).toHaveBeenCalled();
+    expect(DOM.addUserFormBtn.disabled).toBe(false);
   });
 
   it(`should display a delete button only if a user is passed in input`, () => {

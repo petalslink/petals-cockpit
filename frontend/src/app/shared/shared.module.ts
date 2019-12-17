@@ -231,7 +231,7 @@ export const exportss = [
   declarations,
   entryComponents: [
     SnackBarDeploymentProgressComponent,
-    ConfirmMessageDialogComponent
+    ConfirmMessageDialogComponent,
   ],
 })
 export class SharedModule {
