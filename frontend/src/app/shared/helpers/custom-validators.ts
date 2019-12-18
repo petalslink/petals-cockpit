@@ -15,7 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
+import { getWorkspacesIdsNames } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { Store } from '@ngrx/store';
+import { IStore } from '@shared/state/store.interface';
+import { first, map } from 'rxjs/operators';
 
 export class CustomValidators {
   static isIp(c: AbstractControl) {
@@ -44,5 +48,38 @@ export class CustomValidators {
 
   static isPortOrNull(c: AbstractControl) {
     return !c.value || CustomValidators.isPort(c);
+  }
+
+  /**
+   * async validator to determine is there is
+   * an existing workspace with similar name
+   */
+  static existingWorkspaceWithSimilarNameValidator(
+    store$: Store<IStore>
+  ): AsyncValidatorFn {
+    return (control: AbstractControl) =>
+      store$.pipe(
+        getWorkspacesIdsNames,
+        first(),
+        map(workspaceIdNames => {
+          return workspaceIdNames.list
+            .map(wks => this.cleanWorkspaceName(wks.name))
+            .includes(this.cleanWorkspaceName(control.value))
+            ? { existingWorkspaceWithSimilarName: true }
+            : null;
+        })
+      );
+  }
+
+  private static cleanWorkspaceName(name: string): string {
+    const backendIgnoredCharacters = '-_@~!?,;.:^${}[]()=+#~²%§&|*\\/\'":° ';
+    let cleanName = '';
+    for (let i = 0; i < name.length; i++) {
+      const char = name.charAt(i);
+      if (!backendIgnoredCharacters.includes(char)) {
+        cleanName += char;
+      }
+    }
+    return cleanName.toUpperCase();
   }
 }

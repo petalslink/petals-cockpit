@@ -22,10 +22,10 @@ export const MENU_DOM = {
     toggleMenu: `${bs} .btn-menu`,
   },
   links: {
-    goToWksList: `${bs} .menu-item-back-wks-list`,
-    goToCreateWks: `${bs} .menu-item-create-wks`,
-    itemList: `${bs} .item-list`,
-    itemsWksNames: `${bs} .item-list .menu-item-wks-name`,
+    goToWksList: `.menu-item-back-wks-list`,
+    goToCreateWks: `.menu-item-create-wks`,
+    itemList: `.item-list`,
+    itemsWksNames: `.item-list .menu-item-wks-name`,
   },
   texts: {
     itemNameWksList: `span .back-to-wks`,

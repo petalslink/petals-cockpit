@@ -26,11 +26,13 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import { Store } from '@ngrx/store';
+import { CustomValidators } from '@shared/helpers/custom-validators';
 import {
   FormErrorStateMatcher,
   getFormErrors,
 } from '@shared/helpers/form.helper';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
+import { IStore } from '@shared/state/store.interface';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
@@ -45,19 +47,22 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
 
   msgError: string;
 
-  @Input() workspace: IWorkspace;
-
   @Input() canCreate: boolean;
   @Input() canFocus = true;
   @Input()
   set msgErrorInput(value: string) {
     this.msgError = value;
     if (this.newWksForm !== undefined) {
-      const formValues: { name: string; shortDescription: string } = this
-        .newWksForm.value;
+      const formValues: {
+        workspaceName: string;
+        shortDescription: string;
+      } = this.newWksForm.value;
 
       this.newWksForm = this.fb.group({
-        name: { value: formValues.name, disabled: false },
+        workspaceName: {
+          value: formValues.workspaceName,
+          disabled: false,
+        },
         shortDescription: {
           value: formValues.shortDescription,
           disabled: false,
@@ -72,19 +77,20 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   newWksForm: FormGroup;
 
   formErrors = {
-    name: '',
+    workspaceName: '',
     shortDescription: '',
   };
 
   matcher = new FormErrorStateMatcher();
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.newWksForm = this.fb.group({
-      name: [
+      workspaceName: [
         '',
         Validators.compose([Validators.required, Validators.maxLength(200)]),
+        CustomValidators.existingWorkspaceWithSimilarNameValidator(this.store$),
       ],
       shortDescription: '',
     });
@@ -108,19 +114,21 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
 
   reset() {
     this.newWksForm.reset({
-      name: this.workspace ? this.workspace.name : '',
-      shortDescription: this.workspace ? this.workspace.shortDescription : '',
+      workspaceName: '',
+      shortDescription: '',
     });
   }
 
   doSubmit() {
-    const value: { name: string; shortDescription: string } = this.newWksForm
-      .value;
+    const value: { name: string; shortDescription: string } = {
+      name: this.newWksForm.value.workspaceName,
+      shortDescription: this.newWksForm.value.shortDescription,
+    };
 
     this.evtCreate.emit(value);
 
     this.newWksForm = this.fb.group({
-      name: { value: value.name, disabled: true },
+      workspaceName: { value: value.name, disabled: true },
       shortDescription: { value: value.shortDescription, disabled: true },
     });
   }

@@ -51,6 +51,10 @@ interface IValidationMessages {
   token?: {
     required: string;
   };
+  workspaceName?: {
+    required: string;
+    existingWorkspaceWithSimilarName: string;
+  };
 }
 
 const validationMessages: IValidationMessages = {
@@ -80,6 +84,10 @@ const validationMessages: IValidationMessages = {
   },
   token: {
     required: 'Required!',
+  },
+  workspaceName: {
+    required: 'Required!',
+    existingWorkspaceWithSimilarName: 'Existing workspace with similar name',
   },
 };
 
