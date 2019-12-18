@@ -91,7 +91,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         color="accent"
         type="button"
         (click)="doSubmit()"
-        [disabled]="userManagementForm.invalid"
+        [disabled]="userManagementForm.invalid || userUnchanged()"
         class="btn-add-user-form text-upper"
       >
         <mat-icon>{{ user ? 'done' : 'person_add' }}</mat-icon>

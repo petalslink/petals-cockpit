@@ -33,7 +33,7 @@ import { IUserNew } from '@shared/services/users.service';
 import { IStore } from '@shared/state/store.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
 import { Users } from '@shared/state/users.actions';
-import { ICurrentUser, IUser } from '@shared/state/users.interface';
+import { ICurrentUser, IUser, IUserRow } from '@shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from '@shared/state/users.selectors';
 import { AddEditUserComponent } from './add-edit-user/add-edit-user.component';
 
@@ -50,7 +50,7 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   isModifyingAdministrator = false;
   isLastAdmin: boolean;
 
-  users$: Observable<IUser[]>;
+  users$: Observable<IUserRow[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;

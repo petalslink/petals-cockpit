@@ -180,6 +180,15 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     }
     this.reset();
   }
+  
+  userUnchanged() {
+    return (
+      this.user &&
+      this.userManagementForm.get('name').value === this.user.name &&
+      this.userManagementForm.get('isAdmin').value === this.user.isAdmin &&
+      this.userManagementForm.get('password').value === ''
+    );
+  }
 
   doDelete() {
     this.evtDelete.emit();
