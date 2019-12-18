@@ -132,7 +132,9 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractCockpitResourceTest.class);
 
-    private final int DEFAULT_SSE_TIMEOUT = 2;
+    private final int DEFAULT_SSE_TIMEOUT = 10;
+
+    private final int EXPECT_NOTHING_SSE_TIMEOUT = 4;
 
     @Rule
     public TemporaryFolder zipFolder = new TemporaryFolder();
@@ -353,7 +355,6 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected void expectEvent(EventInput eventInput, BiConsumer<InboundEvent, SoftAssertions> c) {
-        // By default we expect 1 event of any type for 2 seconds.
         expectEventAmongNext(1, null, DEFAULT_SSE_TIMEOUT, true, eventInput, c);
     }
 
@@ -423,7 +424,7 @@ public class AbstractCockpitResourceTest extends AbstractTest {
 
     protected void expectNoServicesUpdated(EventInput eventInput) {
         SoftAssertions.assertSoftly(sa -> {
-            expectEventAmongNext(2, "SERVICES_UPDATED", DEFAULT_SSE_TIMEOUT, false, eventInput, (e, a) -> {
+            expectEventAmongNext(2, "SERVICES_UPDATED", EXPECT_NOTHING_SSE_TIMEOUT, false, eventInput, (e, a) -> {
                 sa.fail("Failure: \"SERVICES_UPDATED\" SSE Event should not have been sent!");
             });
         });
