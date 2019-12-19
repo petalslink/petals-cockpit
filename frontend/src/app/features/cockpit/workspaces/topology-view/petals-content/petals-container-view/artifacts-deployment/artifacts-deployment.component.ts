@@ -273,7 +273,13 @@ export class ArtifactsDeploymentComponent
             default:
               break;
           }
+
           this.artifact.init();
+          this.store$.dispatch(
+            new Containers.CleanArtifactDeploymentError({
+              id: this.container.id,
+            })
+          );
         }),
         catchError(err => {
           this.notifications.warn(
@@ -292,25 +298,14 @@ export class ArtifactsDeploymentComponent
       .subscribe();
   }
 
-  isDeployingArtifact(type: string) {
-    if (type) {
-      // to capitalize the first character of every types
-      const titleArtifactType = type.replace(
-        /(^\w{1})|(\s{1}\w{1})/,
-        (match: string) => match.toUpperCase()
-      );
-      this.openSnackBarDeployment(titleArtifactType);
-    }
-  }
-
-  openSnackBarDeployment(titleArtifactType: string) {
+  openSnackBarDeployment(type: string) {
     this.snackRef = this.snackBar.openFromComponent(
       SnackBarDeploymentProgressComponent,
       {
         verticalPosition: 'top',
         horizontalPosition: 'center',
         data: {
-          titleArtifactType,
+          type,
           uploadProgress$: this.percentage$.asObservable(),
         },
       }
@@ -322,7 +317,7 @@ export class ArtifactsDeploymentComponent
   deploy(file: File) {
     const correlationId = uuid();
 
-    this.isDeployingArtifact(this.artifact.type);
+    this.artifact.isDeployingArtifact();
 
     const actionToDispatch: Action = this.artifact.fetchActionToDispatch(
       file,
@@ -486,7 +481,8 @@ abstract class DeploymentArtifact {
   protected constructor(
     readonly parent: ArtifactsDeploymentComponent,
     readonly type: string,
-    protected name: string
+    readonly name: string,
+    readonly version?: string
   ) {}
   abstract init(): void;
   abstract getTitle(): string;
@@ -494,13 +490,23 @@ abstract class DeploymentArtifact {
   abstract isDisabledDeployArtifact(): boolean;
   abstract cancelSelectedFile(): void;
   abstract fetchActionToDispatch(file: File, correlationId: string): Action;
+  isDeployingArtifact() {
+    if (this.type) {
+      // to capitalize the first character of every types
+      const titleArtifactType = this.type.replace(
+        /(^\w{1})|(\s{1}\w{1})/,
+        (match: string) => match.toUpperCase()
+      );
+      this.parent.openSnackBarDeployment(titleArtifactType);
+    }
+  }
 }
 
 class Comp extends DeploymentArtifact {
   constructor(
     parent: ArtifactsDeploymentComponent,
     name: string,
-    protected sharedLibraries: ISharedLibrarySimplified[]
+    readonly sharedLibraries: ISharedLibrarySimplified[]
   ) {
     super(parent, 'component', name);
   }
@@ -615,9 +621,9 @@ class Sl extends DeploymentArtifact {
   constructor(
     parent: ArtifactsDeploymentComponent,
     name: string,
-    protected version: string
+    version: string
   ) {
-    super(parent, 'shared-library', name);
+    super(parent, 'shared-library', name, version);
   }
 
   init() {

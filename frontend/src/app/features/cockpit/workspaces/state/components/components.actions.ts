@@ -170,4 +170,11 @@ export namespace Components {
       public readonly payload: IServiceUnitBackendSSE & ICorrelationId
     ) {}
   }
+
+  export const CleanServiceUnitDeploymentErrorType =
+    '[Components] Clean service unit deployment error';
+  export class CleanServiceUnitDeploymentError implements Action {
+    readonly type = CleanServiceUnitDeploymentErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
 }

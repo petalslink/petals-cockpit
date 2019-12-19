@@ -184,7 +184,11 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
           const [
             serviceAssembly,
             serviceUnit,
-          ] = component.container.addServiceUnit(component, 'Shutdown');
+          ] = component.container.addServiceUnit(
+            component,
+            'Shutdown',
+            serviceUnitName
+          );
 
           return {
             sseResult: {

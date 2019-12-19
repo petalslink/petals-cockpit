@@ -61,6 +61,7 @@ export namespace ComponentsReducer {
     | Components.DeployServiceUnit
     | Components.DeployServiceUnitError
     | Components.DeployServiceUnitSuccess
+    | Components.CleanServiceUnitDeploymentError
     | ServiceUnits.Added
     | ServiceUnits.Removed
     | Workspaces.Clean;
@@ -127,6 +128,9 @@ export namespace ComponentsReducer {
       case Components.DeployServiceUnitSuccessType: {
         return deployServiceUnitSuccess(table, action.payload);
       }
+      case Components.CleanServiceUnitDeploymentErrorType: {
+        return cleanServiceUnitDeploymentError(table, action.payload);
+      }
       case ServiceUnits.AddedType: {
         return addedServiceUnits(table, action.payload);
       }
@@ -167,7 +171,7 @@ export namespace ComponentsReducer {
       return {
         ...updateById(table, payload.id, {
           updateError: '',
-          deployError: '',
+          errorDeploymentServiceUnit: '',
         }),
         ...res,
       };
@@ -285,7 +289,7 @@ export namespace ComponentsReducer {
   ) {
     return updateById(table, payload.id, {
       isUpdating: false,
-      deployError: payload.errorDeployment,
+      errorDeploymentServiceUnit: payload.errorDeployment,
     });
   }
 
@@ -295,7 +299,16 @@ export namespace ComponentsReducer {
   ) {
     return updateById(table, payload.componentId, {
       isUpdating: false,
-      deployError: '',
+      errorDeploymentServiceUnit: '',
+    });
+  }
+
+  function cleanServiceUnitDeploymentError(
+    table: IComponentsTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
+      errorDeploymentServiceUnit: '',
     });
   }
 

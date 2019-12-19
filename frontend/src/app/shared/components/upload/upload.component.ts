@@ -47,14 +47,12 @@ export class UploadComponent {
   @Input() acceptedFileType?: string;
   @Input() error?: string;
   @Input() disabled: boolean;
-  @Input() isFileParsed: boolean;
+  @Input() isFileParsed? = true;
   @Input()
   set uploadStatus(uploadStatus: { percentage: number }) {
-    if (!!uploadStatus && typeof uploadStatus.percentage === 'number') {
-      this.isUploading = true;
+    if (uploadStatus && typeof uploadStatus.percentage === 'number') {
       this.percentage = uploadStatus.percentage;
     } else {
-      this.isUploading = false;
       this.percentage = undefined;
     }
   }
@@ -69,7 +67,7 @@ export class UploadComponent {
   evtUploadFile = new EventEmitter<{
     selectedFileInformation: ISelectedFileInformation;
   }>();
-  isUploading = false;
+
   percentage: number;
 
   @Output() evtResetFile = new EventEmitter<void>();
@@ -91,7 +89,6 @@ export class UploadComponent {
   }
 
   uploadFile() {
-    this.isUploading = true;
     this.evtUploadFile.emit({
       selectedFileInformation: this.selectedFileInformation,
     });
@@ -99,9 +96,7 @@ export class UploadComponent {
 
   reset() {
     this.selectedFileInformation = undefined;
-    this.isUploading = false;
     this.percentage = undefined;
-    this.error = undefined;
     this.evtResetFile.emit();
   }
 
@@ -132,7 +127,7 @@ export class UploadComponent {
   selector: 'app-snackbar-deployment-progress',
   template: `
     <div class="mat-typography">
-      <h3 class="title">{{ data.titleArtifactType }} deployment in progress...</h3>
+      <h3 class="title">{{ data.type }} deployment in progress...</h3>
       <div class="wrapper-progress-bar" *ngIf="data.uploadProgress$ | async as uploadProgress">
         <span class="progress-value">{{ uploadProgress }}%</span>
         <mat-progress-bar mode="determinate" [value]="uploadProgress" class="margin-left-x1 margin-right-x1"></mat-progress-bar>
@@ -148,7 +143,7 @@ export class SnackBarDeploymentProgressComponent implements OnInit {
     public snackRef: MatSnackBarRef<SnackBarDeploymentProgressComponent>,
     @Inject(MAT_SNACK_BAR_DATA)
     public data: {
-      titleArtifactType: string;
+      type: string;
       uploadProgress$: Observable<number>;
     }
   ) {}

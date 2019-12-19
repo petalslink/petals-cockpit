@@ -21,9 +21,10 @@ import { SharedModule } from '@shared/shared.module';
 import { PetalsComponentViewRoutingModule } from './petals-component-view-routing.module';
 
 import { PetalsComponentViewComponent } from './petals-component-view.component';
+import { SuDeploymentComponent } from './su-deployment/su-deployment.component';
 
 @NgModule({
   imports: [SharedModule, PetalsComponentViewRoutingModule],
-  declarations: [PetalsComponentViewComponent],
+  declarations: [PetalsComponentViewComponent, SuDeploymentComponent],
 })
 export class PetalsComponentViewModule {}
