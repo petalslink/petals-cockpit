@@ -72,13 +72,11 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit() {
     this.userManagementForm = this.fb.group({
-      username: ['', Validators.required],
-      name: ['', Validators.required],
-      password: '',
-      isAdmin: false,
+      username: [this.user ? this.user.id : '', Validators.required],
+      name: [this.user ? this.user.name : '', Validators.required],
+      password: ['', this.user ? '' : Validators.required],
+      isAdmin: this.user ? this.user.isAdmin : true,
     });
-
-    this.reset();
 
     this.userManagementForm.valueChanges
       .pipe(
@@ -94,7 +92,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['user']) {
+    if (changes['user'] && changes['user'].previousValue === undefined) {
       this.reset();
     }
   }
@@ -178,7 +176,6 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       this.evtSubmit.emit(value);
     }
-    this.reset();
   }
   
   userUnchanged() {

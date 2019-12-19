@@ -98,7 +98,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 *ngFor="let user of users; trackBy:trackByUser; let i = index"
                 [hideToggle]="false" 
                 [ngClass]="'exp-pnl-user-'+user.id"
-                (closed)="onResetEditUserForm(i)"
+                (opened)="onResetEditUserForm(i)"
               >
                 <mat-expansion-panel-header (click)='isAdministratorChecked = user.isAdmin' fxLayout="row" class="mat-body" >
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
