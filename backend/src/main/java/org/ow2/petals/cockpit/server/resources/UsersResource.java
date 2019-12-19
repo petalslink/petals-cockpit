@@ -53,7 +53,9 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.services.LdapService;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @Singleton
 @Path("/users")
@@ -247,10 +249,44 @@ public class UsersResource {
             this(record.getUsername(), record.getName(), record.getAdmin());
         }
 
-        private UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name, @JsonProperty("isAdmin") boolean isAdmin) {
+        public UserMin(@JsonProperty("id") String id, @JsonProperty("name") String name,
+                @JsonProperty("isAdmin") boolean isAdmin) {
             this.id = id;
             this.name = name;
             this.isAdmin = isAdmin;
         }
+    }
+
+    public static class WorkspaceUser {
+        @Valid
+        @JsonUnwrapped
+        public final UserMin userMin;
+
+        @NotNull
+        @JsonProperty
+        public boolean adminWorkspace;
+
+        @NotNull
+        @JsonProperty
+        public boolean deployArtifact;
+
+        @NotNull
+        @JsonProperty
+        public boolean lifecycleArtifact;
+
+        public WorkspaceUser(UserMin userMin, boolean adminWorkspace, boolean deployArtifact,
+                boolean lifecycleArtifact) {
+            this.userMin = userMin;
+            this.adminWorkspace = adminWorkspace;
+            this.deployArtifact = deployArtifact;
+            this.lifecycleArtifact = lifecycleArtifact;
+        }
+
+        @JsonCreator
+        private WorkspaceUser() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this(new UserMin("", "", false), false, false, false);
+        }
+
     }
 }

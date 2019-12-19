@@ -37,6 +37,7 @@ import org.ow2.petals.admin.endpoint.Endpoint;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
+import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.AddUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
@@ -161,7 +162,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         assertContentOverview(get.workspace);
 
-        assertUsers(get.users);
+        assertWorkspaceUsers(get.users);
     }
 
     @Test
@@ -197,7 +198,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(put.workspace.description).isEqualTo("description");
         assertThat(put.workspace.shortDescription).isEqualTo("shortDescription");
 
-        assertUsers(put.users);
+        assertWorkspaceUsers(put.users);
 
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.SHORT_DESCRIPTION.getName())
                 .isEqualTo("shortDescription");
@@ -348,10 +349,22 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(users).hasSize(1);
 
         UserMin u = users.values().iterator().next();
-        assert u != null;
 
         assertThat(u.id).isEqualTo(ADMIN);
         assertThat(u.name).isEqualTo("admin");
+    }
+
+    private void assertWorkspaceUsers(Map<String, WorkspaceUser> users) {
+        assertThat(users).hasSize(1);
+
+        WorkspaceUser u = users.values().iterator().next();
+
+        assertThat(u.userMin.id).isEqualTo(ADMIN);
+        assertThat(u.userMin.name).isEqualTo("admin");
+        assertThat(u.userMin.isAdmin).isTrue();
+        assertThat(u.adminWorkspace).isTrue();
+        assertThat(u.deployArtifact).isTrue();
+        assertThat(u.lifecycleArtifact).isTrue();
     }
 
     private void assertContentOverview(WorkspaceOverview overview) {

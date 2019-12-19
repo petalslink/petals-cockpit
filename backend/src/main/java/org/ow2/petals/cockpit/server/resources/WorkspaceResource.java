@@ -76,6 +76,7 @@ import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
+import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
@@ -101,6 +102,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.webcohesion.enunciate.metadata.rs.ResponseCode;
 import com.webcohesion.enunciate.metadata.rs.Warnings;
@@ -151,8 +153,7 @@ public class WorkspaceResource {
         return DSL.using(jooq).transactionResult(conf -> {
             WorkspacesRecord ws = get(conf);
 
-            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+            List<WorkspaceUser> wsUsers = workspaceDb.getWorkspaceUsers(conf, wsId);
 
             return new WorkspaceOverviewContent(ws, wsUsers);
         });
@@ -189,8 +190,7 @@ public class WorkspaceResource {
 
             ws.store();
 
-            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
+            List<WorkspaceUser> wsUsers = workspaceDb.getWorkspaceUsers(conf, wsId);
 
             return new WorkspaceOverviewContent(ws, wsUsers);
         });
@@ -579,19 +579,20 @@ public class WorkspaceResource {
 
         @Valid
         @JsonProperty
-        public final ImmutableMap<String, UserMin> users;
+        public final ImmutableMap<String, WorkspaceUser> users;
 
-        public WorkspaceOverviewContent(WorkspacesRecord ws, List<UsersRecord> users) {
-            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
-            List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
-                    .collect(ImmutableList.toImmutableList());
-            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(), ws.getDescription(),
-                    wsUsernames);
+        public WorkspaceOverviewContent(WorkspacesRecord ws, List<WorkspaceUser> users) {
+            Builder<String, WorkspaceUser> builder = new ImmutableMap.Builder<String, WorkspaceUser>();
+            users.forEach(user -> builder.put(user.userMin.id, user));
+
+            this.users = builder.build();
+            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(),
+                    ws.getDescription(), ImmutableList.copyOf(this.users.keySet()));
         }
 
         @JsonCreator
         private WorkspaceOverviewContent(@JsonProperty("workspace") WorkspaceOverview workspace,
-                @JsonProperty("users") Map<String, UserMin> users) {
+                @JsonProperty("users") Map<String, WorkspaceUser> users) {
             this.workspace = workspace;
             this.users = ImmutableMap.copyOf(users);
         }
