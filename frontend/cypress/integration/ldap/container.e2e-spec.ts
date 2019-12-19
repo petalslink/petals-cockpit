@@ -16,6 +16,7 @@
  */
 
 import { ARTIFACT_DEPLOYMENT_DOM } from '../../support/container.dom';
+import { expectedTreeBeforeDeploy } from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
@@ -1286,40 +1287,6 @@ describe('Container', () => {
       `petals-sl-sqlserver-6.1.0.jre7`,
       `1.0.0`,
       `SL 0`,
-    ];
-
-    const expectedTreeBeforeDeploy = [
-      `Bus 0`,
-      `Cont 0`,
-      `Components`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      `Comp 2`,
-      `Service Assemblies`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `Shared Libraries`,
-      `SL 0`,
-      `Cont 1`,
-      `Components`,
-      `Comp 3`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 4`,
-      `SU 5`,
-      `SU 7`,
-      `Comp 5`,
-      `Service Assemblies`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Shared Libraries`,
-      `SL 1`,
     ];
 
     const expectedTreeAfterDeploySA = [
