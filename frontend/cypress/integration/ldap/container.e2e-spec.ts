@@ -192,7 +192,7 @@ describe('Container', () => {
       cy.expectNotification(
         'warn',
         'File error',
-        `An error occurred while trying to read the artifact zip file.`
+        `An error occurred while trying to read the artifact zip file: Could not read zip file`
       );
 
       // check if default content of the deployment card did not change

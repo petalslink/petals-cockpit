@@ -22,7 +22,7 @@ import { catchError, tap } from 'rxjs/operators';
 
 import {
   _getTextFromZip,
-  loadFilesContentFromZip,
+  loadJbiFilesContentFromZip,
 } from '@shared/helpers/zip.helper';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
@@ -45,33 +45,47 @@ describe(`Zip helper`, () => {
     );
   });
 
-  describe(`loadFilesContentFromZip`, () => {
-    it(
-      `should return an array of files content, for files that pass the predicate`,
-      async(() => {
-        const JSZipMock = {
-          loadAsync: (zipFileMock: any) =>
-            Promise.resolve({
-              forEach: (relativePath: any, zipEntry: any) => {},
-            }),
-        };
+  describe(`loadJbiFilesContentFromZip`, () => {
+    /**
+     * This mock use a map as input to emulate a zip file.
+     * The structure is the map is:
+     * {
+     *   'file1': 'Content of file1',
+     *   'path/to/file2': 'Content of file2'
+     * }
+     */
+    const JSZipMock = {
+      loadAsync: (zipFileMock: { [relativePath: string]: string }) =>
+        Promise.resolve({
+          forEach: (callback: any) => {
+            for (const relativePath in zipFileMock) {
+              if (zipFileMock.hasOwnProperty(relativePath)) {
+                callback(relativePath, null);
+              }
+            }
+          },
+          file: (relativePath: string) => ({
+            async: () => Promise.resolve(zipFileMock[relativePath]),
+          }),
+        }),
+    };
 
+    it(
+      `should return an array of JBI files content`,
+      async(() => {
         spyOn(JSZip, 'loadAsync').and.callFake(JSZipMock.loadAsync);
 
         const zipFile: any = {
           './first-file.txt': 'Content of first file',
-          './second-file.txt': 'Content of second file',
+          './jbi.xml': 'Content of JBI file',
         };
 
-        const filesContent$ = loadFilesContentFromZip(
-          zipFile,
-          relativePath => relativePath === './first-file.txt'
-        );
+        const filesContent$ = loadJbiFilesContentFromZip(zipFile);
 
         filesContent$
           .pipe(
             tap(filesContent =>
-              expect(filesContent).toEqual(['Content of first file'])
+              expect(filesContent).toEqual(['Content of JBI file'])
             )
           )
           .subscribe();
@@ -85,20 +99,38 @@ describe(`Zip helper`, () => {
           throwError('some error while reading zip file')
         );
 
-        const zipFile: any = {
-          name: 'some-file.zip',
-        };
+        // zipFile is null because the mock does not use its value here
+        const zipFile: any = null;
 
-        const filesContent$ = loadFilesContentFromZip(zipFile, null);
+        const filesContent$ = loadJbiFilesContentFromZip(zipFile);
 
         filesContent$
           .pipe(
             catchError((err: Error) => {
-              expect(err.message).toEqual(
-                `An error occured while trying to read the zip "${
-                  zipFile.name
-                }"`
-              );
+              expect(err.message).toEqual('Could not read zip file');
+              return of();
+            })
+          )
+          .subscribe();
+      })
+    );
+
+    it(
+      `should throw an error within the observable if no JBI file is found`,
+      async(() => {
+        spyOn(JSZip, 'loadAsync').and.callFake(JSZipMock.loadAsync);
+
+        const zipFile: any = {
+          './first-file.txt': 'Content of first file',
+          './second-file.txt': 'Content of second file',
+        };
+
+        const filesContent$ = loadJbiFilesContentFromZip(zipFile);
+
+        filesContent$
+          .pipe(
+            catchError((err: Error) => {
+              expect(err.message).toEqual('Zip file does not contain jbi.xml');
               return of();
             })
           )

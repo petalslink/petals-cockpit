@@ -278,7 +278,9 @@ export class ArtifactsDeploymentComponent
         catchError(err => {
           this.notifications.warn(
             'File error',
-            `An error occurred while trying to read the artifact zip file.`
+            `An error occurred while trying to read the artifact zip file: ${
+              err.message
+            }`
           );
 
           this.isFileParsed = false;
