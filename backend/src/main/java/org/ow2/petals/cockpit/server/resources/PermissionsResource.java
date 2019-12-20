@@ -22,7 +22,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,13 +36,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
 import org.jooq.Result;
 import org.jooq.exception.NoDataFoundException;
 import org.jooq.impl.DSL;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.pac4j.core.profile.ProfileManager;
@@ -69,8 +68,7 @@ public class PermissionsResource {
 
     @Inject
     public PermissionsResource(@NotEmpty @PathParam("username") String username,
-            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager, Configuration jooq,
-            CockpitConfiguration config) {
+            @Pac4JProfileManager ProfileManager<CockpitProfile> profileManager, Configuration jooq) {
         this.profile = profileManager.get(true).orElseThrow(() -> new WebApplicationException(Status.UNAUTHORIZED));
         this.jooq = jooq;
         this.username = username;

@@ -57,6 +57,7 @@ import com.google.common.collect.ImmutableSet;
 
 import jersey.repackaged.com.google.common.collect.ImmutableMap;
 
+@SuppressWarnings("null")
 public class ImportBusTest extends AbstractBasicResourceTest {
 
     private final Domain domain = new Domain("dom");
@@ -177,7 +178,6 @@ public class ImportBusTest extends AbstractBasicResourceTest {
 
     @Test
     public void importSameBusTwiceError() {
-        long busId;
         try (EventInput eventInput = resource.sse(1)) {
 
             expectWorkspaceContent(eventInput);

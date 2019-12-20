@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import io.dropwizard.logging.BootstrapLogging;
 
+@SuppressWarnings("null")
 public class AbstractTest {
 
     @Rule

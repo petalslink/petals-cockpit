@@ -85,6 +85,7 @@ public class UserSession {
         return getUserData(profile);
     }
 
+    @SuppressWarnings("unused")
     @POST
     @Path("/session")
     @Pac4JCallback(defaultUrl = "/user/session", renewSession = false)

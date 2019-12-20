@@ -57,6 +57,7 @@ import com.google.common.collect.ImmutableSet;
 import io.dropwizard.jersey.errors.ErrorMessage;
 import javaslang.Tuple;
 
+@SuppressWarnings("null")
 public class DeployComponentTest extends AbstractBasicResourceTest {
 
     private static final String COMPONENT_WITH_SL_JBI_XML = "component-with-sl-jbi.xml";
@@ -262,7 +263,7 @@ public class DeployComponentTest extends AbstractBasicResourceTest {
 
     private void overrideWithExistingSL(String jbiXml)
             throws Exception {
-        overrideWith(jbiXml, true, null, ImmutableSet.of(SharedLibraryIdentifier.from(sl)), 
+        overrideWith(jbiXml, true, null, ImmutableSet.of(SharedLibraryIdentifier.from(sl)),
                 COMP_NAME, Arrays.asList(sl));
     }
 

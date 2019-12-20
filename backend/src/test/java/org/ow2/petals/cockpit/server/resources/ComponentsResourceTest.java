@@ -42,6 +42,8 @@ public class ComponentsResourceTest extends AbstractDefaultWorkspaceResourceTest
         // TODO check assumptions
         ComponentOverview get = resource.target("/components/" + getId(component)).request()
                 .get(ComponentOverview.class);
+
+        assertThat(get).isNotNull();
     }
 
     @Test

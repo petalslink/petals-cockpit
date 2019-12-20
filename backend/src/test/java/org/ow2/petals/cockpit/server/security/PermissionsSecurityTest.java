@@ -42,6 +42,7 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SLChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate;
 
+@SuppressWarnings("null")
 public class PermissionsSecurityTest extends AbstractSecurityTest {
 
     public static final NewUser ADMINWORKSPACE = new NewUser("ADMINWORKSPACE", "ADMINWORKSPACE", "ADMINWORKSPACE",

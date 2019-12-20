@@ -36,6 +36,7 @@ import io.dropwizard.configuration.YamlConfigurationFactory;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.jersey.validation.Validators;
 
+@SuppressWarnings("null")
 public class LdapConfigTest {
     private final ObjectMapper objectMapper = Jackson.newObjectMapper();
 

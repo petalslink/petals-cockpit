@@ -42,7 +42,7 @@ public class CockpitProfile extends CommonProfile {
 
     public final static String LIFECYCLE_ARTIFACT_PERMISSION = "LIFECYCLEMANAGER_ARTIFACT";
 
-    private Map<Long, Set<String>> permissions;
+    private Map<Long, Set<String>> permissions = new HashMap<Long, Set<String>>();
 
     CockpitProfile() {
         // needed because UserProfile is Externalizable
@@ -60,7 +60,9 @@ public class CockpitProfile extends CommonProfile {
 
     public boolean hasPermission(Long wsId, String permission) {
         if (this.permissions.containsKey(wsId)) {
-            return this.permissions.get(wsId).contains(permission);
+            final Set<String> workspacePermissions = this.permissions.get(wsId);
+            assert workspacePermissions != null;
+            return workspacePermissions.contains(permission);
         }
         return false;
     }

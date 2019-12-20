@@ -40,12 +40,10 @@ import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
 import org.ow2.petals.cockpit.server.resources.UsersResource.NewUser;
 import org.ow2.petals.cockpit.server.rules.CockpitLdapApplicationRule;
 
+@SuppressWarnings("null")
 public class AbstractLdapTest extends AbstractTest {
 
-    @SuppressWarnings("null")
     public static final NewUser ADMIN_LDAP_DB = MockLdapServer.LDAP_USER1;
-
-    @SuppressWarnings("null")
     public static final NewUser USER_LDAP_NODB = MockLdapServer.LDAP_USER2;
 
     public static final NewUser USER_NOLDAP_DB = new NewUser("user", "userpass", "Normal user", false);
