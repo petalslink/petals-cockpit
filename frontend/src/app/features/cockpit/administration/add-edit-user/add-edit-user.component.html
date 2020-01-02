@@ -55,7 +55,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           fxLayoutAlign.sm="center center"
           color="primary" 
           formControlName="isAdmin"
-          [disabled]="isModifyingAdministrator || (isLastAdmin && currentUser.id === user.id)"
+          [disabled]="isLastAdmin && currentUser.id === user.id"
         >
         Administrator
         </mat-slide-toggle>

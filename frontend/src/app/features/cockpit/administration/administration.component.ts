@@ -46,7 +46,7 @@ export class AdministrationComponent implements OnInit, OnDestroy {
 
   currentUser: ICurrentUser;
   isAdministratorChecked: boolean;
-  isModifyingAdministrator = false;
+  isCurrentUserModifyingAdministrator = false;
   isLastAdmin: boolean;
 
   users$: Observable<IUserRow[]>;
@@ -130,8 +130,10 @@ export class AdministrationComponent implements OnInit, OnDestroy {
     const changes: { isAdmin: boolean } = {
       isAdmin,
     };
-    if (this.currentUser.id === id && !isAdmin) {
-      this.isModifyingAdministrator = true;
+    const currentUserSelfDemoting = this.currentUser.id === id && !isAdmin;
+
+    if (currentUserSelfDemoting) {
+      this.isCurrentUserModifyingAdministrator = true;
       this.dialog
         .open(ConfirmMessageDialogComponent, {
           data: {
@@ -147,7 +149,7 @@ export class AdministrationComponent implements OnInit, OnDestroy {
               this.store$.dispatch(new Users.Modify({ id, changes }));
             } else {
               this.isAdministratorChecked = true;
-              this.isModifyingAdministrator = false;
+              this.isCurrentUserModifyingAdministrator = false;
             }
           })
         )

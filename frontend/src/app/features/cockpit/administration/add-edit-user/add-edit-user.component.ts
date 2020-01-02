@@ -57,8 +57,6 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   @Output() evtDelete = new EventEmitter<void>();
   @Output() evtCancel = new EventEmitter<void>();
 
-  isModifyingAdministrator: boolean;
-
   userManagementForm: FormGroup;
 
   formErrors = {
@@ -130,60 +128,62 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
 
   doSubmit() {
     const value: IUserNew = this.userManagementForm.value;
-    if (this.user) {
-      const u: { name?: string; password?: string; isAdmin?: boolean } = {};
+    const u: { name?: string; password?: string; isAdmin?: boolean } = {};
+
+    if (!this.user) {
+      this.evtSubmit.emit(value);
+    } else {
       if (value.name !== this.user.name) {
         u.name = value.name;
       }
       if (value.password && value.password !== '') {
         u.password = value.password;
       }
-      if (value.isAdmin !== this.user.isAdmin) {
+      if (value.isAdmin !== null) {
         u.isAdmin = value.isAdmin;
       }
-      if (u.name || u.password || u.isAdmin === value.isAdmin) {
-        if (this.currentUser.id === this.user.id && !value.isAdmin) {
-          this.isModifyingAdministrator = true;
-          this.dialog
-            .open(ConfirmMessageDialogComponent, {
-              data: {
-                title: 'Remove admin role?',
-                message:
-                  'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
-              },
-            })
-            .beforeClose()
-            .pipe(
-              tap(result => {
-                if (
-                  result &&
-                  (u.name || u.password || u.isAdmin === value.isAdmin)
-                ) {
-                  this.evtSubmit.emit(u);
-                } else {
-                  this.evtCancel.emit();
-                  this.isModifyingAdministrator = false;
-                }
-              })
-            )
-            .subscribe();
-        } else {
-          this.evtSubmit.emit(u);
-        }
+      const currentUserSelfDemoting =
+        this.user && this.currentUser.id === this.user.id && !value.isAdmin;
+      if (currentUserSelfDemoting) {
+        this.doSubmitSelfAdmin(u);
       } else {
-        this.evtCancel.emit();
+        this.evtSubmit.emit(u);
       }
-    } else {
-      this.evtSubmit.emit(value);
     }
   }
-  
+
+  private doSubmitSelfAdmin(value: {
+    name?: string;
+    password?: string;
+    isAdmin?: boolean;
+  }) {
+    this.dialog
+      .open(ConfirmMessageDialogComponent, {
+        data: {
+          title: 'Remove admin role?',
+          message:
+            'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+        },
+      })
+      .beforeClose()
+      .pipe(
+        tap(res => {
+          if (res) {
+            this.evtSubmit.emit(value);
+          } else {
+            this.evtCancel.emit();
+          }
+        })
+      )
+      .subscribe();
+  }
+
   userUnchanged() {
     return (
       this.user &&
-      this.userManagementForm.get('name').value === this.user.name &&
-      this.userManagementForm.get('isAdmin').value === this.user.isAdmin &&
-      this.userManagementForm.get('password').value === ''
+      this.userManagementForm.value.name === this.user.name &&
+      this.userManagementForm.value.isAdmin === this.user.isAdmin &&
+      this.userManagementForm.value.password === ''
     );
   }
 

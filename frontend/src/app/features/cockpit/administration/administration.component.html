@@ -154,7 +154,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   >
                     <mat-slide-toggle
                       color="primary"
-                      [disabled]="isModifyingAdministrator || (isLastAdmin && currentUser.id === user.id)"
+                      [disabled]="isCurrentUserModifyingAdministrator || (isLastAdmin && currentUser.id === user.id)"
                       [checked]="isAdministratorChecked"
                       (change)="doSubmitAdministrator(user.id,$event.checked)"
                       class="btn-user-isadmin"
