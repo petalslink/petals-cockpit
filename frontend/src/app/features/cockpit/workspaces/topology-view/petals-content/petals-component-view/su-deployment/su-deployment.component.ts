@@ -166,13 +166,11 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 }
 
-function hasComponentIdChanged(componentChanges: SimpleChange) {
-  const oldComponent = componentChanges.previousValue;
-  const newComponent = componentChanges.currentValue;
+function hasComponentIdChanged(componentChange: SimpleChange) {
+  const oldComponent = componentChange.previousValue;
+  const newComponent = componentChange.currentValue;
 
-  if (!oldComponent) {
-    return false;
-  }
-
-  return oldComponent.id !== newComponent.id;
+  return (
+    !componentChange.isFirstChange() && oldComponent.id !== newComponent.id
+  );
 }

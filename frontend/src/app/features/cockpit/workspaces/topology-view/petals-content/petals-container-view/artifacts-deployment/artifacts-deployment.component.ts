@@ -466,15 +466,13 @@ export class ArtifactsDeploymentComponent
   }
 }
 
-function hasContainerIdChanged(containerChanges: SimpleChange) {
-  const oldContainer = containerChanges.previousValue;
-  const newContainer = containerChanges.currentValue;
+function hasContainerIdChanged(containerChange: SimpleChange) {
+  const oldContainer = containerChange.previousValue;
+  const newContainer = containerChange.currentValue;
 
-  if (!oldContainer) {
-    return false;
-  }
-
-  return oldContainer.id !== newContainer.id;
+  return (
+    !containerChange.isFirstChange() && oldContainer.id !== newContainer.id
+  );
 }
 
 abstract class DeploymentArtifact {
