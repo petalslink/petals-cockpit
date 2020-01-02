@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
-                    <span class="margin-left-x1 light-bold user-name" *ngIf="isLargeScreen$ | async">({{ user.name }})</span>
+                    <span class="margin-left-x1 light-bold user-name">({{ user.name }})</span>
                     <mat-spinner 
                       *ngIf="user.isAdding || user.isModifying"
                       class="margin-left-x1" 
@@ -164,10 +164,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </div>
                   <app-message
                     *ngIf="isLastAdmin && (currentUser.id === user.id)"
-                    class="info-admin-edit"
                     type="info"
                     msg="You are the last administrator remaining."
                     [isClosable]="false"
+                    class="info-admin-edit"
                 ></app-message>
                   <mat-action-row 
                     fxLayoutAlign="center center" 
@@ -207,10 +207,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div class="central-content">
         <mat-card>
           <app-message
-            class="warning-not-admin"
-            type="warning"
-            msg="You are not an administrator."
-            [isClosable]="false"
+          type="warning"
+          msg="You are not an administrator."
+          [isClosable]="false"
+          class="warning-not-admin"
           ></app-message>
         </mat-card>
       </div>

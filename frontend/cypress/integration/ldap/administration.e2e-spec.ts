@@ -480,14 +480,6 @@ describe(`Administration`, () => {
         .should('contain', 'Victor NONO');
     });
 
-    it(`should not show a user-name in panel list users`, () => {
-      cy.expectLdapUsersListToBe(expectedUsersIds, expectedUsersNames);
-
-      cy.viewport(412, 732);
-
-      cy.expectLdapUsersListToBe(expectedUsersIds, []);
-    });
-
     it(`should change an admin`, () => {
       cy
         .get(ADD_EDIT_USER_DOM.texts.titleUserIds)

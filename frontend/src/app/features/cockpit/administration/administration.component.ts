@@ -31,7 +31,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
 import { IUserNew } from '@shared/services/users.service';
 import { IStore } from '@shared/state/store.interface';
-import { isLargeScreen } from '@shared/state/ui.selectors';
 import { Users } from '@shared/state/users.actions';
 import { ICurrentUser, IUser, IUserRow } from '@shared/state/users.interface';
 import { getAllUsers, getCurrentUser } from '@shared/state/users.selectors';
@@ -53,7 +52,6 @@ export class AdministrationComponent implements OnInit, OnDestroy {
   users$: Observable<IUserRow[]>;
   user$: Observable<ICurrentUser>;
   isFetchingUsers$: Observable<boolean>;
-  isLargeScreen$: Observable<boolean>;
 
   @ViewChildren('editUser') children: QueryList<AddEditUserComponent>;
   @ViewChild('addUser') child: AddEditUserComponent;
@@ -89,8 +87,6 @@ export class AdministrationComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe();
-
-    this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
   }
 
   ngOnDestroy() {
