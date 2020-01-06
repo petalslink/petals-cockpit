@@ -1,5 +1,27 @@
-<a name="1.1.0"></a>
-# [1.1.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.27.0...v1.1.0) (2019-12-05)
+<a name="1.02.0"></a>
+# [1.02.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.01.0...v1.02.0) (2020-01-06)
+
+
+### Bug Fixes
+
+
+* **backend:** unload sl when another share same name ([af0190c](https://gitlab.com/linagora/petals-cockpit/commit/af0190c)), closes [#597](https://gitlab.com/linagora/petals-cockpit/issues/597)
+* **frontend** focus input based on screen size ([ad7a1b1](https://gitlab.com/linagora/petals-cockpit/commit/ad7a1b1))
+* **frontend:** bug with autofill setting ([b335a90](https://gitlab.com/linagora/petals-cockpit/commit/b335a90)), closes [#519](https://gitlab.com/linagora/petals-cockpit/issues/519)
+
+### Features
+
+* **backend:** add cockpit admin and workspace permissions security. Security is activated on backend (but all permissions are given by default for now) ([5b0074e](https://gitlab.com/linagora/petals-cockpit/commit/5b0074e)), closes [#547](https://gitlab.com/linagora/petals-cockpit/issues/547)
+* **backend:** add short description to workspace ([f0391b5](https://gitlab.com/linagora/petals-cockpit/commit/f0391b5)), closes [#524](https://gitlab.com/linagora/petals-cockpit/issues/524)
+* **product:** prevent workspaces duplicates ([b428cac](https://gitlab.com/linagora/petals-cockpit/commit/b428cac)), closes [#595](https://gitlab.com/linagora/petals-cockpit/issues/595)
+* **frontend:** add menu to header of workspace ([bdae434](https://gitlab.com/linagora/petals-cockpit/commit/bdae434)), closes [#536](https://gitlab.com/linagora/petals-cockpit/issues/536)
+* **frontend:** display bus list on workspace overview ([4aea27d](https://gitlab.com/linagora/petals-cockpit/commit/4aea27d))
+* **frontend:** remove tabs of component view ([d0d539a](https://gitlab.com/linagora/petals-cockpit/commit/d0d539a)), closes [#571](https://gitlab.com/linagora/petals-cockpit/issues/571)
+
+
+
+<a name="1.01.0"></a>
+# [1.01.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.27.0...v1.01.0) (2019-12-05)
 
 ### General
 * **frontend:** We took some time to refactor almost all of the frontend user interface. Bus elements overview (like component, SA, SU, SL) and services views remain to be done. **But we are back in sprint mode !**
