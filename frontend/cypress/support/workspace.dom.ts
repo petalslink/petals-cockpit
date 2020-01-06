@@ -75,6 +75,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
     editImportBus: `${bsWksOverview} .btn-import-bus`,
     cancelAttachBus: `${bsWksOverview} .btn-cancel-attach-bus`,
     importNewBus: `${bsWksOverview} .btn-import-new-bus`,
+    addUserInWorkspace: `${bsWksOverview} .btn-add-user`,
   },
   formFields: {
     shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
@@ -92,6 +93,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
     username: `${bs} input[formcontrolname="username"]`,
     password: `${bs} input[formcontrolname="password"]`,
     passphrase: `${bs} input[formcontrolname="passphrase"]`,
+    userSearchCtrl: `${bsWksOverview} input[formcontrolname="userSearchCtrl"]`,
   },
   listGridItem: {
     itemBus: `${bsWksOverview} .bus-grid-item .bus-item .bus-link`,
@@ -110,6 +112,11 @@ export const WORKSPACE_OVERVIEW_DOM = {
   textArea: {
     shortDescriptionTextarea: `${bsWksOverview} textarea.short-description-wks`,
     descriptionTextarea: `${bsWksOverview} textarea.description-wks`,
+  },
+  table: {
+    userTable: `${bsWksOverview} .users-table`,
+    rowNames: `${bsWksOverview} .users-table .mat-row`,
+    headerCellUserName: `${bsWksOverview} .mat-header-cell-user-name`,
   },
 };
 

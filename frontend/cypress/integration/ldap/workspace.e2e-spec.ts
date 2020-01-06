@@ -60,7 +60,7 @@ describe('Workspace', () => {
       .click();
 
     cy
-      .get(`.item-list .menu-item-wks-name`)
+      .get(MENU_DOM.links.itemsWksNames)
       .last()
       .should('not.have.class', 'active')
       .and('not.have.attr', 'disabled', 'disabled')
@@ -117,7 +117,7 @@ describe('Workspace', () => {
         .click();
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .first()
         .should('have.class', 'active')
         .and('have.attr', 'disabled', 'disabled')
@@ -126,7 +126,7 @@ describe('Workspace', () => {
         .and('be.visible');
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .last()
         .should('not.have.class', 'active')
         .and('not.have.attr', 'disabled', 'disabled')
@@ -145,7 +145,7 @@ describe('Workspace', () => {
         .click();
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .first()
         .should('have.class', 'active')
         .and('have.attr', 'disabled', 'disabled')
@@ -154,7 +154,7 @@ describe('Workspace', () => {
         .and('be.visible');
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .last()
         .should('not.have.class', 'active')
         .and('not.have.attr', 'disabled', 'disabled')
@@ -177,7 +177,7 @@ describe('Workspace', () => {
         .click();
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .first()
         .should('have.class', 'active')
         .and('have.attr', 'disabled', 'disabled')
@@ -186,7 +186,7 @@ describe('Workspace', () => {
         .and('be.visible');
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .eq(-2)
         .should('not.have.class', 'active')
         .and('not.have.attr', 'disabled', 'disabled')
@@ -195,7 +195,7 @@ describe('Workspace', () => {
         .and('be.visible');
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .last()
         .should('not.have.class', 'active')
         .and('not.have.attr', 'disabled', 'disabled')
@@ -319,7 +319,7 @@ describe('Workspace', () => {
 
       // check if Workspace 0 is selected in the menu
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .first()
         .should('have.class', 'active')
         .and('have.attr', 'disabled', 'disabled')
@@ -350,7 +350,7 @@ describe('Workspace', () => {
 
       // check if Workspace 0 is always selected in the menu
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .first()
         .should('have.class', 'active')
         .and('have.attr', 'disabled', 'disabled')
@@ -719,7 +719,7 @@ describe('Workspace', () => {
         .click();
 
       cy
-        .get(`.item-list .menu-item-wks-name`)
+        .get(MENU_DOM.links.itemsWksNames)
         .last()
         .should('not.have.class', 'active')
         .and('not.have.attr', 'disabled', 'disabled')
@@ -1241,5 +1241,169 @@ describe('Workspace', () => {
     const postImportErrorTroncateTxt = `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec qu...`;
 
     const postImportErrorLongText = `Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Fusce vulputate eleifend sapien. Vestibulum purus quam, scelerisque ut, mollis sed, nonummy id, metus. Nullam accumsan lorem in dui. Cras ultricies mi eu turpis hendrerit fringilla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; In ac dui quis mi`;
+  });
+
+  describe('Users', () => {
+    beforeEach(() => {
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy.expectWorkspacesListMenuToBe(['Workspace 0', 'Workspace 1']);
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 1`)
+        .click();
+
+      cy.expectLocationToBe('/workspaces/idWks1');
+
+      cy.expectBusListToBe([`Bus 1`]);
+    });
+
+    it('should have user list', () => {
+      // expect to have 3 columns
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.userTable)
+        .find('th')
+        .should('have.length', 3);
+
+      // expect to have 6 users present in the list
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
+
+      // expect to have names, id for all users sorted in asc order
+      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+    });
+
+    it('should add workspace user from cockpit users', () => {
+      // expect to have 6 users present in the list
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
+
+      // expect to have names, id for all users sorted in asc order
+      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
+
+      cy.get(`mat-option .mat-option-text`).should('not.exist');
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+
+      cy
+        .get(`mat-option span`)
+        .contains('cdeneux')
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl)
+        .should('have.value', 'cdeneux');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('not.be.disabled')
+        .click();
+
+      // expect to have user list updated
+      cy.expectUserListToBe(expectedUserListUpdatedWithNewUser);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
+    });
+
+    it('should remove workspace user from workspace users', () => {
+      // expect to have 6 users present in the list
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
+
+      // expect to have names, id for all users sorted in asc order
+      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+
+      cy.get(`mat-option span`).should('not.contain', 'bescudie');
+
+      cy.get('.cell-user-delete-bescudie').click({ force: true });
+
+      cy.expectUserListToBe(expectedUserListUpdated);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
+
+      cy.get(`mat-option .mat-option-text`).should('not.exist');
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+
+      cy
+        .get(`mat-option span`)
+        .contains('bescudie')
+        .should('be.visible');
+    });
+
+    it('should not be able to remove himself from workspace users', () => {
+      // expect to have names, id for all users sorted in asc order
+      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+
+      cy.get(`mat-option span`).should('not.contain', 'admin');
+
+      cy.get('.cell-user-delete-admin').should('not.exist');
+    });
+
+    const expectedDefaultUserListSortedInAscOrder = [
+      `Administrator`,
+      `admin`,
+      `Administrator LDAP`,
+      `adminldap`,
+      `Bertrand ESCUDIE`,
+      `bescudie`,
+      `Christophe CHEVALIER`,
+      `cchevalier`,
+      `Maxime ROBERT`,
+      `mrobert`,
+      `Victor NOEL`,
+      `vnoel`,
+    ];
+
+    const expectedUserListUpdatedWithNewUser = [
+      `Administrator`,
+      `admin`,
+      `Administrator LDAP`,
+      `adminldap`,
+      `Bertrand ESCUDIE`,
+      `bescudie`,
+      `Christophe CHEVALIER`,
+      `cchevalier`,
+      `Christophe DENEUX`,
+      `cdeneux`,
+      `Maxime ROBERT`,
+      `mrobert`,
+      `Victor NOEL`,
+      `vnoel`,
+    ];
+
+    const expectedUserListUpdated = [
+      `Administrator`,
+      `admin`,
+      `Administrator LDAP`,
+      `adminldap`,
+      `Christophe CHEVALIER`,
+      `cchevalier`,
+      `Maxime ROBERT`,
+      `mrobert`,
+      `Victor NOEL`,
+      `vnoel`,
+    ];
   });
 });

@@ -47,7 +47,7 @@ describe(`Profile`, () => {
       .click();
 
     // check that no workspaces names in the menu profile
-    cy.get(`.item-list .menu-item-wks-name`).should('not.be.visible');
+    cy.get(MENU_DOM.links.itemsWksNames).should('not.be.visible');
 
     cy
       .get(`.menu-item-create-wks`)

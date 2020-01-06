@@ -66,7 +66,7 @@ describe(`Administration`, () => {
         .click();
 
       // check that no workspaces names in the menu administration
-      cy.get(`.item-list .menu-item-wks-name`).should('not.be.visible');
+      cy.get(MENU_DOM.links.itemsWksNames).should('not.be.visible');
 
       cy
         .get(`.menu-item-create-wks`)
