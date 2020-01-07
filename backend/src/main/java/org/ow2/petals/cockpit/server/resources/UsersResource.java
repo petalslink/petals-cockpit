@@ -160,15 +160,18 @@ public class UsersResource {
                 user.set(USERS.PASSWORD, CockpitAuthenticator.passwordEncoder.encode(password));
             }
 
-            final Integer currentAdminsCount = DSL.using(conf).selectCount().from(USERS).where(USERS.ADMIN.eq(true))
-                    .fetchOne(0, int.class);
-            boolean isAlreadyAdmin = DSL.using(conf).select(USERS.ADMIN).from(USERS).where(USERS.USERNAME.eq(username))
-                    .fetchOne(0, boolean.class);
-            boolean willBeAdmin = userUpdated.isAdmin;
-            if ((currentAdminsCount == 1) && isAlreadyAdmin && !willBeAdmin) {
-                throw new WebApplicationException("At least one cockpit administrator must remain!", Status.CONFLICT);
+            final Boolean willBeAdmin = userUpdated.isAdmin;
+            if (willBeAdmin != null) {
+                final Integer currentAdminsCount = DSL.using(conf).selectCount().from(USERS).where(USERS.ADMIN.eq(true))
+                        .fetchOne(0, int.class);
+                boolean isAlreadyAdmin = DSL.using(conf).select(USERS.ADMIN).from(USERS)
+                        .where(USERS.USERNAME.eq(username)).fetchOne(0, boolean.class);
+                if ((currentAdminsCount == 1) && isAlreadyAdmin && !willBeAdmin) {
+                    throw new WebApplicationException("At least one cockpit administrator must remain!",
+                            Status.CONFLICT);
+                }
+                user.set(USERS.ADMIN, userUpdated.isAdmin);
             }
-            user.set(USERS.ADMIN, willBeAdmin);
 
             DSL.using(jooq).executeUpdate(user, USERS.USERNAME.eq(username));
 
@@ -192,12 +195,12 @@ public class UsersResource {
         @JsonProperty
         public final String name;
 
-        @NotNull
+        @Nullable
         @JsonProperty
-        public final boolean isAdmin;
+        public final Boolean isAdmin;
 
         public UpdateUser(@Nullable @JsonProperty("password") String password,
-                @Nullable @JsonProperty("name") String name, @JsonProperty("isAdmin") boolean isAdmin) {
+                @Nullable @JsonProperty("name") String name, @Nullable @JsonProperty("isAdmin") Boolean isAdmin) {
             this.password = password;
             this.name = name;
             this.isAdmin = isAdmin;
