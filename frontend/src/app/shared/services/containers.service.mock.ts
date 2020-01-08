@@ -22,7 +22,7 @@ import { containersService } from '@mocks/containers-mock';
 import { deployMockAndTriggerSse } from '@mocks/utils';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import * as helper from '@shared/helpers/mock.helper';
-import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
+import { loadJbiFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
@@ -155,9 +155,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
   }
 
   getArtifactFromZipFile(file: File) {
-    return loadFilesContentFromZip(file, filePath =>
-      filePath.includes('jbi.xml')
-    ).pipe(
+    return loadJbiFilesContentFromZip(file).pipe(
       delay(2000),
       map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
     );

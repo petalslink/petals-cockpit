@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
 import { streamHttpProgressAndSuccess } from '@shared/helpers/shared.helper';
-import { loadFilesContentFromZip } from '@shared/helpers/zip.helper';
+import { loadJbiFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { IComponentBackendSSE } from '@shared/services/components.service';
 import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
@@ -232,9 +232,7 @@ export class ContainersServiceImpl extends ContainersService {
   }
 
   getArtifactFromZipFile(file: File) {
-    return loadFilesContentFromZip(file, filePath =>
-      filePath.includes('jbi.xml')
-    ).pipe(
+    return loadJbiFilesContentFromZip(file).pipe(
       map(([firstFileContent]) => this.getInformationFromXml(firstFileContent))
     );
   }

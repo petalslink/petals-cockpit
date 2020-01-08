@@ -19,9 +19,8 @@ import * as JSZip from 'jszip';
 import { forkJoin, from, Observable, throwError } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 
-export function loadFilesContentFromZip(
-  zipFile: File,
-  shouldKeepFile?: (relativePath: string) => boolean
+export function loadJbiFilesContentFromZip(
+  zipFile: File
 ): Observable<string[]> {
   return from(JSZip.loadAsync(zipFile)).pipe(
     switchMap(zip => {
@@ -30,17 +29,21 @@ export function loadFilesContentFromZip(
       // forEach is not the one from Array.prototype
       // it's the one provided by JSZip
       zip.forEach((relativePath, zipEntry) => {
-        if (shouldKeepFile(relativePath)) {
+        if (relativePath.includes('jbi.xml')) {
           filesContent.push(_getTextFromZip(zip, relativePath));
         }
       });
 
-      return forkJoin(filesContent);
+      return filesContent.length > 0
+        ? forkJoin(filesContent)
+        : throwError('noJbiFound');
     }),
     catchError(err =>
       throwError(
         new Error(
-          `An error occured while trying to read the zip "${zipFile.name}"`
+          err === 'noJbiFound'
+            ? 'Zip file does not contain jbi.xml'
+            : 'Could not read zip file'
         )
       )
     )
