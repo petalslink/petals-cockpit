@@ -332,7 +332,6 @@ export class ArtifactsDeploymentComponent
       onProgressUpdate: (percentage: number) => {
         this.artifactUploadProgress = { percentage };
         this.percentage$.next(percentage);
-        this.deployArtifact.reset();
       },
       onComplete: () => {
         this.snackRef.dismiss();
@@ -347,7 +346,10 @@ export class ArtifactsDeploymentComponent
         filter(action => action.payload.correlationId === correlationId),
         // we want 1 or 0 (first wants exactly one) because of takeUntil
         take(1),
-        switchMap(action => action.payload.getProgress()),
+        switchMap(action => {
+          this.deployArtifact.reset();
+          return action.payload.getProgress();
+        }),
         tap(deployActions.onProgressUpdate),
         tap({
           complete: deployActions.onComplete,

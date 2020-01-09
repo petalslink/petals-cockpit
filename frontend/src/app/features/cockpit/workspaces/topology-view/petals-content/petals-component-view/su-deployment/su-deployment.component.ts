@@ -168,11 +168,13 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         filter(action => action.payload.correlationId === correlationId),
         // we want 1 or 0 (first wants exactly one) because of takeUntil
         take(1),
-        switchMap(action => action.payload.getProgress()),
+        switchMap(action => {
+          this.deployServiceUnit.reset();
+          return action.payload.getProgress();
+        }),
         tap(percentage => {
           this.serviceUnitUploadProgress = { percentage };
           this.percentage$.next(percentage);
-          this.deployServiceUnit.reset();
         }),
         tap({
           complete: () => this.snackRef.dismiss(),
