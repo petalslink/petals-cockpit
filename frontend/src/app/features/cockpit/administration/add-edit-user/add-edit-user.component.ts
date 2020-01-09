@@ -30,9 +30,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
 import { getFormErrors } from '@shared/helpers/form.helper';
 import { IUserNew } from '@shared/services/users.service';
-import { IUser } from '@shared/state/users.interface';
+import { ICurrentUser, IUser } from '@shared/state/users.interface';
 
 @Component({
   selector: 'app-add-edit-user',
@@ -44,11 +46,13 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   onDestroy$ = new Subject<void>();
 
   @Input() user?: IUser;
+  @Input() currentUser?: ICurrentUser;
+  @Input() isLastAdmin?: boolean;
   @Input() canDelete = false;
 
   @Output()
   evtSubmit = new EventEmitter<
-    IUserNew | { name?: string; password?: string }
+    IUserNew | { name?: string; password?: string; isAdmin?: boolean }
   >();
   @Output() evtDelete = new EventEmitter<void>();
   @Output() evtCancel = new EventEmitter<void>();
@@ -59,18 +63,18 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     username: '',
     name: '',
     password: '',
+    isAdmin: false,
   };
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private dialog: MatDialog) {}
 
   ngOnInit() {
     this.userManagementForm = this.fb.group({
-      username: ['', Validators.required],
-      name: ['', Validators.required],
-      password: '',
+      username: [this.user ? this.user.id : '', Validators.required],
+      name: [this.user ? this.user.name : '', Validators.required],
+      password: ['', this.user ? '' : Validators.required],
+      isAdmin: this.user ? this.user.isAdmin : true,
     });
-
-    this.reset();
 
     this.userManagementForm.valueChanges
       .pipe(
@@ -86,7 +90,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['user']) {
+    if (changes['user'] && changes['user'].previousValue === undefined) {
       this.reset();
     }
   }
@@ -113,6 +117,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
       username: this.user ? this.user.id : '',
       name: this.user ? this.user.name : '',
       password: '',
+      isAdmin: this.user ? this.user.isAdmin : false,
     });
   }
 
@@ -123,23 +128,63 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
 
   doSubmit() {
     const value: IUserNew = this.userManagementForm.value;
-    if (this.user) {
-      const u: { name?: string; password?: string } = {};
+    const u: { name?: string; password?: string; isAdmin?: boolean } = {};
+
+    if (!this.user) {
+      this.evtSubmit.emit(value);
+    } else {
       if (value.name !== this.user.name) {
         u.name = value.name;
       }
       if (value.password && value.password !== '') {
         u.password = value.password;
       }
-      if (u.name || u.password) {
-        this.evtSubmit.emit(u);
-      } else {
-        this.evtCancel.emit();
+      if (value.isAdmin !== null) {
+        u.isAdmin = value.isAdmin;
       }
-    } else {
-      this.evtSubmit.emit(value);
+      const currentUserSelfDemoting =
+        this.user && this.currentUser.id === this.user.id && !value.isAdmin;
+      if (currentUserSelfDemoting) {
+        this.doSubmitSelfAdmin(u);
+      } else {
+        this.evtSubmit.emit(u);
+      }
     }
-    this.reset();
+  }
+
+  private doSubmitSelfAdmin(value: {
+    name?: string;
+    password?: string;
+    isAdmin?: boolean;
+  }) {
+    this.dialog
+      .open(ConfirmMessageDialogComponent, {
+        data: {
+          title: 'Remove admin role?',
+          message:
+            'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+        },
+      })
+      .beforeClose()
+      .pipe(
+        tap(res => {
+          if (res) {
+            this.evtSubmit.emit(value);
+          } else {
+            this.evtCancel.emit();
+          }
+        })
+      )
+      .subscribe();
+  }
+
+  userUnchanged() {
+    return (
+      this.user &&
+      this.userManagementForm.value.name === this.user.name &&
+      this.userManagementForm.value.isAdmin === this.user.isAdmin &&
+      this.userManagementForm.value.password === ''
+    );
   }
 
   doDelete() {

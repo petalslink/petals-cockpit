@@ -116,7 +116,7 @@ export namespace Users {
     constructor(
       public readonly payload: {
         id: string;
-        changes: { name?: string; password?: string };
+        changes: { name?: string; password?: string; isAdmin?: boolean };
       }
     ) {}
   }
@@ -133,7 +133,7 @@ export namespace Users {
     constructor(
       public readonly payload: {
         id: string;
-        changes: { name?: string; password?: string };
+        changes: { name?: string; password?: string; isAdmin?: boolean };
       }
     ) {}
   }

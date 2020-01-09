@@ -91,6 +91,16 @@ export function getButtonByClass(
   return getElementBySelector(fixture, `button.${className}`);
 }
 
+export function getToggleSlideByName(
+  fixture: ComponentFixture<any>,
+  name: string
+): HTMLLabelElement {
+  return getElementBySelector(
+    fixture,
+    `mat-slide-toggle[formControlName="${name}"]`
+  );
+}
+
 export function setInputValue(input: HTMLInputElement, value: string) {
   input.value = value;
   input.dispatchEvent(new Event('input'));

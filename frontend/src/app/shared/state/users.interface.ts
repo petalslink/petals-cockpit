@@ -64,6 +64,7 @@ export function userRowFactory(): IUserRow {
   return {
     id: null,
     name: null,
+    isAdmin: false,
 
     isAdding: false,
     isDeleting: false,

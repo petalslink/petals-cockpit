@@ -177,24 +177,6 @@ describe(`Administration`, () => {
       editVnoel.nameInput.sendKeys(`Victor NOEL`);
       editVnoel.saveButton.click();
     });
-
-    it('should not show a user-name in panel list users', () => {
-      browser
-        .manage()
-        .window()
-        .setSize(412, 732);
-
-      expect(
-        getMultipleElementsTexts(admin.panelListUsers, '.user-id')
-      ).toEqual([
-        ['admin'],
-        ['bescudie'],
-        ['cchevalier'],
-        ['cdeneux'],
-        ['mrobert'],
-        ['vnoel'],
-      ]);
-    });
   });
 
   it('should not be visible to non-admin', () => {

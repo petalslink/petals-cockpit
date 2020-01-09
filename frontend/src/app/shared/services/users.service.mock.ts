@@ -110,6 +110,7 @@ export class UsersServiceMock extends UsersService {
     const usersIdAndName = BackendUser.getAll().map(u => ({
       id: u.id,
       name: u.name,
+      isAdmin: u.isAdmin,
     }));
 
     return this.responseAdmin(helper.responseBody(usersIdAndName));
@@ -119,7 +120,9 @@ export class UsersServiceMock extends UsersService {
     const u = BackendUser.get(id);
 
     return this.responseAdmin(
-      u ? helper.responseBody({ id: u.id, name: u.name }) : helper.response(404)
+      u
+        ? helper.responseBody({ id: u.id, name: u.name, isAdmin: u.isAdmin })
+        : helper.response(404)
     );
   }
 
@@ -139,12 +142,16 @@ export class UsersServiceMock extends UsersService {
     );
   }
 
-  modify(id: string, props: { name?: string; password?: string }) {
+  modify(
+    id: string,
+    props: { name?: string; password?: string; isAdmin?: boolean }
+  ) {
     const user = BackendUser.get(id);
 
     if (user) {
       user.name = props.name || user.name;
       user.password = props.password || user.password;
+      user.isAdmin = props.isAdmin;
     }
 
     return this.responseAdmin(

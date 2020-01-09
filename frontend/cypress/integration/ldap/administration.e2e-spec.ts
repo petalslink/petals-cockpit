@@ -19,6 +19,7 @@ import {
   ADD_EDIT_USER_DOM,
   ADD_LDAP_USER_DOM,
   ADMINISTRATION_DOM,
+  EDIT_ADMIN_DIALOG_DOM,
 } from '../../support/administration.dom';
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
@@ -268,7 +269,7 @@ describe(`Administration`, () => {
         .get(`.exp-pnl-user-bescudie`)
         .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
         .should('contain', 'Save')
-        .and('be.enabled')
+        .and('be.disabled')
         .and('be.visible');
 
       // clean form fields
@@ -351,7 +352,7 @@ describe(`Administration`, () => {
         .get(`.exp-pnl-user-admin`)
         .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
         .should('contain', 'Save')
-        .and('be.enabled')
+        .and('be.disabled')
         .and('be.visible');
 
       // the previous panel should have been closed
@@ -479,12 +480,190 @@ describe(`Administration`, () => {
         .should('contain', 'Victor NONO');
     });
 
-    it(`should not show a user-name in panel list users`, () => {
-      cy.expectLdapUsersListToBe(expectedUsersIds, expectedUsersNames);
+    it(`should change an admin`, () => {
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('cchevalier')
+        .click();
+      cy.get(`.exp-pnl-user-cchevalier`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('not.be.checked')
+        .click();
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+      cy.logout();
 
-      cy.viewport(412, 732);
+      cy.login('cchevalier', 'cchevalier');
 
-      cy.expectLdapUsersListToBe(expectedUsersIds, []);
+      cy
+        .get(PETALS_COCKPIT_DOM.buttons.goToAdminPage)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('not.be.checked')
+        .click();
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+      cy.logout();
+
+      cy.login('admin', 'admin');
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
+    });
+
+    it(`should change my admin role`, () => {
+      // disabled if there is only 1 admin remaining
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('adminldap')
+        .click();
+
+      cy.get(`.exp-pnl-user-adminldap`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .click();
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('have.class', 'mat-disabled');
+
+      // change own role admin and redirect
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('adminldap')
+        .click();
+
+      cy.get(`.exp-pnl-user-adminldap`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .click()
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .click()
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .should('be.visible')
+        .contains(
+          'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
+        );
+      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.remove).click();
+
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
+      cy.url().should('include', 'workspaces?page=list');
+    });
+
+    it(`should close and clear on cancel admin dialog`, () => {
+      cy
+        .get(ADD_EDIT_USER_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('be.visible');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('be.visible');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.isAdmin)
+        .click()
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .should('be.visible')
+        .contains(
+          'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
+        );
+      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.cancel).click();
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.name)
+        .should('not.be.visible');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_EDIT_USER_DOM.inputs.password)
+        .should('not.be.visible');
     });
   });
 
@@ -714,6 +893,175 @@ describe(`Administration`, () => {
         .get(`.msg-option`)
         .contains('There is no user found.')
         .should('be.visible');
+    });
+
+    it(`should delete ldap user`, () => {
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('cchevalier')
+        .should('be.visible')
+        .click();
+      cy.get(`.exp-pnl-user-cchevalier`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_LDAP_USER_DOM.buttons.deleteBtn)
+        .click();
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('cchevalier')
+        .should('not.be.visible');
+    });
+
+    it('should change an admin', () => {
+      cy.logout();
+      cy.login('cchevalier', 'cchevalier');
+
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
+      cy.logout();
+
+      cy.login('adminldap', 'adminldap');
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).click();
+
+      cy
+        .get(ADMINISTRATION_DOM.panel.panelListUsers)
+        .contains('cchevalier')
+        .click();
+
+      cy.get(`.exp-pnl-user-cchevalier`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .click();
+      cy
+        .get(`.exp-pnl-user-cchevalier`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-checked');
+      cy.logout();
+
+      cy.login('cchevalier', 'cchevalier');
+      cy
+        .get(PETALS_COCKPIT_DOM.buttons.goToAdminPage)
+        .should('be.visible')
+        .click();
+    });
+
+    it(`should change my admin role`, () => {
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .click();
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('not.have.class', 'mat-checked');
+
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('adminldap')
+        .click();
+
+      cy.get(`.exp-pnl-user-adminldap`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-disabled');
+
+      // change own role admin and redirect
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('admin')
+        .click();
+
+      cy.get(`.exp-pnl-user-admin`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('not.have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-admin`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .click()
+        .should('have.class', 'mat-checked');
+
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('adminldap')
+        .click();
+
+      cy.get(`.exp-pnl-user-adminldap`).should('have.class', 'mat-expanded');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .click()
+        .should('not.have.class', 'mat-checked');
+
+      cy
+        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .should('be.visible')
+        .contains(
+          'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
+        );
+      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.remove).click();
+
+      cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
+      cy.url().should('include', 'workspaces?page=list');
+    });
+
+    it(`should close and clear on cancel admin dialog`, () => {
+      cy
+        .get(ADMINISTRATION_DOM.texts.titleUserIds)
+        .contains('adminldap')
+        .click();
+      cy.get(`.exp-pnl-user-adminldap`).should('have.class', 'mat-expanded');
+
+      cy
+        .get(ADMINISTRATION_DOM.texts.userId)
+        .contains('adminldap')
+        .should('be.visible');
+      cy
+        .get(ADMINISTRATION_DOM.texts.userName)
+        .contains('Administrator LDAP')
+        .should('be.visible');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-checked');
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .click()
+        .should('not.have.class', 'mat-checked');
+
+      cy
+        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .should('be.visible')
+        .contains(
+          'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
+        );
+      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.cancel).click();
+
+      cy
+        .get(`.exp-pnl-user-adminldap`)
+        .find(ADD_LDAP_USER_DOM.buttons.adminBtn)
+        .should('have.class', 'mat-checked');
     });
   });
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2019 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-mat-form-field [matprefix] {
-  margin-right: 10px;
-}
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-mat-icon {
-  padding-right: 10px;
-}
+@Component({
+  selector: 'app-confirm-message-dialog-component',
+  templateUrl: './confirm-message-dialog.component.html',
+  styleUrls: ['./confirm-message-dialog.component.scss'],
+})
+export class ConfirmMessageDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmMessageDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { title: string; message: string }
+  ) {}
 
-mat-slide-toggle {
-  margin-bottom: 10px;
+  close() {
+    this.dialogRef.close();
+  }
+
+  confirm() {
+    this.dialogRef.close(true);
+  }
 }

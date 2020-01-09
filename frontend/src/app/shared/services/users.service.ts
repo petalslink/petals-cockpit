@@ -26,6 +26,7 @@ import { IUserLDAP } from '@shared/state/users.interface';
 export interface IUserBackend {
   id: string;
   name: string;
+  isAdmin: boolean;
 }
 
 export interface ICurrentUserBackend extends IUserBackend {
@@ -41,6 +42,7 @@ export interface IUserLogin {
 
 export interface IUserNew extends IUserLogin {
   name: string;
+  isAdmin: boolean;
 }
 
 export interface IUserSetup extends IUserNew {
@@ -68,7 +70,7 @@ export abstract class UsersService {
 
   abstract modify(
     id: string,
-    props: { name?: string; password?: string }
+    props: { name?: string; password?: string; isAdmin?: boolean }
   ): Observable<void>;
 }
 
@@ -127,7 +129,10 @@ export class UsersServiceImpl extends UsersService {
     return this.http.delete<void>(`${environment.urlBackend}/users/${id}`);
   }
 
-  modify(id: string, props: { name?: string; password?: string }) {
+  modify(
+    id: string,
+    props: { name?: string; password?: string; isAdmin?: boolean }
+  ) {
     return this.http.put<void>(`${environment.urlBackend}/users/${id}`, props);
   }
 }

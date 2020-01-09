@@ -19,7 +19,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input,
   OnDestroy,
   OnInit,
   Output,
@@ -75,11 +74,10 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     other: '# users are matching this search.',
   };
 
-  @Input() canAdd = false;
-
   @Output()
   evtSubmit = new EventEmitter<
-    IUserNew | { username: string; name?: string; password?: string }
+    | IUserNew
+    | { username: string; name?: string; password?: string; isAdmin: boolean }
   >();
 
   constructor(
@@ -146,11 +144,12 @@ export class AddLdapUserComponent implements OnInit, OnDestroy {
     this.store$.dispatch(new Users.CleanLdapUsers());
   }
 
-  doSubmit(username: string, name: string) {
+  doSubmit(username: string, name: string, isAdmin: boolean) {
     const value: IUserNew = {
       username,
       name,
       password: '',
+      isAdmin,
     };
     this.evtSubmit.emit(value);
   }

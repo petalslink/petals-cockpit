@@ -16,8 +16,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <form novalidate [formGroup]="userManagementForm">
   <div fxLayout="column" class="user-form">
     <div fxLayout="column wrap" fxLayoutGap="10px">
-
-      <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center" class="margin-top-x1">
+      <div 
+        fxLayoutAlign="start center" 
+        fxLayoutAlign.md="center center" 
+        fxLayoutAlign.sm="center center" 
+        class="margin-top-x1"
+      >
         <mat-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <span matPrefix><mat-icon color="primary">person</mat-icon></span>
           <input type="text" autocomplete="off" matInput placeholder="Username" formControlName="username">
@@ -26,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-error>
         </mat-form-field>
       </div>
-
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <span matPrefix><mat-icon color="primary">assignment_ind</mat-icon></span>
@@ -45,14 +48,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-error>
         </mat-form-field>
       </div>
+      <div fxLayoutAlign="flex-end center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
+        <mat-slide-toggle 
+          fxLayoutAlign="end center"
+          fxLayoutAlign.md="center center"
+          fxLayoutAlign.sm="center center"
+          color="primary" 
+          formControlName="isAdmin"
+          [disabled]="isLastAdmin && currentUser.id === user.id"
+        >
+        Administrator
+        </mat-slide-toggle>
+      </div>
+
+      <app-message
+        *ngIf="isLastAdmin && (currentUser.id == user.id)"
+        type="info"
+        msg="You are the last administrator remaining."
+        [isClosable]="false"
+        class="info-admin-edit"
+      ></app-message>
     </div>
 
-    <mat-action-row class="pnl-actions-user-management"
+    <mat-action-row 
       fxLayoutAlign="end center"
       fxLayoutAlign.md="center center"
       fxLayoutAlign.sm="center center"
       fxLayout.lt-md="column wrap"
-      fxLayoutGap="10px">
+      fxLayoutGap="10px"
+      class="pnl-actions-user-management"
+    >
       <button mat-raised-button type="button" class="btn-cancel-form text-upper" (click)="doCancel()">
         <mat-icon color="primary">cancel</mat-icon>
         <span class="cancel-name">Cancel</span>
@@ -66,8 +91,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         color="accent"
         type="button"
         (click)="doSubmit()"
+        [disabled]="userManagementForm.invalid || userUnchanged()"
         class="btn-add-user-form text-upper"
-        [disabled]="userManagementForm.invalid">
+      >
         <mat-icon>{{ user ? 'done' : 'person_add' }}</mat-icon>
         <span class="save-name">{{ user ? 'Save' : 'Add' }}</span>
       </button>

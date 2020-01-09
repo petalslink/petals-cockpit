@@ -1,0 +1,36 @@
+<!-- Copyright (C) 2017-2019 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<div fxLayout="column" class="confirm-message-dialog">
+  <div class="central-content">
+    <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
+      <span fxLayoutAlign="start center">
+        <mat-icon color="accent">warning</mat-icon>
+        <span class="margin-left-x1">{{ data.title }}</span>
+      </span>
+    </div>
+    
+    <mat-dialog-content>
+      <p fxLayout="column" class="mat-body-1">
+        <span class='data-msg'>{{ data.message }}</span>
+      </p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
+      <button mat-button color="primary" (click)="close()" class="btn-cancel-modal">CANCEL</button>
+      <button mat-raised-button color="primary" (click)="confirm()" class="btn-confirm-modal">REMOVE</button>
+    </mat-dialog-actions>
+  </div>
+</div>

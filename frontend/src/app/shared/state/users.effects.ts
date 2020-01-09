@@ -19,7 +19,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
 import { Observable, of } from 'rxjs';
 import {
@@ -27,15 +27,19 @@ import {
   filter,
   flatMap,
   map,
+  mapTo,
   switchMap,
   tap,
+  withLatestFrom,
 } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { UsersService } from '@shared/services/users.service';
+import { IStore } from './store.interface';
 import { Users } from './users.actions';
+import { getCurrentUser } from './users.selectors';
 
 @Injectable()
 export class UsersEffects {
@@ -43,7 +47,8 @@ export class UsersEffects {
     private actions$: Actions,
     private router: Router,
     private usersService: UsersService,
-    private notification: NotificationsService
+    private notification: NotificationsService,
+    private store$: Store<IStore>
   ) {}
 
   @Effect()
@@ -99,6 +104,7 @@ export class UsersEffects {
             new Users.AddSuccess({
               id: action.payload.username,
               name: action.payload.name,
+              isAdmin: action.payload.isAdmin,
             })
         ),
         catchError((err: HttpErrorResponse) => {
@@ -157,6 +163,27 @@ export class UsersEffects {
         })
       )
     )
+  );
+
+  @Effect({ dispatch: false })
+  modifySuccess$: Observable<void> = this.actions$.pipe(
+    ofType<Users.ModifySuccess>(Users.ModifySuccessType),
+    withLatestFrom(this.store$.pipe(getCurrentUser)),
+    tap(([action, currentUser]) => {
+      if (
+        currentUser.id === action.payload.id &&
+        !action.payload.changes.isAdmin
+      ) {
+        this.router.navigate(['/workspaces'], {
+          queryParams: { page: 'list' },
+        });
+        this.notification.success(
+          'Role updated',
+          'You are no longer administrator'
+        );
+      }
+    }),
+    mapTo(null)
   );
 
   @Effect()
@@ -255,6 +282,7 @@ export class UsersEffects {
               username: data.value.username,
               name: data.value.name,
               password: data.value.password,
+              isAdmin: data.value.isAdmin,
             },
             validSetupUser: 'User has been added successfully.',
           });

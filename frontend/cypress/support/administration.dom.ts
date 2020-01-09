@@ -19,14 +19,15 @@
 const bs = `app-administration`;
 const bsAddEditUser = `app-add-edit-user`;
 const bsAddLdapUser = `app-add-ldap-user`;
+const bsEditAdminModal = `app-confirm-message-dialog-component`;
 
 export const ADMINISTRATION_DOM = {
   texts: {
     title: `.title-admin-page`,
     titleUserIds: `${bs} .pnl-list-users mat-panel-title .user-id`,
     titleUserNames: `${bs} .pnl-list-users mat-panel-title .user-name`,
-    userId: `${bs} mat-expansion-panel-content .user-id`,
-    userName: `${bs} mat-expansion-panel-content .user-name`,
+    userId: `${bs} .mat-expansion-panel-content .user-id`,
+    userName: `${bs} .mat-expansion-panel-content .user-name`,
   },
   panel: {
     panelAddUser: `${bs} .pnl-add-user`,
@@ -48,6 +49,7 @@ export const ADD_EDIT_USER_DOM = {
     username: `${bsAddEditUser} input[formcontrolname="username"]`,
     name: `${bsAddEditUser} input[formcontrolname="name"]`,
     password: `${bsAddEditUser} input[formcontrolname="password"]`,
+    isAdmin: `${bsAddEditUser} mat-slide-toggle[formcontrolname="isAdmin"]`,
   },
   buttons: {
     cancelBtn: `${bsAddEditUser} .btn-cancel-form`,
@@ -66,5 +68,18 @@ export const ADD_LDAP_USER_DOM = {
     ldapUserIds: `.ldap-user .ldap-user-id`,
     matError: `${bsAddLdapUser} mat-error`,
   },
-  buttons: { deleteBtn: `${bsAddLdapUser} .btn-delete-form` },
+  buttons: {
+    deleteBtn: `.btn-delete-form`,
+    adminBtn: `.btn-user-isadmin`,
+  },
+};
+
+export const EDIT_ADMIN_DIALOG_DOM = {
+  text: {
+    message: `${bsEditAdminModal} .data-msg`,
+  },
+  buttons: {
+    remove: `${bsEditAdminModal} .btn-confirm-modal`,
+    cancel: `${bsEditAdminModal} .btn-cancel-modal`,
+  },
 };
