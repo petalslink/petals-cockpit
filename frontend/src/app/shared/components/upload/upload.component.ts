@@ -47,7 +47,7 @@ export class UploadComponent {
   @Input() acceptedFileType?: string;
   @Input() error?: string;
   @Input() disabled: boolean;
-  @Input() isFileParsed? = true;
+  @Input() isFileParsed? = false;
   @Input()
   set uploadStatus(uploadStatus: { percentage: number }) {
     if (uploadStatus && typeof uploadStatus.percentage === 'number') {
@@ -102,7 +102,7 @@ export class UploadComponent {
 
   private getSelectedFileInformation(files: File[]): ISelectedFileInformation {
     if (files.length <= 0) {
-      return null;
+      return (this.selectedFileInformation = <ISelectedFileInformation>{});
     }
 
     const [file] = files;

@@ -29,8 +29,16 @@ import {
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { NotificationsService } from 'angular2-notifications';
+import { EMPTY, Subject } from 'rxjs';
+import {
+  catchError,
+  filter,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 
 import { IComponentRow } from '@feat/cockpit/workspaces/state/components/components.interface';
@@ -38,6 +46,7 @@ import {
   SnackBarDeploymentProgressComponent,
   UploadComponent,
 } from '@shared/components/upload/upload.component';
+import { ComponentsService } from '@shared/services/components.service';
 import {
   HttpProgress,
   HttpProgressType,
@@ -57,20 +66,19 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() component: IComponentRow;
 
-  @Input()
-  serviceUnitsByName: {
-    [name: string]: boolean;
-  };
-
   @ViewChild('deployServiceUnit') deployServiceUnit: UploadComponent;
 
   serviceUnitUploadProgress: {
     percentage: number;
   };
 
+  isFileParsed = false;
+
   constructor(
     private store$: Store<IStore>,
     private actions$: Actions,
+    private notifications: NotificationsService,
+    private componentsService: ComponentsService,
     private snackBar: MatSnackBar
   ) {}
 
@@ -94,6 +102,41 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         match.toUpperCase()
       );
       this.openSnackBarDeployment(suTitle);
+    }
+  }
+
+  fileSelected(file: File) {
+    if (file) {
+      this.componentsService
+        .getSuFromZipFile(file)
+        .pipe(
+          takeUntil(this.onDestroy$),
+          tap(_ => {
+            this.isFileParsed = true;
+
+            this.store$.dispatch(
+              new Components.CleanServiceUnitDeploymentError({
+                id: this.component.id,
+              })
+            );
+          }),
+          catchError(err => {
+            this.notifications.warn(
+              'File error',
+              `An error occurred while trying to read the service-unit zip file: ${
+                err.message
+              }`
+            );
+
+            this.isFileParsed = false;
+            this.deployServiceUnit.reset();
+
+            return EMPTY;
+          })
+        )
+        .subscribe();
+    } else {
+      this.deployServiceUnit.reset();
     }
   }
 
@@ -149,14 +192,6 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   getSuDeploymentError() {
     return this.component.errorDeploymentServiceUnit;
-  }
-
-  cleanSuDeploymentError() {
-    this.store$.dispatch(
-      new Components.CleanServiceUnitDeploymentError({
-        id: this.component.id,
-      })
-    );
   }
 
   cancelSelectedFile() {

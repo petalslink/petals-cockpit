@@ -22,6 +22,7 @@ import { flatMap, last } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { JsTable, toJsTable } from '@shared/helpers/jstable.helper';
+import { loadJbiFilesContentFromZip } from '@shared/helpers/zip.helper';
 import { IServiceAssemblyBackendSSE } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
 
@@ -96,6 +97,8 @@ export abstract class ComponentsService {
       serviceUnits: JsTable<IServiceUnitBackendSSE>;
     }>;
   };
+
+  abstract getSuFromZipFile(file: File): Observable<string[]>;
 }
 
 @Injectable()
@@ -197,5 +200,9 @@ export class ComponentsServiceImpl extends ComponentsService {
         last()
       ),
     };
+  }
+
+  getSuFromZipFile(file: File) {
+    return loadJbiFilesContentFromZip(file);
   }
 }

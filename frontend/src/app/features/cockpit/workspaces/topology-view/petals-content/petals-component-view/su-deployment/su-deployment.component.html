@@ -22,8 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       [message]="'Choose Service Unit:'"
       [uploadStatus]="serviceUnitUploadProgress"
       [error]="getSuDeploymentError()"
-      (evtFileSelected)="cleanSuDeploymentError()"
+      [isFileParsed]="isFileParsed"
       (evtUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
+      (evtFileSelected)="fileSelected($event.file)"
       (evtResetFile)="cancelSelectedFile()"
     ></app-upload>
   </ngx-hover-opacity>

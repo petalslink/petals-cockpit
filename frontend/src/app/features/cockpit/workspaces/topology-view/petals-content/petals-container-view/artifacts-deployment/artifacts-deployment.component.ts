@@ -246,56 +246,60 @@ export class ArtifactsDeploymentComponent
   }
 
   fileSelected(file: File) {
-    this.containersService
-      .getArtifactFromZipFile(file)
-      .pipe(
-        takeUntil(this.onDestroy$),
-        tap(artifactFromZip => {
-          switch (artifactFromZip.type) {
-            case 'component':
-              this.artifact = new Comp(
-                this,
-                artifactFromZip.name,
-                artifactFromZip.sharedLibraries
-              );
-              break;
-            case 'service-assembly':
-              this.artifact = new Sa(this, artifactFromZip.name);
-              break;
-            case 'shared-library':
-              this.artifact = new Sl(
-                this,
-                artifactFromZip.name,
-                artifactFromZip.version
-              );
-              break;
+    if (file) {
+      this.containersService
+        .getArtifactFromZipFile(file)
+        .pipe(
+          takeUntil(this.onDestroy$),
+          tap(artifactFromZip => {
+            switch (artifactFromZip.type) {
+              case 'component':
+                this.artifact = new Comp(
+                  this,
+                  artifactFromZip.name,
+                  artifactFromZip.sharedLibraries
+                );
+                break;
+              case 'service-assembly':
+                this.artifact = new Sa(this, artifactFromZip.name);
+                break;
+              case 'shared-library':
+                this.artifact = new Sl(
+                  this,
+                  artifactFromZip.name,
+                  artifactFromZip.version
+                );
+                break;
 
-            default:
-              break;
-          }
+              default:
+                break;
+            }
 
-          this.artifact.init();
-          this.store$.dispatch(
-            new Containers.CleanArtifactDeploymentError({
-              id: this.container.id,
-            })
-          );
-        }),
-        catchError(err => {
-          this.notifications.warn(
-            'File error',
-            `An error occurred while trying to read the artifact zip file: ${
-              err.message
-            }`
-          );
+            this.artifact.init();
+            this.store$.dispatch(
+              new Containers.CleanArtifactDeploymentError({
+                id: this.container.id,
+              })
+            );
+          }),
+          catchError(err => {
+            this.notifications.warn(
+              'File error',
+              `An error occurred while trying to read the artifact zip file: ${
+                err.message
+              }`
+            );
 
-          this.isFileParsed = false;
-          this.deployArtifact.reset();
+            this.isFileParsed = false;
+            this.deployArtifact.reset();
 
-          return EMPTY;
-        })
-      )
-      .subscribe();
+            return EMPTY;
+          })
+        )
+        .subscribe();
+    } else {
+      this.deployArtifact.reset();
+    }
   }
 
   openSnackBarDeployment(type: string) {
