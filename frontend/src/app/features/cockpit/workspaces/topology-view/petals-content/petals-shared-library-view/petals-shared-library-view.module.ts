@@ -21,8 +21,6 @@ import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsSharedLibraryViewRoutingModule } from './petals-shared-library-view-routing.module';
 
-import { PetalsSharedLibraryOperationsComponent } from './petals-shared-library-operations/petals-shared-library-operations.component';
-import { PetalsSharedLibraryOverviewComponent } from './petals-shared-library-overview/petals-shared-library-overview.component';
 import { PetalsSharedLibraryViewComponent } from './petals-shared-library-view.component';
 @NgModule({
   imports: [
@@ -30,10 +28,6 @@ import { PetalsSharedLibraryViewComponent } from './petals-shared-library-view.c
     PetalsSharedLibraryViewRoutingModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    PetalsSharedLibraryViewComponent,
-    PetalsSharedLibraryOverviewComponent,
-    PetalsSharedLibraryOperationsComponent,
-  ],
+  declarations: [PetalsSharedLibraryViewComponent],
 })
 export class PetalsSharedLibraryViewModule {}
