@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const readline = require('readline');
 
-const currentYear = '2019';
+const currentYear = '2020';
 
 // folders
 const sourceFolders = [
