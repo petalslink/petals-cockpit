@@ -1,6 +1,6 @@
 import { IUsersTable } from './users.interface';
 /**
- * Copyright (C) 2017-2019 Linagora
+ * Copyright (C) 2017-2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
