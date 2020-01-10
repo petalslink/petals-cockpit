@@ -17,8 +17,9 @@
 
 import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
 import { getWorkspacesIdsNames } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
-import { Store } from '@ngrx/store';
+import { select, Store } from '@ngrx/store';
 import { IStore } from '@shared/state/store.interface';
+import { getUsersAllIds } from '@shared/state/users.selectors';
 import { first, map } from 'rxjs/operators';
 
 export class CustomValidators {
@@ -51,7 +52,7 @@ export class CustomValidators {
   }
 
   /**
-   * async validator to determine is there is
+   * async validator to determine if there is
    * an existing workspace with similar name
    */
   static existingWorkspaceWithSimilarNameValidator(
@@ -81,5 +82,28 @@ export class CustomValidators {
       }
     }
     return cleanName.toUpperCase();
+  }
+
+  /**
+   * async validator to determine if there is
+   * an existing user with similar username
+   */
+  static existingUserWithSimilarUsernameValidator(
+    store$: Store<IStore>,
+    isAddingUser: boolean
+  ): AsyncValidatorFn {
+    return (control: AbstractControl) =>
+      store$.pipe(
+        select(getUsersAllIds),
+        first(),
+        map(userId => {
+          return isAddingUser &&
+            userId
+              .map(user => user.toLowerCase())
+              .includes(control.value.toLowerCase())
+            ? { existingUserWithSimilarUsername: true }
+            : null;
+        })
+      );
   }
 }

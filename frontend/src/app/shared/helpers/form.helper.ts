@@ -35,6 +35,7 @@ interface IValidationMessages {
   };
   username?: {
     required: string;
+    existingUserWithSimilarUsername: string;
   };
   name?: {
     required: string;
@@ -69,6 +70,7 @@ const validationMessages: IValidationMessages = {
   },
   username: {
     required: 'Required!',
+    existingUserWithSimilarUsername: 'User already exists!',
   },
   name: {
     required: 'Required!',
