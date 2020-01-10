@@ -82,7 +82,6 @@ describe(`UploadComponent`, () => {
   it(
     `should upload a file by emitting event to the parent`,
     fakeAsync(() => {
-      uploadComponent.isUploading = false;
       uploadComponent.selectedFileInformation = <any>'information';
 
       uploadComponent.evtUploadFile
@@ -92,8 +91,6 @@ describe(`UploadComponent`, () => {
             expect(information).toEqual(<any>{
               selectedFileInformation: 'information',
             });
-
-            expect(uploadComponent.isUploading).toBe(true);
           })
         )
         .subscribe();
@@ -104,13 +101,11 @@ describe(`UploadComponent`, () => {
     })
   );
 
-  it(`should update uploading status and percentage when the input changes`, () => {
-    expect(uploadComponent.isUploading).toBe(false);
+  it(`should update percentage when the input changes`, () => {
     expect(uploadComponent.percentage).toBeUndefined();
 
     uploadComponent.uploadStatus = { percentage: 5 };
 
-    expect(uploadComponent.isUploading).toBe(true);
     expect(uploadComponent.percentage).toEqual(5);
   });
 });

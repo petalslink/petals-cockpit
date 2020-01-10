@@ -29,7 +29,7 @@ export interface IComponentUI {
   isFolded: boolean;
   isUpdating: boolean;
   updateError: string;
-  deployError: string;
+  errorDeploymentServiceUnit: string;
 }
 
 export interface IComponentRow
@@ -68,7 +68,7 @@ export function componentRowFactory(): IComponentRow {
     isFolded: false,
     isUpdating: false,
     updateError: '',
-    deployError: '',
+    errorDeploymentServiceUnit: '',
 
     serviceUnits: [],
     sharedLibraries: [],

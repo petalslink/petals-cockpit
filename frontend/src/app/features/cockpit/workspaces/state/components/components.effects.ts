@@ -17,6 +17,7 @@
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store';
 import { NotificationsService } from 'angular2-notifications';
@@ -50,7 +51,8 @@ export class ComponentsEffects {
     private store$: Store<IStore>,
     private actions$: Actions,
     private componentsService: ComponentsService,
-    private notifications: NotificationsService
+    private notifications: NotificationsService,
+    private snackBar: MatSnackBar
   ) {}
 
   @Effect()
@@ -239,6 +241,9 @@ export class ComponentsEffects {
             'Service Unit Deployment Failed',
             `An error occurred while deploying ${action.payload.file.name}`
           );
+
+          // dismiss the currently-visible snack bar
+          this.snackBar.dismiss();
 
           return of(
             new Components.DeployServiceUnitError({

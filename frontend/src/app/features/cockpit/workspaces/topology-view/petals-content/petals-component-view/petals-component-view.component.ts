@@ -15,17 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  Component,
-  ElementRef,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges,
-} from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, ElementRef, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
 
@@ -40,29 +33,18 @@ import { Components } from '@wks/state/components/components.actions';
 import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 
-// import { UploadComponent } from '@shared/components/upload/upload.component';
-
 @Component({
   selector: 'app-petals-component-view',
   templateUrl: './petals-component-view.component.html',
   styleUrls: ['./petals-component-view.component.scss'],
 })
-export class PetalsComponentViewComponent
-  implements OnInit, OnChanges, OnDestroy {
+export class PetalsComponentViewComponent implements OnInit {
   component$: Observable<IComponentWithSlsAndSus>;
   workspaceId$: Observable<string>;
-
-  onDestroy$ = new Subject<void>();
 
   top: ElementRef;
 
   parametersForm: FormGroup;
-
-  // deployServiceUnit: UploadComponent;
-
-  // uploadServiceUnitStatus: {
-  //   percentage: number;
-  // };
 
   constructor(private store$: Store<IStore>) {}
 
@@ -74,33 +56,30 @@ export class PetalsComponentViewComponent
     );
   }
 
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
-  }
+  // TODO: We don't need to use ngOnChanges in the parent component.
+  // For now, keep this code commented, and reuse it during the next refactor of the following issues:
+  // https://gitlab.com/linagora/petals-cockpit/issues/574
+  // https://gitlab.com/linagora/petals-cockpit/issues/575
+  // ngOnChanges(changes: SimpleChanges) {
+  //   // if an error happens, without that control the form will be reset to the values in store
+  //   if (
+  //     changes.component.previousValue &&
+  //     changes.component.previousValue.parameters ===
+  //       changes.component.currentValue.parameters
+  //   ) {
+  //     return;
+  //   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    // if an error happen, without that control the form will be reset to the values in store
-    if (
-      changes.component.previousValue &&
-      changes.component.previousValue.parameters ===
-        changes.component.currentValue.parameters
-    ) {
-      return;
-    }
+  //   const parameters = changes.component.currentValue.parameters;
+  //   const keysParameters = Object.keys(parameters);
 
-    const parameters = changes.component.currentValue.parameters;
-    const keysParameters = Object.keys(parameters);
-
-    this.parametersForm = new FormGroup(
-      keysParameters.reduce(
-        (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
-        {}
-      )
-    );
-
-    // this.deployServiceUnit.reset();
-  }
+  //   this.parametersForm = new FormGroup(
+  //     keysParameters.reduce(
+  //       (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
+  //       {}
+  //     )
+  //   );
+  // }
 
   trackBySl(i: number, sl: ISharedLibraryRow) {
     return sl.id;
@@ -142,40 +121,4 @@ export class PetalsComponentViewComponent
   trackByComponentState(index: number, item: any) {
     return item.actionName;
   }
-
-  // deploy(file: File, serviceUnitName: string) {
-  //   const correlationId = uuid();
-
-  //   this.actions$
-  //     .pipe(
-  //       ofType<HttpProgress>(HttpProgressType),
-  //       takeUntil(this.onDestroy$),
-  //       filter(action => action.payload.correlationId === correlationId),
-  //       // we want 1 or 0 (first wants exactly one) because of takeUntil
-  //       take(1),
-  //       switchMap(action =>
-  //         action.payload.getProgress().pipe(
-  //           tap(
-  //             percentage =>
-  //               (this.uploadServiceUnitStatus = {
-  //                 percentage,
-  //               })
-  //           ),
-  //           tap({
-  //             complete: () => this.deployServiceUnit.reset(),
-  //           })
-  //         )
-  //       )
-  //     )
-  //     .subscribe();
-
-  //   this.store$.dispatch(
-  //     new Components.DeployServiceUnit({
-  //       id: this.component.id,
-  //       file,
-  //       serviceUnitName: serviceUnitName.trim(),
-  //       correlationId,
-  //     })
-  //   );
-  // }
 }

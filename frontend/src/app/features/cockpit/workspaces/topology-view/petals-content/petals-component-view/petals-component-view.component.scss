@@ -30,3 +30,9 @@ mat-icon {
   background-size: cover;
   background-repeat: no-repeat;
 }
+
+.sl-name,
+.su-name,
+.sa-name {
+  word-break: break-word;
+}

@@ -197,4 +197,11 @@ export namespace Containers {
       public readonly payload: IComponentBackendSSE & ICorrelationId
     ) {}
   }
+
+  export const CleanArtifactDeploymentErrorType =
+    '[Containers] Clean artifact deployment error';
+  export class CleanArtifactDeploymentError implements Action {
+    readonly type = CleanArtifactDeploymentErrorType;
+    constructor(public readonly payload: { id: string }) {}
+  }
 }

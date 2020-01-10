@@ -246,71 +246,70 @@ export class ArtifactsDeploymentComponent
   }
 
   fileSelected(file: File) {
-    this.containersService
-      .getArtifactFromZipFile(file)
-      .pipe(
-        takeUntil(this.onDestroy$),
-        tap(artifactFromZip => {
-          switch (artifactFromZip.type) {
-            case 'component':
-              this.artifact = new Comp(
-                this,
-                artifactFromZip.name,
-                artifactFromZip.sharedLibraries
-              );
-              break;
-            case 'service-assembly':
-              this.artifact = new Sa(this, artifactFromZip.name);
-              break;
-            case 'shared-library':
-              this.artifact = new Sl(
-                this,
-                artifactFromZip.name,
-                artifactFromZip.version
-              );
-              break;
+    if (file) {
+      this.containersService
+        .getArtifactFromZipFile(file)
+        .pipe(
+          takeUntil(this.onDestroy$),
+          tap(artifactFromZip => {
+            switch (artifactFromZip.type) {
+              case 'component':
+                this.artifact = new Comp(
+                  this,
+                  artifactFromZip.name,
+                  artifactFromZip.sharedLibraries
+                );
+                break;
+              case 'service-assembly':
+                this.artifact = new Sa(this, artifactFromZip.name);
+                break;
+              case 'shared-library':
+                this.artifact = new Sl(
+                  this,
+                  artifactFromZip.name,
+                  artifactFromZip.version
+                );
+                break;
 
-            default:
-              break;
-          }
-          this.artifact.init();
-        }),
-        catchError(err => {
-          this.notifications.warn(
-            'File error',
-            `An error occurred while trying to read the artifact zip file: ${
-              err.message
-            }`
-          );
+              default:
+                break;
+            }
 
-          this.isFileParsed = false;
-          this.deployArtifact.reset();
+            this.artifact.init();
+            this.store$.dispatch(
+              new Containers.CleanArtifactDeploymentError({
+                id: this.container.id,
+              })
+            );
+          }),
+          catchError(err => {
+            this.notifications.warn(
+              'File error',
+              `An error occurred while trying to read the artifact zip file: ${
+                err.message
+              }`
+            );
 
-          return EMPTY;
-        })
-      )
-      .subscribe();
-  }
+            this.isFileParsed = false;
+            this.deployArtifact.reset();
 
-  isDeployingArtifact(type: string) {
-    if (type) {
-      // to capitalize the first character of every types
-      const titleArtifactType = type.replace(
-        /(^\w{1})|(\s{1}\w{1})/,
-        (match: string) => match.toUpperCase()
-      );
-      this.openSnackBarDeployment(titleArtifactType);
+            return EMPTY;
+          })
+        )
+        .subscribe();
+    } else {
+      this.deployArtifact.reset();
     }
   }
 
-  openSnackBarDeployment(titleArtifactType: string) {
+  openSnackBarDeployment(type: string) {
     this.snackRef = this.snackBar.openFromComponent(
       SnackBarDeploymentProgressComponent,
       {
         verticalPosition: 'top',
         horizontalPosition: 'center',
         data: {
-          titleArtifactType,
+          type,
           uploadProgress$: this.percentage$.asObservable(),
         },
       }
@@ -322,7 +321,7 @@ export class ArtifactsDeploymentComponent
   deploy(file: File) {
     const correlationId = uuid();
 
-    this.isDeployingArtifact(this.artifact.type);
+    this.artifact.isDeployingArtifact();
 
     const actionToDispatch: Action = this.artifact.fetchActionToDispatch(
       file,
@@ -333,7 +332,6 @@ export class ArtifactsDeploymentComponent
       onProgressUpdate: (percentage: number) => {
         this.artifactUploadProgress = { percentage };
         this.percentage$.next(percentage);
-        this.deployArtifact.reset();
       },
       onComplete: () => {
         this.snackRef.dismiss();
@@ -348,7 +346,10 @@ export class ArtifactsDeploymentComponent
         filter(action => action.payload.correlationId === correlationId),
         // we want 1 or 0 (first wants exactly one) because of takeUntil
         take(1),
-        switchMap(action => action.payload.getProgress()),
+        switchMap(action => {
+          this.deployArtifact.reset();
+          return action.payload.getProgress();
+        }),
         tap(deployActions.onProgressUpdate),
         tap({
           complete: deployActions.onComplete,
@@ -471,22 +472,21 @@ export class ArtifactsDeploymentComponent
   }
 }
 
-function hasContainerIdChanged(containerChanges: SimpleChange) {
-  const oldContainer = containerChanges.previousValue;
-  const newContainer = containerChanges.currentValue;
+function hasContainerIdChanged(containerChange: SimpleChange) {
+  const oldContainer = containerChange.previousValue;
+  const newContainer = containerChange.currentValue;
 
-  if (!oldContainer) {
-    return false;
-  }
-
-  return oldContainer.id !== newContainer.id;
+  return (
+    !containerChange.isFirstChange() && oldContainer.id !== newContainer.id
+  );
 }
 
 abstract class DeploymentArtifact {
   protected constructor(
     readonly parent: ArtifactsDeploymentComponent,
     readonly type: string,
-    protected name: string
+    readonly name: string,
+    readonly version?: string
   ) {}
   abstract init(): void;
   abstract getTitle(): string;
@@ -494,13 +494,23 @@ abstract class DeploymentArtifact {
   abstract isDisabledDeployArtifact(): boolean;
   abstract cancelSelectedFile(): void;
   abstract fetchActionToDispatch(file: File, correlationId: string): Action;
+  isDeployingArtifact() {
+    if (this.type) {
+      // to capitalize the first character of every types
+      const titleArtifactType = this.type.replace(
+        /(^\w{1})|(\s{1}\w{1})/,
+        (match: string) => match.toUpperCase()
+      );
+      this.parent.openSnackBarDeployment(titleArtifactType);
+    }
+  }
 }
 
 class Comp extends DeploymentArtifact {
   constructor(
     parent: ArtifactsDeploymentComponent,
     name: string,
-    protected sharedLibraries: ISharedLibrarySimplified[]
+    readonly sharedLibraries: ISharedLibrarySimplified[]
   ) {
     super(parent, 'component', name);
   }
@@ -615,9 +625,9 @@ class Sl extends DeploymentArtifact {
   constructor(
     parent: ArtifactsDeploymentComponent,
     name: string,
-    protected version: string
+    version: string
   ) {
-    super(parent, 'shared-library', name);
+    super(parent, 'shared-library', name, version);
   }
 
   init() {

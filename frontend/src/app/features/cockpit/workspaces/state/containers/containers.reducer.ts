@@ -64,6 +64,7 @@ export namespace ContainersReducer {
     | Containers.DeployComponent
     | Containers.DeployComponentError
     | Containers.DeployComponentSuccess
+    | Containers.CleanArtifactDeploymentError
     | Components.Added
     | Components.Removed
     | ServiceAssemblies.Added
@@ -142,6 +143,9 @@ export namespace ContainersReducer {
       }
       case Containers.DeployComponentSuccessType: {
         return deployComponentSuccess(table, action.payload);
+      }
+      case Containers.CleanArtifactDeploymentErrorType: {
+        return cleanArtifactDeploymentError(table, action.payload);
       }
       case ServiceAssemblies.AddedType: {
         return serviceAssembliesAdded(table, action.payload);
@@ -323,6 +327,17 @@ export namespace ContainersReducer {
   ) {
     return updateById(table, payload.containerId, {
       isDeployingSharedLibrary: false,
+      errorDeploymentSharedLibrary: '',
+    });
+  }
+
+  function cleanArtifactDeploymentError(
+    table: IContainersTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, {
+      errorDeploymentComponent: '',
+      errorDeploymentServiceAssembly: '',
       errorDeploymentSharedLibrary: '',
     });
   }
