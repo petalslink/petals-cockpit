@@ -20,7 +20,6 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 
-import { PetalsServiceUnitOverviewComponent } from './petals-service-unit-overview/petals-service-unit-overview.component';
 import { PetalsServiceUnitViewRoutingModule } from './petals-service-unit-view-routing.module';
 import { PetalsServiceUnitViewComponent } from './petals-service-unit-view.component';
 
@@ -30,9 +29,6 @@ import { PetalsServiceUnitViewComponent } from './petals-service-unit-view.compo
     PetalsServiceUnitViewRoutingModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    PetalsServiceUnitViewComponent,
-    PetalsServiceUnitOverviewComponent,
-  ],
+  declarations: [PetalsServiceUnitViewComponent],
 })
 export class PetalsServiceUnitViewModule {}
