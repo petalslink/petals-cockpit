@@ -135,7 +135,7 @@ describe('Container', () => {
       .click();
 
     cy
-      .get(`.item-list .menu-item-wks-name`)
+      .get(MENU_DOM.links.itemsWksNames)
       .find(MENU_DOM.texts.wksNames)
       .contains(`Workspace 1`)
       .click();

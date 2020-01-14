@@ -58,7 +58,7 @@ mat-card-content.workspace-short-description > .short-description {
   border-bottom-style: solid;
 }
 
-mat-card.bus-list {
+mat-card.card-buses {
   mat-form-field {
     span > fa-icon {
       position: relative;
@@ -120,4 +120,9 @@ mat-card.bus-list {
       }
     }
   }
+}
+
+.user-name,
+.user-id {
+  word-break: break-word;
 }

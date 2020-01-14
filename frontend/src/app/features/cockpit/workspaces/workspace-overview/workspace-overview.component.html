@@ -19,11 +19,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
       <mat-card>
         <mat-card-title class="light-bold">Short Description</mat-card-title>
-        
-        <mat-card-content *ngIf="!isEditingDescriptions; else shortDescriptionEdit" fxLayout="column" class="workspace-short-description">
+
+        <mat-card-content 
+          *ngIf="!isEditingDescriptions; else shortDescriptionEdit"
+          fxLayout="column"
+          class="workspace-short-description"
+        >
           <div *ngIf="workspace.shortDescription; else noShortDescription" fxFlexFill class="short-description">
             <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
-          </div>   
+          </div>
           <ng-template #noShortDescription>
             <app-message
               type="info"
@@ -38,18 +42,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-card-content fxLayout="column">
             <div fxFlexFill class="workspace-short-description-edit">
               <mat-form-field appearance="outline" fxFlexFill class="short-description-form-field">
-                <textarea 
+                <textarea
                   #txtShortDescription
-                  matInput 
+                  matInput
                   matTextareaAutosize
                   maxLength="200"
                   placeholder="Add short description to the current workspace"
                   [appFocusInputIfLargeScreen]="isFocusShortDescriptionTextarea"
-                  [disabled]="isSettingDescriptions" 
+                  [disabled]="isSettingDescriptions"
                   [(ngModel)]="shortDescription"
                   class="short-description-wks"
                 ></textarea>
-                <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxLength">{{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
+                <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxLength">
+                  {{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
                 <ng-template #isMaxLength>
                   <mat-error>Max 200 characters!</mat-error>
                 </ng-template>
@@ -60,7 +65,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-card-title class="light-bold margin-top-x1">Description</mat-card-title>
 
-        <mat-card-content *ngIf="!isEditingDescriptions; else descriptionEdit" fxLayout="column" class="workspace-description">
+        <mat-card-content
+          *ngIf="!isEditingDescriptions; else descriptionEdit"
+          fxLayout="column"
+          class="workspace-description">
           <div *ngIf="workspace.description; else noDescription" fxFlexFill class="description">
             <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
           </div>
@@ -78,24 +86,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-card-content fxLayout="column">
             <div fxFlexFill class="workspace-description-edit">
               <mat-form-field appearance="outline" fxFlexFill class="description-form-field">
-                <textarea 
-                  matInput 
+                <textarea
+                  matInput
                   matTextareaAutosize
                   placeholder="Add description to the current workspace"
-                  [disabled]="isSettingDescriptions" 
+                  [disabled]="isSettingDescriptions"
                   [(ngModel)]="description"
-                  class="description-wks" 
+                  class="description-wks"
                 ></textarea>
                 <mat-hint>Supports Standard Markdown Syntax</mat-hint>
               </mat-form-field>
-              
               <div fxFlexFill>
-                <span 
+                <span
                   *ngIf="description; else nothingToPreview"
-                  fxFlex 
-                  [innerHTML]="description | MarkdownToHtml" 
-                  class="workspace-description-preview padding-x1">
-                </span>
+                  fxFlex [innerHTML]="description | MarkdownToHtml"
+                  class="workspace-description-preview padding-x1"
+                ></span>
                 <ng-template #nothingToPreview>
                   <div fxFlexFill fxFlex class="msg-no-description padding-x1">Nothing to preview</div>
                 </ng-template>
@@ -104,21 +110,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-card-content>
         </ng-template>
 
-        <mat-card-actions 
+        <mat-card-actions
           *ngIf="!isEditingDescriptions; else descriptionsBtnEdit"
           fxFlexFill
           fxLayoutAlign="end center"
         >
-          <button 
-            mat-raised-button 
-            type="button"
-            color="primary" 
-            (click)="editDescriptions()" 
+          <button
+            mat-raised-button type="button"
+            color="primary"
+            (click)="editDescriptions()"
             class="btn-add-edit-descriptions text-upper margin-right-x1"
-          > 
+          >
             <span
-              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addDescriptions" 
-              fxLayout="row" 
+              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addDescriptions"
+              fxLayout="row"
               fxLayoutAlign="start center"
             >
               <mat-icon class="margin-right-x1">edit</mat-icon>
@@ -131,13 +136,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </span>
             </ng-template>
           </button>
-          <button 
-            mat-raised-button
-            type="button"
-            color="warn" 
-            (click)="openDeletionDialog()" 
+          <button
+            mat-raised-button type="button"
+            color="warn"
+            (click)="openDeletionDialog()"
             [disabled]="workspace.isRemoving || isRemoving"
-            class="btn-delete-wks" 
+            class="btn-delete-wks"
           >
             <span fxLayout="row" fxLayoutAlign="start center">
               <mat-icon class="margin-right-x1">delete</mat-icon>
@@ -158,12 +162,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             >
               Cancel
             </button>
-            <button 
-              mat-raised-button
-              type="button"
-              color="primary" 
-              (click)="saveDescriptions()" 
-              [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)" 
+            <button
+              mat-raised-button type="button"
+              color="primary"
+              (click)="saveDescriptions()"
+              [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)"
               class="btn-save-descriptions text-upper"
             >
               <span fxLayout="row" fxLayoutAlign="start center">
@@ -173,28 +176,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </button>
           </mat-card-actions>
         </ng-template>
-        
+
       </mat-card>
 
-      <mat-card *ngIf="buses$ | async as buses" class="bus-list">
+      <mat-card *ngIf="buses$ | async as buses" class="card-buses">
         <mat-card-title class="light-bold">Bus list</mat-card-title>
         <mat-card-content fxLayout="column">
-          <div 
+          <div
             *ngIf="buses.list.length; else noBuses"
-            fxLayout="row wrap" 
+            fxLayout="row wrap"
             fxLayout.lt-sm="column"
             fxLayoutGap="24px grid"
             fxLayoutAlign="flex-start"
             class="bus-grid-item"
           >
-            <div 
+            <div
               *ngFor="let bus of buses.list"
               fxFlex="0 1 calc(12.5% - 24px)"
               fxFlex.lt-md="0 1 calc(50% - 24px)"
               class="bus-item"
             >
               <a
-                *ngIf="!isEditingBusList && !bus.isBusSelectedForDetachment" 
+                *ngIf="!isEditingBusList && !bus.isBusSelectedForDetachment"
                 [routerLink]="['/workspaces', workspace.id, 'petals', 'buses', bus.id]"
                 gdAreas="content | footer"
                 gdRows="60px 36px"
@@ -209,15 +212,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <span class="bus-name">{{ bus.name }}</span>
                 </div>
               </a>
-              
+
               <ng-template #detachInProgress [ngIf]="isBusDetaching() && bus.isBusSelectedForDetachment">
                 <div fxLayout="row" fxLayoutAlign="center center" class="margin-top-x2">
-                  <mat-spinner
-                    [diameter]="32"
-                    [strokeWidth]="2"
-                    color="primary"
-                    class="detach-spinner"
-                  ></mat-spinner>
+                  <mat-spinner [diameter]="32" [strokeWidth]="2" color="primary" class="detach-spinner"></mat-spinner>
                 </div>
               </ng-template>
 
@@ -231,13 +229,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   (click)="toggleSelectDetachBus(bus.id)"
                   class="bus-detach"
                 >
-                  <div 
-                    gdArea="content" 
-                    fxLayout="row" 
-                    fxLayoutAlign="center center" 
-                    [ngClass]="{'active': bus.isBusSelectedForDetachment}" 
+                  <div
+                    gdArea="content"
+                    fxLayout="row"
+                    fxLayoutAlign="center center"
+                    [ngClass]="{'active': bus.isBusSelectedForDetachment}"
                     class="bus-svg-content"
-                    >
+                  >
                     <mat-icon color="primary" svgIcon="bus" class="padding-x2"></mat-icon>
                     <fa-icon class="margin-right-x1 icon-x4" icon="unlink"></fa-icon>
                   </div>
@@ -258,31 +256,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             ></app-message>
           </ng-template>
         </mat-card-content>
-        
+
         <form class="bus-import-form" novalidate (ngSubmit)="onSubmit(busImportForm)" [formGroup]="busImportForm">
           <div *ngIf="!(buses$ | async).isBusSelectedForDetachment && isEditingImportBus" class="margin-top-x2">
             <mat-card-title class="light-bold">Import bus details</mat-card-title>
 
             <mat-card-content>
-
-              <div 
-                fxLayout="row wrap" 
-                fxLayout.lt-sm="column" 
-                fxLayoutGap="24px grid" 
+              <div
+                fxLayout="row wrap"
+                fxLayout.lt-sm="column"
+                fxLayoutGap="24px grid"
                 fxLayoutGap.xs="0 grid"
                 class="bus-import-edit"
               >
                 <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="ip-form-field">
                   <mat-label>IP or hostname</mat-label>
-                  <input type="text" placeholder="{{formDefault.ip}}" matInput appFocusInputIfLargeScreen formControlName="ip">
+                  <input
+                    type="text"
+                    placeholder="{{formDefault.ip}}"
+                    matInput
+                    appFocusInputIfLargeScreen
+                    formControlName="ip"
+                  >
                   <span matPrefix>
                     <fa-icon icon="map-marker-alt" class="icon-x2"></fa-icon>
                   </span>
                 </mat-form-field>
-              
+
                 <mat-form-field appearance="outline" floatLabel="always" fxFlex="28%" class="port-form-field">
                   <mat-label>Port</mat-label>
-                  <input type="text" placeholder="{{formDefault.port}}" matInput formControlName="port" [errorStateMatcher]="importBusMatcher">
+                  <input
+                    type="text"
+                    placeholder="{{formDefault.port}}"
+                    matInput formControlName="port"
+                    [errorStateMatcher]="importBusMatcher"
+                  >
                   <span matPrefix>
                     <fa-icon icon="ethernet" class="icon-x2"></fa-icon>
                   </span>
@@ -290,7 +298,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     {{ formErrors.port }}
                   </mat-error>
                 </mat-form-field>
-              
+
                 <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="username-form-field">
                   <mat-label>Username</mat-label>
                   <input type="text" placeholder="{{formDefault.username}}" matInput formControlName="username">
@@ -298,12 +306,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <fa-icon icon="id-badge" class="icon-x2"></fa-icon>
                   </span>
                 </mat-form-field>
-              
-                <mat-form-field 
-                  [ngClass.gt-xs]="'pwd-form-field'" 
-                  appearance="outline" 
-                  floatLabel="always" 
+
+                <mat-form-field
+                  appearance="outline"
+                  floatLabel="always"
                   fxFlex="36%"
+                  [ngClass.gt-xs]="'pwd-form-field'"
                   class="pwd-form-field"
                 >
                   <mat-label>Password</mat-label>
@@ -312,12 +320,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <fa-icon icon="key" class="icon-x2"></fa-icon>
                   </span>
                 </mat-form-field>
-              
-                <mat-form-field 
-                  [ngClass.gt-xs]="'passphrase-form-field'" 
-                  appearance="outline" 
-                  floatLabel="always" 
+
+                <mat-form-field
+                  appearance="outline"
+                  floatLabel="always"
                   fxFlex="64%"
+                  [ngClass.gt-xs]="'passphrase-form-field'"
                   class="passphrase-form-field"
                 >
                   <mat-label>Topology passphrase</mat-label>
@@ -332,7 +340,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
             </mat-card-content>
           </div>
-    
+
           <mat-card-actions fxFlexFill fxLayoutAlign="end center">
             <!-- Attach Bus -->
             <button
@@ -340,9 +348,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               mat-raised-button
               type="button"
               color="primary"
-              class="btn-import-bus margin-right-x1 text-upper"
               (click)="editAttachBus()"
-              >
+              class="btn-import-bus margin-right-x1 text-upper"
+            >
               <span fxLayout="row" fxLayoutAlign="start center">
                 <fa-icon class="margin-right-x1 icon-x1" icon="link"></fa-icon>
                 <span class="attach-bus-text-btn">Attach Bus</span>
@@ -350,24 +358,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </button>
             <ng-template #attachBusBtnEdit>
               <button
-                *ngIf="isEditingImportBus" 
-                mat-button
-                type="button"
+                *ngIf="isEditingImportBus"
+                mat-button type="button"
                 color="primary"
                 [disabled]="disabledCancelBtn || isImportingBus || importBusId"
-                class="btn-cancel-attach-bus text-upper margin-right-x1"
                 (click)="cancelAttachBus()"
-                >
-                  Cancel
+                class="btn-cancel-attach-bus text-upper margin-right-x1"
+              >
+                Cancel
               </button>
-              <button 
-                *ngIf="isEditingImportBus" 
-                mat-raised-button
-                type="submit"
+              <button
+                *ngIf="isEditingImportBus"
+                mat-raised-button type="submit" 
                 color="primary"
                 [disabled]="disabledAttachBtn || busImportForm.invalid || isImportingBus || importBusId"
                 class="btn-import-new-bus text-upper"
-                >
+              >
                 <span *ngIf="isImportingBus; else canImport" fxLayout="row" fxLayoutAlign="start center">
                   <mat-spinner class="margin-right-x1" [diameter]="16" [strokeWidth]="1"></mat-spinner>
                   Importing
@@ -383,8 +389,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <!-- Detach Bus -->
             <button
               *ngIf="!isEditingBusList && !isEditingImportBus && buses.list.length && !isBusDetaching(); else detachBusBtnEdit"
-              mat-raised-button
-              type="button"
+              mat-raised-button type="button" 
               color="accent"
               class="btn-detach-bus margin-right-x1 text-upper"
               (click)="editDetachBus()"
@@ -396,110 +401,168 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </button>
             <ng-template #detachBusBtnEdit>
               <button
-                *ngIf="isEditingBusList" 
-                mat-button
-                type="button"
+                *ngIf="isEditingBusList"
+                mat-button type="button"
                 color="primary"
-                class="btn-cancel-detach-bus text-upper margin-right-x1"
                 (click)="cancelDetachBus()"
-                >
-                  Cancel
+                class="btn-cancel-detach-bus text-upper margin-right-x1"
+              >
+                Cancel
               </button>
-              <button 
-                *ngIf="isEditingBusList" 
-                mat-raised-button
-                type="button"
+              <button
+                *ngIf="isEditingBusList"
+                mat-raised-button type="button"
                 color="primary"
-                class="btn-open-detach-bus-dialog text-upper"
                 (click)="openDetachBusDialog()"
                 [disabled]="disabledDetachBtn || !isBusSelectedForDetachment()"
-                >
+                class="btn-open-detach-bus-dialog text-upper"
+              >
                 <span fxLayout="row" fxLayoutAlign="start center">
-                  <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
+                  <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
                   <span class="text-upper detach-bus-text-btn">Detach</span>
                 </span>
               </button>
             </ng-template>
           </mat-card-actions>
         </form>
-
       </mat-card>
 
-      <mat-card class="users-list">
+      <mat-card fxLayout="column" fxFlex class="card-users">
         <mat-card-title class="light-bold">Users</mat-card-title>
 
-        <mat-card-content>
-          <div *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
+        <div *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
+          <app-message
+            *ngIf="users.length === 1; else workspaceShared"
+            type="info"
+            msg="You are the only one using this workspace."
+            [isClosable]="false"
+            class="info-user-workspace"
+          ></app-message>
 
+          <ng-template #workspaceShared>
             <app-message
-              *ngIf="users.length === 1; else workspaceShared"
               type="info"
-              msg="You are the only one using this workspace."
+              msg="{{users.length}} people are using this workspace."
               [isClosable]="false"
-              class="info-user-workspace"
+              class="info-user-workspace-shared"
             ></app-message>
+          </ng-template>
 
-            <ng-template #workspaceShared>
-              <app-message
-                type="info"
-                msg="{{users.length}} people are using this workspace."
-                [isClosable]="false"
-                class="info-user-workspace-shared"
-              ></app-message>
-            </ng-template>
+          <form [formGroup]="addUserFormGroup" class="margin-top-x1">
+            <mat-form-field class="margin-right-x1">
+              <input
+                matInput placeholder="User to add"
+                [matAutocomplete]="autocompleteUsers"
+                formControlName="userSearchCtrl"
+                [errorStateMatcher]="matcher"
+                required
+              >
+              <mat-error>Select a user on the list</mat-error>
+            </mat-form-field>
 
-            <form [formGroup]="addUserFormGroup" (ngSubmit)="addUser()" class="margin-top-x1">
-              <mat-form-field class="margin-right-x1">
-                <input
-                  matInput
-                  placeholder="User to add"
-                  [matAutocomplete]="autocompleteUsers"
-                  formControlName="userSearchCtrl"
-                  [errorStateMatcher]="matcher"
-                  required>
-                <mat-error>Select a user on the list</mat-error>
-              </mat-form-field>
+            <mat-autocomplete #autocompleteUsers>
+              <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                {{ filteredUser }}
+              </mat-option>
+            </mat-autocomplete>
 
-              <mat-autocomplete #autocompleteUsers>
-                <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
-                  {{ filteredUser }}
-                </mat-option>
-              </mat-autocomplete>
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="addUser()"
+              [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
+              class="btn-add-user text-upper"
+            >
+              Add
+            </button>
+          </form>
 
-              <button 
-                mat-raised-button 
-                type="submit" 
-                color="accent" 
-                [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
-                class="text-upper" >Add</button>
-            </form>
-
-            <mat-list *ngIf="currentUserId$ | async as currentUserId">
-              <mat-list-item *ngFor="let user of users; trackBy:trackByUser">
-                <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
-
-                <h2 matLine class="user-id">{{ user.id }}</h2>
-
-                <p matLine>
-                  <span class="user-name">{{ user.name }}</span>
-                </p>
-
+          <table
+            *ngIf="currentUserId$ | async as currentUserId"
+            mat-table
+            matSort
+            fxLayout="column"
+            [dataSource]="dataSource"
+            [matSortActive]="sortableColumn"
+            [matSortDirection]="sortDirection"
+            class="users-table"
+          >
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th 
+                mat-header-cell 
+                *matHeaderCellDef 
+                mat-sort-header 
+                fxFlex="30"
+                fxLayoutAlign="start center" 
+                class="mat-header-cell-user-name"
+              >
+                Name
+              </th>
+              <td 
+                mat-cell 
+                *matCellDef="let user" 
+                fxFlex="30"
+                fxLayout="row" 
+                fxLayoutAlign="start center"
+              >
+                <span fxFlexFill fxLayout="row" fxLayoutAlign="start center">
+                  <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
+                  <span class="margin-left-x1 user-name ellipsis">{{ user.name }}</span>
+                </span>
+              </td>
+            </ng-container>
+          
+            <!-- Id Column -->
+            <ng-container matColumnDef="id">
+              <th 
+                mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header
+                fxFlex="30"
+                fxLayout="row"
+                fxLayoutAlign="start center"
+              >
+                Id
+              </th>
+              <td mat-cell *matCellDef="let user" fxFlex="30" fxLayout="row" fxLayoutAlign="start center" class="cell-user-id">
+                <span class="user-id ellipsis">{{ user.id }}</span>
+              </td>
+            </ng-container>
+          
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef fxFlex="40" fxLayout="row" fxLayoutAlign="end center">Action</th>
+              <td mat-cell *matCellDef="let user" fxFlex="40" fxLayout="column" fxLayoutAlign="center end" class="cell-user-action">
                 <button 
                   *ngIf="currentUserId !== user.id"
                   mat-icon-button
+                  matTooltip="Delete"
+                  matTooltipPosition="before"
                   (click)="removeUser(user.id)"
                   [disabled]="user.isDeletingFromWorkspace"
-                  class="delete">
-                  <mat-icon>delete</mat-icon>
+                  [ngClass]="'cell-user-delete-'+user.id"
+                >
+                  <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
                 </button>
-              </mat-list-item>
-            </mat-list>
+              </td>
+            </ng-container>
             
-          </div>
-        </mat-card-content>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let user; columns: displayedColumns;"></tr>
+          </table>
 
+          <mat-action-row
+            fxLayoutAlign="end center"
+            fxLayoutAlign.md="center center"
+            fxLayoutAlign.sm="center center"
+            fxLayout.lt-md="column wrap"
+            fxLayoutGap="10px"
+            class="pnl-actions-user-management"
+          >
+          </mat-action-row>
+        </div>
       </mat-card>
-        
     </div>
   </div>
 </div>

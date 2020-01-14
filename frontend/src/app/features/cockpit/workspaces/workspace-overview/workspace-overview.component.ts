@@ -20,6 +20,7 @@ import {
   Inject,
   OnDestroy,
   OnInit,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -28,10 +29,11 @@ import {
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
-import { combineLatest } from 'rxjs';
+import { combineLatest, Observable, Subject } from 'rxjs';
 import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { CustomValidators } from '@shared/helpers/custom-validators';
@@ -124,6 +126,13 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
 
+  dataSource = new MatTableDataSource<IUserRow>([]);
+  displayedColumns: string[] = ['name', 'id', 'action'];
+  sortDirection = 'asc';
+  sortableColumn = 'name';
+
+  @ViewChild(MatSort) sort: MatSort;
+
   constructor(
     private fb: FormBuilder,
     private store$: Store<IStore>,
@@ -166,7 +175,14 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.users$ = this.store$.pipe(getCurrentWorkspaceUsers);
+    this.users$ = this.store$.pipe(
+      getCurrentWorkspaceUsers,
+      takeUntil(this.onDestroy$),
+      tap(data => {
+        this.dataSource.data = data;
+        this.dataSource.sort = this.sort;
+      })
+    );
 
     this.store$
       .pipe(
