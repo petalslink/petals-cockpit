@@ -1,5 +1,5 @@
 <!--
- Copyright (C) 2016-2019 Linagora
+ Copyright (C) 2016-2020 Linagora
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU Affero General Public License as
@@ -305,7 +305,7 @@
           <dependency>
             <groupId>org.ow2.petals</groupId>
             <artifactId>petals-checkstyle-rules</artifactId>
-            <version>1.0.7-SNAPSHOT</version>
+            <version>1.0.8-SNAPSHOT</version>
           </dependency>
           <dependency>
             <!-- Latest version -->
