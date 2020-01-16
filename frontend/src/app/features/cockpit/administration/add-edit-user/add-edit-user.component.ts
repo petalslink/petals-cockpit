@@ -31,9 +31,15 @@ import { Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 
 import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngrx/store';
 import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
-import { getFormErrors } from '@shared/helpers/form.helper';
+import { CustomValidators } from '@shared/helpers/custom-validators';
+import {
+  FormErrorStateMatcher,
+  getFormErrors,
+} from '@shared/helpers/form.helper';
 import { IUserNew } from '@shared/services/users.service';
+import { IStore } from '@shared/state/store.interface';
 import { ICurrentUser, IUser } from '@shared/state/users.interface';
 
 @Component({
@@ -45,7 +51,7 @@ import { ICurrentUser, IUser } from '@shared/state/users.interface';
 export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   onDestroy$ = new Subject<void>();
 
-  @Input() user?: IUser;
+  @Input() editUser?: IUser;
   @Input() currentUser?: ICurrentUser;
   @Input() isLastAdmin?: boolean;
   @Input() canDelete = false;
@@ -58,6 +64,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
   @Output() evtCancel = new EventEmitter<void>();
 
   userManagementForm: FormGroup;
+  matcher = new FormErrorStateMatcher();
 
   formErrors = {
     username: '',
@@ -66,14 +73,25 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     isAdmin: false,
   };
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog) {}
+  constructor(
+    private store$: Store<IStore>,
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.userManagementForm = this.fb.group({
-      username: [this.user ? this.user.id : '', Validators.required],
-      name: [this.user ? this.user.name : '', Validators.required],
-      password: ['', this.user ? '' : Validators.required],
-      isAdmin: this.user ? this.user.isAdmin : true,
+      username: [
+        this.editUser ? this.editUser.id : '',
+        Validators.required,
+        CustomValidators.existingUserWithSimilarUsernameValidator(
+          this.store$,
+          !this.editUser
+        ),
+      ],
+      name: [this.editUser ? this.editUser.name : '', Validators.required],
+      password: ['', this.editUser ? null : Validators.required],
+      isAdmin: this.editUser ? this.editUser.isAdmin : false,
     });
 
     this.userManagementForm.valueChanges
@@ -105,7 +123,7 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    if (this.user) {
+    if (this.editUser) {
       this.userManagementForm.controls['password'].clearValidators();
     } else {
       this.userManagementForm.controls['password'].setValidators([
@@ -114,10 +132,10 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this.userManagementForm.reset({
-      username: this.user ? this.user.id : '',
-      name: this.user ? this.user.name : '',
+      username: this.editUser ? this.editUser.id : '',
+      name: this.editUser ? this.editUser.name : '',
       password: '',
-      isAdmin: this.user ? this.user.isAdmin : false,
+      isAdmin: this.editUser ? this.editUser.isAdmin : false,
     });
   }
 
@@ -130,10 +148,10 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     const value: IUserNew = this.userManagementForm.value;
     const u: { name?: string; password?: string; isAdmin?: boolean } = {};
 
-    if (!this.user) {
+    if (!this.editUser) {
       this.evtSubmit.emit(value);
     } else {
-      if (value.name !== this.user.name) {
+      if (value.name !== this.editUser.name) {
         u.name = value.name;
       }
       if (value.password && value.password !== '') {
@@ -143,7 +161,9 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
         u.isAdmin = value.isAdmin;
       }
       const currentUserSelfDemoting =
-        this.user && this.currentUser.id === this.user.id && !value.isAdmin;
+        this.editUser &&
+        this.currentUser.id === this.editUser.id &&
+        !value.isAdmin;
       if (currentUserSelfDemoting) {
         this.doSubmitSelfAdmin(u);
       } else {
@@ -178,16 +198,16 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe();
   }
 
-  userUnchanged() {
-    return (
-      this.user &&
-      this.userManagementForm.value.name === this.user.name &&
-      this.userManagementForm.value.isAdmin === this.user.isAdmin &&
-      this.userManagementForm.value.password === ''
-    );
-  }
-
   doDelete() {
     this.evtDelete.emit();
+  }
+
+  userUnchanged() {
+    return (
+      this.editUser &&
+      this.userManagementForm.value.name === this.editUser.name &&
+      this.userManagementForm.value.isAdmin === this.editUser.isAdmin &&
+      this.userManagementForm.value.password === ''
+    );
   }
 }

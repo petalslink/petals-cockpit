@@ -22,30 +22,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         fxLayoutAlign.sm="center center" 
         class="margin-top-x1"
       >
-        <mat-form-field *ngIf="!user" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
+        <mat-form-field *ngIf="!editUser" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <span matPrefix><mat-icon color="primary">person</mat-icon></span>
-          <input type="text" autocomplete="off" matInput placeholder="Username" formControlName="username">
-          <mat-error *ngIf="formErrors.username">
-            {{ formErrors.username }}
-          </mat-error>
+          <input matInput type="text" autocomplete="off" placeholder="Username" formControlName="username" [errorStateMatcher]="matcher">
+          <mat-error *ngIf="formErrors.username"> {{ formErrors.username }} </mat-error>
         </mat-form-field>
       </div>
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <span matPrefix><mat-icon color="primary">assignment_ind</mat-icon></span>
-          <input type="text" autocomplete="off" matInput placeholder="Name" formControlName="name">
-          <mat-error *ngIf="formErrors.name">
-            {{ formErrors.name }}
-          </mat-error>
+          <input matInput type="text" autocomplete="off" placeholder="Name" formControlName="name">
+          <mat-error *ngIf="formErrors.name"> {{ formErrors.name }} </mat-error>
         </mat-form-field>
       </div>
       <div fxLayoutAlign="start center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
         <mat-form-field fxFlex fxFlex.md="50%" fxFlex.sm="50%">
           <span matPrefix><mat-icon color="primary">vpn_key</mat-icon></span>
-          <input type="password" matInput placeholder="Password" formControlName="password">
-          <mat-error *ngIf="formErrors.password">
-            {{ formErrors.password }}
-          </mat-error>
+          <input matInput type="password" placeholder="Password" formControlName="password">
+          <mat-error *ngIf="formErrors.password"> {{ formErrors.password }} </mat-error>
         </mat-form-field>
       </div>
       <div fxLayoutAlign="flex-end center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
@@ -55,14 +49,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           fxLayoutAlign.sm="center center"
           color="primary" 
           formControlName="isAdmin"
-          [disabled]="isLastAdmin && currentUser.id === user.id"
+          [disabled]="isLastAdmin && currentUser.id === editUser.id"
         >
         Administrator
         </mat-slide-toggle>
       </div>
 
       <app-message
-        *ngIf="isLastAdmin && (currentUser.id == user.id)"
+        *ngIf="isLastAdmin && (currentUser.id == editUser.id)"
         type="info"
         msg="You are the last administrator remaining."
         [isClosable]="false"
@@ -82,7 +76,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-icon color="primary">cancel</mat-icon>
         <span class="cancel-name">Cancel</span>
       </button>
-      <button mat-raised-button type="button" class="btn-delete-form text-upper" (click)="doDelete()" *ngIf="user" [disabled]="!canDelete">
+      <button 
+        *ngIf="editUser" 
+        mat-raised-button
+        type="button" 
+        (click)="doDelete()" 
+        [disabled]="!canDelete"
+        class="btn-delete-form text-upper"
+      >
         <mat-icon color="warn">delete</mat-icon>
         <span class="delete-name">Delete</span>
       </button>
@@ -94,8 +95,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [disabled]="userManagementForm.invalid || userUnchanged()"
         class="btn-add-user-form text-upper"
       >
-        <mat-icon>{{ user ? 'done' : 'person_add' }}</mat-icon>
-        <span class="save-name">{{ user ? 'Save' : 'Add' }}</span>
+        <mat-icon>{{ editUser ? 'done' : 'person_add' }}</mat-icon>
+        <span class="save-name">{{ editUser ? 'Save' : 'Add' }}</span>
       </button>
     </mat-action-row>
   </div>
