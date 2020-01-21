@@ -13,19 +13,90 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="sharedLibrary$" deletedMessage="This shared library has been removed" #we>
+  <div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+    <div fxLayout="column" fxFlex class="content">
+      <div *ngIf="sharedLibrary$ | async as sl" fxLayout="column" fxLayoutGap="20px">
 
-  <app-petals-shared-library-overview
-    *appWorkspaceElementTab="'Overview'"
-    [sharedLibrary]="we.resource"
-    [workspaceId]="workspaceId$ | async"
-    fxFlexFill
-  ></app-petals-shared-library-overview>
+        <mat-card fxFlex class="card-sl-infos">
+          <mat-card-title fxLayout="row">
+            <span fxFlex class="sl-name light-bold">About {{ sl.name }}</span>
+            <mat-icon color="primary">info_outline</mat-icon>
+          </mat-card-title>
 
-  <app-petals-shared-library-operations
-    *appWorkspaceElementTab="'Operations'"
-    [sharedLibrary]="we.resource"
-    fxFlexFill
-  ></app-petals-shared-library-operations>
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-card-header fxFlex>
+              <mat-card-title>Version</mat-card-title>
+              <mat-card-subtitle fxLayoutAlign="start center" class="sl-version">
+                {{ sl.version }}
+              </mat-card-subtitle>
+            </mat-card-header>
+          </div>
+        </mat-card>
 
-</app-workspace-element>
+        <mat-card fxFlex class="card-components">
+          <mat-card-title fxLayout="row">
+            <span fxFlex class="light-bold">Components</span>
+            <mat-icon color="primary">view_list</mat-icon>
+          </mat-card-title>
+
+          <mat-card-content class="margin-top-x1 components-content">
+            <mat-nav-list *ngIf="sl.components.length !== 0; else noComponent" dense fxLayout="column" class="padding-top-x1">
+              <div *ngFor="let component of sl.components; trackBy:trackByComponent" fxLayout="row" fxLayoutAlign="start center">
+                <a 
+                  mat-raised-button 
+                  color="primary" 
+                  [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', component.id]"
+                  class="component"
+                >
+                  <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                    <span class="component-name margin-right-x1">{{ component.name }}</span>
+                    <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x1"></mat-icon>
+                  </div>
+                </a>
+              </div>
+            </mat-nav-list>
+
+            <ng-template #noComponent>
+              <app-message
+                type="info"
+                msg="This shared library isn't used by any component."
+                [isClosable]="false"
+                class="info-sl-no-component"
+              ></app-message>
+            </ng-template>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card fxFlex class="shared-library-lifecycle">
+          <mat-card-title fxLayout="row">
+            <span fxFlex class="light-bold">Lifecycle</span>
+            <mat-icon color="primary">play_for_work</mat-icon>
+          </mat-card-title>
+
+          <mat-card-content fxLayout="row wrap" class="margin-top-x1">
+            <span class="padding-bottom-x1">
+              <button
+                mat-raised-button
+                (click)="unload(sl.id)"
+                [disabled]="sl.isFetchingDetails || sl.isUpdatingState || sl.components.length > 0"
+                class="color-primary text-upper margin-right-x1"
+              >
+                <mat-icon
+                  *ngIf="sl.components.length > 0"
+                  matTooltip="To unload a shared-library, all components that use it should be unloaded first"
+                  matTooltipPosition="above"
+                >
+                  info
+                </mat-icon>
+                <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
+                <span>Unload</span>
+              </button>
+            </span>
+          </mat-card-content>
+
+          <app-message type="error" [msg]="sl.errorChangeState"></app-message>
+
+        </mat-card>
+      </div>
+    </div>
+  </div>

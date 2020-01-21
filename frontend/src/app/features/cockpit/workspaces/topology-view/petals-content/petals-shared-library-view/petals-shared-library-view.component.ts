@@ -19,6 +19,9 @@ import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { IComponentRow } from '@feat/cockpit/workspaces/state/components/components.interface';
+import { SharedLibraries } from '@feat/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { ESharedLibraryState } from '@shared/services/shared-libraries.service';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentSharedLibrary,
@@ -41,6 +44,19 @@ export class PetalsSharedLibraryViewComponent implements OnInit {
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
+    );
+  }
+
+  trackByComponent(i: number, component: IComponentRow) {
+    return component.id;
+  }
+
+  unload(slId: string) {
+    this.store$.dispatch(
+      new SharedLibraries.ChangeState({
+        id: slId,
+        state: ESharedLibraryState.Unloaded,
+      })
     );
   }
 }

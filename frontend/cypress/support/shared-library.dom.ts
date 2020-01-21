@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2020 Linagora
+ * Copyright (C) 2018-2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -14,3 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+const bs = `app-petals-shared-library-view`;
+
+export const SHARED_LIBRARY_DOM = {
+  texts: {
+    slName: `${bs} .sl-name`,
+    slVersion: `${bs} .sl-version`,
+  },
+};

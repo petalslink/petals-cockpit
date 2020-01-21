@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-describe('Shared Library', () => {
+import { SHARED_LIBRARY_DOM } from '../../support/shared-library.dom';
+
+describe('Shared-library', () => {
   beforeEach(() => {
     cy.visit(`/login`);
 
@@ -31,7 +33,7 @@ describe('Shared Library', () => {
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
   });
 
-  it('should show name and version in overview', () => {
+  it('should have shared-library details', () => {
     cy
       .get('.mat-list-item-content')
       .contains('SL 0')
@@ -39,8 +41,8 @@ describe('Shared Library', () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
 
-    cy.get('.workspace-element .title').should('contain', 'SL 0');
+    cy.get(SHARED_LIBRARY_DOM.texts.slName).should('contain', 'SL 0');
 
-    cy.get('.workspace-element .sl-version').should('contain', '1.0.0');
+    cy.get(SHARED_LIBRARY_DOM.texts.slVersion).should('contain', '1.0.0');
   });
 });
