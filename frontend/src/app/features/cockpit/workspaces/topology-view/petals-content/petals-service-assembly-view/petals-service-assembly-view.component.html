@@ -13,19 +13,103 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="serviceAssembly$" deletedMessage="This service assembly has been removed" #we>
+<div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+  <div fxLayout="column" fxFlex class="content">
+    <div *ngIf= "(serviceAssembly$ | async) as sa" fxLayout="column" fxLayoutGap="20px">
 
-  <app-petals-service-assembly-overview
-    *appWorkspaceElementTab="'Overview'"
-    [serviceAssembly]="we.resource"
-    [workspaceId]="workspaceId$ | async"
-    fxFlexFill
-  ></app-petals-service-assembly-overview>
+      <mat-card fxFlex class="sa-infos">
+        <mat-card-title fxLayout="row">
+          <span fxFlex class="sa-name light-bold">About {{ sa.name }}</span>
+          <mat-icon color="primary">info_outline</mat-icon>
+        </mat-card-title>
 
-  <app-petals-service-assembly-operations
-    *appWorkspaceElementTab="'Operations'"
-    [serviceAssembly]="we.resource"
-    fxFlexFill
-  ></app-petals-service-assembly-operations>
+        <div fxLayout="row" fxLayoutAlign="start center">
+          <mat-card-header *ngIf="sa.state" fxFlex>
+            <mat-card-title>State</mat-card-title>
+            <mat-card-subtitle fxLayoutAlign="start center" class="sa-state">
+              {{ sa.state }}
+              <app-led [color]="getLedColorFromState(sa.state)" class="margin-left-x1"></app-led>
+            </mat-card-subtitle>
+          </mat-card-header>
+        </div>
+      </mat-card>
 
-</app-workspace-element>
+      <mat-card fxFlex class="service-units">
+        <mat-card-title fxLayout="row">
+          <span fxFlex class="light-bold">Service Units</span>
+          <mat-icon color="primary" svgIcon="su"></mat-icon>
+        </mat-card-title>
+
+        <mat-card-content class="margin-top-x1 shared-libraries-content">
+          <mat-nav-list dense fxLayout="column" class="padding-top-x1">
+            <div *ngFor="let su of sa.serviceUnits; trackBy:trackBySu" fxLayout="row" fxLayoutAlign="start center">
+              <a
+                mat-raised-button
+                color="primary"
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
+                class="service-unit"
+              >
+                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
+                  <span class="su-name margin-right-x1">{{ su.name }}</span>
+                  <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x1"></mat-icon>
+                </div>
+              </a>
+
+              <span fxFlex matSubheader fxLayoutAlign="center center">deployed on component</span>
+
+              <a 
+                mat-raised-button 
+                color="primary"
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
+                class="su-component"
+              >
+                <div fxFlex fxLayout="row" fxLayoutAlign="end center">
+                  <span fxFlex class="component-name margin-right-x1">{{ su.component.name }}</span>
+                  <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x1"></mat-icon>
+                </div>
+              </a>
+            </div>
+          </mat-nav-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex class="sa-lifecycle">
+        <mat-card-title fxLayout="row">
+          <span fxFlex class="light-bold">Lifecycle</span>
+          <mat-icon color="primary">play_for_work</mat-icon>
+        </mat-card-title>
+
+        <div fxLayout="column">
+          <mat-card-subtitle>State: <b><span class="service-assembly-state">{{ sa.state }}</span></b></mat-card-subtitle>
+
+          <app-message
+            type="info"
+            msg="Changing the state of an SA will affect its SUs."
+            [isClosable]="false"
+            class="info-lifecycle-sa"
+          ></app-message>
+        </div>
+
+        <mat-card-content *ngIf="sa.state" fxLayout="row wrap" class="margin-top-x1 sa-lifecycle-action">
+          <span *ngFor="let possibleState of getPossibleStateActions(sa.state); trackBy:trackBySaState" class="color-primary padding-bottom-x1">
+            <button
+              mat-raised-button
+              (click)="changeState(sa.id, possibleState.newStateAfterAction)"
+              [disabled]="sa.isUpdatingState"
+              class="text-upper margin-right-x1 color-primary"
+            >
+              <mat-icon *ngIf="possibleState.actionName === 'Stop'">stop</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</mat-icon>
+              <mat-icon *ngIf="possibleState.actionName === 'Unload'">remove_circle_outline</mat-icon>
+              <span class="sa-state">{{ possibleState.actionName }}</span>
+            </button>
+          </span>
+        </mat-card-content>
+
+        <app-message type="error" [msg]="sa.errorChangeState" class="error-change-state"></app-message>
+
+      </mat-card>
+
+    </div>
+  </div>
+</div>

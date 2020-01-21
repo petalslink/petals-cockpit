@@ -20,9 +20,6 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { PetalsServiceAssemblyViewRoutingModule } from './petals-service-assembly-view-routing.module';
-
-import { PetalsServiceAssemblyOperationsComponent } from './petals-service-assembly-operations/petals-service-assembly-operations.component';
-import { PetalsServiceAssemblyOverviewComponent } from './petals-service-assembly-overview/petals-service-assembly-overview.component';
 import { PetalsServiceAssemblyViewComponent } from './petals-service-assembly-view.component';
 
 @NgModule({
@@ -31,10 +28,6 @@ import { PetalsServiceAssemblyViewComponent } from './petals-service-assembly-vi
     PetalsServiceAssemblyViewRoutingModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    PetalsServiceAssemblyViewComponent,
-    PetalsServiceAssemblyOverviewComponent,
-    PetalsServiceAssemblyOperationsComponent,
-  ],
+  declarations: [PetalsServiceAssemblyViewComponent],
 })
 export class PetalsServiceAssemblyViewModule {}

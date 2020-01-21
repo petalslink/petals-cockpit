@@ -19,6 +19,11 @@ import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { ServiceAssemblies } from '@feat/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
+import { IServiceUnitRow } from '@feat/cockpit/workspaces/state/service-units/service-units.interface';
+import { stateNameToPossibleActionsServiceAssembly } from '@shared/helpers/service-assembly.helper';
+import { stateToLedColor } from '@shared/helpers/shared.helper';
+import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceAssembly,
@@ -41,6 +46,31 @@ export class PetalsServiceAssemblyViewComponent implements OnInit {
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
+    );
+  }
+
+  trackBySu(i: number, su: IServiceUnitRow) {
+    return su.id;
+  }
+
+  getLedColorFromState(state: ServiceAssemblyState) {
+    return stateToLedColor(state);
+  }
+
+  getPossibleStateActions(state: ServiceAssemblyState) {
+    return stateNameToPossibleActionsServiceAssembly(state);
+  }
+
+  trackBySaState(index: number, item: any) {
+    return item.newStateAction;
+  }
+
+  changeState(saId: string, state: ServiceAssemblyState) {
+    this.store$.dispatch(
+      new ServiceAssemblies.ChangeState({
+        id: saId,
+        state,
+      })
     );
   }
 }
