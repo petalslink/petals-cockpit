@@ -1,3 +1,4 @@
+import { ServiceAssemblyState } from './../../../../../../shared/services/service-assemblies.service';
 /**
  * Copyright (C) 2017-2020 Linagora
  *
@@ -19,6 +20,7 @@ import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceUnit,
@@ -42,5 +44,9 @@ export class PetalsServiceUnitViewComponent implements OnInit {
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
+  }
+
+  getLedColorFromState(state: ServiceAssemblyState) {
+    return stateToLedColor(state);
   }
 }
