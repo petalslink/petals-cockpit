@@ -125,6 +125,9 @@ declare namespace Cypress {
     getActionStateInLifecycleComponent(name: string): any;
     checkOverrideSharedLibrariesInputs(expectedSharedLibraries: string[]): any;
     checkUploadComponentSharedLibraries(expectedSharedLibraries: string[]): any;
+    expectParametersListToBe(expectedParametersList: string[]): any;
+    expectPossibleStateListToBe(expectedPossibleStateList: string[]): any;
+    getParameterInLifecycleComponent(label: string, value: string): any;
 
     // interface.commands
     expectServicesListToBe(listServicesLocalpartsNamespace: string[]): any;

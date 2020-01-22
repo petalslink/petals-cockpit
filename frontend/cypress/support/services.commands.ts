@@ -16,7 +16,6 @@
  */
 
 import { BREADCRUMB_DOM } from './breadcrumb.dom';
-import { COMPONENT_DOM } from './component.dom';
 import { MENU_DOM } from './menu.dom';
 import { SERVICES_TREE_DOM } from './services.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
@@ -74,11 +73,6 @@ Cypress.Commands.add('triggerSSEForComp', (name, id) => {
   cy.expectLocationToBe(`/workspaces/idWks0/petals/components/${id}`);
 
   // TODO: we should check the state of the component when we migrate the component tests made with Protractor
-
-  cy
-    .get(COMPONENT_DOM.tabs)
-    .contains(`Operations`)
-    .click();
 
   cy.getActionStateInLifecycleComponent(`Stop`).click();
 

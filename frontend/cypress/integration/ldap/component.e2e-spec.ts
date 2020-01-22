@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { SERVICE_UNIT_DEPLOYMENT_DOM } from '../../support/component.dom';
+import {
+  COMPONENT_DOM,
+  SERVICE_UNIT_DEPLOYMENT_DOM,
+} from '../../support/component.dom';
 import { expectedTreeBeforeDeploy } from '../../support/helper.const';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
@@ -35,6 +38,142 @@ describe('Component', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+  });
+
+  describe('Lifecycle', () => {
+    beforeEach(() => {
+      cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+      cy.get(COMPONENT_DOM.texts.title).should('contain', 'Comp 2');
+    });
+
+    it('should have parameters sorted by name', () => {
+      // runtime parameters
+      cy.expectParametersListToBe([`httpThreadPoolSizeMax`]);
+
+      cy.getActionStateInLifecycleComponent(`Stop`).click();
+
+      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+
+      // install parameters
+      cy.expectParametersListToBe(expectedParametersListSortByName);
+    });
+
+    it('should manage the state started to stopped, uninstalled, re-installed and then started', () => {
+      cy
+        .get(COMPONENT_DOM.lifecycle.state)
+        .should('contain', 'Started')
+        .and('be.visible')
+        .find('app-led div')
+        .should('have.class', 'green');
+
+      cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
+
+      // should have stop if started
+      cy.getActionStateInLifecycleComponent(`Stop`).click();
+
+      cy
+        .get(COMPONENT_DOM.lifecycle.state)
+        .should('contain', 'Stopped')
+        .and('be.visible')
+        .find('app-led div')
+        .should('have.class', 'yellow');
+
+      cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.not.visible');
+
+      // should have start, uninstall, and unload if stopped
+      cy.expectPossibleStateListToBe([`Start`, `Uninstall`, `Unload`]);
+
+      // should have info message when component is stopped
+      cy.expectMessageToBe(
+        `.info-no-parameter`,
+        'info',
+        `No configurable parameter in this state.`
+      );
+
+      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+
+      cy
+        .get(COMPONENT_DOM.lifecycle.state)
+        .should('contain', 'Loaded')
+        .and('be.visible')
+        .find('app-led div')
+        .should('have.class', 'grey');
+
+      cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
+
+      cy.getActionStateInLifecycleComponent(`Install`).click();
+
+      cy
+        .get(COMPONENT_DOM.lifecycle.state)
+        .should('contain', 'Shutdown')
+        .and('be.visible')
+        .find('app-led div')
+        .should('have.class', 'red');
+
+      cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.not.visible');
+
+      // should have info message when component is shutdown
+      cy.expectMessageToBe(
+        `.info-no-parameter`,
+        'info',
+        `No configurable parameter in this state.`
+      );
+
+      // should have start, uninstall, and unload if shutdown
+      cy.expectPossibleStateListToBe([`Start`, `Uninstall`, `Unload`]);
+    });
+
+    it('should update runtime parameters when component state is started', () => {
+      cy.expectParametersListToBe([`httpThreadPoolSizeMax`]);
+
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`);
+
+      cy.get(COMPONENT_DOM.buttons.setParameters).should('be.disabled');
+
+      cy
+        .getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`)
+        .type(`123`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.setParameters)
+        .should('be.enabled')
+        .click();
+
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
+    });
+
+    it('should update install parameters when component state is loaded', () => {
+      cy.getActionStateInLifecycleComponent(`Stop`).click();
+      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+
+      cy.expectParametersListToBe(expectedParametersListSortByName);
+
+      cy.getParameterInLifecycleComponent(`httpPort`, `8484`);
+      cy.getParameterInLifecycleComponent(`httpsEnabled`, `false`);
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`);
+
+      cy.get(COMPONENT_DOM.buttons.setParameters).should('be.disabled');
+
+      cy
+        .getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`)
+        .type(`123`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.setParameters)
+        .should('be.enabled')
+        .click();
+
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
+
+      cy.getActionStateInLifecycleComponent(`Install`).click();
+      cy.getActionStateInLifecycleComponent(`Start`).click();
+
+      // httpThreadPoolSizeMax should be updated on runtime parameter
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
+    });
   });
 
   describe('Service Unit Deployment', () => {
@@ -289,5 +428,11 @@ describe('Component', () => {
     `SA 5`,
     `Shared Libraries`,
     `SL 1`,
+  ];
+
+  const expectedParametersListSortByName = [
+    `httpPort`,
+    `httpsEnabled`,
+    `httpThreadPoolSizeMax`,
   ];
 });
