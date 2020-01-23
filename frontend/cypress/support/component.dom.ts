@@ -23,6 +23,13 @@ export const COMPONENT_DOM = {
   buttons: {
     actionState: `${bs} .card-component-lifecycle .list-actions-name span button span span.action-name`,
     setParameters: `${bs} .card-component-lifecycle .component-parameters .btn-set-parameters-form`,
+    sharedLibraries: `${bs} .shared-library .btn-sl`,
+    serviceUnits: `${bs} .service-unit .btn-su`,
+    serviceAssemblies: `${bs} .service-unit .btn-sa`,
+  },
+  messages: {
+    noSl: `${bs} .info-no-sl .msg-details`,
+    noSu: `${bs} .info-no-su .msg-details`,
   },
   card: `${bs} .card-component-lifecycle`,
   formFields: {
