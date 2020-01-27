@@ -21,18 +21,12 @@
   flex-direction: column;
 }
 
-mat-icon {
-  padding-right: 10px;
-}
-
-.img-card-type {
-  background-image: url(../../../../../../../assets/img/type.png);
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
 .sl-name,
 .su-name,
 .sa-name {
   word-break: break-word;
+}
+
+input {
+  text-overflow: ellipsis;
 }

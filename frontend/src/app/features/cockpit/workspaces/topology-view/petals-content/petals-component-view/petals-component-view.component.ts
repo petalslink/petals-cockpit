@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ElementRef, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-
-import { IStore } from '@shared/state/store.interface';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 import {
   getCurrentComponent,
@@ -29,6 +29,7 @@ import {
 import { stateNameToPossibleActionsComponent } from '@shared/helpers/component.helper';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { ComponentState } from '@shared/services/components.service';
+import { IStore } from '@shared/state/store.interface';
 import { Components } from '@wks/state/components/components.actions';
 import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
@@ -38,8 +39,10 @@ import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.
   templateUrl: './petals-component-view.component.html',
   styleUrls: ['./petals-component-view.component.scss'],
 })
-export class PetalsComponentViewComponent implements OnInit {
-  component$: Observable<IComponentWithSlsAndSus>;
+export class PetalsComponentViewComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
+  component: IComponentWithSlsAndSus;
   workspaceId$: Observable<string>;
 
   top: ElementRef;
@@ -49,37 +52,50 @@ export class PetalsComponentViewComponent implements OnInit {
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.component$ = this.store$.pipe(select(getCurrentComponent));
+    this.store$
+      .pipe(
+        select(getCurrentComponent),
+        takeUntil(this.onDestroy$),
+        tap(component => {
+          this.component = component;
+          if (
+            component &&
+            (component.updateError !== '' || !component.isUpdating) &&
+            this.parametersForm
+          ) {
+            this.parametersForm.enable();
+          }
+        }),
+        distinctUntilChanged(
+          (prev, curr) =>
+            prev && curr ? prev.parameters === curr.parameters : true
+        ),
+        tap(comp => {
+          const parameters = comp.parameters;
+          const keysParameters = Object.keys(parameters);
+
+          this.parametersForm = new FormGroup(
+            keysParameters.reduce(
+              (acc, key) => ({
+                ...acc,
+                [key]: new FormControl(parameters[key]),
+              }),
+              {}
+            )
+          );
+        })
+      )
+      .subscribe();
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
   }
 
-  // TODO: We don't need to use ngOnChanges in the parent component.
-  // For now, keep this code commented, and reuse it during the next refactor of the following issues:
-  // https://gitlab.com/linagora/petals-cockpit/issues/574
-  // https://gitlab.com/linagora/petals-cockpit/issues/575
-  // ngOnChanges(changes: SimpleChanges) {
-  //   // if an error happens, without that control the form will be reset to the values in store
-  //   if (
-  //     changes.component.previousValue &&
-  //     changes.component.previousValue.parameters ===
-  //       changes.component.currentValue.parameters
-  //   ) {
-  //     return;
-  //   }
-
-  //   const parameters = changes.component.currentValue.parameters;
-  //   const keysParameters = Object.keys(parameters);
-
-  //   this.parametersForm = new FormGroup(
-  //     keysParameters.reduce(
-  //       (acc, key) => ({ ...acc, [key]: new FormControl(parameters[key]) }),
-  //       {}
-  //     )
-  //   );
-  // }
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
+  }
 
   trackBySl(i: number, sl: ISharedLibraryRow) {
     return sl.id;
@@ -98,6 +114,8 @@ export class PetalsComponentViewComponent implements OnInit {
   }
 
   changeState(state: ComponentState, compId: string) {
+    this.parametersForm.disable();
+
     this.store$.dispatch(
       new Components.ChangeState({
         id: compId,
@@ -107,15 +125,14 @@ export class PetalsComponentViewComponent implements OnInit {
   }
 
   setParameters(compId: string) {
+    this.parametersForm.disable();
+
     this.store$.dispatch(
       new Components.SetParameters({
         id: compId,
         parameters: this.parametersForm.value,
       })
     );
-    // if it's succeeds, we want to go back to top to continue our business
-    // if it fails, we want to go back to top to see the error
-    this.top.nativeElement.scrollIntoView();
   }
 
   trackByComponentState(index: number, item: any) {

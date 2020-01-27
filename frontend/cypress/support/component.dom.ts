@@ -20,10 +20,20 @@ const bs = `app-petals-component-view`;
 const bsServiceUnitDeploy = 'app-su-deployment';
 
 export const COMPONENT_DOM = {
-  tabs: `${bs} .mat-tab-label`,
   buttons: {
-    actionState: `${bs} .list-actions-name span button span span.action-name`,
+    actionState: `${bs} .card-component-lifecycle .list-actions-name span button span span.action-name`,
+    setParameters: `${bs} .card-component-lifecycle .component-parameters .btn-set-parameters-form`,
   },
+  card: `${bs} .card-component-lifecycle`,
+  formFields: {
+    paramNameFormField: `${bs} card-component-lifecycle .param-name-form-field`,
+  },
+  inputs: { param: `${bs} input[formcontrolname="param"]` },
+  lifecycle: {
+    parameters: `${bs} .card-component-lifecycle .component-parameters`,
+    state: `${bs} .card-component-lifecycle .component-state`,
+  },
+  texts: { title: `${bs} .card-component-lifecycle .title-about` },
 };
 
 export const SERVICE_UNIT_DEPLOYMENT_DOM = {

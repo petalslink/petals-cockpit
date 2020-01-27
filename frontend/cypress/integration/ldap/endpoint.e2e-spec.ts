@@ -269,7 +269,7 @@ describe(`Endpoint`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
 
-    cy.get(`.card-component-infos`).should('be.visible');
+    cy.get(`.card-component-lifecycle`).should('be.visible');
   });
 
   const expectedInterfacesLocalpartsNamespacesOfEdp0 = [

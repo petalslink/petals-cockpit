@@ -63,10 +63,10 @@ export class ComponentOverviewPage extends ComponentPage {
 
   public readonly overview = ComponentOverviewPage.overview;
   public readonly state = this.overview.$(
-    `.card-component-infos .component-state`
+    `.card-component-lifecycle .component-state`
   );
   public readonly type = this.overview.$(
-    `.card-component-infos .component-type`
+    `.card-component-lifecycle .component-type`
   );
   public readonly sharedLibraries = this.overview
     .$(`.shared-libraries-content`)
