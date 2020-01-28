@@ -1,12 +1,38 @@
+<a name="1.03.0"></a>
+# [1.03.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.02.0...v1.03.0) (2020-01-28)
+
+
+### Bug Fixes
+
+* **backend:** make isAdmin field in edit user optional ([2b06e0d](https://gitlab.com/linagora/petals-cockpit/commit/2b06e0d4a4504cd5fa9b283827f616783f1c38e7)), closes [#624](https://gitlab.com/linagora/petals-cockpit/issues/624)
+* **frontend:** dismiss snackbar when su deployment failed ([e6be33b](https://gitlab.com/linagora/petals-cockpit/commit/e6be33bc01785a98b098c28015a302bd27eb3d57))
+* **frontend:** get su from zip file only if file is selected ([ed013c6](https://gitlab.com/linagora/petals-cockpit/commit/ed013c66d8fd4c392788479a7300ba39998d328a))
+* **frontend:** prevent adding duplicated users to cockpit users ([8133686](https://gitlab.com/linagora/petals-cockpit/commit/813368642fe4b364a179206f60bbb08ecb9226c8)), closes [#619](https://gitlab.com/linagora/petals-cockpit/issues/619)
+* **frontend:** fix reset fields before submitting user ([c9d1c81](https://gitlab.com/linagora/petals-cockpit/commit/c9d1c81b8ed9f56f5cf97dd213951ed91a8560a1)), closes [#617](https://gitlab.com/linagora/petals-cockpit/issues/617)
+* **frontend:** thow error reading zip without jbi ([7af90fb](https://gitlab.com/linagora/petals-cockpit/commit/7af90fb6b6d9d5369903f56858916603ee5f5351)), closes [#615](https://gitlab.com/linagora/petals-cockpit/issues/615)
+
+
+### Features
+
+* **frontend:** improve component related elements view ([c820205](https://gitlab.com/linagora/petals-cockpit/commit/c8202058468998337787367fb6e45cbfc3a404fd)), closes [#634](https://gitlab.com/linagora/petals-cockpit/issues/634)
+* **frontend:** merge component details with lifecycle ([0b1b70d](https://gitlab.com/linagora/petals-cockpit/commit/0b1b70d6e8334ecee9efc43b4d83ddba26a1b7d5)), closes [#574](https://gitlab.com/linagora/petals-cockpit/issues/574), [#575](https://gitlab.com/linagora/petals-cockpit/issues/575)
+* **frontend:** remove tabs in service unit view ([bd2cfe9](https://gitlab.com/linagora/petals-cockpit/commit/bd2cfe9453fe5c780e20eb2d0fc809493bd7a174)), closes [#626](https://gitlab.com/linagora/petals-cockpit/issues/626)
+* **frontend:** remove tabs in shared library view ([4c9eccd](https://gitlab.com/linagora/petals-cockpit/commit/4c9eccd9cfab37014e1b0ff2c40088943beda269)), closes [#627](https://gitlab.com/linagora/petals-cockpit/issues/627)
+* **frontend:** remove tabs in service assembly view ([06f6dbe](https://gitlab.com/linagora/petals-cockpit/commit/06f6dbe331f7d869ed55a998bc94a62f883da1c6)), closes [#628](https://gitlab.com/linagora/petals-cockpit/issues/628)
+* **frontend:** add admin cockpit manager ([f6eb631](https://gitlab.com/linagora/petals-cockpit/commit/f6eb6319a8b2192676972011620ed56963b19e2e))
+* **frontend:** disable save button when no change in user administration ([119e80a](https://gitlab.com/linagora/petals-cockpit/commit/119e80aa3c9029eea3e5455d08873e3390f52d4e))
+
+
+
 <a name="1.02.0"></a>
 # [1.02.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.01.0...v1.02.0) (2020-01-06)
 
 
 ### Bug Fixes
 
-
 * **backend:** unload sl when another share same name ([af0190c](https://gitlab.com/linagora/petals-cockpit/commit/af0190c)), closes [#597](https://gitlab.com/linagora/petals-cockpit/issues/597)
 * **frontend:** bug with autofill setting ([b335a90](https://gitlab.com/linagora/petals-cockpit/commit/b335a90)), closes [#519](https://gitlab.com/linagora/petals-cockpit/issues/519)
+
 
 ### Features
 
@@ -19,8 +45,11 @@
 <a name="1.01.0"></a>
 # [1.01.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.27.0...v1.01.0) (2019-12-05)
 
+
 ### General
+
 * **frontend:** We took some time to refactor almost all of the frontend user interface. Bus elements overview (like component, SA, SU, SL) and services views remain to be done. **But we are back in sprint mode !**
+
 
 ### Bug Fixes
 
@@ -42,13 +71,15 @@
 
 
 
-
 <a name="1.00.0-beta"></a>
 # [1.00.0-beta](https://gitlab.com/linagora/petals-cockpit/compare/v1.00.0-beta...v0.27.0) (2018-09-07)
+
 
 ### General
 
 * **product:** Released **beta version 1.00.0** (Based of version 0.27.0)
+
+
 
 <a name="0.27.0"></a>
 # [0.27.0](https://gitlab.com/linagora/petals-cockpit/compare/v0.26.0...v0.27.0) (2018-09-07)
@@ -69,7 +100,6 @@
 ### Features
 
 * **product:** ldap setup page ([785b18b2](https://gitlab.com/linagora/petals-cockpit/commit/785b18b2)), closes [#506](https://gitlab.com/linagora/petals-cockpit/issues/506)
-
 
 
 
