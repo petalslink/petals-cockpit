@@ -38,6 +38,94 @@ describe('Component', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+
+    cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+  });
+
+  describe('Related Elements', () => {
+    it('should go to related shared library view when clicking a shared library button', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.sharedLibraries)
+        .should('have.length', 1)
+        .eq(0)
+        .should('contain', 'SL 0')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    });
+
+    it('should go to related service unit view when clicking a service unit button', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceUnits)
+        .should('have.length', 2)
+        .eq(0)
+        .should('contain', 'SU 0')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+    });
+
+    it('should go to related service assembly view when clicking the service assembly button next to a service unit button', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .should('have.length', 2)
+        .eq(0)
+        .trigger('mouseenter');
+
+      cy.get('mat-tooltip-component').should('contain', 'SA 0');
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .eq(0)
+        .trigger('mouseleave');
+
+      cy.get('mat-tooltip-component').should('not.be.visible');
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .eq(0)
+        .click();
+
+      cy.expectLocationToBe(
+        `/workspaces/idWks0/petals/service-assemblies/idSa0`
+      );
+    });
+
+    it('should show an info message when there is no related shared library', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy.get(COMPONENT_DOM.messages.noSl).should('be.visible');
+
+      cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+      cy.get(COMPONENT_DOM.messages.noSl).should('not.be.visible');
+    });
+
+    it('should show an info message when there is no related service unit', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+      cy.get(COMPONENT_DOM.messages.noSu).should('be.visible');
+
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy.get(COMPONENT_DOM.messages.noSu).should('not.be.visible');
+    });
   });
 
   describe('Lifecycle', () => {
