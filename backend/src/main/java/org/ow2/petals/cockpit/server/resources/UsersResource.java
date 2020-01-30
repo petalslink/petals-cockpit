@@ -50,6 +50,7 @@ import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.services.LdapService;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
@@ -261,34 +262,25 @@ public class UsersResource {
     }
 
     public static class WorkspaceUser {
+
         @Valid
         @JsonUnwrapped
         public final UserMin userMin;
 
-        @NotNull
-        @JsonProperty
-        public boolean adminWorkspace;
 
-        @NotNull
-        @JsonProperty
-        public boolean deployArtifact;
+        @Valid
+        @JsonUnwrapped
+        public final PermissionsMin wsPermissions;
 
-        @NotNull
-        @JsonProperty
-        public boolean lifecycleArtifact;
-
-        public WorkspaceUser(UserMin userMin, boolean adminWorkspace, boolean deployArtifact,
-                boolean lifecycleArtifact) {
+        public WorkspaceUser(UserMin userMin, PermissionsMin wsPerm) {
             this.userMin = userMin;
-            this.adminWorkspace = adminWorkspace;
-            this.deployArtifact = deployArtifact;
-            this.lifecycleArtifact = lifecycleArtifact;
+            this.wsPermissions = wsPerm;
         }
 
         @JsonCreator
         private WorkspaceUser() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new UserMin("", "", false), false, false, false);
+            this(new UserMin("", "", false), new PermissionsMin(false, false, false));
         }
 
     }
