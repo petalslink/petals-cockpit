@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.ow2.petals.admin.endpoint.Endpoint;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
+import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.AddUser;
@@ -226,14 +227,14 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         addUser("user1");
 
         Response add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")));
-        assertThat(add.getStatus()).isEqualTo(204);
+        assertThat(add.getStatus()).isEqualTo(200);
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(2)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin").value().isEqualTo("user1");
 
-        // adding an already added user should work
+        // adding an already added user should not work
         Response add2 = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")));
-        assertThat(add2.getStatus()).isEqualTo(204);
+        assertThat(add2.getStatus()).isEqualTo(409);
 
         // non-existing user
         Response add3 = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user2")));
@@ -261,6 +262,16 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         Response add = resource.target("/workspaces/3/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void getPermissionsWhenAddingUser() { 
+        addUser("user1");
+
+        PermissionsMin add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")), PermissionsMin.class);
+        assertThat(add.adminWorkspace).isTrue();
+        assertThat(add.deployArtifact).isTrue();
+        assertThat(add.lifecycleArtifact).isTrue();
     }
 
     @Test
@@ -363,9 +374,9 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(u.userMin.id).isEqualTo(ADMIN);
         assertThat(u.userMin.name).isEqualTo("admin");
         assertThat(u.userMin.isAdmin).isTrue();
-        assertThat(u.adminWorkspace).isTrue();
-        assertThat(u.deployArtifact).isTrue();
-        assertThat(u.lifecycleArtifact).isTrue();
+        assertThat(u.wsPermissions.adminWorkspace).isTrue();
+        assertThat(u.wsPermissions.deployArtifact).isTrue();
+        assertThat(u.wsPermissions.lifecycleArtifact).isTrue();
     }
 
     private void assertContentOverview(WorkspaceOverview overview) {
