@@ -71,6 +71,7 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecor
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.EndpointsResource.EndpointFull;
 import org.ow2.petals.cockpit.server.resources.InterfacesResource.InterfaceFull;
+import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
@@ -703,9 +704,9 @@ public class WorkspaceDbOperations {
                 .orderBy(USERS_WORKSPACES.USERNAME)
                 .fetch(record -> new WorkspaceUser(
                         new UserMin(record.get(USERS.USERNAME), record.get(USERS.NAME), record.get(USERS.ADMIN)),
-                        record.get(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION),
+                        new PermissionsMin(record.get(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION),
                         record.get(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION),
-                        record.get(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION)));
+                        record.get(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION))));
         assert result != null;
         return result;
     }

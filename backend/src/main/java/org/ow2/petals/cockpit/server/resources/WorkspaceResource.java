@@ -71,8 +71,10 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
+import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
+import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
@@ -528,15 +530,20 @@ public class WorkspaceResource {
     @POST
     @Path("/users/")
     @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
-    public void addUsers(@Valid AddUser userToAdd) {
+    public PermissionsMin addUsers(@Valid AddUser userToAdd) {
         try {
-            DSL.using(jooq).insertInto(USERS_WORKSPACES)
-                    .set(USERS_WORKSPACES.WORKSPACE_ID, wsId)
-                    .set(USERS_WORKSPACES.USERNAME, userToAdd.id)
-                    .set(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION, true)
-                    .set(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION, true)
-                    .set(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION, true).onDuplicateKeyIgnore().execute();
+            boolean isAlreadyInWorkspace = DSL.using(jooq).fetchExists(USERS_WORKSPACES, USERS_WORKSPACES.USERNAME.eq(userToAdd.id));
+            if (isAlreadyInWorkspace) { 
+              throw new WebApplicationException("User already exists in this workspace!", Status.CONFLICT);
+            }
+
+            UsersWorkspacesRecord newUserWs = new UsersWorkspacesRecord(this.wsId, userToAdd.id, true, true, true);
+            newUserWs.attach(jooq);
+            newUserWs.insert();
+
+            return new PermissionsMin(newUserWs);
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);
