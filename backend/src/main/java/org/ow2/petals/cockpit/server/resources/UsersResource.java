@@ -98,6 +98,12 @@ public class UsersResource {
                     DSL.using(jooq).executeInsert(
                             new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
                 } else {
+                    final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
+                    final String username = user.username;
+                    if (!username.matches(correctSyntax)) { 
+                        throw new WebApplicationException("Unprocessable entity: username must be valid.", 422);
+                    };
+
                     final String password = user.password;
                     final String name = user.name;
                     final boolean isAdmin = user.isAdmin;
@@ -106,7 +112,7 @@ public class UsersResource {
                         throw new WebApplicationException("Unprocessable entity: password and name must be valid.",
                                 422);
                     } else {
-                        DSL.using(jooq).executeInsert(new UsersRecord(user.username,
+                        DSL.using(jooq).executeInsert(new UsersRecord(username,
                                 CockpitAuthenticator.passwordEncoder.encode(password), name, null, isAdmin, false));
                     }
                 }
