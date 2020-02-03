@@ -98,8 +98,13 @@ public class UsersResource {
                     DSL.using(jooq).executeInsert(
                             new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
                 } else {
-                    final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
                     final String username = user.username;
+                    final boolean userAlreadyExists = DSL.using(jooq).fetchExists(USERS, USERS.USERNAME.equalIgnoreCase(username));
+                    if (userAlreadyExists) { 
+                        throw new WebApplicationException("User already exists!", Status.CONFLICT);
+                    };
+
+                    final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
                     if (!username.matches(correctSyntax)) { 
                         throw new WebApplicationException("Unprocessable entity: username must be valid.", 422);
                     };
