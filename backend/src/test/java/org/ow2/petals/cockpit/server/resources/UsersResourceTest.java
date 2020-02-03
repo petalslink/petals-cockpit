@@ -107,6 +107,23 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void addUserDifferentCaseUsername() { 
+        String username = "gregoire";
+        String password = "pw";
+        String name = "name";
+
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser(username, password, name, false)));
+        assertThat(post.getStatus()).isEqualTo(204); // Success: No content
+        assertThatDbUser(username);
+
+        String diffCaseUsername = "GreGoIRe";
+
+        Response newPost = resource.target("/users").request().post(Entity.json(new NewUser(diffCaseUsername, password, name, false)));
+        assertThat(newPost.getStatus()).isEqualTo(409); // Conflict
+        assertNoDbUser(diffCaseUsername);
+    }
+
+    @Test
     public void addUserSeparatedUsername() {
         String password = "pw";
         String name = "name";
