@@ -106,4 +106,22 @@ export class CustomValidators {
         })
       );
   }
+
+  /**
+   * sync validator to determine if username
+   * has valid characters
+   */
+  static validCharactersUsernameValidator(control: AbstractControl) {
+    const userStartRegexp = /^[a-zA-Z0-9]/;
+    const userContentRegexp = /^[a-zA-Z0-9-_.]*$/;
+
+    if (!userStartRegexp.test(control.value)) {
+      return { isInvalidUsernameFirstChar: true };
+    }
+    if (!userContentRegexp.test(control.value)) {
+      return { isInvalidUsername: true };
+    }
+
+    return null;
+  }
 }

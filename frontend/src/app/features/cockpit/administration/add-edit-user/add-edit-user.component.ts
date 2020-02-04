@@ -83,7 +83,10 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
     this.userManagementForm = this.fb.group({
       username: [
         this.editUser ? this.editUser.id : '',
-        Validators.required,
+        Validators.compose([
+          Validators.required,
+          CustomValidators.validCharactersUsernameValidator,
+        ]),
         CustomValidators.existingUserWithSimilarUsernameValidator(
           this.store$,
           !this.editUser
