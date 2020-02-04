@@ -35,6 +35,7 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.junit.Test;
 import org.ow2.petals.admin.endpoint.Endpoint;
 import org.ow2.petals.admin.topology.Domain;
+import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
@@ -262,6 +263,27 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         Response add = resource.target("/workspaces/3/users").request().post(Entity.json(new AddUser("user1")));
         assertThat(add.getStatus()).isEqualTo(403);
+    }
+
+    @Test
+    public void addSameUserToDifferentWorkspaces() { 
+        // verify users of both workspaces 
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1);
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4);
+
+        // add user1 to the first workspace
+        addUser("user1");
+        Response add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")));
+        assertThat(add.getStatus()).isEqualTo(200);
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(2);
+
+        // relog as an admin workspace
+        resource.setCurrentProfile(new CockpitProfile(ADMINWORKSPACEUSER, resource.db().configuration()));
+
+        // add user1 to the second workspace
+        Response add2 = resource.target("/workspaces/2/users").request().post(Entity.json(new AddUser("user1")));
+        assertThat(add2.getStatus()).isEqualTo(200);
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(5);
     }
 
     @Test
