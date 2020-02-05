@@ -516,6 +516,96 @@ describe(`Administration`, () => {
         .contains('User already exists!');
     });
 
+    it(`should not add user with invalid id`, () => {
+      cy.get(`.exp-pnl-add-user`).should('not.have.class', 'mat-expanded');
+
+      cy.get(ADMINISTRATION_DOM.expPanel.expPanelAddUser).click();
+
+      cy.get(`.exp-pnl-add-user`).should('have.class', 'mat-expanded');
+
+      // non ascii characters
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .type('𝖕𝖊𝖙𝖆𝖑𝖘');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.texts.matError)
+        .contains(matErrorUsernameFirstChar);
+
+      // special characters inside alphanum chars id
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .clear()
+        .type('to$&+,:;=?@#pi');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.texts.matError)
+        .contains(matErrorUsernameContent);
+
+      // special characters prefix
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .clear()
+        .type('-jeanalbert');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.texts.matError)
+        .contains(matErrorUsernameFirstChar);
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .clear()
+        .type('.jeanalbert');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.texts.matError)
+        .contains(matErrorUsernameFirstChar);
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.inputs.username)
+        .clear()
+        .type('_jeanalbert');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.buttons.submitBtn)
+        .should('be.disabled');
+
+      cy
+        .get(`.exp-pnl-add-user`)
+        .find(ADD_EDIT_USER_DOM.texts.matError)
+        .contains(matErrorUsernameFirstChar);
+    });
+
     it(`should edit a user`, () => {
       // open edit vnoel
       cy
@@ -1245,4 +1335,8 @@ describe(`Administration`, () => {
     'Albin VIGIER',
     'Yoann HOUPERT',
   ];
+
+  const matErrorUsernameFirstChar = 'Must start with an alphanumeric character';
+  const matErrorUsernameContent =
+    'Can only contain alphanumeric characters as well as dots, dashes and underscores';
 });
