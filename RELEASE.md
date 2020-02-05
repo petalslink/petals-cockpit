@@ -1,7 +1,8 @@
 # Release process
 
 ## GIT
-- create a branch named product/release-X.X.X
+- pull the master branch
+- create a branch from master named product/release-X.X.X
 - change the version to a stable number in the 3 pom.xml: `mvn versions:set -DnewVersion=X.X.X`
 - change the version to the next number in the package.json
 - change the version in the appropriate places in the README.md
@@ -13,15 +14,19 @@ conventional-changelog -p angular -i ../CHANGELOG.md -s
 - verify the content of CHANGELOG.md and adapt it!
 - commit all of it with message: `chore: bump version to X.X.X`
 - push with branch named product/release-X.X.X
-- verify CI is ok
 - merge
-- tag the merge commit (with an annotated tag!) vX.X.X and message: Release version X.X.X
+- then tag the merge commit via tags page on GitLab (https://gitlab.com/linagora/petals-cockpit/-/tags)
 ```
-git tag -a vX.X.X -m "Release version X.X.X"
+Tag name: vX.X.X
+Create from: master
+Messages: Release version X.X.X
 ```
-- prepare for next development version (bump to -SNAPSHOT in poms and to -alpha in package.json)
+- pull the master branch
+- create a branch from master named product/development-Y.Y.Y where Y.Y.Y is the next version, it should not have zeros before numbers to generate the changelog correctly (1.04.0 should be 1.4.0)
+- prepare for next development version (bump to Y.Y.Y-SNAPSHOT in poms and to Y.Y.Y-alpha in package.json)
 - commit with message: `chore: prepare for next development`
-- push that on master with `--follow-tags` option
+- push with branch named product/development-Y.Y.Y
+- merge
 
 ## DOCKER
 ```
