@@ -21,5 +21,14 @@ export const SHARED_LIBRARY_DOM = {
   texts: {
     slName: `${bs} .sl-name`,
     slVersion: `${bs} .sl-version`,
+    slNoComponent: `${bs} .info-sl-no-component`,
   },
+  buttons: {
+    unloadSlBtn: `${bs} .btn-unload-sl`,
+    componentBtn: `.btn-comp`,
+  },
+  led: {
+    stateLed: `.comp-led`,
+  },
+  component: (compId: string) => `${bs} .comp-${compId}`,
 };
