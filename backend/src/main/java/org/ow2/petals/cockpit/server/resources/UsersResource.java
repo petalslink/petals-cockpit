@@ -106,7 +106,7 @@ public class UsersResource {
 
                     final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
                     if (!username.matches(correctSyntax)) { 
-                        throw new WebApplicationException("Unprocessable entity: username must be valid.", 422);
+                        throw new WebApplicationException("Username must be valid.", 422);
                     };
 
                     final String password = user.password;
@@ -114,7 +114,7 @@ public class UsersResource {
                     final boolean isAdmin = user.isAdmin;
 
                     if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
-                        throw new WebApplicationException("Unprocessable entity: password and name must be valid.",
+                        throw new WebApplicationException("Password and name must be valid.",
                                 422);
                     } else {
                         DSL.using(jooq).executeInsert(new UsersRecord(username,
@@ -192,7 +192,7 @@ public class UsersResource {
 
     private void failIfLdapMode() {
         if (ldapConfig != null) {
-            throw new WebApplicationException("Method not allowed: cannot change user name and password in LDAP mode",
+            throw new WebApplicationException("Cannot change user name and password in LDAP mode",
                     Status.METHOD_NOT_ALLOWED);
         }
     }

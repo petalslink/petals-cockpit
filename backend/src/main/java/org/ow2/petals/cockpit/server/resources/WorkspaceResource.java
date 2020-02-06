@@ -171,7 +171,7 @@ public class WorkspaceResource {
             final String newName = update.name;
             if (newName != null) {
                 if (WorkspacesResource.similarWorkspaceNameAlreadyTaken(newName, conf, ws.getName())) {
-                    throw new WebApplicationException("Conflict: another workspace with a similar name already exists.",
+                    throw new WebApplicationException("Another workspace with a similar name already exists.",
                             409);
                 }
                 ws.setName(newName);
@@ -179,7 +179,7 @@ public class WorkspaceResource {
 
             if (update.shortDescription != null) {
                 if (update.shortDescription.length() > WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH) {
-                    throw new WebApplicationException("Unprocessable entity: shortDescription must have less than "
+                    throw new WebApplicationException("ShortDescription must have less than "
                             + WorkspacesResource.SHORT_DESCRIPTION_MAX_LENGTH + " characters.", 422);
                 } else {
                     ws.setShortDescription(update.shortDescription);
