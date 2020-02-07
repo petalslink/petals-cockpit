@@ -534,8 +534,9 @@ public class WorkspaceResource {
     @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public PermissionsMin addUsers(@Valid AddUser userToAdd) {
         try {
-            boolean isAlreadyInWorkspace = DSL.using(jooq).fetchExists(USERS_WORKSPACES, USERS_WORKSPACES.USERNAME.eq(userToAdd.id));
-            if (isAlreadyInWorkspace) { 
+            final boolean isAlreadyInWorkspace = DSL.using(jooq).fetchExists(USERS_WORKSPACES,
+                USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(userToAdd.id)));
+            if (isAlreadyInWorkspace) {
               throw new WebApplicationException("User already exists in this workspace!", Status.CONFLICT);
             }
 
