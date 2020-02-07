@@ -108,12 +108,12 @@ public class SetupResource {
 
                 if (!userCreated.compareAndSet(false, true)) {
                     // this will rollback the transaction and cancel the insert
-                    throw new NotFoundException("Petals Cockpit is already setup");
+                    throw new NotFoundException("Petals Cockpit is already setup.");
                 }
             });
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
-                throw new WebApplicationException(String.format("User %s already exists", username), Status.CONFLICT);
+                throw new WebApplicationException(String.format("User %s already exists.", username), Status.CONFLICT);
             } else {
                 throw e;
             }

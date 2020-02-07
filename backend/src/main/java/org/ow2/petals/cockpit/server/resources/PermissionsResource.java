@@ -79,7 +79,7 @@ public class PermissionsResource {
         DSL.using(jooq).transaction(conf -> {
             perms.forEach((wsId, permissions) -> {
                 DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wsId))
-                        .fetchOptional().orElseThrow(() -> new NoDataFoundException("Workspace does not exist"));
+                        .fetchOptional().orElseThrow(() -> new NoDataFoundException("Workspace does not exist."));
 
                 if (!this.profile.isAdmin() && !this.profile.hasPermission(wsId, CockpitProfile.ADMIN_WORKSPACE)) {
                     throw new WebApplicationException(Status.UNAUTHORIZED);
@@ -121,7 +121,7 @@ public class PermissionsResource {
                         .selectFrom(USERS_WORKSPACES)
                         .where(USERS_WORKSPACES.USERNAME.eq(username)
                         .and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)))
-                        .fetchOptional().orElseThrow(() -> new NoDataFoundException("Workspace or username is incorrect !"));
+                        .fetchOptional().orElseThrow(() -> new NoDataFoundException("Workspace or username is incorrect!"));
                 return new ViewPermissions(wsPermissions);
             } else {
                 Map<Long, PermissionsMin> allPermissions = new HashMap<Long, PermissionsMin>();

@@ -107,6 +107,44 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
     }
 
     @Test
+    public void addUserDifferentCaseUsername() { 
+        String username = "gregoire";
+        String password = "pw";
+        String name = "name";
+
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser(username, password, name, false)));
+        assertThat(post.getStatus()).isEqualTo(204); // Success: No content
+        assertThatDbUser(username);
+
+        String diffCaseUsername = "GreGoIRe";
+
+        Response newPost = resource.target("/users").request().post(Entity.json(new NewUser(diffCaseUsername, password, name, false)));
+        assertThat(newPost.getStatus()).isEqualTo(409); // Conflict
+        assertNoDbUser(diffCaseUsername);
+    }
+
+    @Test
+    public void addUserSeparatedUsername() {
+        String password = "pw";
+        String name = "name";
+
+        String dashUsername = "alex-lagane";
+        Response postDashUsername = resource.target("/users").request().post(Entity.json(new NewUser(dashUsername, password, name, false)));
+        assertThat(postDashUsername.getStatus()).isEqualTo(204); // Success: No content
+        assertThatDbUser(dashUsername);
+
+        String dotUsername = "bertrand.escudie";
+        Response postDotUsername = resource.target("/users").request().post(Entity.json(new NewUser(dotUsername, password, name, false)));
+        assertThat(postDotUsername.getStatus()).isEqualTo(204); // Success: No content
+        assertThatDbUser(dotUsername);
+
+        String underscoreUsername = "pierre_souquet";
+        Response postUnderscoreUsername = resource.target("/users").request().post(Entity.json(new NewUser(underscoreUsername, password, name, false)));
+        assertThat(postUnderscoreUsername.getStatus()).isEqualTo(204); // Success: No content
+        assertThatDbUser(underscoreUsername);
+    }
+
+    @Test
     public void addUserNullName() {
         Response post = resource.target("/users").request().post(Entity.json(new NewUser("nameless", "pw", null, false)));
         assertThat(post.getStatus()).isEqualTo(422); // Unprocessable Entity
@@ -150,14 +188,51 @@ public class UsersResourceTest extends AbstractCockpitResourceTest {
 
     @Test
     public void addUserConflict() {
-        String username = "User Name";
-        Response post = resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", username, false)));
+        String name = "User Name";
+        Response post = resource.target("/users").request().post(Entity.json(new NewUser("user1", "pw", name, false)));
         assertThat(post.getStatus()).isEqualTo(409); // Conflict
 
         assertThatDbUser("user1").value("name").isEqualTo("user1");
         assertThatDbUserPassword("user1", "user1");
         assertThatDbUser("user2");
         assertThatDbUser("user3");
+    }
+
+    @Test
+    public void addUserSpecialCharactersUsername() { 
+        // user with spaced username
+        String spacedUsername = "Pierre Souquet";
+        Response postSpacedUsername = resource.target("/users").request().post(Entity.json(new NewUser(spacedUsername, "pw", "psouquet", false)));
+        assertThat(postSpacedUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(spacedUsername);
+
+        // user with special characters username
+        String specialCharUsername = "Tôp$î^@éé";
+        Response postSpecialCharUsername = resource.target("/users").request().post(Entity.json(new NewUser(specialCharUsername, "pw", "cchevalier", false)));
+        assertThat(postSpecialCharUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(specialCharUsername);
+
+        // username starts with special characters
+        String startWithDotUsername = ".pierre";
+        Response postStartWithDotUsername = resource.target("/users").request().post(Entity.json(new NewUser(startWithDotUsername, "pw", "cchevalier", false)));
+        assertThat(postStartWithDotUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(startWithDotUsername);
+ 
+        String startWithDashUsername = "-pierre";
+        Response postStartWithDashUsername = resource.target("/users").request().post(Entity.json(new NewUser(startWithDashUsername, "pw", "cchevalier", false)));
+        assertThat(postStartWithDashUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(startWithDashUsername);
+        
+        String startWithUnderscoreUsername = "_pierre";
+        Response postStartWithUnderscoreUsername = resource.target("/users").request().post(Entity.json(new NewUser(startWithUnderscoreUsername, "pw", "cchevalier", false)));
+        assertThat(postStartWithUnderscoreUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(startWithUnderscoreUsername);
+
+        //user with one dot username
+        String oneDotUsername = ".";
+        Response postOneDotUsername = resource.target("/users").request().post(Entity.json(new NewUser(oneDotUsername, "pw", "point", false)));
+        assertThat(postOneDotUsername.getStatus()).isEqualTo(422); // Unprocessable entity: username must be valid.
+        assertNoDbUser(oneDotUsername);
     }
 
     @Test

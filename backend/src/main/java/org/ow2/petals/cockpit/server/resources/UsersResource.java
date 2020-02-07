@@ -98,15 +98,26 @@ public class UsersResource {
                     DSL.using(jooq).executeInsert(
                             new UsersRecord(user.username, LdapConfigFactory.LDAP_PASSWORD, name, null, false, true));
                 } else {
+                    final String username = user.username;
+                    final boolean userAlreadyExists = DSL.using(jooq).fetchExists(USERS, USERS.USERNAME.equalIgnoreCase(username));
+                    if (userAlreadyExists) { 
+                        throw new WebApplicationException("User already exists!", Status.CONFLICT);
+                    };
+
+                    final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
+                    if (!username.matches(correctSyntax)) { 
+                        throw new WebApplicationException("Username must be valid.", 422);
+                    };
+
                     final String password = user.password;
                     final String name = user.name;
                     final boolean isAdmin = user.isAdmin;
 
                     if (password == null || password.isEmpty() || name == null || name.isEmpty()) {
-                        throw new WebApplicationException("Unprocessable entity: password and name must be valid.",
+                        throw new WebApplicationException("Password and name must be valid.",
                                 422);
                     } else {
-                        DSL.using(jooq).executeInsert(new UsersRecord(user.username,
+                        DSL.using(jooq).executeInsert(new UsersRecord(username,
                                 CockpitAuthenticator.passwordEncoder.encode(password), name, null, isAdmin, false));
                     }
                 }
@@ -181,7 +192,7 @@ public class UsersResource {
 
     private void failIfLdapMode() {
         if (ldapConfig != null) {
-            throw new WebApplicationException("Method not allowed: cannot change user name and password in LDAP mode",
+            throw new WebApplicationException("Cannot change user name and password in LDAP mode",
                     Status.METHOD_NOT_ALLOWED);
         }
     }

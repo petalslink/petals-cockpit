@@ -80,7 +80,7 @@ public class WorkspacesResource {
         return DSL.using(jooq).transactionResult(conf -> {
 
             if (similarWorkspaceNameAlreadyTaken(ws.name, jooq)) {
-                throw new WebApplicationException("Conflict: another workspace with a similar name already exists.",
+                throw new WebApplicationException("Another workspace with a similar name already exists.",
                         409);
             }
 
@@ -90,7 +90,7 @@ public class WorkspacesResource {
             if (ws.shortDescription == null) {
                 wsDb.setShortDescription(DEFAULT_SHORT_DESCRIPTION);
             } else if (ws.shortDescription != null && ws.shortDescription.length() > SHORT_DESCRIPTION_MAX_LENGTH) {
-                    throw new WebApplicationException("Unprocessable entity: shortDescription must have less than "
+                    throw new WebApplicationException("ShortDescription must have less than "
                             + SHORT_DESCRIPTION_MAX_LENGTH + " characters.", 422);
             } else {
                 wsDb.setShortDescription(ws.shortDescription);
