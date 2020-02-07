@@ -36,6 +36,8 @@ interface IValidationMessages {
   username?: {
     required: string;
     existingUserWithSimilarUsername: string;
+    isInvalidUsername: string;
+    isInvalidUsernameFirstChar: string;
   };
   name?: {
     required: string;
@@ -71,6 +73,9 @@ const validationMessages: IValidationMessages = {
   username: {
     required: 'Required!',
     existingUserWithSimilarUsername: 'User already exists!',
+    isInvalidUsername:
+      'Can only contain alphanumeric characters as well as dots, dashes and underscores',
+    isInvalidUsernameFirstChar: 'Must start with an alphanumeric character',
   },
   name: {
     required: 'Required!',
