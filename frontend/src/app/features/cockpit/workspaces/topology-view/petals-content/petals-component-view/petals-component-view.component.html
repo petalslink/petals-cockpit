@@ -30,7 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
 
             <div *ngIf="component.state" fxFlex fxLayoutGap="10px" class="list-actions-name">
-              <span *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState" fxFlexFill>
+              <span 
+                *ngFor="let possibleState of getPossibleStateActions(component.state); trackBy:trackByComponentState"
+                fxFlexFill
+                class="btn-state-{{ possibleState.actionName.toLowerCase() }}"
+              >
                 <button
                   mat-stroked-button
                   type="button"

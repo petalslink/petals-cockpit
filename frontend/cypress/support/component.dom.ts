@@ -21,11 +21,12 @@ const bsServiceUnitDeploy = 'app-su-deployment';
 
 export const COMPONENT_DOM = {
   buttons: {
-    actionState: `${bs} .card-component-lifecycle .list-actions-name span button span span.action-name`,
+    allActionsStates: `${bs} .btn-change-comp-state`,
     setParameters: `${bs} .card-component-lifecycle .component-parameters .btn-set-parameters-form`,
     sharedLibraries: `${bs} .shared-library .btn-sl`,
     serviceUnits: `${bs} .service-unit .btn-su`,
     serviceAssemblies: `${bs} .service-unit .btn-sa`,
+    actionState: (actionName: string) => `${bs} .btn-state-${actionName}`,
   },
   messages: {
     noSl: `${bs} .info-no-sl .msg-details`,

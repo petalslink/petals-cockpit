@@ -141,9 +141,9 @@ describe('Component', () => {
       // runtime parameters
       cy.expectParametersListToBe([`httpThreadPoolSizeMax`]);
 
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       // install parameters
       cy.expectParametersListToBe(expectedParametersListSortByName);
@@ -160,7 +160,7 @@ describe('Component', () => {
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
       // should have stop if started
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -181,7 +181,7 @@ describe('Component', () => {
         `No configurable parameter in this state.`
       );
 
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -192,7 +192,7 @@ describe('Component', () => {
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
-      cy.getActionStateInLifecycleComponent(`Install`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -234,8 +234,8 @@ describe('Component', () => {
     });
 
     it('should update install parameters when component state is loaded', () => {
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       cy.expectParametersListToBe(expectedParametersListSortByName);
 
@@ -256,8 +256,8 @@ describe('Component', () => {
 
       cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
 
-      cy.getActionStateInLifecycleComponent(`Install`).click();
-      cy.getActionStateInLifecycleComponent(`Start`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('start')).click();
 
       // httpThreadPoolSizeMax should be updated on runtime parameter
       cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
