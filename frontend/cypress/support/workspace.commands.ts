@@ -85,7 +85,7 @@ Cypress.Commands.add('detachBusAndCheck', (username, shouldSuccess = true) => {
 
     cy
       .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.dialog.dialogDetachBus)
-      .should('not.be.visible');
+      .should('not.exist');
 
     cy.expectNotification('info', /^Bus .*$/, 'Bus detached by ' + username);
   } else {
@@ -93,7 +93,7 @@ Cypress.Commands.add('detachBusAndCheck', (username, shouldSuccess = true) => {
 
     cy
       .get(WORKSPACE_BUS_DETACH_DIALOG_DOM.dialog.dialogDetachBus)
-      .should('not.be.visible');
+      .should('not.exist');
   }
 });
 
