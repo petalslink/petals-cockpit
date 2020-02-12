@@ -233,8 +233,13 @@ export namespace WorkspacesReducer {
     table: IWorkspacesTable,
     payload: IWorkspaceBackend
   ): IWorkspacesTable {
+    const wksCurrentUser: IWorkspaceDetails = {
+      ...payload,
+      users: emptyJsTable(),
+    };
+
     return {
-      ...putById(table, payload.id, payload, workspaceRowFactory),
+      ...putById(table, wksCurrentUser.id, wksCurrentUser, workspaceRowFactory),
       isAddingWorkspace: false,
     };
   }

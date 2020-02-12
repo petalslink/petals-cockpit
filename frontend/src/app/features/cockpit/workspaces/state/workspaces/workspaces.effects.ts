@@ -103,7 +103,13 @@ export class WorkspacesEffects {
               this.router.navigate(['/workspaces', newWks.id]);
             }
           }),
-          map(res => new Workspaces.CreateSuccess(res)),
+          map(
+            res =>
+              new Workspaces.CreateSuccess({
+                ...res,
+                users: [],
+              })
+          ),
           catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
@@ -157,7 +163,6 @@ export class WorkspacesEffects {
             `Workspace Error`,
             `An error occurred with the workspace connection.`
           );
-
           return of(new Workspaces.FetchError(action.payload));
         })
       )
