@@ -109,7 +109,11 @@ export class BackendUser {
 
   toObj(): { [id: string]: IUserBackend } {
     return {
-      [this.id]: { id: this.id, name: this.name, isAdmin: this.isAdmin },
+      [this.id]: {
+        id: this.id,
+        name: this.name,
+        isAdmin: this.isAdmin,
+      },
     };
   }
 }
@@ -131,7 +135,20 @@ BackendUser.create({
   username: 'bescudie',
   name: 'Bertrand ESCUDIE',
 });
-BackendUser.create({ username: 'mrobert', name: 'Maxime ROBERT' });
-BackendUser.create({ username: 'cchevalier', name: 'Christophe CHEVALIER' });
+
+BackendUser.create({
+  username: 'mrobert',
+  name: 'Maxime ROBERT',
+});
+
+BackendUser.create({
+  username: 'cchevalier',
+  name: 'Christophe CHEVALIER',
+});
+
 BackendUser.create({ username: 'vnoel', name: 'Victor NOEL' });
-BackendUser.create({ username: 'cdeneux', name: 'Christophe DENEUX' });
+
+BackendUser.create({
+  username: 'cdeneux',
+  name: 'Christophe DENEUX',
+});
