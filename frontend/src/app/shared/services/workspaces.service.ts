@@ -32,6 +32,11 @@ export interface IWorkspaceBackendDetailsCommon {
   description: string;
 }
 
+export interface IUserWorkspaceBackend extends IWorkspaceUserPermissions {
+  id: string;
+  name: string;
+}
+
 export interface IWorkspaceBackend
   extends IWorkspaceBackendCommon,
     IWorkspaceBackendDetailsCommon {

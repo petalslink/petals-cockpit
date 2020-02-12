@@ -17,10 +17,11 @@
 
 import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
+  IUserWorkspaceBackend,
   IWorkspaceBackendCommon,
-  IWorkspaceBackendDetails,
+  IWorkspaceBackendDetailsCommon,
 } from '@shared/services/workspaces.service';
-import { IUser } from '@shared/state/users.interface';
+import { IUserUI } from '@shared/state/users.interface';
 
 export interface IWorkspaceUI {
   // from UI
@@ -28,32 +29,56 @@ export interface IWorkspaceUI {
   isFetchingDetails: boolean;
   isSettingDescriptions: boolean;
   isAddingUserToWorkspace: boolean;
+  isRemovingUserFromWorkspace: boolean;
 }
 
 // used within table
-export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceBackendDetails {}
+export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceDetails {}
 
 // used in generated views
 export interface IWorkspace extends IWorkspaceBackendCommon {
-  users: IUser[];
   shortDescription: string;
   description: string;
+  users: JsTable<IUserWorkspaceBackend>;
+}
+
+export interface IWorkspaceDetails
+  extends IWorkspaceBackendCommon,
+    IWorkspaceBackendDetailsCommon {
+  users: JsTable<IUserWorkspaceBackend>;
+}
+
+// used within ws table
+export interface IWorkspaceUserRow extends IUserUI, IUserWorkspaceBackend {}
+
+export interface IWorkspaceUserPermissions {
+  adminWorkspace?: boolean;
+  deployArtifact?: boolean;
+  lifecycleArtifact?: boolean;
+}
+
+// TODO: put all permissions to false for the edit permissions feature
+// See https://gitlab.com/linagora/petals-cockpit/issues/585
+export function workspaceUserPermissionsFactory(): IWorkspaceUserPermissions {
+  return {
+    adminWorkspace: true,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  };
 }
 
 export function workspaceRowFactory(): IWorkspaceRow {
   return {
     id: null,
     name: null,
-
     shortDescription: undefined,
     description: undefined,
-
     isRemoving: false,
     isFetchingDetails: false,
     isSettingDescriptions: false,
     isAddingUserToWorkspace: false,
-
-    users: [],
+    isRemovingUserFromWorkspace: false,
+    users: emptyJsTable<IUserWorkspaceBackend>(),
   };
 }
 
@@ -88,13 +113,10 @@ export function workspacesTableFactory(): IWorkspacesTable {
     ...emptyJsTable<IWorkspaceRow>(),
     selectedWorkspaceId: '',
     isSelectedWorkspaceDeleted: false,
-
     isAddingWorkspace: false,
     isFetchingWorkspaces: false,
     isFetchingWorkspace: false,
-
     isFetchingServices: false,
-
     searchPetals: '',
     searchServices: '',
     createWksError: '',
