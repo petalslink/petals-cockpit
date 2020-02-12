@@ -25,7 +25,7 @@ import {
   Output,
 } from '@angular/core';
 
-import { ICurrentUser, IUser } from '@shared/state/users.interface';
+import { ICurrentUser } from '@shared/state/users.interface';
 import {
   IWorkspace,
   IWorkspaces,
@@ -67,9 +67,9 @@ export class WorkspacesListComponent implements OnInit, OnDestroy {
     this.evtFetch.emit(workspace);
   }
 
-  getUsersNames(users: IUser[]) {
-    return users
-      .map(user => user.name)
+  getUsersNames(workspace: IWorkspace) {
+    return workspace.users.allIds
+      .map(id => workspace.users.byId[id].name)
       .join(', ')
       .concat('.');
   }

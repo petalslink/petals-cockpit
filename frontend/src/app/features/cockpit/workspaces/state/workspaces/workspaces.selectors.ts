@@ -18,7 +18,7 @@
 import { select, Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
@@ -72,18 +72,11 @@ export interface IWorkspacesIdsNames {
 export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
   return store$.pipe(
     select(state => state.workspaces),
-    withLatestFrom(store$.pipe(select(getUsersById))),
-    map(([workspaces, usersById]) => {
+    map(workspaces => {
       return {
         ...workspaces,
         list: workspaces.allIds
-          .map(wId => {
-            const ws = workspaces.byId[wId];
-            return {
-              ...ws,
-              users: ws.users.map(id => usersById[id]),
-            };
-          })
+          .map(wksId => workspaces.byId[wksId])
           .sort((a, b) => a.name.localeCompare(b.name)),
       };
     })

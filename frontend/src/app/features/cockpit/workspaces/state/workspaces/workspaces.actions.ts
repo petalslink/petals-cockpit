@@ -17,7 +17,7 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from '@shared/helpers/jstable.helper';
+import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
@@ -45,7 +45,12 @@ export namespace Workspaces {
   export const FetchAllSuccessType = '[Workspaces] Fetch all success';
   export class FetchAllSuccess implements Action {
     readonly type = FetchAllSuccessType;
-    constructor(public readonly payload: JsTable<IWorkspaceBackend>) {}
+    constructor(
+      public readonly payload: {
+        workspaces: { [id: string]: IWorkspaceBackend };
+        users: { [id: string]: IUserBackend };
+      }
+    ) {}
   }
 
   export const CreateType = '[Workspaces] Create';

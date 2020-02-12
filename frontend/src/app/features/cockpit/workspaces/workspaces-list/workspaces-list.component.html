@@ -25,10 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
         <div fxLayout="row" fxLayoutAlign="end start" fxFlex>
           <mat-icon
-            [matBadge]="workspace.users.length"
+            [matBadge]="workspace.users.allIds.length"
             matBadgeColor="primary"
             matBadgeOverlap="false"
-            [matTooltip]="'Member' + ((workspace.users.length - 1) >= 2 ? 's' : '') + ': ' + getUsersNames(workspace.users)"
+            [matTooltip]="'Member' + (workspace.users.allIds.length !== 1 ? 's' : '') + ': ' + getUsersNames(workspace)"
             matTooltipClass="members-tooltip"
             matTooltipPosition="above"
             class="icon-x1 badge-users margin-right-x2"

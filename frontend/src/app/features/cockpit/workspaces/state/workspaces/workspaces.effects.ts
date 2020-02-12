@@ -68,7 +68,7 @@ export class WorkspacesEffects {
     switchMap(() => this.workspacesService.fetchWorkspaces()),
     map(res =>
       batchActions([
-        new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
+        new Workspaces.FetchAllSuccess(res),
         new Users.Fetched(toJsTable(res.users)),
       ])
     ),

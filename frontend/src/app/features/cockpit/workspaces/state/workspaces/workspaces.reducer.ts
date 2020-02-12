@@ -16,6 +16,7 @@
  */
 
 import {
+  IWorkspaceDetails,
   IWorkspacesTable,
   workspaceRowFactory,
   workspacesTableFactory,
@@ -26,10 +27,13 @@ import {
   mergeInto,
   putById,
   removeById,
+  toJsTable,
   updateById,
 } from '@shared/helpers/jstable.helper';
 import { SseActions } from '@shared/services/sse.service';
+import { IUserBackend } from '@shared/services/users.service';
 import {
+  IUserWorkspaceBackend,
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
@@ -174,10 +178,36 @@ export namespace WorkspacesReducer {
 
   function fetchAllSuccess(
     table: IWorkspacesTable,
-    payload: JsTable<IWorkspaceBackend>
+    payload: {
+      workspaces: { [id: string]: IWorkspaceBackend };
+      users: { [id: string]: IUserBackend };
+    }
   ): IWorkspacesTable {
+    const wksUsersAsJsTable: JsTable<IWorkspaceDetails> = toJsTable(
+      Object.values(payload.workspaces).reduce(
+        (workspaces, wks) => ({
+          ...workspaces,
+          [wks.id]: {
+            ...wks,
+            users: toJsTable(
+              wks.users.reduce(
+                (users, user) => ({
+                  ...users,
+                  [user]: <IUserWorkspaceBackend>{
+                    name: payload.users[user].name,
+                  },
+                }),
+                <{ [id: string]: IUserWorkspaceBackend }>{}
+              )
+            ),
+          },
+        }),
+        <{ [id: string]: IWorkspaceRow }>{}
+      )
+    );
+
     return {
-      ...mergeInto(table, payload, workspaceRowFactory),
+      ...mergeInto(table, wksUsersAsJsTable, workspaceRowFactory),
       isFetchingWorkspaces: false,
     };
   }
