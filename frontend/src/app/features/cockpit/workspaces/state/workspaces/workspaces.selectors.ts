@@ -22,6 +22,7 @@ import { map } from 'rxjs/operators';
 
 import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
+import { IUserWorkspaceBackend } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { IUserRow } from '@shared/state/users.interface';
 import { getUsersAllIds, getUsersById } from '@shared/state/users.selectors';
@@ -37,7 +38,11 @@ import { IServiceUnitRow } from '@wks/state/service-units/service-units.interfac
 import { getServiceUnitsById } from '@wks/state/service-units/service-units.selectors';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
-import { IWorkspaceRow, IWorkspaces } from './workspaces.interface';
+import {
+  IWorkspaceRow,
+  IWorkspaces,
+  IWorkspaceUserRow,
+} from './workspaces.interface';
 
 export function getSelectedWorkspaceId(state: IStore) {
   return state.workspaces.selectedWorkspaceId;
@@ -92,17 +97,27 @@ export function getCurrentWorkspace(store: IStore): IWorkspaceRow {
 const getCurrentWorkspaceUsersById = createSelector(
   (state: IStore) => getCurrentWorkspace(state).users,
   getUsersById,
-  (usersIds, usersById): IUserRow[] => usersIds.map(id => usersById[id])
+  (usersWks, usersById): IUserWorkspaceBackend[] => {
+    return Object.values(usersWks.byId).reduce(
+      (acc, user) => [
+        ...acc,
+        {
+          id: user.id,
+          name: usersById[user.id].name,
+          adminWorkspace: usersWks.byId[user.id].adminWorkspace,
+          deployArtifact: usersWks.byId[user.id].deployArtifact,
+          lifecycleArtifact: usersWks.byId[user.id].lifecycleArtifact,
+        },
+      ],
+      <IWorkspaceUserRow[]>[]
+    );
+  }
 );
 
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
-): Observable<IUserRow[]> {
+): Observable<IUserWorkspaceBackend[]> {
   return store$.pipe(select(getCurrentWorkspaceUsersById));
-}
-
-export function getServicesSearch(state: IStore): string {
-  return state.workspaces.searchServices;
 }
 
 export const getUsersNotInCurrentWorkspace = createSelector(
@@ -111,9 +126,13 @@ export const getUsersNotInCurrentWorkspace = createSelector(
   (state: IStore) => getCurrentWorkspace(state).users,
   (usersAllIds, usersById, currentWorkspaceUsersSe): IUserRow[] =>
     usersAllIds
-      .filter(id => !currentWorkspaceUsersSe.includes(id))
+      .filter(id => !currentWorkspaceUsersSe.byId[id])
       .map(id => usersById[id])
 );
+
+export function getServicesSearch(state: IStore): string {
+  return state.workspaces.searchServices;
+}
 
 // -----------------------------------------------------------
 

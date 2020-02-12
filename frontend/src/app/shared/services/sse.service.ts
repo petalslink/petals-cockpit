@@ -41,7 +41,6 @@ import {
   ISharedLibraryBackendSSE,
   SharedLibraryState,
 } from '@shared/services/shared-libraries.service';
-import { IUserBackend } from '@shared/services/users.service';
 import { IWorkspaceBackend } from '@shared/services/workspaces.service';
 
 export namespace SseActions {
@@ -93,7 +92,6 @@ export namespace SseActions {
     constructor(
       public readonly payload: {
         workspace: IWorkspaceBackend;
-        users: { [key: string]: IUserBackend };
         buses: { [key: string]: IBusBackendSSE };
         containers: { [key: string]: IContainerBackendSSE };
         components: { [key: string]: IComponentBackendSSE };

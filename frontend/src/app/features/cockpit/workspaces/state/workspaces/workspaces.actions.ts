@@ -106,9 +106,7 @@ export namespace Workspaces {
   export const FetchDetailsSuccessType = '[Workspaces] Fetch details success';
   export class FetchDetailsSuccess implements Action {
     readonly type = FetchDetailsSuccessType;
-    constructor(
-      public readonly payload: { id: string; data: IWorkspaceBackendDetails }
-    ) {}
+    constructor(public readonly payload: IWorkspaceBackendDetails) {}
   }
 
   export const SetDescriptionsType = '[Workspaces] Set descriptions';

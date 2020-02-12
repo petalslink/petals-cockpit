@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IUserBackend } from '@shared/services/users.service';
 
 export interface IWorkspaceBackendCommon {
@@ -64,14 +65,7 @@ export abstract class WorkspacesService {
     shortDescription: string
   ): Observable<IWorkspaceBackendDetails>;
 
-  abstract fetchWorkspace(
-    id: string
-  ): Observable<{
-    workspace: IWorkspaceBackendDetails;
-    users: {
-      [id: string]: IUserBackend;
-    };
-  }>;
+  abstract fetchWorkspace(id: string): Observable<IWorkspaceBackendDetails>;
 
   abstract deleteWorkspace(id: string): Observable<void>;
 
@@ -116,12 +110,9 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   fetchWorkspace(id: string) {
-    return this.http.get<{
-      workspace: IWorkspaceBackendDetails;
-      users: {
-        [id: string]: IUserBackend;
-      };
-    }>(`${environment.urlBackend}/workspaces/${id}`);
+    return this.http.get<IWorkspaceBackendDetails>(
+      `${environment.urlBackend}/workspaces/${id}`
+    );
   }
 
   deleteWorkspace(id: string) {
