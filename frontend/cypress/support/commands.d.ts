@@ -95,7 +95,6 @@ declare namespace Cypress {
       passphrase: string,
       shouldCancel?: boolean
     ): any;
-    expectUserListToBe(expectedUserList: string[]): any;
 
     // buses.commands
     expectContainerListToBe(expectedContainerList: string[]): any;

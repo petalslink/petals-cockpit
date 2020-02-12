@@ -1264,25 +1264,48 @@ describe('Workspace', () => {
     });
 
     it('should have user list', () => {
-      // expect to have 3 columns
+      // expect to have 6 columns
       cy
         .get(WORKSPACE_OVERVIEW_DOM.table.userTable)
         .find('th')
-        .should('have.length', 3);
+        .should('have.length', 6);
+
+      // expect to have headers in good order
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.headerTable)
+        .each((_, index) => cy.contains(expectedHeadersTable[index]));
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.allRow)
+        .should('have.length', expectedDefaultUserDetailsList.length);
 
       // expect to have 6 users present in the list
-      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
-
-      // expect to have names, id for all users sorted in asc order
-      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+      expectedDefaultUserDetailsList.forEach(user => {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserId(user.id))
+          .should('contain', user.id);
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserName(user.id))
+          .should('contain', user.name);
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserAdminWorkspace(user.id))
+          .should(user.adminWorkspace ? 'be.checked' : 'not.be.checked');
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserDeployArtifact(user.id))
+          .should(user.deployArtifact ? 'be.checked' : 'not.be.checked');
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserLifecycleArtifact(user.id))
+          .should(user.lifecycleArtifact ? 'be.checked' : 'not.be.checked');
+      });
     });
 
     it('should add workspace user from cockpit users', () => {
-      // expect to have 6 users present in the list
-      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
+      const userToAdd = 'cdeneux';
 
-      // expect to have names, id for all users sorted in asc order
-      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+      // userToAdd should not exist in the table
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToAdd))
+        .should('not.exist');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
 
@@ -1296,21 +1319,21 @@ describe('Workspace', () => {
 
       cy
         .get(`mat-option span`)
-        .contains('cdeneux')
+        .contains(userToAdd)
         .should('be.visible')
         .click();
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl)
-        .should('have.value', 'cdeneux');
+        .should('have.value', userToAdd);
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
         .should('not.be.disabled')
         .click();
 
-      // expect to have user list updated
-      cy.expectUserListToBe(expectedUserListUpdatedWithNewUser);
+      // userToAdd should now exist in the table
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToAdd)).should('exist');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
 
@@ -1320,19 +1343,26 @@ describe('Workspace', () => {
     });
 
     it('should remove workspace user from workspace users', () => {
-      // expect to have 6 users present in the list
-      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowNames).should('have.length', 6);
+      const userToDelete = 'bescudie';
 
-      // expect to have names, id for all users sorted in asc order
-      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+      // user to delete should exist in the table
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToDelete))
+        .should('exist');
 
+      // user to delete can not be added
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
-      cy.get(`mat-option span`).should('not.contain', 'bescudie');
+      cy.get(`mat-option span`).should('not.contain', userToDelete);
 
-      cy.get('.cell-user-delete-bescudie').click({ force: true });
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cellUserActionDelete(userToDelete))
+        .click({ force: true });
 
-      cy.expectUserListToBe(expectedUserListUpdated);
+      // user to delete should not exist in the table
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToDelete))
+        .should('not.exist');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
 
@@ -1342,68 +1372,82 @@ describe('Workspace', () => {
 
       cy.get(`mat-option .mat-option-text`).should('not.exist');
 
+      // user to delete can be added
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
       cy
         .get(`mat-option span`)
-        .contains('bescudie')
+        .contains(userToDelete)
         .should('be.visible');
     });
 
     it('should not be able to remove himself from workspace users', () => {
+      const currentUser = 'admin';
       // expect to have names, id for all users sorted in asc order
-      cy.expectUserListToBe(expectedDefaultUserListSortedInAscOrder);
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowUser(currentUser)).should('exist');
 
+      // can not add ourself
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
-      cy.get(`mat-option span`).should('not.contain', 'admin');
+      cy.get(`mat-option span`).should('not.contain', currentUser);
 
-      cy.get('.cell-user-delete-admin').should('not.exist');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cellUserActionDelete(currentUser))
+        .should('not.exist');
     });
 
-    const expectedDefaultUserListSortedInAscOrder = [
-      `Administrator`,
-      `admin`,
-      `Administrator LDAP`,
-      `adminldap`,
-      `Bertrand ESCUDIE`,
-      `bescudie`,
-      `Christophe CHEVALIER`,
-      `cchevalier`,
-      `Maxime ROBERT`,
-      `mrobert`,
-      `Victor NOEL`,
-      `vnoel`,
+    const expectedDefaultUserDetailsList = [
+      {
+        id: 'admin',
+        name: 'Administrator',
+        adminWorkspace: true,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'adminldap',
+        name: 'Administrator LDAP',
+        adminWorkspace: true,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'bescudie',
+        name: 'Bertrand ESCUDIE',
+        adminWorkspace: false,
+        deployArtifact: false,
+        lifecycleArtifact: false,
+      },
+      {
+        id: 'cchevalier',
+        name: 'Christophe CHEVALIER',
+        adminWorkspace: false,
+        deployArtifact: true,
+        lifecycleArtifact: false,
+      },
+      {
+        id: 'mrobert',
+        name: 'Maxime ROBERT',
+        adminWorkspace: false,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'vnoel',
+        name: 'Victor NOEL',
+        adminWorkspace: false,
+        deployArtifact: false,
+        lifecycleArtifact: true,
+      },
     ];
 
-    const expectedUserListUpdatedWithNewUser = [
-      `Administrator`,
-      `admin`,
-      `Administrator LDAP`,
-      `adminldap`,
-      `Bertrand ESCUDIE`,
-      `bescudie`,
-      `Christophe CHEVALIER`,
-      `cchevalier`,
-      `Christophe DENEUX`,
-      `cdeneux`,
-      `Maxime ROBERT`,
-      `mrobert`,
-      `Victor NOEL`,
-      `vnoel`,
-    ];
-
-    const expectedUserListUpdated = [
-      `Administrator`,
-      `admin`,
-      `Administrator LDAP`,
-      `adminldap`,
-      `Christophe CHEVALIER`,
-      `cchevalier`,
-      `Maxime ROBERT`,
-      `mrobert`,
-      `Victor NOEL`,
-      `vnoel`,
+    const expectedHeadersTable = [
+      'Name',
+      'Id',
+      'Admin Workspace',
+      'Deploy Artifact',
+      'Lifecycle Artifact',
+      'Action',
     ];
   });
 });

@@ -115,8 +115,23 @@ export const WORKSPACE_OVERVIEW_DOM = {
   },
   table: {
     userTable: `${bsWksOverview} .users-table`,
-    rowNames: `${bsWksOverview} .users-table .mat-row`,
-    headerCellUserName: `${bsWksOverview} .mat-header-cell-user-name`,
+
+    headerTable: `${bsWksOverview} .mat-header-cell`,
+
+    rowUser: (userId: string) => `${bsWksOverview} .row-${userId}`,
+    allRow: `${bsWksOverview} .table-row`,
+
+    cellUserId: (userId: string) => `${bsWksOverview} .cell-userid-${userId}`,
+    cellUserName: (userId: string) =>
+      `${bsWksOverview} .cell-username-${userId}`,
+    cellUserAdminWorkspace: (userId: string) =>
+      `${bsWksOverview} .cell-user-admin-wks-${userId} .mat-checkbox-input`,
+    cellUserDeployArtifact: (userId: string) =>
+      `${bsWksOverview} .cell-user-deploy-artifact-${userId} .mat-checkbox-input`,
+    cellUserLifecycleArtifact: (userId: string) =>
+      `${bsWksOverview} .cell-user-lifecycle-artifact-${userId} .mat-checkbox-input`,
+    cellUserActionDelete: (userId: string) =>
+      `${bsWksOverview} .cell-user-action-${userId} .action-delete`,
   },
 };
 
