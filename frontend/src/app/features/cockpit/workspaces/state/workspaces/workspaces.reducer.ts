@@ -21,6 +21,7 @@ import {
   IWorkspacesTable,
   workspaceRowFactory,
   workspacesTableFactory,
+  workspaceUserPermissionsFactory,
 } from './workspaces.interface';
 
 import {
@@ -69,6 +70,8 @@ export namespace WorkspacesReducer {
     | Workspaces.AddUser
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
+    | Workspaces.DeleteUser
+    | Workspaces.DeleteUserError
     | Workspaces.DeleteUserSuccess
     | Workspaces.RefreshServices
     | SseActions.ServicesUpdated
@@ -153,6 +156,12 @@ export namespace WorkspacesReducer {
       }
       case Workspaces.AddUserSuccessType: {
         return addUserSuccess(table, action.payload);
+      }
+      case Workspaces.DeleteUserType: {
+        return deleteUser(table, action.payload);
+      }
+      case Workspaces.DeleteUserErrorType: {
+        return deleteUserError(table, action.payload);
       }
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
@@ -471,45 +480,60 @@ export namespace WorkspacesReducer {
   }
 }
 
-  function addUser(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: true,
-    });
-  }
-
-  function addUserError(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: false,
-    });
-  }
-
-  function addUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: false,
-      users: [
-        ...Array.from(
-          new Set([...table.byId[table.selectedWorkspaceId].users, payload.id])
-        ),
-      },
-    };
-      ],
-    });
-  }
+function addUser(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: true,
+  });
 }
 
-  function refreshServices(table: IWorkspacesTable) {
-    return { ...table, isFetchingServices: true };
-  }
+function addUserError(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: false,
+  });
+}
 
-  function servicesUpdated(table: IWorkspacesTable) {
-    return { ...table, isFetchingServices: false };
-  }
-
-  function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      users: table.byId[table.selectedWorkspaceId].users.filter(
-        userId => userId !== payload.id
+function addUserSuccess(
+  table: IWorkspacesTable,
+  payload: { id: string }
+): IWorkspacesTable {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: false,
+    users: {
+      ...putById(
+        table.byId[table.selectedWorkspaceId].users,
+        payload.id,
+        {},
+        workspaceUserPermissionsFactory
       ),
-    });
-  }
+    },
+  });
+}
+
+function deleteUser(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: true,
+  });
+}
+
+function deleteUserError(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: false,
+  });
+}
+
+function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: false,
+    users: {
+      ...removeById(table.byId[table.selectedWorkspaceId].users, payload.id),
+    },
+  });
+}
+
+function refreshServices(table: IWorkspacesTable) {
+  return { ...table, isFetchingServices: true };
+}
+
+function servicesUpdated(table: IWorkspacesTable) {
+  return { ...table, isFetchingServices: false };
 }

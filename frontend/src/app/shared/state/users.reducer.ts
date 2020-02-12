@@ -1,4 +1,3 @@
-import { IUsersTable } from './users.interface';
 /**
  * Copyright (C) 2017-2020 Linagora
  *
@@ -29,11 +28,11 @@ import {
   IUserNew,
   IUserSetup,
 } from '@shared/services/users.service';
-import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import { Users } from './users.actions';
 import {
   IUserLDAP,
   IUserRow,
+  IUsersTable,
   userRowFactory,
   usersTableFactory,
 } from './users.interface';
@@ -64,10 +63,7 @@ export namespace UsersReducer {
     | Users.ConnectSuccess
     | Users.Disconnect
     | Users.DisconnectError
-    | Users.Disconnected
-    | Workspaces.DeleteUser
-    | Workspaces.DeleteUserSuccess
-    | Workspaces.DeleteUserError;
+    | Users.Disconnected;
 
   export function reducer(
     table = usersTableFactory(),
@@ -148,13 +144,6 @@ export namespace UsersReducer {
       }
       case Users.DisconnectedType: {
         return usersTableFactory();
-      }
-      case Workspaces.DeleteUserType: {
-        return deleteFromWorkspace(table, action.payload);
-      }
-      case Workspaces.DeleteUserSuccessType:
-      case Workspaces.DeleteUserErrorType: {
-        return deleteFromWorkspaceFinished(table, action.payload);
       }
       default:
         return table;
@@ -341,20 +330,5 @@ export namespace UsersReducer {
       ...table,
       isDisconnecting: false,
     };
-  }
-
-  function deleteFromWorkspace(table: IUsersTable, payload: { id: string }) {
-    return updateById(table, payload.id, {
-      isDeletingFromWorkspace: true,
-    });
-  }
-
-  function deleteFromWorkspaceFinished(
-    table: IUsersTable,
-    payload: { id: string }
-  ) {
-    return updateById(table, payload.id, {
-      isDeletingFromWorkspace: false,
-    });
   }
 }
