@@ -13,14 +13,19 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspace$ | async as workspace" fxLayout="column" fxFlexFill class="wrapper-content">
+<div
+  *ngIf="workspace$ | async as workspace"
+  fxLayout="column"
+  fxFlexFill
+  class="wrapper-content"
+>
   <div fxFlex class="content">
     <div fxLayout="column" fxLayoutGap="20px">
 
       <mat-card>
         <mat-card-title class="light-bold">Short Description</mat-card-title>
 
-        <mat-card-content 
+        <mat-card-content
           *ngIf="!isEditingDescriptions; else shortDescriptionEdit"
           fxLayout="column"
           class="workspace-short-description"
@@ -137,7 +142,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </ng-template>
           </button>
           <button
-            mat-raised-button type="button"
+            mat-raised-button
+            type="button"
             color="warn"
             (click)="openDeletionDialog()"
             [disabled]="workspace.isRemoving || isRemoving"
@@ -163,7 +169,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               Cancel
             </button>
             <button
-              mat-raised-button type="button"
+              mat-raised-button
+              type="button"
               color="primary"
               (click)="saveDescriptions()"
               [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)"
@@ -198,24 +205,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             >
               <a
                 *ngIf="!isEditingBusList && !bus.isBusSelectedForDetachment"
-                [routerLink]="['/workspaces', workspace.id, 'petals', 'buses', bus.id]"
                 gdAreas="content | footer"
                 gdRows="60px 36px"
                 matTooltip="Go to this bus"
                 matTooltipPosition="below"
+                [routerLink]="['/workspaces', workspace.id, 'petals', 'buses', bus.id]"
                 class="bus-link"
               >
-                <div gdArea="content" fxLayout="row" fxLayoutAlign="center center" class="bus-svg-content">
+                <div
+                  gdArea="content"
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  class="bus-svg-content"
+                >
                   <mat-icon color="primary" svgIcon="bus" class="padding-x2"></mat-icon>
                 </div>
-                <div gdArea="footer" fxLayout="row" fxLayoutAlign="start center" class="bus-footer">
+                <div
+                  gdArea="footer"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  class="bus-footer"
+                >
                   <span class="bus-name">{{ bus.name }}</span>
                 </div>
               </a>
 
               <ng-template #detachInProgress [ngIf]="isBusDetaching() && bus.isBusSelectedForDetachment">
                 <div fxLayout="row" fxLayoutAlign="center center" class="margin-top-x2">
-                  <mat-spinner [diameter]="32" [strokeWidth]="2" color="primary" class="detach-spinner"></mat-spinner>
+                  <mat-spinner
+                    color="primary"
+                    [diameter]="32"
+                    [strokeWidth]="2"
+                    class="detach-spinner"
+                  ></mat-spinner>
                 </div>
               </ng-template>
 
@@ -224,8 +246,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   gdAreas="content | footer"
                   gdAreas.lt-md="content | footer"
                   gdRows="60px 36px"
-                  [matTooltip]="bus.isBusSelectedForDetachment ? 'Unselect this bus' : 'Select this bus'"
                   matTooltipPosition="below"
+                  [matTooltip]="bus.isBusSelectedForDetachment ? 'Unselect this bus' : 'Select this bus'"
                   (click)="toggleSelectDetachBus(bus.id)"
                   class="bus-detach"
                 >
@@ -239,7 +261,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <mat-icon color="primary" svgIcon="bus" class="padding-x2"></mat-icon>
                     <fa-icon class="margin-right-x1 icon-x4" icon="unlink"></fa-icon>
                   </div>
-                  <div gdArea="footer" fxLayout="row" fxLayoutAlign="start center" class="bus-footer">
+                  <div
+                    gdArea="footer"
+                    fxLayout="row"
+                    fxLayoutAlign="start center"
+                    class="bus-footer"
+                  >
                     <span class="bus-name">{{ bus.name }}</span>
                   </div>
                 </a>
@@ -269,7 +296,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 fxLayoutGap.xs="0 grid"
                 class="bus-import-edit"
               >
-                <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="ip-form-field">
+                <mat-form-field
+                  appearance="outline"
+                  floatLabel="always"
+                  fxFlex="36%"
+                  class="ip-form-field"
+                >
                   <mat-label>IP or hostname</mat-label>
                   <input
                     type="text"
@@ -283,12 +315,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </span>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" floatLabel="always" fxFlex="28%" class="port-form-field">
+                <mat-form-field
+                  appearance="outline"
+                  floatLabel="always"
+                  fxFlex="28%"
+                  class="port-form-field"
+                >
                   <mat-label>Port</mat-label>
                   <input
+                    matInput
                     type="text"
-                    placeholder="{{formDefault.port}}"
-                    matInput formControlName="port"
+                    placeholder="{{ formDefault.port }}"
+                    formControlName="port"
                     [errorStateMatcher]="importBusMatcher"
                   >
                   <span matPrefix>
@@ -299,9 +337,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   </mat-error>
                 </mat-form-field>
 
-                <mat-form-field appearance="outline" floatLabel="always" fxFlex="36%" class="username-form-field">
+                <mat-form-field
+                  appearance="outline"
+                  floatLabel="always"
+                  fxFlex="36%"
+                  class="username-form-field"
+                >
                   <mat-label>Username</mat-label>
-                  <input type="text" placeholder="{{formDefault.username}}" matInput formControlName="username">
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="{{formDefault.username}}"
+                    formControlName="username"
+                  >
                   <span matPrefix>
                     <fa-icon icon="id-badge" class="icon-x2"></fa-icon>
                   </span>
@@ -329,14 +377,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   class="passphrase-form-field"
                 >
                   <mat-label>Topology passphrase</mat-label>
-                  <input type="password" placeholder="{{formDefault.passphrase}}" matInput formControlName="passphrase">
+                  <input
+                    matInput
+                    type="password"
+                    placeholder="{{formDefault.passphrase}}"
+                    formControlName="passphrase"
+                  >
                   <span matPrefix>
                     <fa-icon icon="shield-alt" class="icon-x2"></fa-icon>
                   </span>
                 </mat-form-field>
               </div>
 
-              <app-message class="error-import-details" type="error" [msg]="getError()"></app-message>
+              <app-message type="error" [msg]="getError()" class="error-import-details"></app-message>
 
             </mat-card-content>
           </div>
@@ -352,14 +405,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               class="btn-import-bus margin-right-x1 text-upper"
             >
               <span fxLayout="row" fxLayoutAlign="start center">
-                <fa-icon class="margin-right-x1 icon-x1" icon="link"></fa-icon>
+                <fa-icon icon="link" class="margin-right-x1 icon-x1"></fa-icon>
                 <span class="attach-bus-text-btn">Attach Bus</span>
               </span>
             </button>
             <ng-template #attachBusBtnEdit>
               <button
                 *ngIf="isEditingImportBus"
-                mat-button type="button"
+                mat-button
+                type="button"
                 color="primary"
                 [disabled]="disabledCancelBtn || isImportingBus || importBusId"
                 (click)="cancelAttachBus()"
@@ -369,18 +423,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </button>
               <button
                 *ngIf="isEditingImportBus"
-                mat-raised-button type="submit" 
+                mat-raised-button
+                type="submit"
                 color="primary"
                 [disabled]="disabledAttachBtn || busImportForm.invalid || isImportingBus || importBusId"
                 class="btn-import-new-bus text-upper"
               >
                 <span *ngIf="isImportingBus; else canImport" fxLayout="row" fxLayoutAlign="start center">
-                  <mat-spinner class="margin-right-x1" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
                   Importing
                 </span>
 
                 <ng-template #canImport>
-                  <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
+                  <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
                   <span class="text-upper import-bus-text-btn">Import</span>
                 </ng-template>
               </button>
@@ -389,20 +444,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <!-- Detach Bus -->
             <button
               *ngIf="!isEditingBusList && !isEditingImportBus && buses.list.length && !isBusDetaching(); else detachBusBtnEdit"
-              mat-raised-button type="button" 
+              mat-raised-button
+              type="button"
               color="accent"
-              class="btn-detach-bus margin-right-x1 text-upper"
               (click)="editDetachBus()"
+              class="btn-detach-bus margin-right-x1 text-upper"
             >
               <span fxLayout="row" fxLayoutAlign="start center">
-                <fa-icon class="margin-right-x1 icon-x1" icon="unlink"></fa-icon>
+                <fa-icon icon="unlink" class="margin-right-x1 icon-x1"></fa-icon>
                 <span class="detach-bus-text-btn">Detach Bus</span>
               </span>
             </button>
             <ng-template #detachBusBtnEdit>
               <button
                 *ngIf="isEditingBusList"
-                mat-button type="button"
+                mat-button
+                type="button"
                 color="primary"
                 (click)="cancelDetachBus()"
                 class="btn-cancel-detach-bus text-upper margin-right-x1"
@@ -411,10 +468,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </button>
               <button
                 *ngIf="isEditingBusList"
-                mat-raised-button type="button"
+                mat-raised-button
+                type="button"
                 color="primary"
-                (click)="openDetachBusDialog()"
                 [disabled]="disabledDetachBtn || !isBusSelectedForDetachment()"
+                (click)="openDetachBusDialog()"
                 class="btn-open-detach-bus-dialog text-upper"
               >
                 <span fxLayout="row" fxLayoutAlign="start center">
@@ -427,7 +485,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </form>
       </mat-card>
 
-      <mat-card fxLayout="column" fxFlex class="card-users">
+      <mat-card fxFlex fxLayout="column" class="card-users">
         <mat-card-title class="light-bold">Users</mat-card-title>
 
         <div *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
@@ -451,11 +509,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <form [formGroup]="addUserFormGroup" class="margin-top-x1">
             <mat-form-field class="margin-right-x1">
               <input
-                matInput 
-                placeholder="User to add"
-                [matAutocomplete]="autocompleteUsers"
-                formControlName="userSearchCtrl"
+                matInput
                 required
+                placeholder="User to add"
+                formControlName="userSearchCtrl"
+                [matAutocomplete]="autocompleteUsers"
               >
               <mat-error>Select a user on the list</mat-error>
             </mat-form-field>
@@ -466,11 +524,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </mat-option>
             </mat-autocomplete>
 
-            <button 
+            <button
               mat-raised-button
               color="primary"
-              (click)="addUser()"
               [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
+              (click)="addUser()"
               class="btn-add-user text-upper"
             >
               Add
@@ -481,15 +539,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             *ngIf="currentUserId$ | async as currentUserId"
             mat-table
             matSort
-            fxLayout="column"
             [dataSource]="dataSource"
             [matSortActive]="sortableColumn"
             [matSortDirection]="sortDirection"
+            matSortDisableClear
             class="users-table"
           >
             <!-- Name Column -->
             <ng-container matColumnDef="name">
-              <th 
+              <th
                 mat-header-cell
                 *matHeaderCellDef
                 mat-sort-header
@@ -499,9 +557,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 Name
               </th>
-              <td 
-                mat-cell
+              <td
                 *matCellDef="let user"
+                mat-cell
                 fxFlex="15"
                 fxLayout="row"
                 fxLayoutAlign="start center"
@@ -516,7 +574,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           
             <!-- Id Column -->
             <ng-container matColumnDef="id">
-              <th 
+              <th
                 mat-header-cell
                 *matHeaderCellDef
                 mat-sort-header
@@ -526,14 +584,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 Id
               </th>
-              <td mat-cell *matCellDef="let user" fxFlex="15" fxLayout="row" fxLayoutAlign="center center" class="cell-userid-{{ user.id }}">
+              <td
+                mat-cell
+                *matCellDef="let user"
+                fxFlex="15"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                class="cell-userid-{{ user.id }}"
+              >
                 <span class="user-id ellipsis">{{ user.id }}</span>
               </td>
             </ng-container>
 
             <!-- Admin Workspace Column -->
             <ng-container matColumnDef="adminWorkspace">
-              <th 
+              <th
                 mat-header-cell
                 *matHeaderCellDef
                 fxFlex
@@ -542,14 +607,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 Admin Workspace
               </th>
-              <td mat-cell *matCellDef="let user" fxFlex fxLayout="row" fxLayoutAlign="center center" class="cell-user-adminwks-{{ user.id }}">
+              <td
+                mat-cell
+                *matCellDef="let user"
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                class="cell-user-admin-wks-{{ user.id }}"
+              >
                 <mat-checkbox color="primary" [checked]="user.adminWorkspace"></mat-checkbox>
               </td>
             </ng-container>
 
             <!-- Deploy Artifact Column -->
             <ng-container matColumnDef="deployArtifact">
-              <th 
+              <th
                 mat-header-cell
                 *matHeaderCellDef
                 fxFlex
@@ -558,14 +630,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 Deploy Artifact
               </th>
-              <td mat-cell *matCellDef="let user" fxFlex fxLayout="row" fxLayoutAlign="center center" class="cell-user-deployartifact-{{ user.id }}">
+              <td
+                mat-cell
+                *matCellDef="let user"
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                class="cell-user-deploy-artifact-{{ user.id }}"
+              >
                 <mat-checkbox color="primary" [checked]="user.deployArtifact"></mat-checkbox>
               </td>
             </ng-container>
 
             <!-- Lifecycle Artifact Column -->
             <ng-container matColumnDef="lifecycleArtifact">
-              <th 
+              <th
                 mat-header-cell
                 *matHeaderCellDef
                 fxFlex
@@ -574,15 +653,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 Lifecycle Artifact
               </th>
-              <td mat-cell *matCellDef="let user" fxFlex fxLayout="row" fxLayoutAlign="center center" class="cell-user-lifecycleartifact-{{ user.id }}">
+              <td
+                mat-cell
+                *matCellDef="let user"
+                fxFlex fxLayout="row"
+                fxLayoutAlign="center center"
+                class="cell-user-lifecycle-artifact-{{ user.id }}"
+              >
                 <mat-checkbox color="primary" [checked]="user.lifecycleArtifact"></mat-checkbox>
               </td>
             </ng-container>
           
             <!-- Action Column -->
             <ng-container matColumnDef="action">
-              <th mat-header-cell *matHeaderCellDef fxFlex fxLayout="row" fxLayoutAlign="end center">Action</th>
-              <td mat-cell *matCellDef="let user" fxFlex fxLayout="column" fxLayoutAlign="center end" class="cell-user-action-{{ user.id }}">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="end center"
+              >
+                Action
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let user"
+                fxFlex
+                fxLayout="column"
+                fxLayoutAlign="center end"
+                class="cell-user-action-{{ user.id }}"
+              >
                 <button
                   *ngIf="currentUserId !== user.id"
                   mat-icon-button
@@ -599,21 +699,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr
-              mat-row 
+              mat-row
               *matRowDef="let user; columns: displayedColumns;"
               class="row-{{ user.id }} table-row"
             ></tr>
           </table>
-
-          <mat-action-row
-            fxLayoutAlign="end center"
-            fxLayoutAlign.md="center center"
-            fxLayoutAlign.sm="center center"
-            fxLayout.lt-md="column wrap"
-            fxLayoutGap="10px"
-            class="pnl-actions-user-management"
-          >
-          </mat-action-row>
         </div>
       </mat-card>
     </div>
