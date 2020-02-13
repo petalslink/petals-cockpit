@@ -285,7 +285,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-card-content>
 
         <form class="bus-import-form" novalidate (ngSubmit)="onSubmit(busImportForm)" [formGroup]="busImportForm">
-          <div *ngIf="!(buses$ | async).isBusSelectedForDetachment && isEditingImportBus" class="margin-top-x2">
+          <div *ngIf="isEditingImportBus" class="margin-top-x2">
             <mat-card-title class="light-bold">Import bus details</mat-card-title>
 
             <mat-card-content>
@@ -507,32 +507,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </ng-template>
 
           <form [formGroup]="addUserFormGroup" class="margin-top-x1">
-            <mat-form-field class="margin-right-x1">
-              <input
-                matInput
-                required
-                placeholder="User to add"
-                formControlName="userSearchCtrl"
-                [matAutocomplete]="autocompleteUsers"
+            <div fxLayout="row" fxLayoutAlign="start center">
+              <mat-form-field
+                appearance="outline"
+                floatLabel="always"
+                class="add-user-form-field margin-right-x1"
               >
-              <mat-error>Select a user on the list</mat-error>
-            </mat-form-field>
+                <mat-label>User to add</mat-label>
+                <input
+                  matInput
+                  required
+                  formControlName="userSearchCtrl"
+                  [matAutocomplete]="autocompleteUsers"
+                >
+                <span matPrefix>
+                  <mat-icon class="icon-x2">
+                    <fa-icon icon="user-astronaut"></fa-icon>
+                  </mat-icon>
+                </span>
+                <mat-error>Select a user on the list</mat-error>
+              </mat-form-field>
+  
+              <mat-autocomplete #autocompleteUsers>
+                <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                  {{ filteredUser }}
+                </mat-option>
+              </mat-autocomplete>
+              
+              <button
+                mat-raised-button
+                color="primary"
+                [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
+                (click)="addUser()"
+                class="btn-add-user text-upper margin-bottom-x2"
+              >
+                <span *ngIf="workspace.isAddingUserToWorkspace; else canAdd" fxLayout="row" fxLayoutAlign="start center">
+                  Adding
+                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
+                </span>
 
-            <mat-autocomplete #autocompleteUsers>
-              <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
-                {{ filteredUser }}
-              </mat-option>
-            </mat-autocomplete>
-
-            <button
-              mat-raised-button
-              color="primary"
-              [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
-              (click)="addUser()"
-              class="btn-add-user text-upper"
-            >
-              Add
-            </button>
+                <ng-template #canAdd>
+                  <span class="text-upper add-user-text-btn">Add</span>
+                </ng-template>
+              </button>
+            </div>
           </form>
 
           <table
