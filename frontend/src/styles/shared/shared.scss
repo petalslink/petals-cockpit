@@ -65,6 +65,9 @@ table.mat-table {
 
 .mat-body-2 {
   margin-bottom: 4px;
+
+  // fix angular material not correctly displaying bold text
+  font-weight: bold;
 }
 
 .mat-snack-bar-container .wrapper-progress-bar {
