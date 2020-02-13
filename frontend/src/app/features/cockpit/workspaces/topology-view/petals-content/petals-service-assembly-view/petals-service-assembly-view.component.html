@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+<div fxLayout="column" fxFlexFill class="wrapper-content">
   <div fxLayout="column" fxFlex class="content">
     <div *ngIf= "(serviceAssembly$ | async) as sa" fxLayout="column" fxLayoutGap="20px">
 
@@ -57,8 +57,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
               <span fxFlex matSubheader fxLayoutAlign="center center">deployed on component</span>
 
-              <a 
-                mat-raised-button 
+              <a
+                mat-raised-button
                 color="primary"
                 [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
                 class="su-component"

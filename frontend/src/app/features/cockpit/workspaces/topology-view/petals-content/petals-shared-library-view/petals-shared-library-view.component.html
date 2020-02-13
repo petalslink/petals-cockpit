@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-  <div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+  <div fxLayout="column" fxFlexFill class="wrapper-content">
     <div fxLayout="column" fxFlex class="content">
       <div *ngIf="sharedLibrary$ | async as sl" fxLayout="column" fxLayoutGap="20px">
 
@@ -42,9 +42,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-card-content class="margin-top-x1 components-content">
             <mat-nav-list *ngIf="sl.components.length !== 0; else noComponent" dense fxLayout="column" class="padding-top-x1">
               <div *ngFor="let component of sl.components; trackBy:trackByComponent" fxLayout="row" fxLayoutAlign="start center">
-                <a 
-                  mat-raised-button 
-                  color="primary" 
+                <a
+                  mat-raised-button
+                  color="primary"
                   [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', component.id]"
                   class="component"
                 >

@@ -126,7 +126,7 @@ export class UploadComponent {
 @Component({
   selector: 'app-snackbar-deployment-progress',
   template: `
-    <div class="mat-typography">
+    <div>
       <h3 class="title">{{ data.type }} deployment in progress...</h3>
       <div class="wrapper-progress-bar" *ngIf="data.uploadProgress$ | async as uploadProgress">
         <span class="progress-value">{{ uploadProgress }}%</span>

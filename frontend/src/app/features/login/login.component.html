@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card *ngIf="users$ | async as users" class="mat-typography mat-elevation-z8">
+<mat-card *ngIf="users$ | async as users" class="mat-elevation-z8">
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit(loginForm.value)">
 
     <div fxLayout="column">
@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <h1>Sign In</h1>
         <h3 *ngIf="users.validSetupUser" class="msg-add-setup-user">{{ users.validSetupUser }}</h3>
       </div>
-  
+
       <div fxFlex class="margin-top-x1">
         <mat-form-field appearance="outline" fxFlexFill class="username-form-field">
           <mat-label>Username</mat-label>
@@ -31,24 +31,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-error>Required!</mat-error>
         </mat-form-field>
       </div>
-      
+
       <div fxFlex>
         <mat-form-field appearance="outline" fxFlexFill class="pwd-form-field">
           <mat-label>Password</mat-label>
-          <input 
-            matInput 
-            formControlName="password" 
-            autocomplete="new-password" 
-            [type]="show ? 'text' : 'password'" 
-            [errorStateMatcher]="matcher" 
+          <input
+            matInput
+            formControlName="password"
+            autocomplete="new-password"
+            [type]="show ? 'text' : 'password'"
+            [errorStateMatcher]="matcher"
             required
           >
           <span matPrefix><mat-icon class="icon-x2"><fa-icon icon="key"></fa-icon></mat-icon></span>
           <span matSuffix>
             <mat-icon
               *ngIf="!(users.isConnecting || users.connectedUser)"
-              class="icon-x1 cursor-pointer icon-toggle-pwd" 
-              (click)="togglePassword()" 
+              class="icon-x1 cursor-pointer icon-toggle-pwd"
+              (click)="togglePassword()"
               [color]="show ? 'primary' : ''"
               matTooltip="Toggle Visibility"
             >
@@ -58,21 +58,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-error>Required!</mat-error>
         </mat-form-field>
       </div>
-  
+
       <div
         *ngIf="users.connectionFailed && !users.isConnecting"
-        fxLayout="row" 
-        fxFlex="100%" 
-        fxLayoutAlign="start center" 
+        fxLayout="row"
+        fxFlex="100%"
+        fxLayoutAlign="start center"
         class="form-error margin-bottom-x2"
       >
         <mat-icon color="warn">error</mat-icon>
         <span>Incorrect username or password.</span>
       </div>
-      
+
       <div fxLayout="column" fxLayoutAlign="center end">
         <button
-          mat-raised-button 
+          mat-raised-button
           color="primary"
           [disabled]="loginForm.invalid || users.isConnecting || users.connectedUser"
         >
@@ -87,7 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               Logging in
               <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
             </span>
-  
+
             <ng-template #logInTxtTpl>
               <span class="text-upper">Log in</span>
             </ng-template>

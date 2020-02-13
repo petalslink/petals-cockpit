@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div cdkScrollable fxLayout="column" [style.marginLeft.px]="64" class="wrapper-content mat-typography">
+<div cdkScrollable fxLayout="column" [style.marginLeft.px]="64" class="wrapper-content">
   <div fxFlex class="toolbar mat-elevation-z4">
     <mat-toolbar>
       <app-menu></app-menu>
@@ -30,11 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <label fxFlex class="text-upper">User Management</label>
 
               <div class="margin-right-x1">
-                <mat-spinner 
+                <mat-spinner
                   *ngIf="isFetchingUsers$ | async; else usersFetched"
-                  [diameter]="16" 
-                  [strokeWidth]="1" 
-                  class="margin-right-x1" 
+                  [diameter]="16"
+                  [strokeWidth]="1"
+                  class="margin-right-x1"
                 ></mat-spinner>
                 <ng-template #usersFetched>
                   <span class="color-primary-light-bold" *ngIf="users.length > 0" matLine>
@@ -54,7 +54,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             class="info-user-management"
           ></app-message>
 
-          <app-message 
+          <app-message
             *ngIf="currentUser.isFromLdap"
             type="info"
             msg="As an administrator, you can ADD and DELETE users from LDAP."
@@ -63,27 +63,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </mat-card>
 
-        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">         
+        <div fxLayout="column" fxLayout.gt-md="row" fxLayoutGap.gt-md="10px" class="user-management-panels">
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-add-user margin-top-x1">
-            <mat-expansion-panel 
-              #el 
-              fxLayout="column" 
-              [hideToggle]="false" 
+            <mat-expansion-panel
+              #el
+              fxLayout="column"
+              [hideToggle]="false"
               (closed)="onResetAddUserForm()"
-              class="exp-pnl-add-user" 
+              class="exp-pnl-add-user"
             >
               <mat-expansion-panel-header fxLayout="row">
-                <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+                <div fxLayout="row" fxLayoutAlign="center center">
                   <mat-icon color="primary" class="margin-right-x1">person_add</mat-icon>
                   <span class="text-upper pnl-title light-bold">Add a new user</span>
                 </div>
               </mat-expansion-panel-header>
 
-              <app-add-edit-user 
+              <app-add-edit-user
                 #addUser
-                *ngIf="!currentUser.isFromLdap else isFromLdap" 
-                (evtSubmit)="onAdd($event); el.close()" 
+                *ngIf="!currentUser.isFromLdap else isFromLdap"
+                (evtSubmit)="onAdd($event); el.close()"
                 (evtCancel)="el.close()"
               ></app-add-edit-user>
 
@@ -92,28 +92,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
           <div fxFlex [ngClass.gt-md]="'card-auto-size'" class="pnl-list-users margin-top-x1">
             <mat-accordion displayMode="flat" [multi]="false">
-              <mat-expansion-panel 
+              <mat-expansion-panel
                 #el
                 *ngFor="let user of users; trackBy:trackByUser; let i = index"
                 fxLayout="column"
-                [hideToggle]="false" 
+                [hideToggle]="false"
                 [ngClass]="'exp-pnl-user-' + user.id"
                 (opened)="onResetEditUserForm(i)"
               >
-                <mat-expansion-panel-header (click)='isAdministratorChecked = user.isAdmin' fxLayout="row" class="mat-body" >
+                <mat-expansion-panel-header (click)='isAdministratorChecked = user.isAdmin' fxLayout="row">
                   <mat-panel-title fxLayout="row" fxLayoutAlign="start center">
                     <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
                     <span class="margin-left-x1 user-id">{{ user.id }}</span>
                     <span class="margin-left-x1 light-bold user-name">({{ user.name }})</span>
-                    <mat-spinner 
+                    <mat-spinner
                       *ngIf="user.isAdding || user.isModifying"
-                      [diameter]="16" 
-                      [strokeWidth]="1" 
-                      class="margin-left-x1" 
+                      [diameter]="16"
+                      [strokeWidth]="1"
+                      class="margin-left-x1"
                     ></mat-spinner>
                   </mat-panel-title>
                 </mat-expansion-panel-header>
-    
+
                 <ng-template #isNotLdapUser>
                   <app-add-edit-user
                     #editUser
@@ -126,11 +126,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     (evtCancel)="el.close()"
                   ></app-add-edit-user>
                 </ng-template>
-                
+
                 <div fxLayout="column" fxLayoutGap="10px" *ngIf="currentUser.isFromLdap; else isNotLdapUser">
-                  <div 
-                    fxLayout="row" 
-                    fxLayoutGap="20px" 
+                  <div
+                    fxLayout="row"
+                    fxLayoutGap="20px"
                     fxLayoutAlign.md="center center"
                     fxLayoutAlign.lt-md="start center"
                     class="margin-top-x1"
@@ -145,9 +145,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     </div>
                   </div>
                   <!-- Todo : remove the slide toggle animation while switching between users -->
-                  <div 
-                    fxLayout="row" 
-                    fxLayoutGap="20px" 
+                  <div
+                    fxLayout="row"
+                    fxLayoutGap="20px"
                     fxLayoutAlign.md="center center"
                     fxLayoutAlign.lt-md="start center"
                     class="margin-top-x1"
@@ -169,18 +169,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     [isClosable]="false"
                     class="info-admin-edit"
                 ></app-message>
-                  <mat-action-row 
-                    fxLayoutAlign="center center" 
+                  <mat-action-row
+                    fxLayoutAlign="center center"
                     fxLayout.lt-md="column wrap"
-                    fxLayoutGap="10px" 
-                    class="pnl-actions-user-management" 
+                    fxLayoutGap="10px"
+                    class="pnl-actions-user-management"
                   >
-                  <button 
+                  <button
                     *ngIf="user.id !== currentUser.id && !user.isDeleting"
-                    mat-raised-button 
-                    type="button" 
+                    mat-raised-button
+                    type="button"
                     (click)="onDelete(user.id)"
-                    class="btn-delete-form text-upper" 
+                    class="btn-delete-form text-upper"
                   >
                     <mat-icon color="warn">delete</mat-icon>
                     <span class="delete-name">Delete</span>
@@ -195,11 +195,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </div>
 
         <ng-template #isFromLdap>
-          <app-add-ldap-user 
+          <app-add-ldap-user
             (evtSubmit)="onAdd($event);"
           ></app-add-ldap-user>
         </ng-template>
-        
+
       </div>
     </div>
 
