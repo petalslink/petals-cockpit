@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import './utils';
-
 @mixin custom-color-theme($theme) {
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
