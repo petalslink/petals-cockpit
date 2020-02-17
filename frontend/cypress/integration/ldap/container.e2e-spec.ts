@@ -389,7 +389,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'sa-flowable-vacation-sample.zip',
+        'sa-flowable-vacation-sample-test.zip',
         '.deploy-artifact input[type=file]'
       );
 
@@ -411,7 +411,7 @@ describe('Container', () => {
         .should('be.visible');
 
       cy
-        .get(`.mat-progress-bar`, { timeout: 10000 })
+        .get(`.mat-progress-bar`, { timeout: 15000 })
         .should('be.visible')
         .and('have.attr', 'aria-valuenow', '100');
 
@@ -675,7 +675,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'petals-sl-hsql-1.8.0.10.zip',
+        'petals-sl-hsql-1.8.0.10-test.zip',
         '.deploy-artifact input[type=file]'
       );
 
@@ -697,7 +697,7 @@ describe('Container', () => {
         .should('be.visible');
 
       cy
-        .get(`.mat-progress-bar`, { timeout: 10000 })
+        .get(`.mat-progress-bar`, { timeout: 15000 })
         .should('be.visible')
         .and('have.attr', 'aria-valuenow', '100');
 
@@ -936,7 +936,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'petals-bc-sql-1.6.3-SNAPSHOT-red-green.zip',
+        'petals-bc-sql-1.6.3-SNAPSHOT-red-green-test.zip',
         '.deploy-artifact input[type=file]'
       );
 
@@ -958,7 +958,7 @@ describe('Container', () => {
         .should('be.visible');
 
       cy
-        .get(`.mat-progress-bar`, { timeout: 10000 })
+        .get(`.mat-progress-bar`, { timeout: 15000 })
         .should('be.visible')
         .and('have.attr', 'aria-valuenow', '100');
 

@@ -122,7 +122,6 @@ declare namespace Cypress {
     expectSlListToBe(expectedSlList: string[]): any;
 
     // components.commands
-    getActionStateInLifecycleComponent(name: string): any;
     checkOverrideSharedLibrariesInputs(expectedSharedLibraries: string[]): any;
     checkUploadComponentSharedLibraries(expectedSharedLibraries: string[]): any;
     expectParametersListToBe(expectedParametersList: string[]): any;

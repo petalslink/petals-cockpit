@@ -17,10 +17,6 @@
 
 import { COMPONENT_DOM } from './component.dom';
 
-Cypress.Commands.add('getActionStateInLifecycleComponent', name => {
-  return cy.get(COMPONENT_DOM.buttons.actionState).contains(name);
-});
-
 Cypress.Commands.add('expectParametersListToBe', paramList => {
   const params = cy.get(COMPONENT_DOM.lifecycle.parameters).find('mat-label');
 
@@ -29,7 +25,7 @@ Cypress.Commands.add('expectParametersListToBe', paramList => {
 });
 
 Cypress.Commands.add('expectPossibleStateListToBe', possibleStateList => {
-  const actionStates = cy.get(COMPONENT_DOM.buttons.actionState);
+  const actionStates = cy.get(COMPONENT_DOM.buttons.allActionsStates);
 
   actionStates.should('have.length', possibleStateList.length);
   actionStates.each(($cell, index) =>

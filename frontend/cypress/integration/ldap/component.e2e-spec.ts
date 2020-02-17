@@ -141,9 +141,9 @@ describe('Component', () => {
       // runtime parameters
       cy.expectParametersListToBe([`httpThreadPoolSizeMax`]);
 
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       // install parameters
       cy.expectParametersListToBe(expectedParametersListSortByName);
@@ -160,7 +160,7 @@ describe('Component', () => {
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
       // should have stop if started
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -181,7 +181,7 @@ describe('Component', () => {
         `No configurable parameter in this state.`
       );
 
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -192,7 +192,7 @@ describe('Component', () => {
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
-      cy.getActionStateInLifecycleComponent(`Install`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
 
       cy
         .get(COMPONENT_DOM.lifecycle.state)
@@ -234,8 +234,8 @@ describe('Component', () => {
     });
 
     it('should update install parameters when component state is loaded', () => {
-      cy.getActionStateInLifecycleComponent(`Stop`).click();
-      cy.getActionStateInLifecycleComponent(`Uninstall`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
       cy.expectParametersListToBe(expectedParametersListSortByName);
 
@@ -256,8 +256,8 @@ describe('Component', () => {
 
       cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
 
-      cy.getActionStateInLifecycleComponent(`Install`).click();
-      cy.getActionStateInLifecycleComponent(`Start`).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('start')).click();
 
       // httpThreadPoolSizeMax should be updated on runtime parameter
       cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
@@ -433,7 +433,7 @@ describe('Component', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT.zip',
+        'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT-test.zip',
         '.deploy-su input[type=file]'
       );
 
@@ -458,7 +458,7 @@ describe('Component', () => {
 
       cy
         .get(`.mat-progress-bar`, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .should('be.visible')
         .and('have.attr', 'aria-valuenow', '100');
@@ -475,7 +475,7 @@ describe('Component', () => {
       cy.expectNotification(
         'success',
         'Service Unit Deployed',
-        `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT has been successfully deployed`
+        `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT-test has been successfully deployed`
       );
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');

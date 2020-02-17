@@ -53,7 +53,8 @@ export const deployMockAndTriggerSse = (conf: {
     };
   }
 
-  const progress$ = interval(20).pipe(take(100 + 1), share());
+  const progressSpeed = conf.ifSuccess.file.name.includes('test') ? 100 : 20;
+  const progress$ = interval(progressSpeed).pipe(take(100 + 1), share());
 
   const result$ = progress$.pipe(
     last(),
