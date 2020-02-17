@@ -30,7 +30,7 @@ mat-dialog-content {
 // all types of messages
 @mixin msg-content($bg, $color) {
   padding: 12px;
-  overflow-wrap: break-word;
+  word-break: break-word;
   display: inline-block;
   width: 100%;
   background-color: $bg;
@@ -61,7 +61,7 @@ mat-dialog-content {
 
 // all types of messages dialog
 @mixin msg-dialog-type($color) {
-  overflow-wrap: break-word;
+  word-break: break-word;
   display: inline-block;
   width: 100%;
   color: $color;
