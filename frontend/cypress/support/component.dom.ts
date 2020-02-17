@@ -25,7 +25,7 @@ export const COMPONENT_DOM = {
     setParameters: `${bs} .card-component-lifecycle .component-parameters .btn-set-parameters-form`,
     sharedLibraries: `${bs} .shared-library .btn-sl`,
     serviceUnits: `${bs} .service-unit .btn-su`,
-    serviceAssemblies: `${bs} .service-unit .btn-sa`,
+    serviceAssemblies: `${bs} .service-unit .btn-fab-sa`,
     actionState: (actionName: string) => `${bs} .btn-state-${actionName}`,
   },
   messages: {
