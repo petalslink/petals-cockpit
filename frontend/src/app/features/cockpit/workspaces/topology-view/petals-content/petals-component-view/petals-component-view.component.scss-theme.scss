@@ -16,7 +16,7 @@
  */
 
 @mixin custom-component-view-theme($theme) {
-  .btn-sa {
+  .btn-fab-sa {
     background-color: mat-color($mat-grey, 200);
   }
 }
