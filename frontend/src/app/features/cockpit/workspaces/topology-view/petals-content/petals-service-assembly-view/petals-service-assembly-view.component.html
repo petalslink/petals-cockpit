@@ -13,103 +13,126 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlexFill class="wrapper-content">
-  <div fxLayout="column" fxFlex class="content">
-    <div *ngIf= "(serviceAssembly$ | async) as sa" fxLayout="column" fxLayoutGap="20px">
+<div fxFlexFill fxLayout="column" class="wrapper-content">
+  <div *ngIf="serviceAssembly$ | async as sa" fxLayout="column" fxLayoutGap="20px" class="content">
+    <mat-card fxFlex class="card-component-lifecycle">
+      <mat-card-title class="light-bold sa-name">About {{ sa.name }}</mat-card-title>
 
-      <mat-card fxFlex class="sa-infos">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="sa-name light-bold">About {{ sa.name }}</span>
-          <mat-icon color="primary">info_outline</mat-icon>
-        </mat-card-title>
+      <mat-card-content>
+        <app-message
+          type="info"
+          msg="Changing the state of a SA will affect its SUs."
+          [isClosable]="false"
+          class="info-lifecycle-sa margin-top-x1"
+        ></app-message>
 
-        <div fxLayout="row" fxLayoutAlign="start center">
-          <mat-card-header *ngIf="sa.state" fxFlex>
-            <mat-card-title>State</mat-card-title>
-            <mat-card-subtitle fxLayoutAlign="start center" class="sa-state">
-              {{ sa.state }}
-              <app-led [color]="getLedColorFromState(sa.state)" class="margin-left-x1"></app-led>
-            </mat-card-subtitle>
-          </mat-card-header>
-        </div>
-      </mat-card>
+        <div
+          fxLayout="column"
+          fxLayout.gt-sm="row"
+          fxLayoutAlign="center start"
+          fxLayoutAlign.gt-sm="start center"
+          fxLayoutGap="20px"
+          class="margin-top-x2"
+        >
+          <div fxFlex="100" fxFlex.gt-sm="none" fxLayout="row" fxLayoutAlign="start center" class="sa-state">
+            <span>{{ sa.state }}</span>
 
-      <mat-card fxFlex class="service-units">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="light-bold">Service Units</span>
-          <mat-icon color="primary" svgIcon="su"></mat-icon>
-        </mat-card-title>
+            <app-led [color]="getLedColorFromState(sa.state)" class="margin-left-x1 led-sa"></app-led>
+          </div>
 
-        <mat-card-content class="margin-top-x1 shared-libraries-content">
-          <mat-nav-list dense fxLayout="column" class="padding-top-x1">
-            <div *ngFor="let su of sa.serviceUnits; trackBy:trackBySu" fxLayout="row" fxLayoutAlign="start center">
-              <a
-                mat-raised-button
-                color="primary"
-                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
-                class="service-unit"
-              >
-                <div fxFlex fxLayout="row" fxLayoutAlign="start center">
-                  <span class="su-name margin-right-x1">{{ su.name }}</span>
-                  <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x1"></mat-icon>
-                </div>
-              </a>
-
-              <span fxFlex matSubheader fxLayoutAlign="center center">deployed on component</span>
-
-              <a
-                mat-raised-button
-                color="primary"
-                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
-                class="su-component"
-              >
-                <div fxFlex fxLayout="row" fxLayoutAlign="end center">
-                  <span fxFlex class="component-name margin-right-x1">{{ su.component.name }}</span>
-                  <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x1"></mat-icon>
-                </div>
-              </a>
-            </div>
-          </mat-nav-list>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card fxFlex class="sa-lifecycle">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="light-bold">Lifecycle</span>
-          <mat-icon color="primary">play_for_work</mat-icon>
-        </mat-card-title>
-
-        <div fxLayout="column">
-          <mat-card-subtitle>State: <b><span class="service-assembly-state">{{ sa.state }}</span></b></mat-card-subtitle>
-
-          <app-message
-            type="info"
-            msg="Changing the state of an SA will affect its SUs."
-            [isClosable]="false"
-            class="info-lifecycle-sa"
-          ></app-message>
-        </div>
-
-        <mat-card-content *ngIf="sa.state" fxLayout="row wrap" class="margin-top-x1 sa-lifecycle-action">
-          <span *ngFor="let possibleState of getPossibleStateActions(sa.state); trackBy:trackBySaState" class="color-primary padding-bottom-x1">
-            <button
-              mat-raised-button
-              (click)="changeState(sa.id, possibleState.newStateAfterAction)"
-              [disabled]="sa.isUpdatingState"
-              class="text-upper margin-right-x1 color-primary"
+          <div *ngIf="sa.state" fxFlex fxLayoutGap="10px" class="list-actions-name">
+            <span
+              *ngFor="let possibleState of getPossibleStateActions(sa.state); trackBy:trackBySaState" 
+              fxFlexFill
+              class="btn-state-{{ possibleState.actionName.toLowerCase() }}"
             >
-              <mat-icon *ngIf="possibleState.actionName === 'Stop'">stop</mat-icon>
-              <mat-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</mat-icon>
-              <mat-icon *ngIf="possibleState.actionName === 'Unload'">remove_circle_outline</mat-icon>
-              <span class="sa-state">{{ possibleState.actionName }}</span>
-            </button>
-          </span>
+              <button
+                mat-stroked-button
+                type="button"
+                color="primary"
+                (click)="changeState(sa.id, possibleState.newStateAfterAction)"
+                [disabled]="sa.isUpdatingState"
+                class="btn-change-sa-state text-upper"
+              >
+                <mat-icon *ngIf="possibleState.actionName === 'Stop'">stop</mat-icon>
+                <mat-icon *ngIf="possibleState.actionName === 'Start'">play_arrow</mat-icon>
+                <mat-icon *ngIf="possibleState.actionName === 'Unload'">remove_circle_outline</mat-icon>
+
+                <span>{{ possibleState.actionName }}</span>
+              </button>
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <app-message *ngIf="sa.errorChangeState" type="error" [msg]="sa.errorChangeState" class="error-change-state"></app-message>
+    </mat-card>
+
+    <mat-card fxFlex class="card-related-elements">
+      <mat-card-title class="light-bold title-related-elements">Related Elements</mat-card-title>
+
+      <ng-container>
+        <mat-card-content>
+          <div fxLayout="column"  fxLayout.gt-md="row" fxLayoutGap="20px">
+            <div
+              fxFlex
+              fxFlex.gt-md="none"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              class="margin-top-x1"
+            >
+              <span fxFlexFill>Services units</span>
+            </div>
+
+            <ng-container>
+              <div fxLayout="column" class="service-units">
+                <div
+                  fxLayout="column"
+                  fxLayout.gt-md="row wrap"
+                  fxLayoutGap="0"
+                  fxLayoutGap.gt-md="24px"
+                >
+                  <div *ngFor="let su of sa.serviceUnits; trackBy:trackBySu" class="service-unit">
+                    <span
+                      fxFlex="calc(25% - 24px)"
+                      fxFlex.gt-md="calc(33.3% - 24px)"
+                      fxLayout="row"
+                      fxLayoutAlign="start center"
+                    >
+                      <a
+                        color="primary"
+                        mat-stroked-button
+                        matTooltipPosition="above"
+                        [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
+                        [ngClass]="'btn-su-' + su.id"
+                      >
+                        <span fxFlex class="su-name ellipsis">{{ su.name }}</span>
+                      </a>
+
+                      <app-led
+                        matTooltipPosition="above"
+                        [color]="getLedColorFromState(su.component.state)"
+                        [matTooltip]="su.component.state"
+                        class="comp-led"
+                      ></app-led>
+
+                      <a
+                        mat-icon-button
+                        matTooltipPosition="above"
+                        [matTooltip]="su.component.name"
+                        [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
+                        [ngClass]="'btn-component' + ' comp-' + su.component.id + ' related-su-' + su.id"
+                      >
+                        <mat-icon svgIcon="component" color="primary" class="icon-x3 icon-component"></mat-icon>
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
         </mat-card-content>
-
-        <app-message type="error" [msg]="sa.errorChangeState" class="error-change-state"></app-message>
-
-      </mat-card>
-
-    </div>
+      </ng-container>
+    </mat-card>
   </div>
 </div>

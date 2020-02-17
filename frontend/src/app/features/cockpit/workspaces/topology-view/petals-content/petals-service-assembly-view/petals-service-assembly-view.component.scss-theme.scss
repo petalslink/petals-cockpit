@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2020 Linagora
+ * Copyright (C) 2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,17 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-:host {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.icon-component {
-  margin-bottom: 4px;
-}
-
-.led-component {
-  margin-left: 5px;
-  margin-right: 5px;
+@mixin custom-services-unit-view-theme($theme) {
+  .btn-component {
+    background-color: mat-color($mat-grey, 200);
+  }
 }
