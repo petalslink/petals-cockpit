@@ -49,8 +49,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <app-message
                   *ngIf="!!container.ip && !container.isReachable; else noContainerReachable"
                   type="warning"
-                  [isClosable]="false"
                   msg="Unreachable"
+                  [isClosable]="false"
                   class="warning-unreachable"
                 ></app-message>
 
@@ -58,8 +58,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <app-message
                     *ngIf="!container.reachabilities.length"
                     type="info"
-                    [isClosable]="false"
                     msg="There are no other containers in this bus."
+                    [isClosable]="false"
                     class="info-no-container-reachable"
                   ></app-message>
                 </ng-template>

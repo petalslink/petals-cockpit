@@ -20,6 +20,7 @@ import {
   SERVICE_UNIT_DEPLOYMENT_DOM,
 } from '../../support/component.dom';
 import { expectedTreeBeforeDeploy } from '../../support/helper.const';
+import { MESSAGE_DOM } from '../../support/message.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
   UPLOAD_DOM,
@@ -42,6 +43,21 @@ describe('Component', () => {
     cy.getElementInPetalsTree(`component`, `Comp 0`).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+  });
+
+  it('should display read-only informations when deleted', () => {
+    cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+    cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+
+    cy.get(COMPONENT_DOM.buttons.actionState('unload')).click();
+
+    cy
+      .get(MESSAGE_DOM.texts.msgWarning)
+      .contains('This component has been removed')
+      .scrollIntoView()
+      .should('be.visible');
   });
 
   describe('Related Elements', () => {

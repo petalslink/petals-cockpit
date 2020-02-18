@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 Linagora
+ * Copyright (C) 2017-2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,16 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// base selector
-const bs = `app-message`;
+import { Component, Input, OnInit } from '@angular/core';
 
-export const MESSAGE_DOM = {
-  buttons: {
-    viewMore: `${bs} .btn-view-more-message`,
-    cancelMessage: `${bs} .btn-cancel-message`,
-  },
-  texts: {
-    msgDetails: `${bs} .msg-details`,
-    msgWarning: `${bs} .warning`,
-  },
-};
+@Component({
+  selector: 'app-removable',
+  templateUrl: './removable.component.html',
+  styleUrls: ['./removable.component.scss'],
+})
+export class RemovableComponent implements OnInit {
+  @Input() message: string;
+  @Input() isHoverVisible: boolean;
+
+  constructor() {}
+
+  ngOnInit() {}
+}

@@ -47,10 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <span matSuffix>
             <mat-icon
               *ngIf="!(users.isConnecting || users.connectedUser)"
-              class="icon-x1 cursor-pointer icon-toggle-pwd"
+              matTooltip="Toggle Visibility"
               (click)="togglePassword()"
               [color]="show ? 'primary' : ''"
-              matTooltip="Toggle Visibility"
+              class="icon-x1 cursor-pointer icon-toggle-pwd"
             >
               <fa-icon [icon]="show ? 'eye' : 'eye-slash'"></fa-icon>
             </mat-icon>

@@ -13,19 +13,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card fxLayout="column" fxFlex class="card-su-deployment">
-  <ngx-hover-opacity [isHoverVisible]="component.state && component.state === 'Loaded'" class="deploy-su">
-    <app-upload
-      #deployServiceUnit
-      acceptedFileType=".zip"
-      [title]="'Service Unit Deployment'"
-      [message]="'Choose Service Unit:'"
-      [uploadStatus]="serviceUnitUploadProgress"
-      [error]="getSuDeploymentError()"
-      [isFileParsed]="isFileParsed"
-      (evtUploadFile)="deploy($event.selectedFileInformation.file, $event.selectedFileInformation.fileName)"
-      (evtFileSelected)="fileSelected($event.file)"
-      (evtResetFile)="cancelSelectedFile()"
-    ></app-upload>
+<div fxFlex="grow" fxLayout="column" class="removable">
+  <app-message
+    *ngIf="isHoverVisible"
+    type="warning"
+    fxFlex="none"
+    [msg]="message"
+    [isClosable]="false"></app-message>
+  <ngx-hover-opacity fxFlex="grow" fxLayout="column" [isHoverVisible]="isHoverVisible">
+    <ng-content></ng-content>
   </ngx-hover-opacity>
-</mat-card>
+</div>

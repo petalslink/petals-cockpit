@@ -6679,9 +6679,10 @@ ngrx-store-freeze@0.2.4:
   dependencies:
     deep-freeze-strict "^1.1.1"
 
-ngx-hover-opacity@0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/ngx-hover-opacity/-/ngx-hover-opacity-0.2.0.tgz#7ccc2b148d945e426acc20df36ccb05fb17a90d8"
+ngx-hover-opacity@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/ngx-hover-opacity/-/ngx-hover-opacity-0.3.1.tgz#c28da84eb82418547b86630c0c36cc225fd1d31d"
+  integrity sha512-eLfkbtWcuzmO22MaTwh4UpUpcdt8qqHHK4rVrYJPn6ULpzh+1T12pkfJIB4hbwtLq8LtoxkvVQoFAmGf2dZHSQ==
 
 ngx-pipes@2.1.7:
   version "2.1.7"

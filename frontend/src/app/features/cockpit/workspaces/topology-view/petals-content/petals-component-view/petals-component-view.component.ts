@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 import { distinctUntilChanged } from 'rxjs/operators';
 
 import {
@@ -43,9 +43,9 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   component: IComponentWithSlsAndSus;
-  workspaceId$: Observable<string>;
+  isDeleted: boolean;
 
-  top: ElementRef;
+  workspaceId$: Observable<string>;
 
   parametersForm: FormGroup;
 
@@ -56,10 +56,13 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
       .pipe(
         select(getCurrentComponent),
         takeUntil(this.onDestroy$),
+        filter(component => {
+          this.isDeleted = component === undefined;
+          return !this.isDeleted;
+        }),
         tap(component => {
           this.component = component;
           if (
-            component &&
             (component.updateError !== '' || !component.isUpdating) &&
             this.parametersForm
           ) {
@@ -67,8 +70,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
           }
         }),
         distinctUntilChanged(
-          (prev, curr) =>
-            prev && curr ? prev.parameters === curr.parameters : true
+          (prev, curr) => prev.parameters === curr.parameters
         ),
         tap(comp => {
           const parameters = comp.parameters;
