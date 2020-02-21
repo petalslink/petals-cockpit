@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex class="services-menu-view mat-typography">
+<div fxLayout="column" fxFlex class="services-menu-view">
   <div fxLayout="row" class="wrapper-search-services">
     <form [formGroup]="searchForm" fxFlex>
       <mat-form-field appearance="outline" fxFlex="280px">
@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <mat-accordion displayMode="flat" [multi]="true">
       <mat-expansion-panel fxLayout="column" class="exp-pnl-interfaces-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
         <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+          <div fxLayout="row" fxLayoutAlign="center center">
             <mat-icon class="margin-right-x1" color="primary" svgIcon="interface"></mat-icon>
             <span class="text-upper pnl-title light-bold">Interface Names</span>
           </div>
@@ -63,7 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-expansion-panel>
       <mat-expansion-panel fxLayout="column" class="exp-pnl-services-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
         <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+          <div fxLayout="row" fxLayoutAlign="center center">
             <mat-icon class="margin-right-x1" color="primary" svgIcon="service"></mat-icon>
             <span class="text-upper pnl-title light-bold">Service Names</span>
           </div>
@@ -77,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-expansion-panel>
       <mat-expansion-panel fxLayout="column" class="exp-pnl-endpoints-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
         <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center" class="mat-body">
+          <div fxLayout="row" fxLayoutAlign="center center">
             <mat-icon class="margin-right-x1" color="primary" svgIcon="endpoint"></mat-icon>
             <span class="text-upper pnl-title light-bold">Endpoint Names</span>
           </div>

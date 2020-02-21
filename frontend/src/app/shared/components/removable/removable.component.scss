@@ -14,9 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+:host {
+  flex: 1 1 100%;
+}
 
-// shared
-@import './shared/shared';
-
-// colors
-@import './shared/colors';
+.removable {
+  .message {
+    padding: 10px;
+    background: rgba(255, 0, 0, 0.2);
+    text-align: center;
+  }
+}

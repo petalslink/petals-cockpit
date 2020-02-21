@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 
-<div fxLayout="column" class="margin-top-x4 mat-typography">
+<div fxLayout="column" class="margin-top-x4">
   <mat-nav-list *ngIf="workspaces.list.length !== 0 && !workspaces.isFetchingWorkspaces" class="workspaces-list">
     <mat-list-item *ngFor="let workspace of workspaces.list; trackBy:trackByWorkspace" (click)="select(workspace)" class="workspaces-item">
       <mat-icon class="icon-x4 margin-right-x1 icon-wks">folder</mat-icon>
@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <span class="mat-body workspace-short-description">{{ workspace.shortDescription }}</span>
         </div>
         <div fxLayout="row" fxLayoutAlign="end start" fxFlex>
-          <mat-icon  
+          <mat-icon
             [matBadge]="workspace.users.length"
             matBadgeColor="primary"
             matBadgeOverlap="false"

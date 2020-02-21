@@ -580,7 +580,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           </span>
         </div>
         <mat-dialog-content>
-          <p fxLayout="column" class="mat-body-1">
+          <p fxLayout="column">
             <span>This will delete <b>{{ data.name }}</b> along with its settings (members, permissions, descriptions).</span>
             <span>Buses will be detached.</span>
           </p>
@@ -626,7 +626,7 @@ export class WorkspaceDeleteDialogComponent {
           </span>
         </div>
         <mat-dialog-content>
-          <p fxLayout="column" class="mat-body-1">
+          <p fxLayout="column">
             <span>This will detach <b>{{ data.name }}</b>.</span>
           </p>
         </mat-dialog-content>

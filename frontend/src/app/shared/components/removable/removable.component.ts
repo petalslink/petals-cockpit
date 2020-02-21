@@ -15,39 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@mixin custom-color-theme($theme) {
-  $primary: map-get($theme, primary);
-  $accent: map-get($theme, accent);
+import { Component, Input, OnInit } from '@angular/core';
 
-  .color-primary {
-    color: mat-color($primary, 700);
-  }
+@Component({
+  selector: 'app-removable',
+  templateUrl: './removable.component.html',
+  styleUrls: ['./removable.component.scss'],
+})
+export class RemovableComponent implements OnInit {
+  @Input() message: string;
+  @Input() isHoverVisible: boolean;
 
-  .color-accent {
-    color: mat-color($primary, 700);
-  }
+  constructor() {}
 
-  .color-primary-light-bold {
-    color: mat-color($primary, 600);
-  }
-
-  .color-accent-light-bold {
-    color: mat-color($accent, 600);
-  }
-
-  .color-primary-bold {
-    color: mat-color($primary, darker);
-  }
-
-  .color-accent-bold {
-    color: mat-color($accent, darker);
-  }
-
-  .color-red-light-bold {
-    color: mat-color($mat-red, 600);
-  }
-
-  .color-green-light-bold {
-    color: mat-color($mat-green, 600);
-  }
+  ngOnInit() {}
 }

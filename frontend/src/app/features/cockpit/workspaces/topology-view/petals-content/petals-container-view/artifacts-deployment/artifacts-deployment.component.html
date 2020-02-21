@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<mat-card fxLayout="column" fxFlex class="card-artifact-deployment margin-bottom-x2">
+<mat-card fxLayout="column" fxFlex class="card-artifact-deployment">
   <ngx-hover-opacity [isHoverVisible]="!container.isReachable" class="deploy-artifact">
     <app-upload
       #deployArtifact
@@ -29,21 +29,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       (evtResetFile)="cancelSelectedFile()"
       >
       <ng-template updateFileInformation>
-        <form 
-          *ngIf="artifact.type === 'component'" 
-          novalidate 
+        <form
+          *ngIf="artifact.type === 'component'"
+          novalidate
           [formGroup]="updateComponentDeployInfoFormGroup"
         >
           <div fxLayout="column" fxLayout.gt-md="row" fxLayoutAlign.gt-md="start center">
             <div fxFlex.gt-md="49" fxFlex="100">
               <mat-form-field appearance="outline" floatLabel="always" fxFlexFill class="comp-name-form-field">
                 <mat-label>Name</mat-label>
-                <input 
-                  type="text" 
-                  matInput 
+                <input
+                  type="text"
+                  matInput
                   placeholder="{{artifact.name}}"
-                  formControlName="name" 
-                  [appFocusInputIfLargeScreen]="canFocus" 
+                  formControlName="name"
+                  [appFocusInputIfLargeScreen]="canFocus"
                   [errorStateMatcher]="compErrorStateMatcher"
                 >
                 <button
@@ -99,22 +99,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               [isHoverVisible]="updateComponentDeployInfoFormGroup.get('name').hasError('isKeyPresentInObject')"
               class="already-in-container"
             >
-              <table 
+              <table
                 *ngIf="dataSource.data.length"
-                mat-table 
-                fxLayout="column" 
-                [dataSource]="dataSource" 
+                mat-table
+                fxLayout="column"
+                [dataSource]="dataSource"
                 class="comp-shared-libraries-table"
               >
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
-                  <th 
-                    mat-header-cell 
-                    *matHeaderCellDef 
-                    fxFlex="35" 
-                    fxFlex.gt-md="25" 
-                    fxLayout="row" 
-                    fxLayoutAlign="start center" 
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    fxFlex="35"
+                    fxFlex.gt-md="25"
+                    fxLayout="row"
+                    fxLayoutAlign="start center"
                   >
                     Name
                   </th>
@@ -124,13 +124,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                       <span class="sl-name ellipsis" title="{{ sl.name }}">{{ sl.name }}</span>
                     </span>
 
-                    <ng-template #slNameEdit>                      
+                    <ng-template #slNameEdit>
                       <mat-form-field class="override-sl-name-form-field ellipsis">
                         <input
                           type="text"
                           matInput
                           formControlName="slName"
-                          [ngModel]="currentSl.name" 
+                          [ngModel]="currentSl.name"
                           (ngModelChange)="currentSl.name = $event"
                           required
                         >
@@ -139,14 +139,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     </ng-template>
                   </td>
                 </ng-container>
-              
+
                 <!-- Version Column -->
                 <ng-container matColumnDef="version">
-                  <th 
-                    mat-header-cell 
-                    *matHeaderCellDef 
-                    fxFlex="25" 
-                    fxLayout="row" 
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    fxFlex="25"
+                    fxLayout="row"
                     fxLayoutAlign="center center"
                   >
                     Version
@@ -158,12 +158,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
                     <ng-template #slVersionEdit>
                       <mat-form-field class="override-sl-version-form-field ellipsis">
-                        <input 
-                          type="text" 
-                          matInput 
-                          formControlName="slVersion" 
+                        <input
+                          type="text"
+                          matInput
+                          formControlName="slVersion"
                           [ngModel]="currentSl.version"
-                          (ngModelChange)="currentSl.version = $event" 
+                          (ngModelChange)="currentSl.version = $event"
                           required
                         >
                         <mat-error>Required!</mat-error>
@@ -171,15 +171,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     </ng-template>
                   </td>
                 </ng-container>
-              
+
                 <!-- Status Column -->
                 <ng-container matColumnDef="status">
-                  <th 
-                    mat-header-cell 
-                    *matHeaderCellDef 
-                    fxFlex="15" 
-                    fxFlex.gt-md="25" 
-                    fxLayout="row" 
+                  <th
+                    mat-header-cell
+                    *matHeaderCellDef
+                    fxFlex="15"
+                    fxFlex.gt-md="25"
+                    fxLayout="row"
                     fxLayoutAlign="center center"
                   >
                     Status
@@ -194,15 +194,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     </div>
                   </td>
                 </ng-container>
-          
+
                 <!-- Actions Column -->
                 <ng-container matColumnDef="actions">
-                  <th 
-                    mat-header-cell 
+                  <th
+                    mat-header-cell
                     *matHeaderCellDef
-                    fxFlex="25" 
-                    fxLayout="row" 
-                    fxLayoutAlign="end center" 
+                    fxFlex="25"
+                    fxLayout="row"
+                    fxLayoutAlign="end center"
                   >
                     Actions
                   </th>
@@ -217,11 +217,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     </span>
                     <ng-template #slActionsEdit>
                       <span *ngIf="currentSlBeingEdited === i">
-                        <button 
-                          *ngIf="updateComponentDeployInfoFormGroup.valid" 
-                          mat-icon-button 
-                          matTooltip="Save" 
-                          (click)="updateSharedLibrary()" 
+                        <button
+                          *ngIf="updateComponentDeployInfoFormGroup.valid"
+                          mat-icon-button
+                          matTooltip="Save"
+                          (click)="updateSharedLibrary()"
                           class="btn-save-sl"
                           >
                           <fa-icon icon="check" class="icon-x1"></fa-icon>
@@ -231,10 +231,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                         </button>
                       </span>
                     </ng-template>
-                    
+
                   </td>
                 </ng-container>
-              
+
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
               </table>
@@ -259,23 +259,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </form>
 
-        <form 
-          *ngIf="artifact.type === 'service-assembly'" 
-          fxLayout="column" 
+        <form
+          *ngIf="artifact.type === 'service-assembly'"
+          fxLayout="column"
           fxLayout.gt-md="row"
-          fxLayoutAlign.gt-md="start center" 
-          novalidate 
+          fxLayoutAlign.gt-md="start center"
+          novalidate
           [formGroup]="updateServiceAssemblyDeployInfoFormGroup"
         >
           <div fxFlex.gt-md="49" fxFlex="100">
             <mat-form-field appearance="outline" floatLabel="always" fxFlexFill class="sa-name-form-field">
               <mat-label>Name</mat-label>
-              <input 
-                type="text" 
-                matInput 
+              <input
+                type="text"
+                matInput
                 placeholder="{{artifact.name}}"
-                formControlName="name" 
-                [appFocusInputIfLargeScreen]="canFocus" 
+                formControlName="name"
+                [appFocusInputIfLargeScreen]="canFocus"
                 [errorStateMatcher]="saErrorStateMatcher"
               >
               <button
@@ -297,23 +297,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </form>
 
-        <form 
-          *ngIf="artifact.type === 'shared-library'" 
-          fxLayout="column" 
+        <form
+          *ngIf="artifact.type === 'shared-library'"
+          fxLayout="column"
           fxLayout.gt-md="row"
-          fxLayoutAlign.gt-md="space-between center" 
-          novalidate 
+          fxLayoutAlign.gt-md="space-between center"
+          novalidate
           [formGroup]="updateSharedLibraryDeployInfoFormGroup"
         >
           <div fxFlex.gt-md="49" fxFlex="100">
             <mat-form-field appearance="outline" floatLabel="always" fxFlexFill class="sl-name-form-field">
               <mat-label>Name</mat-label>
-              <input 
-                type="text" 
-                matInput 
+              <input
+                type="text"
+                matInput
                 placeholder="{{artifact.name}}"
-                formControlName="name" 
-                [appFocusInputIfLargeScreen]="canFocus" 
+                formControlName="name"
+                [appFocusInputIfLargeScreen]="canFocus"
                 [errorStateMatcher]="slErrorStateMatcher"
               >
               <button
@@ -336,11 +336,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div fxFlex.gt-md="49" fxFlex="100">
             <mat-form-field appearance="outline" floatLabel="always" fxFlexFill class="sl-version-form-field">
               <mat-label>Version</mat-label>
-              <input 
-                type="text" 
-                matInput 
+              <input
+                type="text"
+                matInput
                 placeholder="{{artifact.version}}"
-                formControlName="version" 
+                formControlName="version"
                 [errorStateMatcher]="slErrorStateMatcher"
               >
               <button

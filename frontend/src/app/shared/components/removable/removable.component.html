@@ -13,9 +13,14 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div *ngIf="workspace.id" fxLayout="column" class="toolbar mat-elevation-z4">
-  <mat-toolbar role="header">
-    <app-menu [selectedWksId]="workspace.id" [workspacesIdsNames]="workspacesIdsNames"></app-menu>
-    <app-breadcrumb [workspace]="workspace"></app-breadcrumb>
-  </mat-toolbar>
+<div fxFlex="grow" fxLayout="column" class="removable">
+  <app-message
+    *ngIf="isHoverVisible"
+    type="warning"
+    fxFlex="none"
+    [msg]="message"
+    [isClosable]="false"></app-message>
+  <ngx-hover-opacity fxFlex="grow" fxLayout="column" [isHoverVisible]="isHoverVisible">
+    <ng-content></ng-content>
+  </ngx-hover-opacity>
 </div>

@@ -13,17 +13,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlexFill class="wrapper-content mat-typography">
+<div fxLayout="column" fxFlexFill class="wrapper-content">
   <div fxLayout="column" fxFlex class="content">
     <div *ngIf="container$ | async as container" fxLayout="column" fxLayoutGap="20px">
-      
-      <mat-card 
+
+      <mat-card
         fxFlex
         class="padding-x0 card-container-reachabilities"
       >
         <div fxLayout="column" fxLayout.gt-md="row" fxFlexFill>
-          <div 
-            fxLayout="column" 
+          <div
+            fxLayout="column"
             [fxFlex.gt-md]="!container.isReachable ? '100' : '35'"
             class="container-infos"
             >
@@ -49,17 +49,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <app-message
                   *ngIf="!!container.ip && !container.isReachable; else noContainerReachable"
                   type="warning"
-                  [isClosable]="false"
                   msg="Unreachable"
+                  [isClosable]="false"
                   class="warning-unreachable"
                 ></app-message>
-    
+
                 <ng-template #noContainerReachable>
-                  <app-message 
-                    *ngIf="!container.reachabilities.length" 
-                    type="info" 
-                    [isClosable]="false" 
+                  <app-message
+                    *ngIf="!container.reachabilities.length"
+                    type="info"
                     msg="There are no other containers in this bus."
+                    [isClosable]="false"
                     class="info-no-container-reachable"
                   ></app-message>
                 </ng-template>
@@ -67,29 +67,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </mat-card-content>
           </div>
 
-          <div 
-            *ngIf="container.isReachable" 
-            fxLayout="column" 
-            fxFlex="none" 
-            fxFlex.gt-md="65" 
+          <div
+            *ngIf="container.isReachable"
+            fxLayout="column"
+            fxFlex="none"
+            fxFlex.gt-md="65"
             class="container-list-graph"
           >
             <div class="title-containers-wrapper">
               <mat-card-title class="light-bold title-containers">Container Reachabilities</mat-card-title>
             </div>
 
-            <div 
-              *ngIf="container.isFetchingDetails; else displayContainerReachabilities" 
-              fxFlex 
-              fxLayout="column" 
-              fxLayoutAlign="center center" 
+            <div
+              *ngIf="container.isFetchingDetails; else displayContainerReachabilities"
+              fxFlex
+              fxLayout="column"
+              fxLayoutAlign="center center"
               class="loading-graph padding-x2"
             >
               <mat-spinner [diameter]="64" [strokeWidth]="2" color="primary"></mat-spinner>
             </div>
 
             <ng-template #displayContainerReachabilities>
-              <div 
+              <div
                 fxFlex
                 [visNetwork]="visNetwork"
                 [visNetworkData]="visNetworkData"

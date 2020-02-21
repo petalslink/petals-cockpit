@@ -64,6 +64,7 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { MessageComponent } from './components/message/message.component';
+import { RemovableComponent } from './components/removable/removable.component';
 
 import { NotFound404Component } from './components/not-found-404/not-found-404.component';
 import { SettingsThemeColorComponent } from './components/settings-theme-color/settings-theme-color.component';
@@ -211,6 +212,7 @@ export const declarations = [
   MenuComponent,
   SnackBarDeploymentProgressComponent,
   ConfirmMessageDialogComponent,
+  RemovableComponent,
 ];
 
 export const exportss = [

@@ -25,5 +25,6 @@ export const MESSAGE_DOM = {
   },
   texts: {
     msgDetails: `${bs} .msg-details`,
+    msgWarning: `${bs} .warning`,
   },
 };
