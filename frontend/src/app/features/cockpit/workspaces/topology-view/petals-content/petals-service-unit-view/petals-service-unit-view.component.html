@@ -13,84 +13,94 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-
-
 <div fxFlexFill fxLayout="column" class="wrapper-content">
-  <div fxLayout="column" class="content">
-    <div *ngIf= "(serviceUnit$ | async) as su" fxLayout="column" fxLayoutGap="20px">
+  <div *ngIf="serviceUnit$ | async as su" fxLayout="column" fxLayoutGap="20px" class="content">
+    <mat-card fxFlex class="card-component-lifecycle">
+      <mat-card-title class="light-bold title-about">About {{ su.name }}</mat-card-title>
 
-      <mat-card fxFlex [ngClass.gt-md]="'card-auto-size'" class="su-infos">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="text-upper">About <b>{{ su.name }}</b></span>
-          <mat-icon color="primary">info_outline</mat-icon>
-        </mat-card-title>
+      <mat-card-content class="margin-top-x1">
+        <span fxLayout="row" class="mat-body-2 margin-bottom-x1">State</span>
 
-        <div fxLayout="row" fxLayoutAlign="start center">
-          <mat-card-header fxFlex>
-            <mat-card-title>State</mat-card-title>
-            <mat-card-subtitle fxLayoutAlign="start center" class="sa-state">
-              {{ su.serviceAssembly.state }}
-              <app-led [color]="getLedColorFromState(su.serviceAssembly.state)" class="margin-left-x1"></app-led>
-            </mat-card-subtitle>
-          </mat-card-header>
+        <div fxLayout="row" fxLayoutAlign="start center" class="sa-state">
+          <span>{{ su.serviceAssembly.state }}</span>
+          <app-led [color]="getLedColorFromState(su.serviceAssembly.state)" class="margin-left-x1"></app-led>
         </div>
+      </mat-card-content>
+    </mat-card>
 
-      </mat-card>
+    <mat-card fxFlex class="card-related-elements">
+      <mat-card-title class="light-bold title-related-elements">Related Elements</mat-card-title>
 
-      <mat-card fxFlex class="su-info-sa">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="text-upper">Service Assembly</span>
-          <mat-icon color="primary" svgIcon="sa-overview"></mat-icon>
-        </mat-card-title>
+      <mat-card-content>
+        <div fxLayout="column" fxLayoutGap="20px">
+          <div
+            fxLayout="row"
+            fxLayout.lt-md="column"
+            fxLayoutGap="20px"
+            class="margin-top-x1"
+          >
+            <span fxLayoutAlign="start center">Services Assembly</span>
 
-        <div fxLayout="row wrap" fxLayoutAlign="start center">
-          <mat-card-header fxFlex fxLayout="row" class="service-assembly">
-            <mat-card-title>Name</mat-card-title>
-            <mat-card-subtitle fxLayoutAlign="start center" class="sa-name">
-              {{ su.serviceAssembly.name }}
-            </mat-card-subtitle>
-          </mat-card-header>
+            <span
+              fxFlex="calc(25% - 24px)"
+              fxLayoutGap="5px"
+              fxFlex.gt-md="calc(33.3% - 24px)"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+            >
+              <a
+                color="primary"
+                mat-stroked-button
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
+                class="btn-sa"
+              >
+                <span fxFlex class="sa-name ellipsis">{{ su.serviceAssembly.name }}</span>
+              </a>
 
-          <mat-card-content fxLayout="row" fxLayoutAlign="start center" class="view-sa">
-            <a mat-raised-button color="primary" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
-              class="sa">
-              <div fxFlex fxLayout="row" fxLayoutAlign="end center">
-                <span class="text-upper view-sa-name margin-right-x1">View this sa</span>
+              <app-led
+                matTooltipPosition="above"
+                [color]="getLedColorFromState(su.serviceAssembly.state)"
+                [matTooltip]="su.serviceAssembly.state"
+                class="sa-led"
+              ></app-led>
+            </span>
+          </div>
 
-                <mat-icon svgIcon="goto" fxLayoutAlign="center center" class="icon-x2"></mat-icon>
-              </div>
-            </a>
-          </mat-card-content>
+          <div
+            fxLayout.gt-md="row"
+            fxLayoutGap="65px"
+            fxLayout.lt-md="column"
+            fxLayoutGap.lt-md="20px"
+            class="margin-top-x1"
+          >
+            <span fxLayoutAlign="start center">Component</span>
+          
+            <span
+              fxFlex="calc(25% - 24px)"
+              fxLayoutGap="5px"
+              fxFlex.gt-md="calc(33.3% - 24px)"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+            >
+              <a
+                color="primary"
+                mat-stroked-button
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
+                class="btn-comp"
+              >
+                <span fxFlex class="comp-name ellipsis">{{ su.component.name }}</span>
+              </a>
+
+              <app-led
+                matTooltipPosition="above"
+                [color]="getLedColorFromState(su.component.state)"
+                [matTooltip]="su.serviceAssembly.state"
+                class="comp-led"
+              ></app-led>
+            </span>
+          </div>
         </div>
-      </mat-card>
-
-      <mat-card fxFlex class="su-info-comp">
-        <mat-card-title fxLayout="row">
-          <span fxFlex class="text-upper">Component</span>
-          <mat-icon color="primary" svgIcon="component" class="icon-x3"></mat-icon>
-        </mat-card-title>
-
-        <div fxLayout="row wrap" fxLayoutAlign="start center">
-          <mat-card-header fxFlex fxLayout="row" class="component">
-            <mat-card-title>Name</mat-card-title>
-            <mat-card-subtitle fxLayoutAlign="start center" class="component-name">
-              {{ su.component.name }}
-            </mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content fxLayout="row" fxLayoutAlign="start center" class="view-component">
-            <a mat-raised-button color="primary" [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', su.component.id]"
-              class="comp">
-              <div fxFlex fxLayout="row" fxLayoutAlign="end center">
-                <span class="text-upper view-component-name margin-right-x1">View this component</span>
-                <mat-icon svgIcon="goto"  fxLayoutAlign="center center" class="icon-x2"></mat-icon>
-              </div>
-            </a>
-          </mat-card-content>
-        </div>
-      </mat-card>
-
-    </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>
-
