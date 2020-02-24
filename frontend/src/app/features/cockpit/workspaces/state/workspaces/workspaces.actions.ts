@@ -23,6 +23,8 @@ import {
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
 
+import { IWorkspaceUserPermissions } from './workspaces.interface';
+
 export namespace Workspaces {
   export const CleanType = '[Workspaces] Clean';
   export class Clean implements Action {
@@ -195,7 +197,12 @@ export namespace Workspaces {
   export const AddUserSuccessType = '[Workspaces] Add user success';
   export class AddUserSuccess implements Action {
     readonly type = AddUserSuccessType;
-    constructor(public readonly payload: { id: string }) {}
+    constructor(
+      public readonly payload: {
+        id: string;
+        permissions: IWorkspaceUserPermissions;
+      }
+    ) {}
   }
 
   export const DeleteUserType = '[Workspaces] Delete user';

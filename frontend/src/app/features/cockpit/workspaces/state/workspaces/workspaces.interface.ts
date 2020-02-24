@@ -57,13 +57,11 @@ export interface IWorkspaceUserPermissions {
   lifecycleArtifact?: boolean;
 }
 
-// TODO: put all permissions to false for the edit permissions feature
-// See https://gitlab.com/linagora/petals-cockpit/issues/585
 export function workspaceUserPermissionsFactory(): IWorkspaceUserPermissions {
   return {
-    adminWorkspace: true,
-    deployArtifact: true,
-    lifecycleArtifact: true,
+    adminWorkspace: false,
+    deployArtifact: false,
+    lifecycleArtifact: false,
   };
 }
 

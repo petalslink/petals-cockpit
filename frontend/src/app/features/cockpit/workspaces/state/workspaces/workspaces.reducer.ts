@@ -19,6 +19,7 @@ import {
   IWorkspaceDetails,
   IWorkspaceRow,
   IWorkspacesTable,
+  IWorkspaceUserPermissions,
   workspaceRowFactory,
   workspacesTableFactory,
   workspaceUserPermissionsFactory,
@@ -149,10 +150,10 @@ export namespace WorkspacesReducer {
         return clean(table);
       }
       case Workspaces.AddUserType: {
-        return addUser(table, action.payload);
+        return addUser(table);
       }
       case Workspaces.AddUserErrorType: {
-        return addUserError(table, action.payload);
+        return addUserError(table);
       }
       case Workspaces.AddUserSuccessType: {
         return addUserSuccess(table, action.payload);
@@ -480,13 +481,13 @@ export namespace WorkspacesReducer {
   }
 }
 
-function addUser(table: IWorkspacesTable, payload: { id: string }) {
+function addUser(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isAddingUserToWorkspace: true,
   });
 }
 
-function addUserError(table: IWorkspacesTable, payload: { id: string }) {
+function addUserError(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isAddingUserToWorkspace: false,
   });
@@ -494,7 +495,7 @@ function addUserError(table: IWorkspacesTable, payload: { id: string }) {
 
 function addUserSuccess(
   table: IWorkspacesTable,
-  payload: { id: string }
+  payload: { id: string; permissions: IWorkspaceUserPermissions }
 ): IWorkspacesTable {
   return updateById(table, table.selectedWorkspaceId, {
     isAddingUserToWorkspace: false,
@@ -502,7 +503,7 @@ function addUserSuccess(
       ...putById(
         table.byId[table.selectedWorkspaceId].users,
         payload.id,
-        {},
+        { ...payload.permissions },
         workspaceUserPermissionsFactory
       ),
     },

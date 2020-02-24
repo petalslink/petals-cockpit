@@ -75,7 +75,10 @@ export abstract class WorkspacesService {
     description: string
   ): Observable<void>;
 
-  abstract addUser(workspaceId: string, userId: string): Observable<void>;
+  abstract addUser(
+    workspaceId: string,
+    userId: string
+  ): Observable<IWorkspaceUserPermissions>;
 
   abstract removeUser(workspaceId: string, userId: string): Observable<void>;
 
@@ -127,7 +130,7 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   addUser(workspaceId: string, id: string) {
-    return this.http.post<void>(
+    return this.http.post<IWorkspaceUserPermissions>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
       { id }
     );

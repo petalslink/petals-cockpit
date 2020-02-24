@@ -271,7 +271,13 @@ export class WorkspacesEffects {
     ),
     mergeMap(([action, workspaceId]) =>
       this.workspacesService.addUser(workspaceId, action.payload.id).pipe(
-        map(_ => new Workspaces.AddUserSuccess(action.payload)),
+        map(
+          res =>
+            new Workspaces.AddUserSuccess({
+              id: action.payload.id,
+              permissions: res,
+            })
+        ),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
