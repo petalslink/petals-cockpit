@@ -1,3 +1,23 @@
+<a name="1.4.0"></a>
+# [1.4.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.03.0...v1.4.0) (2020-02-24)
+
+
+### Bug Fixes
+
+* **backend:** verify if a user is already in the workspace before adding him to it ([1de0f9d](https://gitlab.com/linagora/petals-cockpit/commit/1de0f9ddd86abfcfcd03a6eb735df167fa42a677))
+* **backend:** prevent admins from adding a user with same username but not same case as an existing user ([9166f61](https://gitlab.com/linagora/petals-cockpit/commit/9166f610b89cd8761b4ec70bd24815a966db58fd)), closes [#640](https://gitlab.com/linagora/petals-cockpit/issues/640)
+
+
+### Features
+
+* **backend:** prevent usernames containing non-alphanumeric characters ([1d546b3](https://gitlab.com/linagora/petals-cockpit/commit/1d546b3b543f8af9b023ab155bcb2515a496d5cb)), closes [#638](https://gitlab.com/linagora/petals-cockpit/issues/638)
+* **frontend:** prevent usernames containing non-alphanumeric characters ([51e8f1d](https://gitlab.com/linagora/petals-cockpit/commit/51e8f1df06133960afdaf17d66ac80c348032a24))
+* **frontend:** component informations are read-only after deletion ([f70603c](https://gitlab.com/linagora/petals-cockpit/commit/f70603cd4f146fe4f3ddbb6462409ba2bf697d8f)), closes [#630](https://gitlab.com/linagora/petals-cockpit/issues/630)
+* **frontend:** refactor service unit view ([949261f](https://gitlab.com/linagora/petals-cockpit/commit/949261fab5622d2030a15d189d78778c62e6977c)), closes [#642](https://gitlab.com/linagora/petals-cockpit/issues/642)
+* **frontend:** refactor shared libraries view ([d05c812](https://gitlab.com/linagora/petals-cockpit/commit/d05c8122bb6311fea6d156e036239818f36dea11)), closes [#646](https://gitlab.com/linagora/petals-cockpit/issues/646) [#645](https://gitlab.com/linagora/petals-cockpit/issues/645)
+
+
+
 <a name="1.03.0"></a>
 # [1.03.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.02.0...v1.03.0) (2020-01-28)
 
