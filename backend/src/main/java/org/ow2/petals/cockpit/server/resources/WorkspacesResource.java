@@ -66,6 +66,8 @@ public class WorkspacesResource {
 
     public static final int SHORT_DESCRIPTION_MAX_LENGTH = 200;
 
+    public static final int NAME_MAX_LENGTH = 100;
+
     private final Configuration jooq;
 
     @Inject
@@ -78,6 +80,11 @@ public class WorkspacesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public WorkspaceMin create(@NotNull @Valid NewWorkspace ws, @Pac4JProfile CockpitProfile profile) {
         return DSL.using(jooq).transactionResult(conf -> {
+
+            if (ws.name.length() > NAME_MAX_LENGTH) {
+                throw new WebApplicationException(
+                        "Name must have less than " + NAME_MAX_LENGTH + " characters.", 422);
+            }
 
             if (similarWorkspaceNameAlreadyTaken(ws.name, jooq)) {
                 throw new WebApplicationException("Another workspace with a similar name already exists.",

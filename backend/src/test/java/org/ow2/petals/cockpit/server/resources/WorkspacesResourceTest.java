@@ -35,6 +35,9 @@ import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspacesCont
 @SuppressWarnings("null")
 public class WorkspacesResourceTest extends AbstractBasicResourceTest {
 
+    // This is a 101 characters long Cthuvian Lorem Ipsum, don't say it out loud!
+    private static final String STRING_OF_101_CHARS = "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl gol fhtagn. Hai ph'orr'e, n'ghft n'gha uaah Nyarlathotep.";
+
     public WorkspacesResourceTest() {
         super(WorkspacesResource.class);
     }
@@ -189,6 +192,17 @@ public class WorkspacesResourceTest extends AbstractBasicResourceTest {
         // there should be only one!
         assertThat(table(WORKSPACES)).hasNumberOfRows(1);
         assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(1);
+    }
+
+    @Test
+    public void createWorkspaceTooLongName() {
+        NewWorkspace newWs = new NewWorkspace(STRING_OF_101_CHARS, null, null);
+
+        Response add = resource.target("/workspaces").request().post(Entity.json(newWs));
+
+        assertThat(add.getStatus()).isEqualTo(422);
+        assertThat(table(WORKSPACES)).hasNumberOfRows(0);
+        assertThat(table(USERS_WORKSPACES)).hasNumberOfRows(0);
     }
 
 
