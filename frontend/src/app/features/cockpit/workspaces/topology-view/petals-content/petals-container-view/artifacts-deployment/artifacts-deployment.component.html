@@ -276,7 +276,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 placeholder="{{artifact.name}}"
                 formControlName="name"
                 [appFocusInputIfLargeScreen]="canFocus"
-                [errorStateMatcher]="saErrorStateMatcher"
               >
               <button
                 *ngIf="updateServiceAssemblyDeployInfoFormGroup.get('name')"
@@ -289,10 +288,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               >
                 <mat-icon>close</mat-icon>
               </button>
-
-              <mat-error class="error-sa-name-input">
-                This name already exists in {{container.name}}
-              </mat-error>
             </mat-form-field>
           </div>
         </form>
