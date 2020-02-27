@@ -114,16 +114,6 @@ export class ArtifactsDeploymentComponent
   updateServiceAssemblyDeployInfoFormGroup: FormGroup;
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
 
-  compErrorStateMatcher: ErrorStateMatcher = {
-    isErrorState: (
-      control: FormControl,
-      form: FormGroupDirective | NgForm
-    ): boolean =>
-      this.updateComponentDeployInfoFormGroup
-        .get('name')
-        .hasError('isKeyPresentInObject'),
-  };
-
   slErrorStateMatcher: ErrorStateMatcher = {
     isErrorState: (
       control: FormControl,

@@ -44,7 +44,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   placeholder="{{artifact.name}}"
                   formControlName="name"
                   [appFocusInputIfLargeScreen]="canFocus"
-                  [errorStateMatcher]="compErrorStateMatcher"
                 >
                 <button
                   *ngIf="updateComponentDeployInfoFormGroup.get('name')"
