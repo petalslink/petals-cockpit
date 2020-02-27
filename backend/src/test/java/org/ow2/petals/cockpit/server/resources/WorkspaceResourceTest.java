@@ -48,6 +48,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOvervi
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverviewContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate;
 
+import com.google.common.collect.ImmutableList;
+
 @SuppressWarnings("null")
 public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest {
 
@@ -163,9 +165,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void getOverviewExistingWorkspace() {
         WorkspaceOverviewContent get = resource.target("/workspaces/1").request().get(WorkspaceOverviewContent.class);
 
-        assertContentOverview(get.workspace);
-
-        assertWorkspaceUsers(get.users);
+        assertWorkspaceOverviewContent(get);
     }
 
     @Test
@@ -191,18 +191,11 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     public void setShortDescriptionAndDescription() {
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("");
 
-        WorkspaceOverviewContent put = resource.target("/workspaces/1").request()
-                .put(Entity.json(new WorkspaceUpdate(null, "shortDescription", "description")),
-                        WorkspaceOverviewContent.class);
+        WorkspaceOverviewContent put = resource.target("/workspaces/1").request().put(
+                Entity.json(new WorkspaceUpdate(null, "shortDescription", "description")),
+                WorkspaceOverviewContent.class);
 
-        assertThat(put.workspace.id).isEqualTo(1);
-        assertThat(put.workspace.name).isEqualTo("test");
-        assertThat(put.workspace.users).containsExactlyInAnyOrder(ADMIN);
-        assertThat(put.workspace.description).isEqualTo("description");
-        assertThat(put.workspace.shortDescription).isEqualTo("shortDescription");
-
-        assertWorkspaceUsers(put.users);
-
+        assertWorkspaceOverviewContent(put, "shortDescription", "description");
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.SHORT_DESCRIPTION.getName())
                 .isEqualTo("shortDescription");
         assertThat(requestWorkspace(1)).row(0).value(WORKSPACES.DESCRIPTION.getName()).isEqualTo("description");
@@ -266,8 +259,8 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void addSameUserToDifferentWorkspaces() { 
-        // verify users of both workspaces 
+    public void addSameUserToDifferentWorkspaces() {
+        // verify users of both workspaces
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1);
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4);
 
@@ -287,7 +280,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getPermissionsWhenAddingUser() { 
+    public void getPermissionsWhenAddingUser() {
         addUser("user1");
 
         PermissionsMin add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")), PermissionsMin.class);
@@ -388,23 +381,33 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(u.name).isEqualTo("admin");
     }
 
-    private void assertWorkspaceUsers(Map<String, WorkspaceUser> users) {
-        assertThat(users).hasSize(1);
-
-        WorkspaceUser u = users.values().iterator().next();
-
-        assertThat(u.userMin.id).isEqualTo(ADMIN);
-        assertThat(u.userMin.name).isEqualTo("admin");
-        assertThat(u.userMin.isAdmin).isTrue();
-        assertThat(u.wsPermissions.adminWorkspace).isTrue();
-        assertThat(u.wsPermissions.deployArtifact).isTrue();
-        assertThat(u.wsPermissions.lifecycleArtifact).isTrue();
-    }
-
     private void assertContentOverview(WorkspaceOverview overview) {
         assertThat(overview.id).isEqualTo(1);
         assertThat(overview.name).isEqualTo("test");
         assertThat(overview.users).containsExactlyInAnyOrder(ADMIN);
         assertThat(overview.description).isEqualTo("");
+    }
+
+    private void assertWorkspaceUsers(ImmutableList<WorkspaceUser> users) {
+        assertThat(users).hasSize(1);
+        WorkspaceUser u = users.iterator().next();
+
+        assertThat(u.id).isEqualTo(ADMIN);
+        assertThat(u.wsPermissions.adminWorkspace).isTrue();
+        assertThat(u.wsPermissions.deployArtifact).isTrue();
+        assertThat(u.wsPermissions.lifecycleArtifact).isTrue();
+    }
+
+    private void assertWorkspaceOverviewContent(WorkspaceOverviewContent overview) {
+        assertWorkspaceOverviewContent(overview, "", "");
+    }
+
+    private void assertWorkspaceOverviewContent(WorkspaceOverviewContent overview, String shortDescription,
+            String description) {
+        assertThat(overview.workspace.id).isEqualTo(1);
+        assertThat(overview.workspace.name).isEqualTo("test");
+        assertThat(overview.description).isEqualTo(description);
+        assertThat(overview.shortDescription).isEqualTo(shortDescription);
+        assertWorkspaceUsers(overview.users);
     }
 }

@@ -226,13 +226,3 @@ Cypress.Commands.add(
       .should('not.be.visible');
   }
 );
-
-Cypress.Commands.add('expectUserListToBe', userList => {
-  const cellNames = cy
-    .get('.users-table')
-    .find('td.cell-user-action')
-    .siblings();
-
-  cellNames.should('have.length', userList.length);
-  cellNames.each(($cell, index) => cy.wrap($cell).contains(userList[index]));
-});

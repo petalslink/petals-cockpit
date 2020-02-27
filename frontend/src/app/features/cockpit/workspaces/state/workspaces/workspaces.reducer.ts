@@ -16,20 +16,28 @@
  */
 
 import {
+  IWorkspaceDetails,
+  IWorkspaceRow,
   IWorkspacesTable,
+  IWorkspaceUserPermissions,
   workspaceRowFactory,
   workspacesTableFactory,
+  workspaceUserPermissionsFactory,
 } from './workspaces.interface';
 
 import {
+  emptyJsTable,
   JsTable,
   mergeInto,
   putById,
   removeById,
+  toJsTable,
   updateById,
 } from '@shared/helpers/jstable.helper';
 import { SseActions } from '@shared/services/sse.service';
+import { IUserBackend } from '@shared/services/users.service';
 import {
+  IUserWorkspaceBackend,
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
@@ -63,6 +71,8 @@ export namespace WorkspacesReducer {
     | Workspaces.AddUser
     | Workspaces.AddUserError
     | Workspaces.AddUserSuccess
+    | Workspaces.DeleteUser
+    | Workspaces.DeleteUserError
     | Workspaces.DeleteUserSuccess
     | Workspaces.RefreshServices
     | SseActions.ServicesUpdated
@@ -140,13 +150,19 @@ export namespace WorkspacesReducer {
         return clean(table);
       }
       case Workspaces.AddUserType: {
-        return addUser(table, action.payload);
+        return addUser(table);
       }
       case Workspaces.AddUserErrorType: {
-        return addUserError(table, action.payload);
+        return addUserError(table);
       }
       case Workspaces.AddUserSuccessType: {
         return addUserSuccess(table, action.payload);
+      }
+      case Workspaces.DeleteUserType: {
+        return deleteUser(table, action.payload);
+      }
+      case Workspaces.DeleteUserErrorType: {
+        return deleteUserError(table, action.payload);
       }
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
@@ -174,10 +190,36 @@ export namespace WorkspacesReducer {
 
   function fetchAllSuccess(
     table: IWorkspacesTable,
-    payload: JsTable<IWorkspaceBackend>
+    payload: {
+      workspaces: { [id: string]: IWorkspaceBackend };
+      users: { [id: string]: IUserBackend };
+    }
   ): IWorkspacesTable {
+    const wksUsersAsJsTable: JsTable<IWorkspaceDetails> = toJsTable(
+      Object.values(payload.workspaces).reduce(
+        (workspaces, wks) => ({
+          ...workspaces,
+          [wks.id]: {
+            ...wks,
+            users: toJsTable(
+              wks.users.reduce(
+                (users, user) => ({
+                  ...users,
+                  [user]: <IUserWorkspaceBackend>{
+                    name: payload.users[user].name,
+                  },
+                }),
+                <{ [id: string]: IUserWorkspaceBackend }>{}
+              )
+            ),
+          },
+        }),
+        <{ [id: string]: IWorkspaceRow }>{}
+      )
+    );
+
     return {
-      ...mergeInto(table, payload, workspaceRowFactory),
+      ...mergeInto(table, wksUsersAsJsTable, workspaceRowFactory),
       isFetchingWorkspaces: false,
     };
   }
@@ -201,8 +243,13 @@ export namespace WorkspacesReducer {
     table: IWorkspacesTable,
     payload: IWorkspaceBackend
   ): IWorkspacesTable {
+    const wksCurrentUser: IWorkspaceDetails = {
+      ...payload,
+      users: emptyJsTable(),
+    };
+
     return {
-      ...putById(table, payload.id, payload, workspaceRowFactory),
+      ...putById(table, wksCurrentUser.id, wksCurrentUser, workspaceRowFactory),
       isAddingWorkspace: false,
     };
   }
@@ -229,11 +276,32 @@ export namespace WorkspacesReducer {
     table: IWorkspacesTable,
     payload: IWorkspaceBackend
   ): IWorkspacesTable {
+    const wksUsers: IWorkspaceDetails = {
+      ...payload,
+      users:
+        table.allIds.length > 0
+          ? toJsTable(
+              payload.users.reduce(
+                (users, user) => ({
+                  ...users,
+                  [user]: <IUserWorkspaceBackend>{
+                    name:
+                      table.byId[payload.id].users.allIds.length > 0
+                        ? table.byId[payload.id].users.byId[user].name
+                        : '',
+                  },
+                }),
+                <{ [id: string]: IUserWorkspaceBackend }>{}
+              )
+            )
+          : emptyJsTable(),
+    };
+
     return {
-      ...(table.byId[payload.id]
-        ? updateById(table, payload.id, payload)
-        : putById(table, payload.id, payload, workspaceRowFactory)),
-      selectedWorkspaceId: payload.id,
+      ...(table.byId[wksUsers.id]
+        ? updateById(table, wksUsers.id, wksUsers)
+        : putById(table, wksUsers.id, wksUsers, workspaceRowFactory)),
+      selectedWorkspaceId: wksUsers.id,
       isFetchingWorkspace: false,
     };
   }
@@ -246,17 +314,46 @@ export namespace WorkspacesReducer {
   }
 
   function fetchDetails(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, payload.id, { isFetchingDetails: true });
+    return {
+      ...table,
+      isFetchingDetails: true,
+      byId: {
+        ...table.byId,
+        [table.selectedWorkspaceId]: cleanPermissionsWorkspace(
+          table.byId[payload.id]
+        ),
+      },
+    };
   }
 
   function fetchDetailsSuccess(
     table: IWorkspacesTable,
-    payload: { id: string; data: IWorkspaceBackendDetails }
+    payload: IWorkspaceBackendDetails
   ) {
-    return updateById(table, payload.id, {
-      ...payload.data,
-      isFetchingDetails: false,
+    const wksUsersAsJsTable: JsTable<IWorkspaceDetails> = toJsTable({
+      [payload.id]: {
+        ...payload,
+        users: toJsTable(
+          payload.users.reduce(
+            (users, user) => ({
+              ...users,
+              [user.id]: <IUserWorkspaceBackend>{
+                ...user,
+                adminWorkspace: user.adminWorkspace,
+                deployArtifact: user.deployArtifact,
+                lifecycleArtifact: user.lifecycleArtifact,
+              },
+            }),
+            <{ [id: string]: IUserWorkspaceBackend }>{}
+          )
+        ),
+      },
     });
+
+    return {
+      ...mergeInto(table, wksUsersAsJsTable, workspaceRowFactory),
+      isFetchingDetails: false,
+    };
   }
 
   function fetchDetailsError(table: IWorkspacesTable, payload: { id: string }) {
@@ -361,42 +458,83 @@ export namespace WorkspacesReducer {
     }
   }
 
-  function addUser(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: true,
-    });
-  }
-
-  function addUserError(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: false,
-    });
-  }
-
-  function addUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      isAddingUserToWorkspace: false,
-      users: [
-        ...Array.from(
-          new Set([...table.byId[table.selectedWorkspaceId].users, payload.id])
+  function cleanPermissionsWorkspace(workspace: IWorkspaceRow) {
+    return {
+      ...workspace,
+      users: {
+        allIds: workspace.users.allIds,
+        byId: workspace.users.allIds.reduce(
+          (
+            acc: { [userId: string]: IUserWorkspaceBackend },
+            userId: string
+          ) => ({
+            ...acc,
+            [userId]: {
+              id: userId,
+              name: workspace.users.byId[userId].name,
+            },
+          }),
+          <{ [userId: string]: IUserWorkspaceBackend }>{}
         ),
-      ],
-    });
+      },
+    };
   }
+}
 
-  function refreshServices(table: IWorkspacesTable) {
-    return { ...table, isFetchingServices: true };
-  }
+function addUser(table: IWorkspacesTable) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: true,
+  });
+}
 
-  function servicesUpdated(table: IWorkspacesTable) {
-    return { ...table, isFetchingServices: false };
-  }
+function addUserError(table: IWorkspacesTable) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: false,
+  });
+}
 
-  function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, table.selectedWorkspaceId, {
-      users: table.byId[table.selectedWorkspaceId].users.filter(
-        userId => userId !== payload.id
+function addUserSuccess(
+  table: IWorkspacesTable,
+  payload: { id: string; permissions: IWorkspaceUserPermissions }
+): IWorkspacesTable {
+  return updateById(table, table.selectedWorkspaceId, {
+    isAddingUserToWorkspace: false,
+    users: {
+      ...putById(
+        table.byId[table.selectedWorkspaceId].users,
+        payload.id,
+        { ...payload.permissions },
+        workspaceUserPermissionsFactory
       ),
-    });
-  }
+    },
+  });
+}
+
+function deleteUser(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: true,
+  });
+}
+
+function deleteUserError(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: false,
+  });
+}
+
+function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
+  return updateById(table, table.selectedWorkspaceId, {
+    isRemovingUserFromWorkspace: false,
+    users: {
+      ...removeById(table.byId[table.selectedWorkspaceId].users, payload.id),
+    },
+  });
+}
+
+function refreshServices(table: IWorkspacesTable) {
+  return { ...table, isFetchingServices: true };
+}
+
+function servicesUpdated(table: IWorkspacesTable) {
+  return { ...table, isFetchingServices: false };
 }

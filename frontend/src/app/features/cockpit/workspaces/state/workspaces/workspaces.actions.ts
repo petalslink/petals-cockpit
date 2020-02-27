@@ -17,11 +17,13 @@
 
 import { Action } from '@ngrx/store';
 
-import { JsTable } from '@shared/helpers/jstable.helper';
+import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
+
+import { IWorkspaceUserPermissions } from './workspaces.interface';
 
 export namespace Workspaces {
   export const CleanType = '[Workspaces] Clean';
@@ -45,7 +47,12 @@ export namespace Workspaces {
   export const FetchAllSuccessType = '[Workspaces] Fetch all success';
   export class FetchAllSuccess implements Action {
     readonly type = FetchAllSuccessType;
-    constructor(public readonly payload: JsTable<IWorkspaceBackend>) {}
+    constructor(
+      public readonly payload: {
+        workspaces: { [id: string]: IWorkspaceBackend };
+        users: { [id: string]: IUserBackend };
+      }
+    ) {}
   }
 
   export const CreateType = '[Workspaces] Create';
@@ -101,9 +108,7 @@ export namespace Workspaces {
   export const FetchDetailsSuccessType = '[Workspaces] Fetch details success';
   export class FetchDetailsSuccess implements Action {
     readonly type = FetchDetailsSuccessType;
-    constructor(
-      public readonly payload: { id: string; data: IWorkspaceBackendDetails }
-    ) {}
+    constructor(public readonly payload: IWorkspaceBackendDetails) {}
   }
 
   export const SetDescriptionsType = '[Workspaces] Set descriptions';
@@ -192,7 +197,12 @@ export namespace Workspaces {
   export const AddUserSuccessType = '[Workspaces] Add user success';
   export class AddUserSuccess implements Action {
     readonly type = AddUserSuccessType;
-    constructor(public readonly payload: { id: string }) {}
+    constructor(
+      public readonly payload: {
+        id: string;
+        permissions: IWorkspaceUserPermissions;
+      }
+    ) {}
   }
 
   export const DeleteUserType = '[Workspaces] Delete user';

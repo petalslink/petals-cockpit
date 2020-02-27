@@ -19,8 +19,8 @@ import assign from 'lodash-es/assign';
 import flatMap from 'lodash-es/flatMap';
 
 import { IBusImport } from '@shared/services/buses.service';
-import { IUserBackend } from '@shared/services/users.service';
 import {
+  IUserWorkspaceBackend,
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
@@ -47,7 +47,7 @@ export class Workspace {
   public readonly name: string;
   public shortDescription: string;
   public description: string;
-  private readonly users = new Map<string, BackendUser>();
+  private readonly users = new Map<string, IUserWorkspaceBackend>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
   private readonly interfaces = new Map<string, Interface>();
@@ -55,7 +55,15 @@ export class Workspace {
   private readonly endpoints = new Map<string, Endpoint>();
 
   constructor(
-    users: string[] = ['admin'],
+    users: IUserWorkspaceBackend[] = [
+      {
+        id: 'admin',
+        name: 'Administrator',
+        adminWorkspace: true,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+    ],
     name?: string,
     shortDescription?: string,
     description?: string
@@ -69,7 +77,15 @@ export class Workspace {
     this.description = description
       ? description
       : 'Put some description in **markdown** for the workspace here.';
-    users.forEach(u => this.users.set(u, BackendUser.get(u)));
+    users.forEach(user =>
+      this.users.set(user.id, {
+        id: BackendUser.get(user.id).id,
+        name: BackendUser.get(user.id).name,
+        adminWorkspace: user.adminWorkspace,
+        deployArtifact: user.deployArtifact,
+        lifecycleArtifact: user.lifecycleArtifact,
+      })
+    );
 
     // by default add 1 bus
     this.addBus();
@@ -79,19 +95,23 @@ export class Workspace {
     this.users.delete(id);
   }
 
-  getDetails(): {
-    workspace: IWorkspaceBackendDetails;
-    users: { [id: string]: IUserBackend };
-  } {
+  getDetails(): IWorkspaceBackendDetails {
     return {
-      workspace: {
-        id: this.id,
-        name: this.name,
-        shortDescription: this.shortDescription,
-        description: this.description,
-        users: this.getUsersIds(),
-      },
-      users: toObj(this.getUsers()),
+      id: this.id,
+      name: this.name,
+      shortDescription: this.shortDescription,
+      description: this.description,
+      users: this.getUsers(),
+    };
+  }
+
+  getContent(): IWorkspaceBackend {
+    return {
+      id: this.id,
+      name: this.name,
+      shortDescription: this.shortDescription,
+      description: this.description,
+      users: this.getUsersIds(),
     };
   }
 
@@ -100,9 +120,9 @@ export class Workspace {
       [this.id]: {
         id: this.id,
         name: this.name,
-        users: this.getUsersIds(),
         shortDescription: this.shortDescription,
         description: this.description,
+        users: this.getUsersIds(),
       },
     };
   }
@@ -113,6 +133,18 @@ export class Workspace {
 
   getUsers() {
     return Array.from(this.users.values());
+  }
+
+  getUsersBackend() {
+    return BackendUser.getAll()
+      .filter(user => this.getUsersIds().includes(user.id))
+      .map(userWks => {
+        return {
+          id: userWks.id,
+          name: userWks.name,
+          isAdmin: userWks.isAdmin,
+        };
+      });
   }
 
   getInterfacesIds() {
@@ -168,6 +200,17 @@ export class Workspace {
 
   addUser(user: BackendUser) {
     this.users.set(user.id, user);
+  }
+
+  addUserWithoutPermission(user: BackendUser) {
+    const workspaceUsers = {
+      id: user.id,
+      name: user.name,
+      adminWorkspace: false,
+      deployArtifact: false,
+      lifecycleArtifact: false,
+    };
+    this.users.set(user.id, workspaceUsers);
   }
 
   removeUser(userId: string) {
@@ -524,7 +567,8 @@ export class Workspace {
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
     return {
-      ...this.getDetails(),
+      workspace: this.getContent(),
+      users: this.getUsersBackend(),
       buses: toObj(buses),
       containers: toObj(containers),
       components: toObj(components),
@@ -555,12 +599,16 @@ export class Workspaces {
     const workspaces = this.getWorkspaces(user);
     return {
       workspaces: toObj(workspaces),
-      users: toObj(flatMap(workspaces, w => w.getUsers())),
+      users: toObj(
+        flatMap(workspaces, w =>
+          w.getUsers().map(userWkss => BackendUser.get(userWkss.id))
+        )
+      ),
     };
   }
 
   create(
-    users?: string[],
+    users?: IUserWorkspaceBackend[],
     name?: string,
     shortDescription?: string,
     description?: string
@@ -572,9 +620,9 @@ export class Workspaces {
 
   delete(id: string) {
     const ws = this.get(id);
-    ws.getUsers().forEach(u => {
-      if (u.lastWorkspace === id) {
-        u.lastWorkspace = null;
+    ws.getUsers().forEach(user => {
+      if (BackendUser.get(user.id).lastWorkspace === id) {
+        BackendUser.get(user.id).lastWorkspace = null;
       }
     });
     this.workspaces.delete(id);
@@ -598,12 +646,48 @@ ws0.addServices();
 ws0.addEndpoints();
 
 const ws1 = workspacesService.create([
-  'admin',
-  'adminldap',
-  'bescudie',
-  'mrobert',
-  'cchevalier',
-  'vnoel',
+  {
+    id: BackendUser.get('admin').id,
+    name: BackendUser.get('admin').name,
+    adminWorkspace: true,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: BackendUser.get('adminldap').id,
+    name: BackendUser.get('adminldap').name,
+    adminWorkspace: true,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: BackendUser.get('bescudie').id,
+    name: BackendUser.get('bescudie').name,
+    adminWorkspace: false,
+    deployArtifact: false,
+    lifecycleArtifact: false,
+  },
+  {
+    id: BackendUser.get('mrobert').id,
+    name: BackendUser.get('mrobert').name,
+    adminWorkspace: false,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: BackendUser.get('cchevalier').id,
+    name: BackendUser.get('cchevalier').name,
+    adminWorkspace: false,
+    deployArtifact: true,
+    lifecycleArtifact: false,
+  },
+  {
+    id: BackendUser.get('vnoel').id,
+    name: BackendUser.get('vnoel').name,
+    adminWorkspace: false,
+    deployArtifact: false,
+    lifecycleArtifact: true,
+  },
 ]);
 
 // add 2 interfaces, 2 services and 2 endpoints

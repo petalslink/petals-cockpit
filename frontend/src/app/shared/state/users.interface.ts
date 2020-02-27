@@ -25,7 +25,6 @@ export interface IUserUI {
   isAdding: boolean;
   isDeleting: boolean;
   isModifying: boolean;
-  isDeletingFromWorkspace: boolean;
 }
 
 // used within table
@@ -69,7 +68,6 @@ export function userRowFactory(): IUserRow {
     isAdding: false,
     isDeleting: false,
     isModifying: false,
-    isDeletingFromWorkspace: false,
   };
 }
 
@@ -81,13 +79,14 @@ export function usersTableFactory(): IUsersTable {
     isConnecting: false,
     isDisconnecting: false,
     connectionFailed: false,
-    isSettingUp: false,
-    errorSetupUser: '',
-    validSetupUser: '',
 
     isFetchingUsers: false,
     isFetchingLdapUsers: false,
 
     ldapSearchList: [],
+
+    isSettingUp: false,
+    errorSetupUser: '',
+    validSetupUser: '',
   };
 }

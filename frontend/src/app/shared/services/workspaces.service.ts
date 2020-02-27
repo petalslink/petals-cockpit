@@ -20,6 +20,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IUserBackend } from '@shared/services/users.service';
 
 export interface IWorkspaceBackendCommon {
@@ -32,6 +33,11 @@ export interface IWorkspaceBackendDetailsCommon {
   description: string;
 }
 
+export interface IUserWorkspaceBackend extends IWorkspaceUserPermissions {
+  id: string;
+  name: string;
+}
+
 export interface IWorkspaceBackend
   extends IWorkspaceBackendCommon,
     IWorkspaceBackendDetailsCommon {
@@ -40,9 +46,10 @@ export interface IWorkspaceBackend
 }
 
 export interface IWorkspaceBackendDetails
-  extends IWorkspaceBackend,
-    IWorkspaceBackendDetailsCommon {}
-
+  extends IWorkspaceBackendCommon,
+    IWorkspaceBackendDetailsCommon {
+  users: IUserWorkspaceBackend[];
+}
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<{
     workspaces: {
@@ -58,14 +65,7 @@ export abstract class WorkspacesService {
     shortDescription: string
   ): Observable<IWorkspaceBackendDetails>;
 
-  abstract fetchWorkspace(
-    id: string
-  ): Observable<{
-    workspace: IWorkspaceBackendDetails;
-    users: {
-      [id: string]: IUserBackend;
-    };
-  }>;
+  abstract fetchWorkspace(id: string): Observable<IWorkspaceBackendDetails>;
 
   abstract deleteWorkspace(id: string): Observable<void>;
 
@@ -75,7 +75,10 @@ export abstract class WorkspacesService {
     description: string
   ): Observable<void>;
 
-  abstract addUser(workspaceId: string, userId: string): Observable<void>;
+  abstract addUser(
+    workspaceId: string,
+    userId: string
+  ): Observable<IWorkspaceUserPermissions>;
 
   abstract removeUser(workspaceId: string, userId: string): Observable<void>;
 
@@ -110,12 +113,9 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   fetchWorkspace(id: string) {
-    return this.http.get<{
-      workspace: IWorkspaceBackendDetails;
-      users: {
-        [id: string]: IUserBackend;
-      };
-    }>(`${environment.urlBackend}/workspaces/${id}`);
+    return this.http.get<IWorkspaceBackendDetails>(
+      `${environment.urlBackend}/workspaces/${id}`
+    );
   }
 
   deleteWorkspace(id: string) {
@@ -130,7 +130,7 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   addUser(workspaceId: string, id: string) {
-    return this.http.post<void>(
+    return this.http.post<IWorkspaceUserPermissions>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
       { id }
     );

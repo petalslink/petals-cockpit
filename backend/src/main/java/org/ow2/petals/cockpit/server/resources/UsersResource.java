@@ -100,12 +100,12 @@ public class UsersResource {
                 } else {
                     final String username = user.username;
                     final boolean userAlreadyExists = DSL.using(jooq).fetchExists(USERS, USERS.USERNAME.equalIgnoreCase(username));
-                    if (userAlreadyExists) { 
+                    if (userAlreadyExists) {
                         throw new WebApplicationException("User already exists!", Status.CONFLICT);
                     };
 
                     final String correctSyntax = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*$";
-                    if (!username.matches(correctSyntax)) { 
+                    if (!username.matches(correctSyntax)) {
                         throw new WebApplicationException("Username must be valid.", 422);
                     };
 
@@ -274,25 +274,23 @@ public class UsersResource {
 
     public static class WorkspaceUser {
 
-        @Valid
-        @JsonUnwrapped
-        public final UserMin userMin;
-
+        @NotEmpty
+        @JsonProperty
+        public final String id;
 
         @Valid
         @JsonUnwrapped
         public final PermissionsMin wsPermissions;
 
-        public WorkspaceUser(UserMin userMin, PermissionsMin wsPerm) {
-            this.userMin = userMin;
+        public WorkspaceUser(@JsonProperty("id") String id, @JsonProperty("permissions") PermissionsMin wsPerm) {
+            this.id = id;
             this.wsPermissions = wsPerm;
         }
 
         @JsonCreator
         private WorkspaceUser() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new UserMin("", "", false), new PermissionsMin(false, false, false));
+            this("", new PermissionsMin(false, false, false));
         }
-
     }
 }

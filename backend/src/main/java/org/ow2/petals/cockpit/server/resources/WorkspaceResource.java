@@ -81,6 +81,7 @@ import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceMin;
 import org.ow2.petals.cockpit.server.services.ArtifactServer;
 import org.ow2.petals.cockpit.server.services.ArtifactServer.ServedArtifact;
 import org.ow2.petals.cockpit.server.services.WorkspaceDbOperations;
@@ -104,7 +105,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.ImmutableSet;
 import com.webcohesion.enunciate.metadata.rs.ResponseCode;
 import com.webcohesion.enunciate.metadata.rs.Warnings;
@@ -582,27 +582,36 @@ public class WorkspaceResource {
     public static class WorkspaceOverviewContent {
 
         @Valid
+        @JsonUnwrapped
+        public final WorkspaceMin workspace;
+
+        @NotNull
         @JsonProperty
-        public final WorkspaceOverview workspace;
+        public final String shortDescription;
+
+        @NotNull
+        @JsonProperty
+        public final String description;
 
         @Valid
         @JsonProperty
-        public final ImmutableMap<String, WorkspaceUser> users;
+        public final ImmutableList<WorkspaceUser> users;
 
         public WorkspaceOverviewContent(WorkspacesRecord ws, List<WorkspaceUser> users) {
-            Builder<String, WorkspaceUser> builder = new ImmutableMap.Builder<String, WorkspaceUser>();
-            users.forEach(user -> builder.put(user.userMin.id, user));
+            this.users = ImmutableList.<WorkspaceUser> builder().addAll(users).build();
 
-            this.users = builder.build();
-            this.workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(),
-                    ws.getDescription(), ImmutableList.copyOf(this.users.keySet()));
+            this.workspace = new WorkspaceMin(ws.getId(), ws.getName());
+            this.shortDescription = ws.getShortDescription();
+            this.description = ws.getDescription();
         }
 
         @JsonCreator
-        private WorkspaceOverviewContent(@JsonProperty("workspace") WorkspaceOverview workspace,
-                @JsonProperty("users") Map<String, WorkspaceUser> users) {
-            this.workspace = workspace;
-            this.users = ImmutableMap.copyOf(users);
+        private WorkspaceOverviewContent() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            workspace = new WorkspaceMin(0, "");
+            shortDescription = "";
+            description = "";
+            users = ImmutableList.of();
         }
     }
 

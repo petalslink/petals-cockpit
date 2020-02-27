@@ -44,6 +44,7 @@ import {
   getFormErrors,
 } from '@shared/helpers/form.helper';
 import { IBusImport } from '@shared/services/buses.service';
+import { IUserWorkspaceBackend } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
@@ -120,14 +121,21 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   disabledDetachBtn = false;
 
   // workspace users management
-  users$: Observable<IUserRow[]>;
+  users$: Observable<IUserWorkspaceBackend[]>;
   currentUserId$: Observable<string>;
   appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
 
-  dataSource = new MatTableDataSource<IUserRow>([]);
-  displayedColumns: string[] = ['name', 'id', 'action'];
+  dataSource = new MatTableDataSource<IUserWorkspaceBackend>([]);
+  displayedColumns: string[] = [
+    'name',
+    'id',
+    'adminWorkspace',
+    'deployArtifact',
+    'lifecycleArtifact',
+    'action',
+  ];
   sortDirection = 'asc';
   sortableColumn = 'name';
 
@@ -150,7 +158,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
-      map(us => us.map(u => u.id).sort())
+      map(user => user.map(u => u.id).sort())
     );
 
     this.addUserFormGroup = this.fb.group({

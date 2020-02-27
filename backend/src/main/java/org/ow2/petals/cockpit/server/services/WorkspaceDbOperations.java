@@ -703,7 +703,7 @@ public class WorkspaceDbOperations {
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(workspaceId))
                 .orderBy(USERS_WORKSPACES.USERNAME)
                 .fetch(record -> new WorkspaceUser(
-                        new UserMin(record.get(USERS.USERNAME), record.get(USERS.NAME), record.get(USERS.ADMIN)),
+                        record.get(USERS.USERNAME),
                         new PermissionsMin(record.get(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION),
                         record.get(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION),
                         record.get(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION))));

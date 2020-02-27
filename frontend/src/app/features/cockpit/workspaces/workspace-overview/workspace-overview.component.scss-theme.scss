@@ -77,4 +77,11 @@
       }
     }
   }
+  mat-card.card-users {
+    table.users-table {
+      .table-row:hover {
+        background-color: mat-color($mat-grey, 200);
+      }
+    }
+  }
 }

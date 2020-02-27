@@ -68,7 +68,7 @@ export class WorkspacesEffects {
     switchMap(() => this.workspacesService.fetchWorkspaces()),
     map(res =>
       batchActions([
-        new Workspaces.FetchAllSuccess(toJsTable(res.workspaces)),
+        new Workspaces.FetchAllSuccess(res),
         new Users.Fetched(toJsTable(res.users)),
       ])
     ),
@@ -103,7 +103,13 @@ export class WorkspacesEffects {
               this.router.navigate(['/workspaces', newWks.id]);
             }
           }),
-          map(res => new Workspaces.CreateSuccess(res)),
+          map(
+            res =>
+              new Workspaces.CreateSuccess({
+                ...res,
+                users: [],
+              })
+          ),
           catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
@@ -157,7 +163,6 @@ export class WorkspacesEffects {
             `Workspace Error`,
             `An error occurred with the workspace connection.`
           );
-
           return of(new Workspaces.FetchError(action.payload));
         })
       )
@@ -173,7 +178,6 @@ export class WorkspacesEffects {
       return batchActions([
         new Workspaces.Clean(),
         new Workspaces.FetchSuccess(data.workspace),
-        new Users.Fetched(toJsTable(data.users)),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),
         new Components.Fetched(toJsTable(data.components)),
@@ -192,15 +196,7 @@ export class WorkspacesEffects {
     ofType<Workspaces.FetchDetails>(Workspaces.FetchDetailsType),
     switchMap(action =>
       this.workspacesService.fetchWorkspace(action.payload.id).pipe(
-        map(res =>
-          batchActions([
-            new Workspaces.FetchDetailsSuccess({
-              id: action.payload.id,
-              data: res.workspace,
-            }),
-            new Users.Fetched(toJsTable(res.users)),
-          ])
-        ),
+        map(res => new Workspaces.FetchDetailsSuccess(res)),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
@@ -275,7 +271,13 @@ export class WorkspacesEffects {
     ),
     mergeMap(([action, workspaceId]) =>
       this.workspacesService.addUser(workspaceId, action.payload.id).pipe(
-        map(_ => new Workspaces.AddUserSuccess(action.payload)),
+        map(
+          res =>
+            new Workspaces.AddUserSuccess({
+              id: action.payload.id,
+              permissions: res,
+            })
+        ),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();

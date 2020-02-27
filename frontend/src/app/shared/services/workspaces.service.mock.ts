@@ -47,7 +47,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     );
   }
 
-  postWorkspace(name: string, description: string) {
+  postWorkspace(name: string, shortDescription: string) {
     // only used by the tests to verify an error coming from the backend...
     if (name === ADD_WKS_HTTP_ERROR_BACKEND) {
       return helper.errorBackend(errorBackend, 500);
@@ -55,8 +55,20 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
 
     const mock = this.usersService as UsersServiceMock;
     const workspace = workspacesService
-      .create([mock.getCurrentUser().id], name, description)
-      .getDetails().workspace;
+      .create(
+        [
+          {
+            id: mock.getCurrentUser().id,
+            name: mock.getCurrentUser().name,
+            adminWorkspace: true,
+            deployArtifact: true,
+            lifecycleArtifact: true,
+          },
+        ],
+        name,
+        shortDescription
+      )
+      .getDetails();
 
     return helper
       .responseBody(workspace)
@@ -99,7 +111,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       delay(environment.mock.httpDelay),
       tap(_ => {
         const user: BackendUser = BackendUser.get(userId);
-        workspacesService.get(workspaceId).addUser(user);
+        workspacesService.get(workspaceId).addUserWithoutPermission(user);
       })
     );
   }
