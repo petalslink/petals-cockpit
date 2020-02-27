@@ -206,55 +206,6 @@ describe('Container', () => {
     });
 
     // SERVICE ASSEMBLY
-    it('should have incorrect service-assembly deployment form', () => {
-      cy
-        .get(`.card-artifact-deployment`)
-        .scrollIntoView()
-        .should('be.visible')
-        .and('not.have.class', 'hover');
-
-      // check default content of the deployment card
-      cy.contains(UPLOAD_DOM.texts.titleCard, 'Artifact Deployment');
-      cy.get(UPLOAD_DOM.texts.defaultCardContentMsg).should('be.visible');
-      cy.get(UPLOAD_DOM.buttons.browse).should('be.visible');
-
-      cy.uploadFile(
-        'sa-flowable-vacation-sample.zip',
-        '.deploy-artifact input[type=file]'
-      );
-
-      // check if default content of the deployment card is not visible
-      cy
-        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 10000 })
-        .should('not.be.visible');
-      cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
-
-      // check the new content of the deployment card with the new service-assembly deployment form
-      cy.contains(UPLOAD_DOM.texts.titleCard, 'Service Assembly Deployment');
-      cy.contains(UPLOAD_DOM.texts.fileName, 'sa-flowable-vacation-sample.zip');
-      cy.get(UPLOAD_DOM.buttons.deploy).should('be.enabled');
-
-      // rename current sa name
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.inputs.artifactName)
-        .should('have.value', `sa-flowable-vacation-sample`);
-
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`mat-error`)
-        .should('not.be.visible');
-
-      cy.get(ARTIFACT_DEPLOYMENT_DOM.buttons.clearSaName).click();
-      cy.get(ARTIFACT_DEPLOYMENT_DOM.inputs.artifactName).type(`SA 0`);
-
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`.error-sa-name-input`)
-        .contains(`This name already exists in Cont 0`);
-
-      cy.get(UPLOAD_DOM.buttons.deploy).should('not.be.enabled');
-    });
-
     it('should have a correct service-assembly deployment form', () => {
       cy
         .get(`.card-artifact-deployment`)
@@ -284,11 +235,6 @@ describe('Container', () => {
       cy
         .get(ARTIFACT_DEPLOYMENT_DOM.inputs.artifactName)
         .should('have.value', `sa-flowable-vacation-sample`);
-
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`mat-error`)
-        .should('not.be.visible');
     });
 
     it('should cancel and reset service-assembly deployment form', () => {
@@ -321,11 +267,6 @@ describe('Container', () => {
         .get(ARTIFACT_DEPLOYMENT_DOM.inputs.artifactName)
         .should('have.value', `sa-flowable-vacation-sample`);
 
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`mat-error`)
-        .should('not.be.visible');
-
       // clear input value
       cy.get(ARTIFACT_DEPLOYMENT_DOM.buttons.clearSaName).click();
 
@@ -339,15 +280,6 @@ describe('Container', () => {
 
       cy.get(ARTIFACT_DEPLOYMENT_DOM.inputs.artifactName).type('SA 0');
 
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`mat-error`)
-        .first()
-        .contains('This name already exists in Cont 0')
-        .should('be.visible');
-
-      cy.get(UPLOAD_DOM.buttons.deploy).should('not.be.enabled');
-
       // cancel form
       cy.get(UPLOAD_DOM.buttons.cancelFileName).click();
 
@@ -360,11 +292,6 @@ describe('Container', () => {
         'sa-flowable-vacation-sample.zip',
         '.deploy-artifact input[type=file]'
       );
-
-      cy
-        .get(ARTIFACT_DEPLOYMENT_DOM.formFields.saNameFormField)
-        .find(`mat-error`)
-        .should('not.be.visible');
 
       // check the new content of the deployment card with the new service-assembly deployment form
       cy.contains(UPLOAD_DOM.texts.titleCard, 'Service Assembly Deployment');
