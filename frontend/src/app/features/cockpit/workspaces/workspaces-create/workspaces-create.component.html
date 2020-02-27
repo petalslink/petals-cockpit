@@ -22,14 +22,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-form-field appearance="outline" fxFlexFill class="add-workspace-form-field">
           <mat-label>Name</mat-label>
           <input
+            #workspaceNameInput
             matInput
             type="text"
             formControlName="workspaceName"
-            maxLength="200"
+            maxLength="100"
             [appFocusInputIfLargeScreen]="canFocus"
             [errorStateMatcher]="matcher"
             required
           >
+          <mat-hint *ngIf="workspaceNameInput.value?.length !== 100; else isMaxNameLength">{{ workspaceNameInput.value?.length || 0 }}/100</mat-hint>
+          <ng-template #isMaxNameLength>
+            <mat-error>Max 100 characters!</mat-error>
+          </ng-template>
           <span matPrefix><mat-icon class="icon-x2"><fa-icon class="far" [icon]="['far','folder']"></fa-icon></mat-icon></span>
           <mat-error *ngIf="formErrors.workspaceName">{{ formErrors.workspaceName }}</mat-error>
         </mat-form-field>
@@ -48,8 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             formControlName="shortDescription"
             class="description-wks"
           ></textarea>
-          <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxLength">{{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
-          <ng-template #isMaxLength>
+          <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxDescLength">{{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
+          <ng-template #isMaxDescLength>
             <mat-error>Max 200 characters!</mat-error>
           </ng-template>
         </mat-form-field>

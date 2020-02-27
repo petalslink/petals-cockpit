@@ -239,7 +239,7 @@ describe(`Workspaces`, () => {
     cy.expectWorkspacesListToBe(expectedWorkspacesListDetails);
   });
 
-  it('should failed the create of new workspace and then be successful', () => {
+  it('should fail workspace creation and then be successful', () => {
     // open menu
     cy
       .get(MENU_DOM.buttons.toggleMenu)
@@ -337,6 +337,21 @@ describe(`Workspaces`, () => {
       .click();
 
     cy.expectLocationToBe('/workspaces/idWks2');
+  });
+
+  it('should not be able to create workspaces with long name or description', () => {
+    cy.get(MENU_DOM.buttons.toggleMenu).click();
+    cy.get(MENU_DOM.links.goToCreateWks).click();
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.inputs.workspaceName)
+      .type(workspaceName101Chars)
+      .should('have.value', workspaceName101Chars.substring(0, 100));
+
+    cy
+      .get(WORKSPACES_CREATE_DOM.textArea.shortDescription)
+      .type(shortDescription202Chars)
+      .should('have.value', shortDescription202Chars.substring(0, 200));
   });
 
   it('should display message when there is only one workspace in the list', () => {
@@ -572,6 +587,13 @@ describe(`Workspaces`, () => {
       `No description provided.`,
     ]);
   });
+
+  // Long Chtuvian strings
+
+  const workspaceName101Chars =
+    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl gol fhtagn. Hai ph'orr'e, n'ghft n'gha uaah Nyarlathotep.";
+  const shortDescription202Chars =
+    workspaceName101Chars + workspaceName101Chars;
 
   // ---------------------------- Default Workspaces List ---------------------------- //
 
