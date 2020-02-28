@@ -17,6 +17,10 @@
 package org.ow2.petals.cockpit.server.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.db.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -26,6 +30,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.assertj.db.type.Changes;
+import org.assertj.db.type.Table;
 import org.eclipse.jdt.annotation.Nullable;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPart;
@@ -42,9 +48,12 @@ import org.ow2.petals.admin.topology.Container.PortType;
 import org.ow2.petals.admin.topology.Container.State;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyFull;
+import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitFull;
 import org.ow2.petals.cockpit.server.resources.ServiceUnitsResource.ServiceUnitOverview;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAChangeState;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SADeployOverrides;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.SAStateChanged;
 import org.ow2.petals.cockpit.server.services.PetalsAdmin.PetalsAdminException;
 
 import com.google.common.collect.ImmutableList;
@@ -205,6 +214,82 @@ public class DeploySATest extends AbstractBasicResourceTest {
                     .get(ServiceUnitOverview.class);
             resource.target("/serviceunits/" + postSU1.serviceUnit.id).request().get(ServiceUnitOverview.class);
             resource.target("/serviceunits/" + postSU2.serviceUnit.id).request().get(ServiceUnitOverview.class);
+        }
+    }
+
+    @Test
+    public void deploySameSaTwice() throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            MultiPart mpe = getSAMultiPart();
+            WorkspaceContent post = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            assertThat(container.getServiceAssemblies()).hasSize(1);
+            ServiceAssembly serviceAssembly = container.getServiceAssemblies().get(0);
+            assertNotNull(serviceAssembly);
+            assertThat(serviceAssembly.getServiceUnits()).hasSize(2);
+
+
+            Changes changes = new Changes(resource.db.getDataSource());
+            changes.setStartPointNow();
+
+            WorkspaceContent post2 = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            changes.setEndPointNow();
+
+            assertThat(container.getServiceAssemblies()).hasSize(1);
+            serviceAssembly = container.getServiceAssemblies().get(0);
+            assertNotNull(serviceAssembly);
+            assertThat(serviceAssembly.getServiceUnits()).hasSize(2);
+            assertThat(changes.getChangesOfTable(SERVICEASSEMBLIES.getName()).getChangesList().size()).isEqualTo(0);
+            assertThat(changes.getChangesOfTable(SERVICEUNITS.getName()).getChangesList().size()).isEqualTo(0);
+        }
+    }
+
+    @Test
+    public void deploySameSaTwiceStateChanged() throws Exception {
+        try (EventInput eventInput = resource.sse(1)) {
+            expectWorkspaceContent(eventInput);
+
+            MultiPart mpe = getSAMultiPart();
+            WorkspaceContent post = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            assertThat(container.getServiceAssemblies()).hasSize(1);
+            ServiceAssembly serviceAssembly = container.getServiceAssemblies().get(0);
+            assertNotNull(serviceAssembly);
+            assertThat(serviceAssembly.getServiceUnits()).hasSize(2);
+
+            assertThat(serviceAssembly.getState()).isEqualTo(ArtifactState.State.SHUTDOWN);
+            SAStateChanged put = resource.target("/workspaces/1/serviceassemblies/" + getId(serviceAssembly)).request()
+                    .put(Entity.json(new SAChangeState(ServiceAssemblyMin.State.Started)), SAStateChanged.class);
+            assertThat(put.state).isEqualTo(ServiceAssemblyMin.State.Started);
+            serviceAssembly.setState(ArtifactState.State.SHUTDOWN);
+
+            Changes changes = new Changes(resource.db.getDataSource());
+            changes.setStartPointNow();
+
+            WorkspaceContent post2 = resource
+                    .target("/workspaces/1/containers/" + getId(container) + "/serviceassemblies").request()
+                    .post(Entity.entity(mpe, mpe.getMediaType()), WorkspaceContent.class);
+
+            changes.setEndPointNow();
+
+            assertThat(container.getServiceAssemblies()).hasSize(1);
+            serviceAssembly = container.getServiceAssemblies().get(0);
+            assertNotNull(serviceAssembly);
+            assertThat(serviceAssembly.getServiceUnits()).hasSize(2);
+            assertThat(serviceAssembly.getState()).isEqualTo(ArtifactState.State.SHUTDOWN);
+            assertThat(changes.getChangesOfTable(SERVICEUNITS.getName()).getChangesList().size()).isEqualTo(0);
+            assertThat(changes.getChangesOfTable(SERVICEASSEMBLIES.getName()).getChangesList().size()).isEqualTo(1);
+            assertThat(new Table(resource.db.getDataSource(), SERVICEASSEMBLIES.getName())).hasNumberOfRows(1).row()
+                    .column(SERVICEASSEMBLIES.STATE.getName()).value().isEqualTo("Shutdown");
         }
     }
 

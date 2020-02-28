@@ -23,7 +23,6 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEASSEMBLIES;
-import static org.ow2.petals.cockpit.server.db.generated.Tables.SERVICEUNITS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.SHAREDLIBRARIES_COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
@@ -566,26 +565,12 @@ public class WorkspacesService {
         }
 
         private WorkspaceContent serviceAssemblyDeployed(ServiceAssembly deployedSA, long cId, Configuration conf) {
-
             ServiceAssemblyMin.State state = ServiceAssemblyMin.State.from(deployedSA.getState());
-            ServiceassembliesRecord saDb = new ServiceassembliesRecord(null, cId, deployedSA.getName(), state.name());
-            saDb.attach(conf);
-            int saDbi = saDb.insert();
-            assert saDbi == 1;
-
-            workspaceDb.serviceAssemblyAdded(deployedSA, saDb);
+            ServiceassembliesRecord saDb = workspaceDb.insertSAOnDuplicateUpdate(deployedSA, cId, conf, state);
 
             Map<String, ServiceUnitFull> serviceUnitsDb = new HashMap<>();
             for (ServiceUnit su : deployedSA.getServiceUnits()) {
-                // use ServiceunitsRecord for the typing of its constructor
-                ServiceunitsRecord suDb = new ServiceunitsRecord(null, null, su.getName(), saDb.getId(), cId);
-                ServiceunitsRecord inserted = DSL.using(conf).insertInto(SERVICEUNITS).set(suDb)
-                        .set(SERVICEUNITS.COMPONENT_ID,
-                                DSL.select(COMPONENTS.ID).from(COMPONENTS)
-                                        .where(COMPONENTS.NAME.eq(su.getTargetComponent())
-                                                .and(COMPONENTS.CONTAINER_ID.eq(cId))))
-                        .returning(SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID).fetchOne();
-                suDb.from(inserted, SERVICEUNITS.ID, SERVICEUNITS.COMPONENT_ID);
+                ServiceunitsRecord suDb = workspaceDb.insertSuOnDuplicateIgnore(cId, conf, saDb, su);
                 serviceUnitsDb.put(Long.toString(suDb.getId()), new ServiceUnitFull(suDb));
             }
 
@@ -593,11 +578,11 @@ public class WorkspacesService {
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap
                             .of(Long.toString(saDb.getId()), new ServiceAssemblyFull(saDb, serviceUnitsDb.keySet())),
                     serviceUnitsDb, ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of());
-
             broadcast(WorkspaceEvent.saDeployed(res));
 
             return res;
         }
+
 
         public synchronized WorkspaceContent deployComponent(String name, ComponentMin.Type type, URL saUrl, long cId) {
             return DSL.using(jooq).transactionResult(conf -> {
@@ -627,11 +612,13 @@ public class WorkspacesService {
 
             Set<String> sls = new HashSet<>();
             for (SharedLibrary sl : deployedComp.getSharedLibraries()) {
-                SelectConditionStep<Record1<Long>> where = DSL.using(conf).select(SHAREDLIBRARIES.ID)
-                        .from(SHAREDLIBRARIES)
-                        .where(SHAREDLIBRARIES.NAME.eq(sl.getName()).and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
-                                .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId)));
-                int inserted = DSL.using(conf).insertInto(SHAREDLIBRARIES_COMPONENTS)
+                SelectConditionStep<Record1<Long>> where = DSL.using(conf)
+                        .select(SHAREDLIBRARIES.ID).from(SHAREDLIBRARIES)
+                        .where(SHAREDLIBRARIES.NAME.eq(sl.getName())
+                        .and(SHAREDLIBRARIES.VERSION.eq(sl.getVersion()))
+                        .and(SHAREDLIBRARIES.CONTAINER_ID.eq(cId)));
+                int inserted = DSL.using(conf)
+                        .insertInto(SHAREDLIBRARIES_COMPONENTS)
                         .set(SHAREDLIBRARIES_COMPONENTS.COMPONENT_ID, compDb.getId())
                         .set(SHAREDLIBRARIES_COMPONENTS.SHAREDLIBRARY_ID, where).execute();
                 assert inserted == 1;

@@ -622,8 +622,9 @@ public class WorkspaceDbOperations {
         Map<String, ServiceFull> servicesToReturn = new HashMap<String, ServiceFull>();
 
         ctx.select().from(SERVICES)
-                .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID).join(CONTAINERS)
-                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_SERVICE_ID)
+                .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
                 .where(BUSES.WORKSPACE_ID.eq(workspaceId))
                 .forEach(record -> {
                     ServicesRecord servrec = record.into(SERVICES);
@@ -649,19 +650,21 @@ public class WorkspaceDbOperations {
         final DSLContext ctx = DSL.using(conf);
         Map<String, EndpointFull> endpointsToReturn = new HashMap<String, EndpointFull>();
 
-        ctx.select().from(ENDPOINTS).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID).join(CONTAINERS)
-                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
-                .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
-                    EndpointsRecord edprec = record.into(ENDPOINTS);
-                    EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
+        ctx.select().from(ENDPOINTS)
+        .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+        .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+        .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+        .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
+            EndpointsRecord edprec = record.into(ENDPOINTS);
+            EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
 
-                    assert edprec != null && instrec != null;
-                    final String endpointid = edprec.getId().toString();
-                    assert endpointid != null;
+            assert edprec != null && instrec != null;
+            final String endpointid = edprec.getId().toString();
+            assert endpointid != null;
 
-                    endpointsToReturn.put(endpointid,
-                            new EndpointFull(edprec, instrec.getComponentId()));
-                });
+            endpointsToReturn.put(endpointid,
+                    new EndpointFull(edprec, instrec.getComponentId()));
+        });
 
         return ImmutableMap.copyOf(endpointsToReturn);
     }
@@ -670,25 +673,26 @@ public class WorkspaceDbOperations {
         final DSLContext ctx = DSL.using(conf);
         Map<String, InterfaceFull> interfacesToReturn = new HashMap<String, InterfaceFull>();
 
-        ctx.select().from(INTERFACES).join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID).join(CONTAINERS)
-                .onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID).join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
-                .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
-                    InterfacesRecord itfrec = record.into(INTERFACES);
-                    EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
+        ctx.select().from(INTERFACES)
+        .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+        .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+        .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+        .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
+            InterfacesRecord itfrec = record.into(INTERFACES);
+            EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
 
-                    assert itfrec != null && instrec != null;
-                    final String interfaceid = itfrec.getId().toString();
-                    assert interfaceid != null;
+            assert itfrec != null && instrec != null;
+            final String interfaceid = itfrec.getId().toString();
+            assert interfaceid != null;
 
-                    if (interfacesToReturn.containsKey(interfaceid)) {
-                        final InterfaceFull interfaceFull = interfacesToReturn.get(interfaceid);
-                        assert interfaceFull != null;
-                        interfaceFull.addComponent(instrec.getComponentId());
-                    } else {
-                        interfacesToReturn.put(interfaceid,
-                                new InterfaceFull(itfrec, instrec.getComponentId().toString()));
-                    }
-                });
+            if (interfacesToReturn.containsKey(interfaceid)) {
+                final InterfaceFull interfaceFull = interfacesToReturn.get(interfaceid);
+                assert interfaceFull != null;
+                interfaceFull.addComponent(instrec.getComponentId());
+            } else {
+                interfacesToReturn.put(interfaceid, new InterfaceFull(itfrec, instrec.getComponentId().toString()));
+            }
+        });
 
         return ImmutableMap.copyOf(interfacesToReturn);
     }
@@ -709,6 +713,49 @@ public class WorkspaceDbOperations {
                         record.get(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION))));
         assert result != null;
         return result;
+    }
+
+    public ServiceunitsRecord insertSuOnDuplicateIgnore(long cId, Configuration conf, ServiceassembliesRecord saDb,
+            ServiceUnit su) {
+        long targetComponentId = DSL.using(conf)
+                .select().from(COMPONENTS)
+                .where(COMPONENTS.NAME.eq(su.getTargetComponent())
+                .and(COMPONENTS.CONTAINER_ID.eq(cId)))
+                .fetchOne(COMPONENTS.ID);
+
+        ServiceunitsRecord suDb =  DSL.using(conf).selectFrom(SERVICEUNITS)
+                .where(SERVICEUNITS.CONTAINER_ID.eq(targetComponentId))
+                .and(SERVICEUNITS.NAME.eq(su.getName()))
+                .and(SERVICEUNITS.SERVICEASSEMBLY_ID.eq(saDb.getId()))
+                .and(SERVICEUNITS.CONTAINER_ID.eq(cId)).fetchOne();
+
+        if (suDb == null) {
+            suDb = new ServiceunitsRecord(null, targetComponentId, su.getName(), saDb.getId(), cId);
+            suDb.attach(conf);
+            suDb.insert();
+        }
+        return suDb;
+    }
+
+    public ServiceassembliesRecord insertSAOnDuplicateUpdate(ServiceAssembly deployedSA, long cId, Configuration conf,
+            ServiceAssemblyMin.State state) {
+        ServiceassembliesRecord saDb = DSL.using(conf).selectFrom(SERVICEASSEMBLIES)
+                .where(SERVICEASSEMBLIES.CONTAINER_ID.eq(cId))
+                .and(SERVICEASSEMBLIES.NAME.eq(deployedSA.getName())).fetchOne();
+
+        if (saDb == null) {
+            saDb = new ServiceassembliesRecord(null, cId, deployedSA.getName(), state.name());
+            saDb.attach(conf);
+            saDb.insert();
+            this.serviceAssemblyAdded(deployedSA, saDb);
+
+        } else if (state.name().compareTo(saDb.getState()) != 0) {
+            saDb.setState(state.name());
+            DSL.using(conf).update(SERVICEASSEMBLIES)
+                .set(SERVICEASSEMBLIES.STATE, state.name())
+                .where(SERVICEASSEMBLIES.ID.eq(saDb.getId())).execute();
+        }
+        return saDb;
     }
 
 }
