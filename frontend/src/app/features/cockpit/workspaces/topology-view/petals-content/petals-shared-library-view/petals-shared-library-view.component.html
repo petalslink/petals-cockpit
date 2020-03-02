@@ -13,108 +13,113 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlexFill class="wrapper-content">
-  <div
-    *ngIf="sharedLibrary$ | async as sl"
-    fxLayout="column"
-    fxLayoutGap="20px"
-    class="content"
-  >
-    <mat-card class="card-sl-lifecycle">
-      <mat-card-title class="sl-name light-bold">About {{ sl.name }}</mat-card-title>
-      <span fxLayout="row" class="mat-body-2 margin-bottom-x1">Version</span>
-      <span class="sl-version">{{ sl.version }}</span>
-      <mat-card-content class="margin-top-x1">
-        <div
-          fxLayout="column"
-          fxLayout.gt-sm="row"
-          fxLayoutAlign="center start"
-          fxLayoutAlign.gt-sm="start center"
-        >
-          <button
-            mat-raised-button
-            (click)="unload(sl.id)"
-            [disabled]="sl.isFetchingDetails || sl.isUpdatingState || sl.components.length > 0"
-            class="btn-unload-sl color-primary text-upper margin-right-x1"
-          >
-            <mat-icon
-              *ngIf="sl.components.length > 0"
-              matTooltip="To unload a shared-library, all components that use it should be unloaded first"
-              matTooltipPosition="above"
-            >
-              info
-            </mat-icon>
-            <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
-            <span>Unload</span>
-          </button>
-          <app-message type="error" [msg]="sl.errorChangeState"></app-message>
-        </div>
-      </mat-card-content> 
-    </mat-card>
-
-    <mat-card fxFlex class="card-components">
-      <mat-card-title fxLayout="row" class="light-bold">Related Elements</mat-card-title>
-
-      <mat-card-content class="components-content margin-top-x1">
-        <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap="20px">
+<app-removable
+  [isHoverVisible]="isDeleted"
+  [message]="'This shared library has been removed'"
+>
+  <div fxLayout="column" fxFlexFill class="wrapper-content">
+    <div
+      *ngIf="sharedLibrary$ | async as sl"
+      fxLayout="column"
+      fxLayoutGap="20px"
+      class="content"
+    >
+      <mat-card class="card-sl-lifecycle">
+        <mat-card-title class="sl-name light-bold">About {{ sl.name }}</mat-card-title>
+        <span fxLayout="row" class="mat-body-2 margin-bottom-x1">Version</span>
+        <span class="sl-version">{{ sl.version }}</span>
+        <mat-card-content class="margin-top-x1">
           <div
-            fxFlex
-            fxFlex.gt-sm="none"
-            fxLayout="row"
-            fxLayoutAlign="start center"
-            class="margin-top-x1"
+            fxLayout="column"
+            fxLayout.gt-sm="row"
+            fxLayoutAlign="center start"
+            fxLayoutAlign.gt-sm="start center"
           >
-            <span fxFlexFill>Component{{ sl.components.length > 1 ? 's' : '' }}</span>
-            <ng-template #noComponent>
-              <app-message
-                fxFlex
-                type="info"
-                msg="This shared library isn't used by any component."
-                [isClosable]="false"
-                class="info-sl-no-component"
-              ></app-message>
-            </ng-template>
-          </div>
-
-          <ng-container
-            *ngIf="sl.components.length !== 0; else noComponent"
-          >
-            <div
-              fxLayout="column"
-              fxLayout.gt-md="row wrap"
-              fxLayoutGap="0"
-              fxLayoutGap.gt-md="24px"
+            <button
+              mat-raised-button
+              (click)="unload(sl.id)"
+              [disabled]="sl.isFetchingDetails || sl.isUpdatingState || sl.components.length > 0"
+              class="btn-unload-sl color-primary text-upper margin-right-x1"
             >
-              <div *ngFor="let component of sl.components; trackBy:trackByComponent" class="components">
-                <span
-                  fxFlex="calc(25% - 24px)"
-                  fxFlex.gt-md="calc(33.3% - 24px)"
-                  fxLayout="row"
-                  fxLayoutAlign="start center"
-                  class="comp-{{ component.id }}"
-                >
-                  <a
-                    color="primary"
-                    mat-stroked-button
-                    matTooltipPosition="above"
-                    [matTooltip]="component.name"
-                    [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', component.id]"
-                    class="btn-comp"
-                  >
-                    <span fxFlex class="component-name ellipsis">{{ component.name }}</span>
-                  </a>
-                  <app-led
-                    matTooltipPosition="above"
-                    [color]="getLedColorFromState(component.state)"
-                    [matTooltip]="component.state"
-                    class="comp-led"
-                  ></app-led>
-                </span>
-              </div>
+              <mat-icon
+                *ngIf="sl.components.length > 0"
+                matTooltip="To unload a shared-library, all components that use it should be unloaded first"
+                matTooltipPosition="above"
+              >
+                info
+              </mat-icon>
+              <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
+              <span>Unload</span>
+            </button>
+            <app-message type="error" [msg]="sl.errorChangeState"></app-message>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex class="card-components">
+        <mat-card-title fxLayout="row" class="light-bold">Related Elements</mat-card-title>
+
+        <mat-card-content class="components-content margin-top-x1">
+          <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutGap="20px">
+            <div
+              fxFlex
+              fxFlex.gt-sm="none"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+              class="margin-top-x1"
+            >
+              <span fxFlexFill>Component{{ sl.components.length > 1 ? 's' : '' }}</span>
+              <ng-template #noComponent>
+                <app-message
+                  fxFlex
+                  type="info"
+                  msg="This shared library isn't used by any component."
+                  [isClosable]="false"
+                  class="info-sl-no-component"
+                ></app-message>
+              </ng-template>
             </div>
-          </ng-container>
-        </div>
-      </mat-card-content>
-    </mat-card>
+
+            <ng-container
+              *ngIf="sl.components.length !== 0; else noComponent"
+            >
+              <div
+                fxLayout="column"
+                fxLayout.gt-md="row wrap"
+                fxLayoutGap="0"
+                fxLayoutGap.gt-md="24px"
+              >
+                <div *ngFor="let component of sl.components; trackBy:trackByComponent" class="components">
+                  <span
+                    fxFlex="calc(25% - 24px)"
+                    fxFlex.gt-md="calc(33.3% - 24px)"
+                    fxLayout="row"
+                    fxLayoutAlign="start center"
+                    class="comp-{{ component.id }}"
+                  >
+                    <a
+                      color="primary"
+                      mat-stroked-button
+                      matTooltipPosition="above"
+                      [matTooltip]="component.name"
+                      [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', component.id]"
+                      class="btn-comp"
+                    >
+                      <span fxFlex class="component-name ellipsis">{{ component.name }}</span>
+                    </a>
+                    <app-led
+                      matTooltipPosition="above"
+                      [color]="getLedColorFromState(component.state)"
+                      [matTooltip]="component.state"
+                      class="comp-led"
+                    ></app-led>
+                  </span>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
-</div>
+</app-removable>

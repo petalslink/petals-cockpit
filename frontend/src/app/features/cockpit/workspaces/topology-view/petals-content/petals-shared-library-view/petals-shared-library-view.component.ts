@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { IComponentRow } from '@feat/cockpit/workspaces/state/components/components.interface';
 import { SharedLibraries } from '@feat/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
@@ -29,24 +29,41 @@ import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
 } from '@wks/state/shared-libraries/shared-libraries.selectors';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-shared-library-view',
   templateUrl: './petals-shared-library-view.component.html',
   styleUrls: ['./petals-shared-library-view.component.scss'],
 })
-export class PetalsSharedLibraryViewComponent implements OnInit {
+export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   sharedLibrary$: Observable<ISharedLibraryWithComponents>;
   workspaceId$: Observable<string>;
+
+  isDeleted: boolean;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.sharedLibrary$ = this.store$.pipe(select(getCurrentSharedLibrary));
+    this.sharedLibrary$ = this.store$.pipe(
+      select(getCurrentSharedLibrary),
+      takeUntil(this.onDestroy$),
+      filter(sl => {
+        this.isDeleted = sl === undefined;
+        return !this.isDeleted;
+      })
+    );
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 
   trackByComponent(i: number, component: IComponentRow) {

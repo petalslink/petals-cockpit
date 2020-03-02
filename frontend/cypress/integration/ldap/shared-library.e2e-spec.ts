@@ -16,6 +16,7 @@
  */
 
 import { COMPONENT_DOM } from '../../support/component.dom';
+import { MESSAGE_DOM } from '../../support/message.dom';
 import { SHARED_LIBRARY_DOM } from '../../support/shared-library.dom';
 
 describe('Shared-library', () => {
@@ -128,5 +129,38 @@ describe('Shared-library', () => {
       .get(SHARED_LIBRARY_DOM.component('idComp2'))
       .find('div')
       .should('have.class', 'yellow');
+  });
+
+  it('should display read-only informations when deleted', () => {
+    // unload the component
+    cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+    cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+    cy.get(COMPONENT_DOM.buttons.actionState('unload')).click();
+
+    // unload the shared library
+    cy
+      .get('.mat-list-item-content')
+      .contains('SL 0')
+      .click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy
+      .get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn)
+      .should('be.enabled')
+      .click();
+
+    // should display a warning message
+    cy
+      .get(MESSAGE_DOM.texts.msgWarning)
+      .contains('This shared library has been removed')
+      .scrollIntoView()
+      .should('be.visible');
+
+    // should contain all informations
+    cy.get(SHARED_LIBRARY_DOM.texts.slName).should('contain', 'SL 0');
+    cy.get(SHARED_LIBRARY_DOM.texts.slVersion).should('contain', '1.0.0');
+
+    // should disable unload button
+    cy.get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn).should('be.disabled');
   });
 });
