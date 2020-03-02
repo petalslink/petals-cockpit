@@ -114,26 +114,6 @@ export class ArtifactsDeploymentComponent
   updateServiceAssemblyDeployInfoFormGroup: FormGroup;
   updateSharedLibraryDeployInfoFormGroup: FormGroup;
 
-  compErrorStateMatcher: ErrorStateMatcher = {
-    isErrorState: (
-      control: FormControl,
-      form: FormGroupDirective | NgForm
-    ): boolean =>
-      this.updateComponentDeployInfoFormGroup
-        .get('name')
-        .hasError('isKeyPresentInObject'),
-  };
-
-  saErrorStateMatcher: ErrorStateMatcher = {
-    isErrorState: (
-      control: FormControl,
-      form: FormGroupDirective | NgForm
-    ): boolean =>
-      this.updateServiceAssemblyDeployInfoFormGroup
-        .get('name')
-        .hasError('isKeyPresentInObject'),
-  };
-
   slErrorStateMatcher: ErrorStateMatcher = {
     isErrorState: (
       control: FormControl,
@@ -189,21 +169,14 @@ export class ArtifactsDeploymentComponent
 
     this.updateSharedLibraryDeployInfoFormGroup = this.fb.group(
       {
-        name: [''],
-        version: [''],
+        name: '',
+        version: '',
       },
       { validator: this.slNameAndVersionChecker() }
     );
 
     this.updateServiceAssemblyDeployInfoFormGroup = this.fb.group({
-      name: [
-        '',
-        [
-          SharedValidator.isKeyPresentInObject(
-            () => this.serviceAssembliesByName
-          ),
-        ],
-      ],
+      name: '',
     });
   }
 
