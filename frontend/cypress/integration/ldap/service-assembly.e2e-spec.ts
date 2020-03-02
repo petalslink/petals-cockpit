@@ -17,6 +17,7 @@
 
 import { COMPONENT_DOM } from '../../support/component.dom';
 
+import { MESSAGE_DOM } from '../../support/message.dom';
 import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
 
@@ -86,6 +87,27 @@ describe('Service-assembly', () => {
 
     // sa is no longer in the list
     cy.get('.mat-list-item-content').should('not.contain', 'SA 0');
+  });
+
+  it('should display read-only informations when deleted', () => {
+    // unload the sa
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
+
+    // should display a warning message
+    cy
+      .get(MESSAGE_DOM.texts.msgWarning)
+      .contains('This service assembly has been removed')
+      .scrollIntoView()
+      .should('be.visible');
+
+    // should contain all informations
+    cy.get(SERVICE_ASSEMBLY_DOM.texts.saName).should('contain', 'About SA 0');
+    cy
+      .get(SERVICE_ASSEMBLY_DOM.messages.saMessage)
+      .should('contain', 'Changing the state of a SA will affect its SUs.');
+
+    cy.checkLifecycleState(SERVICE_ASSEMBLY_DOM.texts.saState, 'Stopped');
   });
 
   it('should go to related su view when clicking a service-unit button', () => {
