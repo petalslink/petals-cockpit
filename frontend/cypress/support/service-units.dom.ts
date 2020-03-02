@@ -19,7 +19,18 @@ const bs = `app-petals-service-unit-view`;
 
 export const SERVICE_UNITS_DOM = {
   texts: {
+    suName: `${bs} .su-name`,
+    suState: `${bs} .su-state`,
     saName: `${bs} .sa-name`,
     compName: `${bs} .comp-name`,
+  },
+  buttons: {
+    compBtn: `${bs} .btn-comp`,
+    saBtn: `${bs} .btn-sa`,
+  },
+  led: {
+    suStateLed: `${bs} .su-state-led`,
+    saStateLed: `${bs} .sa-led`,
+    compStateLed: `${bs} .comp-led`,
   },
 };
