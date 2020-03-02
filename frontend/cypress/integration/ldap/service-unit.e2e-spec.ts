@@ -17,7 +17,7 @@
 
 import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
 
-describe('Shared-library', () => {
+describe('Service-unit', () => {
   beforeEach(() => {
     cy.visit(`/login`);
 

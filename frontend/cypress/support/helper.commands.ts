@@ -62,3 +62,45 @@ Cypress.Commands.add('expectMessageToBe', (element, type, message) => {
     .parent('.msg-content')
     .should('have.class', type);
 });
+
+Cypress.Commands.add('checkLifecycleState', (element, state) => {
+  let color: string;
+  switch (state) {
+    case 'Started':
+      color = 'green';
+      break;
+    case 'Loaded':
+      color = 'grey';
+      break;
+    case 'Shutdown':
+      color = 'red';
+      break;
+    case 'Stopped':
+      color = 'yellow';
+      break;
+    case 'Unknown':
+      color = 'black';
+      break;
+    case 'Unloaded':
+      color = 'white';
+      break;
+  }
+  cy
+    .get(element)
+    .should('contain', state)
+    .and('be.visible')
+    .find('app-led div')
+    .should('have.class', color);
+});
+
+Cypress.Commands.add(
+  'expectPossibleStatesListToBe',
+  (element, possibleStateList) => {
+    const actionStates = cy.get(element);
+
+    actionStates.should('have.length', possibleStateList.length);
+    actionStates.each(($cell, index) =>
+      cy.wrap($cell).contains(possibleStateList[index])
+    );
+  }
+);
