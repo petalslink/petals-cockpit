@@ -970,7 +970,9 @@ describe('Workspace', () => {
         .get(WORKSPACE_BUS_IMPORT_DIALOG_DOM.dialog.dialogImportBus)
         .should('not.be.visible');
 
-      cy.get('.error-import-details').should('not.be.visible');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
+        .should('not.be.visible');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).click();
 
@@ -979,7 +981,7 @@ describe('Workspace', () => {
         .should('not.be.visible');
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Error backend`)
         .should('be.visible');
     });
@@ -999,7 +1001,9 @@ describe('Workspace', () => {
         .get(WORKSPACE_BUS_IMPORT_DIALOG_DOM.dialog.dialogImportBus)
         .should('not.be.visible');
 
-      cy.get('.error-import-details').should('not.be.visible');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
+        .should('not.be.visible');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).click();
 
@@ -1008,7 +1012,7 @@ describe('Workspace', () => {
         .should('not.be.visible');
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(postImportErrorTroncateTxt)
         .should('be.visible');
 
@@ -1039,7 +1043,7 @@ describe('Workspace', () => {
       );
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Can't connect to IMPORT_ERROR_IP:7700`);
     });
 
@@ -1057,7 +1061,7 @@ describe('Workspace', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.importNewBus).click();
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Can't connect to hostname:7700`)
         .should('be.visible');
 
@@ -1072,7 +1076,7 @@ describe('Workspace', () => {
         .click();
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Can't connect to hostname:7700`)
         .should('not.be.visible');
     });
@@ -1090,7 +1094,7 @@ describe('Workspace', () => {
       );
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Can't connect to hostname:7700`)
         .should('be.visible');
 
@@ -1108,7 +1112,9 @@ describe('Workspace', () => {
 
       cy.expectBusListToBe([`Bus 0`, `Bus 3`]);
 
-      cy.get('.error-import-details').should('not.be.visible');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
+        .should('not.be.visible');
     });
 
     it('should be able to cancel import', () => {
@@ -1148,7 +1154,7 @@ describe('Workspace', () => {
       cy.expectBusListToBe([`Bus 0`]);
 
       cy
-        .get('.error-import-details')
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
         .contains(`Can't connect to FAST_IMPORT_ERROR_IP:7700`);
     });
 
@@ -1165,6 +1171,42 @@ describe('Workspace', () => {
       );
 
       cy.expectBusListToBe([`Bus 0`, `Bus 2`]);
+    });
+
+    it('should remove the error import bus message when user switch workspaces', () => {
+      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).click();
+
+      cy.importBusAndCheck(
+        `FAST_IMPORT_ERROR_IP`,
+        '7700',
+        'admin',
+        'password',
+        'passphrase',
+        false
+      );
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
+        .contains(`Can't connect to FAST_IMPORT_ERROR_IP:7700`);
+
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy.expectWorkspacesListMenuToBe(['Workspace 0', 'Workspace 1']);
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 1`)
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks1`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.messages.importBusDetailsError)
+        .should('not.contain', `Can't connect to FAST_IMPORT_ERROR_IP:7700`);
     });
 
     it('should import with default values on empty fields', () => {

@@ -101,6 +101,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
   },
   messages: {
     nothingToPreview: `${bsWksOverview} workspace-description-edit div .msg-no-description`,
+    importBusDetailsError: `${bsWksOverview} .error-import-details`,
   },
   texts: {
     busNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-link .bus-footer .bus-name`,
