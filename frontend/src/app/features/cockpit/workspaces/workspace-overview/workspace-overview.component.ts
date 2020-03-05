@@ -202,6 +202,9 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           this.shortDescription = null;
           this.description = null;
 
+          this.importBusError = null;
+          this.importError = null;
+
           this.isEditingDescriptions = false;
           this.isSettingDescriptions = false;
           this.isFocusShortDescriptionTextarea = false;
