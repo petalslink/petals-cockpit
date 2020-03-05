@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { ServiceAssemblies } from '@feat/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { IServiceUnitRow } from '@feat/cockpit/workspaces/state/service-units/service-units.interface';
@@ -29,20 +29,31 @@ import {
   getCurrentServiceAssembly,
   IServiceAssemblyWithSUsAndComponents,
 } from '@wks/state/service-assemblies/service-assemblies.selectors';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-service-assembly-view',
   templateUrl: './petals-service-assembly-view.component.html',
   styleUrls: ['./petals-service-assembly-view.component.scss'],
 })
-export class PetalsServiceAssemblyViewComponent implements OnInit {
+export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
+  isDeleted: boolean;
   serviceAssembly$: Observable<IServiceAssemblyWithSUsAndComponents>;
   workspaceId$: Observable<string>;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.serviceAssembly$ = this.store$.pipe(select(getCurrentServiceAssembly));
+    this.serviceAssembly$ = this.store$.pipe(
+      select(getCurrentServiceAssembly),
+      takeUntil(this.onDestroy$),
+      filter(sa => {
+        this.isDeleted = sa === undefined;
+        return !this.isDeleted;
+      })
+    );
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
@@ -72,5 +83,10 @@ export class PetalsServiceAssemblyViewComponent implements OnInit {
         state,
       })
     );
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 }

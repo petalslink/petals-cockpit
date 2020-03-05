@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2018-2020 Linagora
+ * Copyright (C) 2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,22 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const bs = `app-petals-service-unit-view`;
-
-export const SERVICE_UNITS_DOM = {
-  texts: {
-    suName: `${bs} .su-name`,
-    suState: `${bs} .su-state`,
-    saName: `${bs} .sa-name`,
-    compName: `${bs} .comp-name`,
-  },
-  buttons: {
-    compBtn: `${bs} .btn-comp`,
-    saBtn: `${bs} .btn-sa`,
-  },
-  led: {
-    suStateLed: `${bs} .su-state-led`,
-    saStateLed: `${bs} .sa-led`,
-    compStateLed: `${bs} .comp-led`,
-  },
-};
+@mixin custom-services-unit-view-theme($theme) {
+  .btn-component {
+    background-color: mat-color($mat-grey, 200);
+  }
+}

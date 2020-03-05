@@ -124,7 +124,6 @@ declare namespace Cypress {
     checkOverrideSharedLibrariesInputs(expectedSharedLibraries: string[]): any;
     checkUploadComponentSharedLibraries(expectedSharedLibraries: string[]): any;
     expectParametersListToBe(expectedParametersList: string[]): any;
-    expectPossibleStateListToBe(expectedPossibleStateList: string[]): any;
     getParameterInLifecycleComponent(label: string, value: string): any;
 
     // interface.commands
@@ -146,6 +145,12 @@ declare namespace Cypress {
     expectFocused(): any;
     expectLocationToBe(pathname: string): any;
     expectMessageToBe(element: string, type: string, message: string): any;
+    expectPossibleStatesListToBe(
+      element: string,
+      listOfPossibleState: string[]
+    ): any;
+    checkLifecycleState(element: string, state: string): any;
+
     uploadFile(fileName: string, selector: string): any;
   }
 }

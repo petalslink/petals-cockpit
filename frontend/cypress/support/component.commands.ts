@@ -24,15 +24,6 @@ Cypress.Commands.add('expectParametersListToBe', paramList => {
   params.each(($cell, index) => cy.wrap($cell).contains(paramList[index]));
 });
 
-Cypress.Commands.add('expectPossibleStateListToBe', possibleStateList => {
-  const actionStates = cy.get(COMPONENT_DOM.buttons.allActionsStates);
-
-  actionStates.should('have.length', possibleStateList.length);
-  actionStates.each(($cell, index) =>
-    cy.wrap($cell).contains(possibleStateList[index])
-  );
-});
-
 Cypress.Commands.add('getParameterInLifecycleComponent', (label, value) => {
   return cy
     .contains(label)

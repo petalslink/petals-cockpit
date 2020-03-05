@@ -166,29 +166,23 @@ describe('Component', () => {
     });
 
     it('should manage the state started to stopped, uninstalled, re-installed and then started', () => {
-      cy
-        .get(COMPONENT_DOM.lifecycle.state)
-        .should('contain', 'Started')
-        .and('be.visible')
-        .find('app-led div')
-        .should('have.class', 'green');
+      cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Started');
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
       // should have stop if started
       cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
-      cy
-        .get(COMPONENT_DOM.lifecycle.state)
-        .should('contain', 'Stopped')
-        .and('be.visible')
-        .find('app-led div')
-        .should('have.class', 'yellow');
+      cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Stopped');
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.not.visible');
 
       // should have start, uninstall, and unload if stopped
-      cy.expectPossibleStateListToBe([`Start`, `Uninstall`, `Unload`]);
+      cy.expectPossibleStatesListToBe(COMPONENT_DOM.buttons.allActionsStates, [
+        `Start`,
+        `Uninstall`,
+        `Unload`,
+      ]);
 
       // should have info message when component is stopped
       cy.expectMessageToBe(
@@ -199,23 +193,13 @@ describe('Component', () => {
 
       cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
-      cy
-        .get(COMPONENT_DOM.lifecycle.state)
-        .should('contain', 'Loaded')
-        .and('be.visible')
-        .find('app-led div')
-        .should('have.class', 'grey');
+      cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Loaded');
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.visible');
 
       cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
 
-      cy
-        .get(COMPONENT_DOM.lifecycle.state)
-        .should('contain', 'Shutdown')
-        .and('be.visible')
-        .find('app-led div')
-        .should('have.class', 'red');
+      cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Shutdown');
 
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.not.visible');
 
@@ -227,7 +211,11 @@ describe('Component', () => {
       );
 
       // should have start, uninstall, and unload if shutdown
-      cy.expectPossibleStateListToBe([`Start`, `Uninstall`, `Unload`]);
+      cy.expectPossibleStatesListToBe(COMPONENT_DOM.buttons.allActionsStates, [
+        `Start`,
+        `Uninstall`,
+        `Unload`,
+      ]);
     });
 
     it('should update runtime parameters when component state is started', () => {

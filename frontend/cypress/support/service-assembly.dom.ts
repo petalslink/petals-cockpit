@@ -21,7 +21,13 @@ export const SERVICE_ASSEMBLY_DOM = {
   texts: {
     saName: `${bs} .sa-name`,
     saState: `${bs} .sa-state`,
-    suName: `${bs} .su-name`,
-    componentName: `${bs} .component-name`,
   },
+  messages: { saMessage: `${bs} .info-lifecycle-sa` },
+  buttons: {
+    allActionsStates: `${bs} .btn-change-sa-state`,
+    serviceUnitBtn: (suId: string) => `${bs} .btn-su-${suId}`,
+    relatedComponentBtn: (suId: string) => `${bs} .related-su-${suId}`,
+    actionState: (actionName: string) => `${bs} .btn-state-${actionName}`,
+  },
+  led: { stateLed: `${bs} .comp-led` },
 };

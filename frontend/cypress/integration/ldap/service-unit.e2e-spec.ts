@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
+import { COMPONENT_DOM } from './../../support/component.dom';
 
-describe('Shared-library', () => {
+describe('Service-unit', () => {
   beforeEach(() => {
     cy.visit(`/login`);
 
@@ -31,39 +33,88 @@ describe('Shared-library', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
-  });
 
-  it('should have service assembly details', () => {
     cy
       .get('.mat-list-item-content')
       .contains('SU 0')
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+  });
 
+  it('should have all su informations', () => {
+    cy.get(SERVICE_UNITS_DOM.texts.suName).should('contain', 'About SU 0');
+    cy.get(SERVICE_UNITS_DOM.texts.suState).should('contain', 'Started');
+
+    cy.get(SERVICE_UNITS_DOM.texts.saName).should('contain', 'SA 0');
     cy
-      .get(SERVICE_UNITS_DOM.texts.saName)
-      .should('have.length', 1)
-      .and('contain', 'SA 0')
-      .click();
+      .get(SERVICE_UNITS_DOM.led.saStateLed)
+      .find('div')
+      .should('have.class', 'green');
+    cy.get(SERVICE_UNITS_DOM.texts.compName).should('contain', 'Comp 0');
+    cy
+      .get(SERVICE_UNITS_DOM.led.compStateLed)
+      .find('div')
+      .should('have.class', 'green');
+  });
 
+  it('should go to related service assembly when clicking on sa button', () => {
+    cy.get(SERVICE_UNITS_DOM.buttons.saBtn).click();
+
+    // check if it's the right service assembly
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
+    cy
+      .get(SERVICE_ASSEMBLY_DOM.texts.saName)
+      .should('exist')
+      .and('contain', 'About SA 0');
   });
 
-  it('should have component details', () => {
+  it('should have same state as sa', () => {
     cy
-      .get('.mat-list-item-content')
-      .contains('SU 0')
-      .click();
-
-    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
-
+      .get(SERVICE_UNITS_DOM.led.suStateLed)
+      .find('div')
+      .should('have.class', 'green');
     cy
-      .get(SERVICE_UNITS_DOM.texts.compName)
-      .should('have.length', 1)
-      .and('contain', 'Comp 0')
-      .click();
+      .get(SERVICE_UNITS_DOM.led.saStateLed)
+      .find('div')
+      .should('have.class', 'green');
 
+    // stop its sa
+    cy.get(SERVICE_UNITS_DOM.buttons.saBtn).click();
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
+
+    // check if it's the state have changed
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.serviceUnitBtn('idSu0')).click();
+    cy
+      .get(SERVICE_UNITS_DOM.led.suStateLed)
+      .find('div')
+      .should('have.class', 'yellow');
+    cy
+      .get(SERVICE_UNITS_DOM.led.saStateLed)
+      .find('div')
+      .should('have.class', 'yellow');
+  });
+
+  it('should go to related component when clicking on sa button', () => {
+    cy.get(SERVICE_UNITS_DOM.buttons.compBtn).click();
+
+    // check if it's the right component
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+    cy
+      .get(COMPONENT_DOM.texts.title)
+      .should('exist')
+      .and('contain', 'About Comp 0');
+  });
+
+  it('should be removed when unloading its sa', () => {
+    // unload sa
+    cy.get(SERVICE_UNITS_DOM.buttons.saBtn).click();
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
+    cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
+
+    // su is no longer in the list
+    cy.get('.mat-list-item-content').should('not.contain', 'SU 0');
   });
 });
