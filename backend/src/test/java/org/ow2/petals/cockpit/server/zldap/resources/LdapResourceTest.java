@@ -22,13 +22,13 @@
  * As a workaround, the tests are run alphabetically and some were placed in zldap package to make them run last ... see:
  * https://groups.google.com/forum/#!topic/dropwizard-user/hb79pf_gXjg
  */
-package org.ow2.petals.cockpit.server.zldap;
+package org.ow2.petals.cockpit.server.zldap.resources;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.resources.LdapResource.LdapStatus;
-import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
+import org.ow2.petals.cockpit.server.zldap.AbstractLdapTest;
 
 public class LdapResourceTest extends AbstractLdapTest {
 

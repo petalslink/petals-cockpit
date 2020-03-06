@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitExtractor.Authentication;
 import org.ow2.petals.cockpit.server.resources.UserSession.CurrentUser;
-import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -17,100 +17,25 @@
 package org.ow2.petals.cockpit.server.commands;
 
 import static org.assertj.db.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
-import java.util.Optional;
-
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.db.type.Changes;
 import org.assertj.db.type.Table;
-import org.eclipse.jdt.annotation.Nullable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
-import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
-import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import com.codahale.metrics.MetricFilter;
 
-import io.dropwizard.cli.Cli;
-import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.util.JarLocation;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
+public class AddUserCommandTest extends AbstractCommandTest {
 
-public class AddUserTest extends AbstractLdapTest {
-
-    @Rule
-    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
-
-    public ConfigOverride dbConfig = ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl());
-
-    @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
-
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
-
-    @Nullable
-    private Cli cli;
-
-    @Nullable
-    private Bootstrap<CockpitConfiguration> bootstrap;
-
-    private Cli cli() {
-        assert cli != null;
-        return cli;
-    }
-
-    private Bootstrap<CockpitConfiguration> bootstrap() {
-        assert bootstrap != null;
-        return bootstrap;
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        // setup the database schema
-        new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(dbRule.getConnection()))
-                .update("");
-
-        final JarLocation location = mock(JarLocation.class);
-        when(location.getVersion()).thenReturn(Optional.of("1.0.0"));
-
-        // its initialize method won't be run (but its run method will!)
-        bootstrap = new Bootstrap<>(new CockpitApplication<>());
-
-        // let's load configuration from resources
-        bootstrap().setConfigurationSourceProvider(new ResourceConfigurationSourceProvider());
-
-        // let's simulate the initialize method only for what we need here
-        bootstrap().addCommand(new AddUserCommand<>());
-
-        cli = new Cli(location, bootstrap, System.out, System.err);
-
-        // used by the cli when running command
-        dbConfig.addToSystemProperties();
-    }
-
-    @After
-    public void tearDown() {
-        dbConfig.removeFromSystemProperties();
+    public AddUserCommandTest() {
+        super(new AddUserCommand());
     }
 
     @Test
-    public void addUserAdminToDb() throws Exception {
+    public void addUserAdmin() throws Exception {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a",
                 "add-user-test.yml");
 
@@ -132,7 +57,7 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
-    public void addUserToDb() throws Exception {
+    public void addUser() throws Exception {
         boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
@@ -153,29 +78,8 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
-    public void addLdapUserToDb() throws Exception {
-        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "add-ldap-user-test.yml");
-
-        SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isTrue();
-
-        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user");
-        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
-        softly.assertAll();
-
-        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo(AbstractLdapTest.USER1.username)
-                .column(USERS.NAME.getName()).value().isEqualTo(AbstractLdapTest.USER1.name)
-                .column(USERS.ADMIN.getName()).value().isEqualTo(false)
-                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(true);
-
-        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
-        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
-    }
-
-    @Test
-    public void addUserToDbTwice() throws Exception {
-        addUserAdminToDb();
+    public void addUserWithSameUsername() throws Exception {
+        addUserAdmin();
         systemErrRule.clearLog();
         systemOutRule.clearLog();
         // needed because running cli will register them again...
@@ -199,7 +103,7 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
-    public void addUserAdminToDbWithWorkspace() throws Exception {
+    public void addUserAdminWithWorkspace() throws Exception {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a", "-w",
                 "myWorkspace", "add-user-test.yml");
 
@@ -231,8 +135,8 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
-    public void addUsersToDbWithSameWorkspace() throws Exception {
-        addUserAdminToDbWithWorkspace();
+    public void addUsersWithSameWorkspace() throws Exception {
+        addUserAdminWithWorkspace();
         systemErrRule.clearLog();
         systemOutRule.clearLog();
         // needed because running cli will register them again...
@@ -273,7 +177,7 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
-    public void addUserToDbWithWorkspacePermissions() throws Exception {
+    public void addUserWithWorkspacePermissions() throws Exception {
         boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "-w", "myWorkspace",
                 "--adminWorkspace", "--deployArtifact", "add-user-test.yml");
 
@@ -303,38 +207,6 @@ public class AddUserTest extends AbstractLdapTest {
                 .column(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.getName()).value().isTrue()
                 .column(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION.getName()).value().isTrue()
                 .column(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION.getName()).value().isFalse();
-    }
-
-    @Test
-    public void addLdapUserWithPassword() throws Exception {
-        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-p", "password",
-                "add-ldap-user-test.yml");
-
-        SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isFalse();
-        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("Cannot use -p/--password with -l/--ldapUser");
-        softly.assertAll();
-    }
-
-    @Test
-    public void addLdapUserWithName() throws Exception {
-        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-n",
-                AbstractLdapTest.USER1.name, "add-ldap-user-test.yml");
-
-        SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isFalse();
-        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("Cannot use -n/--name with -l/--ldapUser");
-        softly.assertAll();
-    }
-
-    @Test
-    public void addLdapUserWithoutLdapConfig() throws Exception {
-        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "add-user-test.yml");
-
-        SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isFalse();
-        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("LDAP configuration not found");
-        softly.assertAll();
     }
 
     @Test

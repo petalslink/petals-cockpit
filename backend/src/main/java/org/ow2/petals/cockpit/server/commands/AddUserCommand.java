@@ -24,6 +24,7 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.ldaptive.LdapException;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
 import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
@@ -99,15 +100,13 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     @Override
     protected void run(Bootstrap<C> bootstrap, Namespace namespace, C configuration) throws Exception {
 
-        configuration.getDataSourceFactory().asSingleConnectionPool();
+        initArguments(namespace);
+        checkArguments();
+        checkLdapAndInitName(configuration);
 
         final Environment environment = new Environment(bootstrap.getApplication().getName(),
                 bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(),
                 bootstrap.getMetricRegistry(), bootstrap.getClassLoader(), bootstrap.getHealthCheckRegistry());
-
-        initArguments(namespace);
-
-        checkArguments();
 
         if (this.ldapUser) {
             if (configuration.getLdapConfigFactory() == null) {
@@ -119,13 +118,6 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         }
 
         Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
-
-        for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
-            if (lifeCycle instanceof JettyManaged
-                    && ((JettyManaged) lifeCycle).getManaged() instanceof ManagedDataSource) {
-                lifeCycle.start();
-            }
-        }
 
         try (DSLContext jooq = DSL.using(jooqConf)) {
             jooq.transaction(c -> {
@@ -176,6 +168,22 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         }
     }
 
+    private Environment initEnvironment(Bootstrap<C> bootstrap, C configuration) throws Exception {
+        configuration.getDataSourceFactory().asSingleConnectionPool();
+
+        final Environment environment = new Environment(bootstrap.getApplication().getName(),
+                bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(),
+                bootstrap.getMetricRegistry(), bootstrap.getClassLoader(), bootstrap.getHealthCheckRegistry());
+
+        for (LifeCycle lifeCycle : environment.lifecycle().getManagedObjects()) {
+            if (lifeCycle instanceof JettyManaged
+                    && ((JettyManaged) lifeCycle).getManaged() instanceof ManagedDataSource) {
+                lifeCycle.start();
+            }
+        }
+        return environment;
+    }
+
     private void initArguments(Namespace namespace) {
         this.ldapUser = namespace.getBoolean("ldapUser");
 
@@ -214,9 +222,34 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         }
     }
 
+    private void checkLdapAndInitName(C configuration) throws AddUserCommandException {
+        if (this.ldapUser) {
+            if (configuration.getLdapConfigFactory() == null) {
+                throw new AddUserCommandException("LDAP configuration not found but -l/--ldap is used");
+            }
+            LdapService ldapService = new LdapService(configuration);
+            assert this.username != null;
+            try {
+                this.name = ldapService.getUserByUsername(this.username).name;
+            } catch (LdapException e) {
+                throw new AddUserCommandException(e);
+            }
+        } else {
+            if (configuration.getLdapConfigFactory() != null) {
+                throw new AddUserCommandException("LDAP configuration found but -l/--ldap argument is omitted");
+            }
+        }
+    }
+
     public static class AddUserCommandException extends Exception {
+        private static final long serialVersionUID = 3551744806739369290L;
+
         public AddUserCommandException(String message) {
             super(message);
+        }
+
+        public AddUserCommandException(Exception source) {
+            super(source);
         }
     }
 }
