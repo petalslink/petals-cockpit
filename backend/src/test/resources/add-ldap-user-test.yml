@@ -1,0 +1,16 @@
+database:
+  driverClass: org.h2.Driver
+  # url is set by test
+
+logging:
+  loggers:
+    org.pac4j: DEBUG
+    org.ow2.petals.cockpit: DEBUG
+
+ldapConfig:
+  usersDn: ou=people,dc=example,dc=com
+  url: ldap://localhost:33389
+  usernameAttribute: cn
+  nameAttribute: sn
+  principalDn: cn=bind,ou=people,dc=example,dc=com
+  principalPassword: bindpass

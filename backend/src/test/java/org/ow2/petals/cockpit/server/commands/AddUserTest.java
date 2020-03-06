@@ -34,9 +34,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.SystemErrRule;
 import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.ow2.petals.cockpit.server.AbstractTest;
 import org.ow2.petals.cockpit.server.CockpitApplication;
 import org.ow2.petals.cockpit.server.CockpitConfiguration;
+import org.ow2.petals.cockpit.server.security.AbstractLdapTest;
 import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import com.codahale.metrics.MetricFilter;
@@ -50,7 +50,7 @@ import liquibase.Liquibase;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
-public class AddUserTest extends AbstractTest {
+public class AddUserTest extends AbstractLdapTest {
 
     @Rule
     public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
@@ -153,8 +153,7 @@ public class AddUserTest extends AbstractTest {
 
     @Test
     public void addLdapUserToDb() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l",
-                "add-user-test.yml");
+        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "add-ldap-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isTrue();
@@ -164,8 +163,8 @@ public class AddUserTest extends AbstractTest {
         softly.assertAll();
 
         assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
-                .column(USERS.NAME.getName()).value().isEqualTo("User")
+                .column(USERS.USERNAME.getName()).value().isEqualTo(AbstractLdapTest.USER1.username)
+                .column(USERS.NAME.getName()).value().isEqualTo(AbstractLdapTest.USER1.name)
                 .column(USERS.ADMIN.getName()).value().isEqualTo(false)
                 .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(true);
 
@@ -184,7 +183,7 @@ public class AddUserTest extends AbstractTest {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isTrue();
+        softly.assertThat(success).as("Exit success").isFalse();
 
         softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
@@ -229,19 +228,53 @@ public class AddUserTest extends AbstractTest {
 
     @Test
     public void addLdapUserWithPassword() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l", "-p", "password",
-                "add-user-test.yml");
+        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-p", "password",
+                "add-ldap-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("Cannot use -p/--password with -l/--ldapUser");
+        softly.assertAll();
+    }
+
+    @Test
+    public void addLdapUserWithName() throws Exception {
+        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-n",
+                AbstractLdapTest.USER1.name, "add-ldap-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("Cannot use -n/--name with -l/--ldapUser");
+        softly.assertAll();
+    }
+
+    @Test
+    public void addLdapUserWithoutLdapConfig() throws Exception {
+        boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("LDAP configuration not found");
+        softly.assertAll();
+    }
+
+    @Test
+    public void addUserWithoutName() throws Exception {
+        boolean success = cli().run("add-user", "-p", "password", "-u", "user", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("-n/--name is required");
+        softly.assertAll();
     }
 
     @Test
     public void addUserWithoutPassword() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user",
-                "add-user-test.yml");
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("-p/--password is required");
+        softly.assertAll();
     }
 }

@@ -18,6 +18,7 @@ package org.ow2.petals.cockpit.server.commands;
 
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -28,6 +29,7 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
+import org.ow2.petals.cockpit.server.services.LdapService;
 
 import com.bendb.dropwizard.jooq.JooqFactory;
 
@@ -37,7 +39,6 @@ import io.dropwizard.lifecycle.JettyManaged;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.sourceforge.argparse4j.impl.Arguments;
-import net.sourceforge.argparse4j.inf.MutuallyExclusiveGroup;
 import net.sourceforge.argparse4j.inf.Namespace;
 import net.sourceforge.argparse4j.inf.Subparser;
 
@@ -49,6 +50,22 @@ import net.sourceforge.argparse4j.inf.Subparser;
  */
 public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCommand<C> {
 
+    private boolean ldapUser;
+
+    @Nullable
+    private String username;
+
+    @Nullable
+    private String name;
+
+    @Nullable
+    private String password;
+
+    private boolean admin;
+
+    @Nullable
+    private String workspaceName;
+
     public AddUserCommand() {
         super("add-user", "Add a user to the database");
     }
@@ -57,13 +74,15 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     public void configure(Subparser subparser) {
         super.configure(subparser);
 
+        subparser.addArgument("-l", "--ldapUser").dest("ldapUser").action(Arguments.storeTrue());
+
         subparser.addArgument("-u", "--username").dest("username").required(true);
-        subparser.addArgument("-n", "--name").dest("name").required(true);
-        MutuallyExclusiveGroup meg = subparser.addMutuallyExclusiveGroup().required(true);
-        meg.addArgument("-p", "--password").dest("password");
-        meg.addArgument("-l", "--ldapUser").dest("ldapUser").action(Arguments.storeTrue());
+        subparser.addArgument("-n", "--name").dest("name");
+        subparser.addArgument("-p", "--password").dest("password");
+
         subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
-        subparser.addArgument("-w", "--workspacename").dest("workspaceName").required(false);
+
+        subparser.addArgument("-w", "--workspacename").dest("workspaceName");
     }
 
     @Override
@@ -75,26 +94,18 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                 bootstrap.getObjectMapper(), bootstrap.getValidatorFactory().getValidator(),
                 bootstrap.getMetricRegistry(), bootstrap.getClassLoader(), bootstrap.getHealthCheckRegistry());
 
-        final String username = namespace.getString("username");
-        // it is required
-        assert username != null;
+        initArguments(namespace);
 
-        final String name = namespace.getString("name");
-        // required
-        assert name != null;
+        checkArguments();
 
-        final String password = namespace.getString("password");
-
-        final Boolean ldapUser = namespace.getBoolean("ldapUser");
-        assert ldapUser != null;
-
-        final Boolean admin = namespace.getBoolean("admin");
-        assert admin != null;
-
-        // either ldap user or user with password
-        assert ldapUser ^ password != null;
-
-        String workspaceName = namespace.getString("workspaceName");
+        if (this.ldapUser) {
+            if (configuration.getLdapConfigFactory() == null) {
+                throw new AddUserCommandException("LDAP configuration not found");
+            }
+            LdapService ldapService = new LdapService(configuration);
+            assert this.username != null;
+            this.name = ldapService.getUserByUsername(this.username).name;
+        }
 
         Configuration jooqConf = new JooqFactory().build(environment, configuration.getDataSourceFactory());
 
@@ -108,29 +119,29 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         try (DSLContext jooq = DSL.using(jooqConf)) {
             jooq.transaction(c -> {
 
-                if (DSL.using(c).fetchExists(USERS, USERS.USERNAME.eq(username))) {
-                    System.err.println("User " + username + " already exists");
+                if (DSL.using(c).fetchExists(USERS, USERS.USERNAME.eq(this.username))) {
+                    throw new AddUserCommandException("User " + this.username + " already exists");
                 } else {
-                    final UsersRecord userRecord = new UsersRecord(username,
-                            password != null ? CockpitAuthenticator.passwordEncoder.encode(password)
+                    final UsersRecord userRecord = new UsersRecord(this.username,
+                            this.password != null ? CockpitAuthenticator.passwordEncoder.encode(this.password)
                                     : LdapConfigFactory.LDAP_PASSWORD,
-                            name, null, admin, ldapUser);
+                            this.name, null, this.admin, this.ldapUser);
                     DSL.using(c).executeInsert(userRecord);
-                    System.out.println("Added user " + username);
+                    System.out.println("Added user " + this.username);
 
-                    if (workspaceName != null && !workspaceName.isEmpty()) {
+                    if (this.workspaceName != null && !this.workspaceName.isEmpty()) {
                         WorkspacesRecord wsDb = new WorkspacesRecord();
-                        wsDb.setName(workspaceName);
-                        wsDb.setDescription("Workspace automatically generated for **" + username + "**.");
+                        wsDb.setName(this.workspaceName);
+                        wsDb.setDescription("Workspace automatically generated for **" + this.username + "**.");
                         wsDb.attach(c);
                         wsDb.insert();
 
-                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), username, true, true, true));
+                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), this.username, true, true, true));
 
                         userRecord.setLastWorkspace(wsDb.getId());
                         DSL.using(c).executeUpdate(userRecord);
 
-                        System.out.println("Added workspace " + workspaceName);
+                        System.out.println("Added workspace " + this.workspaceName);
                     }
 
                 }
@@ -142,10 +153,46 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                     try {
                         lifeCycle.stop();
                     } catch (Exception e) {
-                        System.err.println("Exception caught on datasource close: " + e.getMessage());
+                        throw new AddUserCommandException(e);
                     }
                 }
             }
+        }
+    }
+
+    private void initArguments(Namespace namespace) {
+        this.ldapUser = namespace.getBoolean("ldapUser");
+
+        this.username = namespace.getString("username");
+        this.name = namespace.getString("name");
+        this.password = namespace.getString("password");
+
+        this.admin = namespace.getBoolean("admin");
+
+        this.workspaceName = namespace.getString("workspaceName");
+    }
+
+    private void checkArguments() throws AddUserCommandException {
+        if (this.ldapUser) {
+            if (this.password != null) {
+                throw new AddUserCommandException("Cannot use -p/--password with -l/--ldapUser");
+            }
+            if (this.name != null) {
+                throw new AddUserCommandException("Cannot use -n/--name with -l/--ldapUser");
+            }
+        } else {
+            if (this.password == null) {
+                throw new AddUserCommandException("-p/--password is required");
+            }
+            if (this.name == null) {
+                throw new AddUserCommandException("-n/--name is required");
+            }
+        }
+    }
+
+    public static class AddUserCommandException extends Exception {
+        public AddUserCommandException(String message) {
+            super(message);
         }
     }
 }
