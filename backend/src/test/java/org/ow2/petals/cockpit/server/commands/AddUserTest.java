@@ -26,6 +26,7 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 import java.util.Optional;
 
 import org.assertj.core.api.SoftAssertions;
+import org.assertj.db.type.Changes;
 import org.assertj.db.type.Table;
 import org.eclipse.jdt.annotation.Nullable;
 import org.junit.After;
@@ -227,6 +228,47 @@ public class AddUserTest extends AbstractLdapTest {
     }
 
     @Test
+    public void addUsersToDbWithSameWorkspace() throws Exception {
+        addUserAdminToDbWithWorkspace();
+        systemErrRule.clearLog();
+        systemOutRule.clearLog();
+        // needed because running cli will register them again...
+        bootstrap().getMetricRegistry().removeMatching(MetricFilter.ALL);
+
+        Changes changes = new Changes(dbRule.getDataSource());
+
+        changes.setStartPointNow();
+        boolean success = cli().run("add-user", "-n", "Christophe CHEVALIER", "-u", "cchevalier", "-p", "cchevalier",
+                "-w", "MYWORKSPACE", "add-user-test.yml");
+        changes.setEndPointNow();
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout")
+                .contains("Added user cchevalier").doesNotContain("Added workspace MYWORKSPACE");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        Long myWorkspaceId = (Long) new Table(dbRule.getDataSource(), WORKSPACES.getName()).getRow(0)
+                .getColumnValue(WORKSPACES.ID.getName()).getValue();
+
+        assertThat(changes).ofCreationOnTable(USERS.getName()).hasNumberOfChanges(1).change()
+                .column(USERS.USERNAME.getName()).valueAtEndPoint().isEqualTo("cchevalier")
+                .column(USERS.NAME.getName()).valueAtEndPoint().isEqualTo("Christophe CHEVALIER")
+                .column(USERS.ADMIN.getName()).valueAtEndPoint().isEqualTo(false)
+                .column(USERS.IS_FROM_LDAP.getName()).valueAtEndPoint().isEqualTo(false)
+                .column(USERS.LAST_WORKSPACE.getName()).valueAtEndPoint().isEqualTo(myWorkspaceId)
+                .ofModificationOnTable(USERS.getName()).hasNumberOfChanges(0);
+
+        assertThat(changes).onTable(WORKSPACES.getName()).hasNumberOfChanges(0);
+
+        assertThat(changes).ofCreationOnTable(USERS_WORKSPACES.getName()).hasNumberOfChanges(1).change()
+                .column(USERS_WORKSPACES.USERNAME.getName()).valueAtEndPoint().isEqualTo("cchevalier")
+                .column(USERS_WORKSPACES.WORKSPACE_ID.getName()).valueAtEndPoint().isEqualTo(myWorkspaceId)
+                .ofModificationOnTable(USERS_WORKSPACES.getName()).hasNumberOfChanges(0);
+    }
+
     public void addLdapUserWithPassword() throws Exception {
         boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-p", "password",
                 "add-ldap-user-test.yml");

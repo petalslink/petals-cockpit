@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.commands;
 
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
+import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.jetty.util.component.LifeCycle;
@@ -130,18 +131,22 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                     System.out.println("Added user " + this.username);
 
                     if (this.workspaceName != null && !this.workspaceName.isEmpty()) {
-                        WorkspacesRecord wsDb = new WorkspacesRecord();
-                        wsDb.setName(this.workspaceName);
-                        wsDb.setDescription("Workspace automatically generated for **" + this.username + "**.");
-                        wsDb.attach(c);
-                        wsDb.insert();
+                        WorkspacesRecord wsDb = DSL.using(c).fetchOne(WORKSPACES,
+                                WORKSPACES.NAME.equalIgnoreCase(this.workspaceName));
+                        if (wsDb == null) {
+                            wsDb = new WorkspacesRecord();
+                            wsDb.setName(this.workspaceName);
+                            wsDb.setDescription("Workspace automatically generated for **" + this.username + "**.");
+                            wsDb.attach(c);
+                            wsDb.insert();
+
+                            System.out.println("Added workspace " + this.workspaceName);
+                        }
 
                         DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), this.username, true, true, true));
 
                         userRecord.setLastWorkspace(wsDb.getId());
                         DSL.using(c).executeUpdate(userRecord);
-
-                        System.out.println("Added workspace " + this.workspaceName);
                     }
 
                 }
