@@ -224,7 +224,10 @@ public class AddUserTest extends AbstractLdapTest {
                 .isEqualTo("Workspace automatically generated for **admin**.");
 
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
-                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.getName()).value().isFalse()
+                .column(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION.getName()).value().isFalse()
+                .column(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION.getName()).value().isFalse();
     }
 
     @Test
@@ -269,6 +272,40 @@ public class AddUserTest extends AbstractLdapTest {
                 .ofModificationOnTable(USERS_WORKSPACES.getName()).hasNumberOfChanges(0);
     }
 
+    @Test
+    public void addUserToDbWithWorkspacePermissions() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "-w", "myWorkspace",
+                "--adminWorkspace", "--deployArtifact", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user",
+                "Added workspace myWorkspace");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS.NAME.getName()).value().isEqualTo("User")
+                .column(USERS.ADMIN.getName()).value().isFalse()
+                .column(USERS.IS_FROM_LDAP.getName()).value().isFalse()
+                .column(USERS.LAST_WORKSPACE.getName())
+                .value().isNotNull();
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo("myWorkspace")
+                .column(WORKSPACES.DESCRIPTION.getName()).value()
+                .isEqualTo("Workspace automatically generated for **user**.");
+
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.getName()).value().isTrue()
+                .column(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION.getName()).value().isTrue()
+                .column(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION.getName()).value().isFalse();
+    }
+
+    @Test
     public void addLdapUserWithPassword() throws Exception {
         boolean success = cli().run("add-user", "-u", AbstractLdapTest.USER1.username, "-l", "-p", "password",
                 "add-ldap-user-test.yml");
@@ -317,6 +354,18 @@ public class AddUserTest extends AbstractLdapTest {
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isFalse();
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("-p/--password is required");
+        softly.assertAll();
+    }
+
+    @Test
+    public void addUserWithPermissionsWithoutWorkspace() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "--adminWorkspace",
+                "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr")
+                .contains("Cannot set workspace permissions without -w/--workspacename");
         softly.assertAll();
     }
 }

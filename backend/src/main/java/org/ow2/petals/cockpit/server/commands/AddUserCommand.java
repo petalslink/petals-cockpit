@@ -67,6 +67,12 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
     @Nullable
     private String workspaceName;
 
+    private boolean adminWorkspace;
+
+    private boolean deployArtifact;
+
+    private boolean lifecycleArtifact;
+
     public AddUserCommand() {
         super("add-user", "Add a user to the database");
     }
@@ -84,6 +90,10 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         subparser.addArgument("-a", "--admin").dest("admin").action(Arguments.storeTrue());
 
         subparser.addArgument("-w", "--workspacename").dest("workspaceName");
+
+        subparser.addArgument("-A", "--adminWorkspace").dest("adminWorkspace").action(Arguments.storeTrue());
+        subparser.addArgument("-D", "--deployArtifact").dest("deployArtifact").action(Arguments.storeTrue());
+        subparser.addArgument("-L", "--lifecycleArtifact").dest("lifecycleArtifact").action(Arguments.storeTrue());
     }
 
     @Override
@@ -143,7 +153,8 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
                             System.out.println("Added workspace " + this.workspaceName);
                         }
 
-                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), this.username, true, true, true));
+                        DSL.using(c).executeInsert(new UsersWorkspacesRecord(wsDb.getId(), this.username,
+                                this.adminWorkspace, this.deployArtifact, this.lifecycleArtifact));
 
                         userRecord.setLastWorkspace(wsDb.getId());
                         DSL.using(c).executeUpdate(userRecord);
@@ -175,6 +186,10 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
         this.admin = namespace.getBoolean("admin");
 
         this.workspaceName = namespace.getString("workspaceName");
+
+        this.adminWorkspace = namespace.getBoolean("adminWorkspace");
+        this.deployArtifact = namespace.getBoolean("deployArtifact");
+        this.lifecycleArtifact = namespace.getBoolean("lifecycleArtifact");
     }
 
     private void checkArguments() throws AddUserCommandException {
@@ -192,6 +207,10 @@ public class AddUserCommand<C extends CockpitConfiguration> extends ConfiguredCo
             if (this.name == null) {
                 throw new AddUserCommandException("-n/--name is required");
             }
+        }
+
+        if (this.workspaceName == null && (this.adminWorkspace || this.deployArtifact || this.lifecycleArtifact)) {
+            throw new AddUserCommandException("Cannot set workspace permissions without -w/--workspacename");
         }
     }
 
