@@ -57,14 +57,23 @@
     .item-namespace:focus {
       background: none;
     }
+  }
 
-    .workspace-element-type-category-components > .mat-list-item-content,
-    .workspace-element-type-category-service-assemblies
-      > .mat-list-item-content,
-    .workspace-element-type-category-shared-libraries > .mat-list-item-content {
-      color: mat-color($primary, 500);
-      &:hover {
-        color: mat-color($primary, 700);
+  // all items elements in petals tree ref
+  // TODO: Remove above classes when mat-tree fully integrated
+  mat-tree {
+    .tree-category-name {
+      color: mat-color($primary, 600);
+    }
+
+    .selected-element,
+    mat-tree-node:hover {
+      background-color: mat-color($primary, 50);
+
+      button,
+      span,
+      mat-icon {
+        color: mat-color($primary, 600);
       }
     }
   }

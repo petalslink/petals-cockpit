@@ -20,11 +20,11 @@ import { select, Store } from '@ngrx/store';
 
 import { Observable, Subject } from 'rxjs';
 
-import { IStore } from '@shared/state/store.interface';
 import {
-  getCurrentWorkspaceTree,
+  getCurrentWorkspaceTreeFiltered,
   WorkspaceElement,
-} from '@wks/state/workspaces/workspaces.selectors';
+} from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import { IStore } from '@shared/state/store.interface';
 
 @Component({
   selector: 'app-topology-view',
@@ -44,7 +44,7 @@ export class TopologyViewComponent implements OnInit, OnDestroy {
       select(state => state.workspaces.selectedWorkspaceId)
     );
 
-    this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTree));
+    this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTreeFiltered));
   }
 
   ngOnDestroy() {

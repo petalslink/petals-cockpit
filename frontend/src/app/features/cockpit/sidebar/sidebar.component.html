@@ -17,64 +17,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxFlex fxLayout="column" class="sidebar-wrapper">
     <div fxLayout="column" fxLayoutAlign="start center" class="sidebar-top">
       <button mat-button disabled class="btn-logo" >
-        <mat-icon class="icon-petals icon-x5" svgIcon="petals"></mat-icon>
+        <mat-icon svgIcon="petals" class="icon-petals icon-x5"></mat-icon>
       </button>
-      <button 
-        *ngIf="workspaceId && tree.length" 
-        mat-button 
-        matTooltip="Topology" 
+      <button
+        *ngIf="workspaceId && tree.length"
+        mat-button
+        matTooltip="Topology"
         matTooltipPosition="right"
         routerLinkActive="active"
         [routerLink]="['/workspaces', workspaceId, 'petals']"
-        class="btn-topology" 
+        class="btn-topology"
         >
-        <fa-icon class="icon-topology icon-x2" icon="network-wired"></fa-icon>
+        <fa-icon icon="network-wired" class="icon-topology icon-x2"></fa-icon>
       </button>
-      <button 
-        *ngIf="workspaceId && tree.length" 
-        mat-button 
-        matTooltip="Services" 
+      <button
+        *ngIf="workspaceId && tree.length"
+        mat-button
+        matTooltip="Services"
         matTooltipPosition="right"
         routerLinkActive="active"
         [routerLink]="['/workspaces', workspaceId, 'services']"
-        class="btn-services" 
+        class="btn-services"
         >
-        <fa-icon class="icon-services icon-x2" icon="cogs"></fa-icon>
+        <fa-icon icon="cogs" class="icon-services icon-x2"></fa-icon>
       </button>
     </div>
     
     <div fxFlex fxLayout="column" fxLayoutAlign="end center" class="sidebar-bottom">
-      <button 
-        *ngIf="user.isAdmin" 
-        mat-button 
-        matTooltip="Administration" 
+      <button
+        *ngIf="user.isAdmin"
+        mat-button
+        matTooltip="Administration"
         matTooltipPosition="right"
-        [routerLink]="['/admin']"
         routerLinkActive="active"
-        class="btn-user-admin" 
+        [routerLink]="['/admin']"
+        class="btn-user-admin"
       >
-        <fa-icon class="icon-administration icon-x2" icon="cog"></fa-icon>
+        <fa-icon icon="cog" class="icon-administration icon-x2"></fa-icon>
       </button>
       
-      <button 
+      <button
         mat-button
-        [matTooltip]="user.name" 
         matTooltipPosition="right"
         matTooltipClass="current-user-tooltip"
-        [routerLink]="['/profile']"
         routerLinkActive="active"
-        class="btn-user-profile" 
+        [matTooltip]="user.name"
+        [routerLink]="['/profile']"
+        class="btn-user-profile"
       >
-        <fa-icon class="icon-user-circle icon-x2" icon="user-circle"></fa-icon>
+        <fa-icon icon="user-circle" class="icon-user-circle icon-x2"></fa-icon>
       </button>
 
-      <button 
+      <button
         mat-icon-button
-        [disabled]="isDisconnecting" 
-        (click)="disconnect()"
-        matTooltip="Disconnect" 
+        matTooltip="Disconnect"
         matTooltipPosition="right"
-        class="btn-user-logout" 
+        [disabled]="isDisconnecting"
+        (click)="disconnect()"
+        class="btn-user-logout"
       >
         <fa-icon class="icon-signout icon-x2" icon="sign-out-alt"></fa-icon>
       </button>
