@@ -100,7 +100,7 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_TREE_DOM.navTree.navTreePetals);
 
-    const treeNames = cy.get(PETALS_TREE_DOM.texts.itemsNames);
+    const treeNames = cy.get(PETALS_TREE_DOM.texts.workspaceElementsName);
 
     treeNames.each((_, index) => cy.contains(expectedTreeNames[index]));
   });
@@ -122,33 +122,45 @@ describe(`Petals`, () => {
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
 
-    cy.foldElementInTree(`bus`, `Bus 0`);
+    cy.get(PETALS_TREE_DOM.buttons.expandableBtn('bus', 'idBus0')).click();
 
-    cy.unfoldElementInTree(`bus`, `Bus 0`);
+    cy.get(PETALS_TREE_DOM.buttons.expandableBtn('bus', 'idBus0')).click();
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
 
-    cy.foldElementInTree(`container`, `Cont 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(treeWithCont0Folded);
 
-    cy.unfoldElementInTree(`container`, `Cont 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
 
-    cy.foldElementInTree(`component`, `Comp 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('component', 'idComp0'))
+      .click();
 
     cy.expectPetalsTreeToBe(treeWithComp0Folded);
 
-    cy.unfoldElementInTree(`component`, `Comp 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('component', 'idComp0'))
+      .click();
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
 
-    cy.foldElementInTree(`category-service-assemblies`, `Service Assemblies`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('sacategory', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(treeWithSasFolded);
 
-    cy.unfoldElementInTree(`category-service-assemblies`, `Service Assemblies`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('sacategory', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
   });
@@ -165,7 +177,7 @@ describe(`Petals`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
-    cy.foldElementInTree(`bus`, `Bus 0`);
+    cy.get(PETALS_TREE_DOM.buttons.expandableBtn('bus', 'idBus0')).click();
 
     cy.get(PETALS_DOM.inputs.search).type(`su 0`);
 
@@ -201,11 +213,15 @@ describe(`Petals`, () => {
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
 
-    cy.foldElementInTree(`container`, `Cont 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(treeWithCont0Folded);
 
-    cy.unfoldElementInTree(`container`, `Cont 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
+      .click();
 
     cy.expectPetalsTreeToBe(expectedTreeNames);
   });
@@ -312,11 +328,15 @@ describe(`Petals`, () => {
 
     cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
 
-    cy.foldElementInTree(`container`, `Cont 0`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
+      .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
 
-    cy.foldElementInTree(`category-service-assemblies`, `Service Assemblies`);
+    cy
+      .get(PETALS_TREE_DOM.buttons.expandableBtn('sacategory', 'idCont1'))
+      .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
   });

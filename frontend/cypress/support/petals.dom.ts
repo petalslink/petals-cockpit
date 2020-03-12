@@ -17,7 +17,6 @@
 
 // base selector
 const bs = `app-petals-menu-view`;
-const bsTree = `app-material-tree`;
 
 export const PETALS_DOM = {
   inputs: { search: `${bs} input[formcontrolname="search"]` },
@@ -25,12 +24,17 @@ export const PETALS_DOM = {
 };
 
 export const PETALS_TREE_DOM = {
-  navTree: { navTreePetals: `${bsTree} .nav-list-tree` },
-  links: {
-    itemsLinks: `${bsTree} .item-list a`,
+  navTree: { navTreePetals: `${bs} .mat-tree` },
+  buttons: {
+    workspaceElementBtn: `${bs} .btn-node`,
+    // type = bus, container, component, serviceassembly, serviceunit, sharedlibrary, compcategory, sacategory, slcategory
+    expandableBtn: (type: string, elementId: string) =>
+      `${bs} .btn-expandable-${type}-${elementId}`,
   },
   texts: {
-    itemsNames: `${bsTree} .item-name`,
-    itemsHighlights: `${bsTree} .highlight`,
+    treeElementsName: `${bs} .tree-element-name`,
+    workspaceElementsName: `${bs} .workspace-element-name`,
+    categoriesName: `${bs} .tree-category-name`,
+    itemsHighlights: `${bs} .highlight`,
   },
 };
