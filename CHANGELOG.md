@@ -1,3 +1,28 @@
+<a name="1.5.0"></a>
+# [1.5.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.4.0...v1.5.0) (2020-03-16)
+
+
+### Bug Fixes
+
+* **backend:** allow to deploy an already deployed SA ([9a398b8](https://gitlab.com/linagora/petals-cockpit/commit/9a398b881f9d7f9d3d452c135ec55bbbb1d8acdf)), closes [#631](https://gitlab.com/linagora/petals-cockpit/issues/631)
+* **frontend:** clean import bus error message when switching workspace ([bd07419](https://gitlab.com/linagora/petals-cockpit/commit/bd0741937d572fb26a72b707268291fc3279b808)), closes [#654](https://gitlab.com/linagora/petals-cockpit/issues/654)
+* **frontend:** display error messages correctly at minimum supported size ([f12a20b](https://gitlab.com/linagora/petals-cockpit/commit/f12a20b40ae7c0b3d7d689c34fa70a82621b3d80)), closes [#652](https://gitlab.com/linagora/petals-cockpit/issues/652)
+
+
+### Features
+
+* **backend:** workspace name is now limited to 100 characters ([69365e6](https://gitlab.com/linagora/petals-cockpit/commit/69365e6f4273f81e8243696d5d50fcae89ca9bc8)), closes [#526](https://gitlab.com/linagora/petals-cockpit/issues/526)
+* **front:** restrict name and short description maximum lengths when creating new workspace ([a3cfea0](https://gitlab.com/linagora/petals-cockpit/commit/a3cfea01435f57657c789ba86a118e9f8f11a647))
+* **frontend:** allow to deploy an already deployed SA ([07b43a9](https://gitlab.com/linagora/petals-cockpit/commit/07b43a9b0b4c626b7d4aad1b08be310be2d21203)), closes [#653](https://gitlab.com/linagora/petals-cockpit/issues/653)
+* **frontend:** improve the form to add a user to a workspace ([29fd3c0](https://gitlab.com/linagora/petals-cockpit/commit/29fd3c0687bee981482b5a45450b65219a422604))
+* **frontend:** display users permissions on workspace overview ([3036a62](https://gitlab.com/linagora/petals-cockpit/commit/3036a62511a5902b5c8c98f4899ba3f3622e3ce7)), closes [#584](https://gitlab.com/linagora/petals-cockpit/issues/584) [#586](https://gitlab.com/linagora/petals-cockpit/issues/586)
+* **frontend:** make service assembly view read-only after deletion ([b757126](https://gitlab.com/linagora/petals-cockpit/commit/b757126b734488575bd4500fde32a81359443a74)), closes [#648](https://gitlab.com/linagora/petals-cockpit/issues/648)
+* **frontend:** make shared library view read-only after deletion ([9ea3dab](https://gitlab.com/linagora/petals-cockpit/commit/9ea3dabe0bbf08cf190408317fe064cb43dcd14e)), closes [#647](https://gitlab.com/linagora/petals-cockpit/issues/647)
+* **frontend:** improve service assembly view ([41530c4](https://gitlab.com/linagora/petals-cockpit/commit/41530c43ac646761435b106f261cb4d9126eb538)), closes [#643](https://gitlab.com/linagora/petals-cockpit/issues/643) [#644](https://gitlab.com/linagora/petals-cockpit/issues/644)
+* **frontend:** return permissons when adding a user to a workspace ([586c25f](https://gitlab.com/linagora/petals-cockpit/commit/586c25f9c19c5c044afad795984505a1608e3462))
+
+
+
 <a name="1.4.0"></a>
 # [1.4.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.03.0...v1.4.0) (2020-02-24)
 
