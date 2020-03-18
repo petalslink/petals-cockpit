@@ -17,99 +17,25 @@
 package org.ow2.petals.cockpit.server.commands;
 
 import static org.assertj.db.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.WORKSPACES;
 
-import java.util.Optional;
-
 import org.assertj.core.api.SoftAssertions;
+import org.assertj.db.type.Changes;
 import org.assertj.db.type.Table;
-import org.eclipse.jdt.annotation.Nullable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.SystemErrRule;
-import org.junit.contrib.java.lang.system.SystemOutRule;
-import org.ow2.petals.cockpit.server.AbstractTest;
-import org.ow2.petals.cockpit.server.CockpitApplication;
-import org.ow2.petals.cockpit.server.CockpitConfiguration;
-import org.zapodot.junit.db.EmbeddedDatabaseRule;
 
 import com.codahale.metrics.MetricFilter;
 
-import io.dropwizard.cli.Cli;
-import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.testing.ConfigOverride;
-import io.dropwizard.util.JarLocation;
-import liquibase.Liquibase;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
+public class AddUserCommandTest extends AbstractCommandTest {
 
-public class AddUserTest extends AbstractTest {
-
-    @Rule
-    public EmbeddedDatabaseRule dbRule = EmbeddedDatabaseRule.builder().build();
-
-    public ConfigOverride dbConfig = ConfigOverride.config("database.url", () -> dbRule.getConnectionJdbcUrl());
-
-    @Rule
-    public final SystemErrRule systemErrRule = new SystemErrRule().enableLog();
-
-    @Rule
-    public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
-
-    @Nullable
-    private Cli cli;
-
-    @Nullable
-    private Bootstrap<CockpitConfiguration> bootstrap;
-
-    private Cli cli() {
-        assert cli != null;
-        return cli;
-    }
-
-    private Bootstrap<CockpitConfiguration> bootstrap() {
-        assert bootstrap != null;
-        return bootstrap;
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        // setup the database schema
-        new Liquibase("migrations.xml", new ClassLoaderResourceAccessor(), new JdbcConnection(dbRule.getConnection()))
-                .update("");
-
-        final JarLocation location = mock(JarLocation.class);
-        when(location.getVersion()).thenReturn(Optional.of("1.0.0"));
-
-        // its initialize method won't be run (but its run method will!)
-        bootstrap = new Bootstrap<>(new CockpitApplication<>());
-
-        // let's load configuration from resources
-        bootstrap().setConfigurationSourceProvider(new ResourceConfigurationSourceProvider());
-
-        // let's simulate the initialize method only for what we need here
-        bootstrap().addCommand(new AddUserCommand<>());
-
-        cli = new Cli(location, bootstrap, System.out, System.err);
-
-        // used by the cli when running command
-        dbConfig.addToSystemProperties();
-    }
-
-    @After
-    public void tearDown() {
-        dbConfig.removeFromSystemProperties();
+    public AddUserCommandTest() {
+        super(new AddUserCommand());
     }
 
     @Test
-    public void addUserAdminToDb() throws Exception {
+    public void addUserAdmin() throws Exception {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a",
                 "add-user-test.yml");
 
@@ -131,7 +57,7 @@ public class AddUserTest extends AbstractTest {
     }
 
     @Test
-    public void addUserToDb() throws Exception {
+    public void addUser() throws Exception {
         boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
@@ -152,30 +78,8 @@ public class AddUserTest extends AbstractTest {
     }
 
     @Test
-    public void addLdapUserToDb() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l",
-                "add-user-test.yml");
-
-        SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isTrue();
-
-        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user");
-        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
-        softly.assertAll();
-
-        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
-                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
-                .column(USERS.NAME.getName()).value().isEqualTo("User")
-                .column(USERS.ADMIN.getName()).value().isEqualTo(false)
-                .column(USERS.IS_FROM_LDAP.getName()).value().isEqualTo(true);
-
-        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(0);
-        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(0);
-    }
-
-    @Test
-    public void addUserToDbTwice() throws Exception {
-        addUserAdminToDb();
+    public void addUserWithSameUsername() throws Exception {
+        addUserAdmin();
         systemErrRule.clearLog();
         systemOutRule.clearLog();
         // needed because running cli will register them again...
@@ -184,7 +88,7 @@ public class AddUserTest extends AbstractTest {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
-        softly.assertThat(success).as("Exit success").isTrue();
+        softly.assertThat(success).as("Exit success").isFalse();
 
         softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").doesNotContain("Added user");
         softly.assertThat(systemErrRule.getLog()).as("stderr").contains("User admin already exists");
@@ -199,7 +103,7 @@ public class AddUserTest extends AbstractTest {
     }
 
     @Test
-    public void addUserAdminToDbWithWorkspace() throws Exception {
+    public void addUserAdminWithWorkspace() throws Exception {
         boolean success = cli().run("add-user", "-n", "Admin", "-u", "admin", "-p", "password", "-a", "-w",
                 "myWorkspace", "add-user-test.yml");
 
@@ -224,24 +128,116 @@ public class AddUserTest extends AbstractTest {
                 .isEqualTo("Workspace automatically generated for **admin**.");
 
         assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
-                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin")
+                .column(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.getName()).value().isFalse()
+                .column(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION.getName()).value().isFalse()
+                .column(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION.getName()).value().isFalse();
     }
 
     @Test
-    public void addLdapUserWithPassword() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-l", "-p", "password",
-                "add-user-test.yml");
+    public void addUsersWithSameWorkspace() throws Exception {
+        addUserAdminWithWorkspace();
+        systemErrRule.clearLog();
+        systemOutRule.clearLog();
+        // needed because running cli will register them again...
+        bootstrap().getMetricRegistry().removeMatching(MetricFilter.ALL);
+
+        Changes changes = new Changes(dbRule.getDataSource());
+
+        changes.setStartPointNow();
+        boolean success = cli().run("add-user", "-n", "Christophe CHEVALIER", "-u", "cchevalier", "-p", "cchevalier",
+                "-w", "MYWORKSPACE", "add-user-test.yml");
+        changes.setEndPointNow();
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout")
+                .contains("Added user cchevalier").doesNotContain("Added workspace MYWORKSPACE");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        Long myWorkspaceId = (Long) new Table(dbRule.getDataSource(), WORKSPACES.getName()).getRow(0)
+                .getColumnValue(WORKSPACES.ID.getName()).getValue();
+
+        assertThat(changes).ofCreationOnTable(USERS.getName()).hasNumberOfChanges(1).change()
+                .column(USERS.USERNAME.getName()).valueAtEndPoint().isEqualTo("cchevalier")
+                .column(USERS.NAME.getName()).valueAtEndPoint().isEqualTo("Christophe CHEVALIER")
+                .column(USERS.ADMIN.getName()).valueAtEndPoint().isEqualTo(false)
+                .column(USERS.IS_FROM_LDAP.getName()).valueAtEndPoint().isEqualTo(false)
+                .column(USERS.LAST_WORKSPACE.getName()).valueAtEndPoint().isEqualTo(myWorkspaceId)
+                .ofModificationOnTable(USERS.getName()).hasNumberOfChanges(0);
+
+        assertThat(changes).onTable(WORKSPACES.getName()).hasNumberOfChanges(0);
+
+        assertThat(changes).ofCreationOnTable(USERS_WORKSPACES.getName()).hasNumberOfChanges(1).change()
+                .column(USERS_WORKSPACES.USERNAME.getName()).valueAtEndPoint().isEqualTo("cchevalier")
+                .column(USERS_WORKSPACES.WORKSPACE_ID.getName()).valueAtEndPoint().isEqualTo(myWorkspaceId)
+                .ofModificationOnTable(USERS_WORKSPACES.getName()).hasNumberOfChanges(0);
+    }
+
+    @Test
+    public void addUserWithWorkspacePermissions() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "-w", "myWorkspace",
+                "--adminWorkspace", "--deployArtifact", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isTrue();
+
+        softly.assertThat(systemOutRule.getLogWithNormalizedLineSeparator()).as("stdout").contains("Added user user",
+                "Added workspace myWorkspace");
+        softly.assertThat(systemErrRule.getLog()).as("stderr").isEmpty();
+        softly.assertAll();
+
+        assertThat(new Table(dbRule.getDataSource(), USERS.getName())).hasNumberOfRows(1).row()
+                .column(USERS.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS.NAME.getName()).value().isEqualTo("User")
+                .column(USERS.ADMIN.getName()).value().isFalse()
+                .column(USERS.IS_FROM_LDAP.getName()).value().isFalse()
+                .column(USERS.LAST_WORKSPACE.getName())
+                .value().isNotNull();
+
+        assertThat(new Table(dbRule.getDataSource(), WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(WORKSPACES.NAME.getName()).value().isEqualTo("myWorkspace")
+                .column(WORKSPACES.DESCRIPTION.getName()).value()
+                .isEqualTo("Workspace automatically generated for **user**.");
+
+        assertThat(new Table(dbRule.getDataSource(), USERS_WORKSPACES.getName())).hasNumberOfRows(1).row()
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("user")
+                .column(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.getName()).value().isTrue()
+                .column(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION.getName()).value().isTrue()
+                .column(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION.getName()).value().isFalse();
+    }
+
+    @Test
+    public void addUserWithoutName() throws Exception {
+        boolean success = cli().run("add-user", "-p", "password", "-u", "user", "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("-n/--name is required");
+        softly.assertAll();
     }
 
     @Test
     public void addUserWithoutPassword() throws Exception {
-        boolean success = cli().run("add-user", "-n", "User", "-u", "user",
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "add-user-test.yml");
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr").contains("-p/--password is required");
+        softly.assertAll();
+    }
+
+    @Test
+    public void addUserWithPermissionsWithoutWorkspace() throws Exception {
+        boolean success = cli().run("add-user", "-n", "User", "-u", "user", "-p", "password", "--adminWorkspace",
                 "add-user-test.yml");
 
         SoftAssertions softly = new SoftAssertions();
         softly.assertThat(success).as("Exit success").isFalse();
+        softly.assertThat(systemErrRule.getLog()).as("stderr")
+                .contains("Cannot set workspace permissions without -w/--workspacename");
+        softly.assertAll();
     }
 }

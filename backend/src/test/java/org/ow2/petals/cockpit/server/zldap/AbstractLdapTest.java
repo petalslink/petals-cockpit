@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.ow2.petals.cockpit.server.security;
+package org.ow2.petals.cockpit.server.zldap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.db.api.Assertions.assertThat;
