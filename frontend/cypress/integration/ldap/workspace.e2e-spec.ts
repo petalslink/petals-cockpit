@@ -1314,29 +1314,31 @@ describe('Workspace', () => {
 
       // expect to have headers in good order
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.headerTable)
+        .get(WORKSPACE_OVERVIEW_DOM.table.texts.headerTable)
         .each((_, index) => cy.contains(expectedHeadersTable[index]));
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.allRow)
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.allRow)
         .should('have.length', expectedDefaultUserDetailsList.length);
 
       // expect to have 6 users present in the list
       expectedDefaultUserDetailsList.forEach(user => {
         cy
-          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserId(user.id))
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userId(user.id))
           .should('contain', user.id);
         cy
-          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserName(user.id))
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userName(user.id))
           .should('contain', user.name);
         cy
-          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserAdminWorkspace(user.id))
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(user.id))
           .should(user.adminWorkspace ? 'be.checked' : 'not.be.checked');
         cy
-          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserDeployArtifact(user.id))
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(user.id))
           .should(user.deployArtifact ? 'be.checked' : 'not.be.checked');
         cy
-          .get(WORKSPACE_OVERVIEW_DOM.table.cellUserLifecycleArtifact(user.id))
+          .get(
+            WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(user.id)
+          )
           .should(user.lifecycleArtifact ? 'be.checked' : 'not.be.checked');
       });
     });
@@ -1346,13 +1348,17 @@ describe('Workspace', () => {
 
       // userToAdd should not exist in the table
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToAdd))
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(userToAdd))
         .should('not.exist');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
         .should('be.disabled');
 
       cy.get(`mat-option .mat-option-text`).should('not.exist');
@@ -1375,7 +1381,26 @@ describe('Workspace', () => {
         .click();
 
       // userToAdd should now exist in the table
-      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToAdd)).should('exist');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(userToAdd))
+        .should('exist');
+
+      // by default, the user added has no permissions
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(userToAdd))
+        .should('not.be.checked');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(userToAdd))
+        .should('not.be.checked');
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(userToAdd)
+        )
+        .should('not.be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
 
@@ -1389,7 +1414,7 @@ describe('Workspace', () => {
 
       // user to delete should exist in the table
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToDelete))
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(userToDelete))
         .should('exist');
 
       // user to delete can not be added
@@ -1398,12 +1423,12 @@ describe('Workspace', () => {
       cy.get(`mat-option span`).should('not.contain', userToDelete);
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.cellUserActionDelete(userToDelete))
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(userToDelete))
         .click({ force: true });
 
       // user to delete should not exist in the table
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.rowUser(userToDelete))
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(userToDelete))
         .should('not.exist');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
@@ -1426,7 +1451,9 @@ describe('Workspace', () => {
     it('should not be able to remove himself from workspace users', () => {
       const currentUser = 'admin';
       // expect to have names, id for all users sorted in asc order
-      cy.get(WORKSPACE_OVERVIEW_DOM.table.rowUser(currentUser)).should('exist');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(currentUser))
+        .should('exist');
 
       // can not add ourself
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
@@ -1434,8 +1461,177 @@ describe('Workspace', () => {
       cy.get(`mat-option span`).should('not.contain', currentUser);
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.cellUserActionDelete(currentUser))
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(currentUser))
         .should('not.exist');
+    });
+
+    it('should edit and update workspace users permissions from workspace users', () => {
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.userTable).scrollIntoView();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
+
+      // should change permission
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact('mrobert'))
+        .should('be.checked')
+        .click({
+          force: true,
+        })
+        .should('not.be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.enabled');
+
+      // should put the same permission than the store
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact('mrobert'))
+        .should('not.be.checked')
+        .click({
+          force: true,
+        })
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
+
+      // should change multiple permissions
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('vnoel'))
+        .should('not.be.checked')
+        .click({
+          force: true,
+        })
+        .should('be.checked');
+
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact('cchevalier')
+        )
+        .should('be.checked')
+        .click({
+          force: true,
+        })
+        .should('not.be.checked');
+
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact('bescudie')
+        )
+        .should('not.be.checked')
+        .click({
+          force: true,
+        })
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.enabled')
+        .click();
+
+      // should keep changed permissions after saving
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact('mrobert'))
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('vnoel'))
+        .should('be.checked');
+
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact('cchevalier')
+        )
+        .should('not.be.checked');
+
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact('bescudie')
+        )
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
+
+      cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 0`)
+        .click();
+
+      cy.expectLocationToBe('/workspaces/idWks0');
+
+      cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 1`)
+        .click();
+
+      cy.expectLocationToBe('/workspaces/idWks1');
+
+      // expect that a permission checkbox have the new store value unchanged
+      cy
+        .get(
+          WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact('bescudie')
+        )
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
+    });
+
+    it('should have a 409 conflict error when trying to remove the last adminWorkspace permission', () => {
+      cy.get(MENU_DOM.buttons.toggleMenu).click();
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 0`)
+        .click();
+
+      cy.expectLocationToBe('/workspaces/idWks0');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('admin'))
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('admin'))
+        .click({ force: true })
+        .should('not.be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.enabled')
+        .click();
+
+      cy.expectNotification(
+        'error',
+        'admin permissions update failed',
+        `Error backend`
+      );
+
+      // should have adminWorkspace permission unchanged
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('admin'))
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.disabled');
     });
 
     const expectedDefaultUserDetailsList = [
