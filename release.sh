@@ -54,7 +54,7 @@ prepare_for_development()
       git add backend/pom.xml
       git add cockpit/pom.xml
       git commit -m "chore: prepare for next development"
-      git push --set-upstream origin product/release-$1
+      git push --set-upstream origin product/development-$1
     fi
   else
     exit 0
