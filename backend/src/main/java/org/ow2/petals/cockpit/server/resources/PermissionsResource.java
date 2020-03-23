@@ -94,7 +94,7 @@ public class PermissionsResource {
                         .and(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchOne(0, boolean.class);
                 boolean willBeAdmin = permissions.adminWorkspace;
                 if (currentAdminsWorkspacesCount == 1 && isAlreadyAdminWorkspace && !willBeAdmin) {
-                    throw new WebApplicationException("At least one cockpit administrator must remain!",
+                    throw new WebApplicationException("At least one workspace administrator must remain!",
                             Status.CONFLICT);
                 }
 
