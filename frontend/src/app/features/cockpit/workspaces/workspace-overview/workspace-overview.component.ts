@@ -20,17 +20,14 @@ import {
   Inject,
   OnDestroy,
   OnInit,
-  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subject } from 'rxjs';
@@ -44,7 +41,6 @@ import {
   getFormErrors,
 } from '@shared/helpers/form.helper';
 import { IBusImport } from '@shared/services/buses.service';
-import { IUserWorkspaceBackend } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
@@ -58,7 +54,11 @@ import {
   getImportBusError,
 } from '@wks/state/buses/buses.selectors';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
-import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
+import {
+  IWorkspaceRow,
+  IWorkspaceUserPermissions,
+  IWorkspaceUserRow,
+} from '@wks/state/workspaces/workspaces.interface';
 import {
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
@@ -121,13 +121,13 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   disabledDetachBtn = false;
 
   // workspace users management
-  users$: Observable<IUserWorkspaceBackend[]>;
+  users$: Observable<IWorkspaceUserRow[]>;
   currentUserId$: Observable<string>;
   appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
+  usersFormGroup: FormGroup;
 
-  dataSource = new MatTableDataSource<IUserWorkspaceBackend>([]);
   displayedColumns: string[] = [
     'name',
     'id',
@@ -136,10 +136,30 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     'lifecycleArtifact',
     'action',
   ];
-  sortDirection = 'asc';
-  sortableColumn = 'name';
+  permissions: {
+    id: string;
+    label: string;
+  }[] = [
+    {
+      id: 'adminWorkspace',
+      label: 'Admin Workspace',
+    },
+    {
+      id: 'deployArtifact',
+      label: 'Deploy Artifact',
+    },
+    {
+      id: 'lifecycleArtifact',
+      label: 'Lifecycle Artifact',
+    },
+  ];
 
-  @ViewChild(MatSort) sort: MatSort;
+  usersPermissionsChanged: {
+    id: string;
+    adminWorkspace: boolean;
+    deployArtifact: boolean;
+    lifecycleArtifact: boolean;
+  }[];
 
   constructor(
     private fb: FormBuilder,
@@ -183,12 +203,21 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.users$ = this.store$.pipe(
-      getCurrentWorkspaceUsers,
+    this.users$ = this.store$.pipe(getCurrentWorkspaceUsers).pipe(
       takeUntil(this.onDestroy$),
-      tap(data => {
-        this.dataSource.data = data;
-        this.dataSource.sort = this.sort;
+      tap(users => {
+        if (!this.isSavingUsersPermissions(users)) {
+          this.usersPermissionsChanged = users.map(user => {
+            return {
+              id: user.id,
+              adminWorkspace: false,
+              deployArtifact: false,
+              lifecycleArtifact: false,
+            };
+          });
+
+          this.updateUsersFormGroup(users);
+        }
       })
     );
 
@@ -239,7 +268,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     // when a user is added to the workspace
     this.actions$
       .pipe(
-        ofType(Workspaces.AddUserSuccessType),
+        ofType(Workspaces.AddWorkspaceUserSuccessType),
         takeUntil(this.onDestroy$),
         // reset the form
         tap(_ => this.addUserFormGroup.reset())
@@ -374,11 +403,131 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   addUser() {
     const id = this.addUserFormGroup.get('userSearchCtrl').value;
-    this.store$.dispatch(new Workspaces.AddUser({ id }));
+    this.store$.dispatch(new Workspaces.AddWorkspaceUser({ id }));
+
+    this.usersFormGroup.disable();
+  }
+
+  get usersFormArray(): FormArray {
+    return this.usersFormGroup.get('usersFormArray') as FormArray;
+  }
+
+  onSubmitUsersPermissions() {
+    this.usersPermissionsChanged
+      .filter(
+        user =>
+          user.adminWorkspace || user.deployArtifact || user.lifecycleArtifact
+      )
+      .map(user => {
+        const userForm = this.usersFormArray.controls.find(
+          userFormArray => userFormArray.value.id === user.id
+        );
+
+        this.store$.dispatch(
+          new Workspaces.UpdateWorkspaceUserPermissions({
+            userId: userForm.value.id,
+            permissions: {
+              adminWorkspace: userForm.value.adminWorkspace,
+              deployArtifact: userForm.value.deployArtifact,
+              lifecycleArtifact: userForm.value.lifecycleArtifact,
+            },
+          })
+        );
+      });
+
+    this.usersFormGroup.disable();
+  }
+
+  updateUsersFormGroup(users: IWorkspaceUserRow[]) {
+    const userListFormGroup: FormGroup[] = users.map(u => {
+      return this.fb.group({
+        id: u.id,
+        name: u.name,
+        adminWorkspace: {
+          value: u.adminWorkspace,
+          disabled: false,
+        },
+        deployArtifact: {
+          value: u.deployArtifact,
+          disabled: false,
+        },
+        lifecycleArtifact: {
+          value: u.lifecycleArtifact,
+          disabled: false,
+        },
+      });
+    });
+
+    this.usersFormGroup = this.fb.group({
+      usersFormArray: this.fb.array(userListFormGroup),
+    });
+  }
+
+  onUserPermissionChange(
+    usersStored: IWorkspaceUserRow[],
+    permissionId: keyof IWorkspaceUserPermissions,
+    index: number
+  ) {
+    const userChanged = this.usersPermissionsChanged.find(
+      user => user.id === this.usersFormArray.controls[index].value.id
+    );
+    userChanged[permissionId] =
+      usersStored.find((user: IWorkspaceUserRow) => user.id === userChanged.id)[
+        permissionId
+      ] !== this.usersFormArray.controls[index].value[permissionId];
+  }
+
+  isSavingUsersPermissions(usersStored: IWorkspaceUserRow[]): boolean {
+    return !!usersStored.find(user => user.isSavingUserPermissions);
+  }
+
+  getCheckBoxColor(
+    usersStored: IWorkspaceUserRow[],
+    permissionId: keyof IWorkspaceUserPermissions,
+    index: number
+  ) {
+    const userForm = this.usersFormArray.controls[index].value;
+    return usersStored.find(
+      user =>
+        user.id === userForm.id && user[permissionId] === userForm[permissionId]
+    )
+      ? 'primary'
+      : 'accent';
+  }
+
+  isUnchecked(
+    usersStored: IWorkspaceUserRow[],
+    userForm: FormGroup,
+    permissionId: keyof IWorkspaceUserPermissions
+  ) {
+    return usersStored.find(
+      user =>
+        user.id === userForm.value.id &&
+        user[permissionId] &&
+        !userForm.value[permissionId]
+    );
+  }
+
+  hasAnyUserChanged(): boolean {
+    return !this.usersPermissionsChanged.find(
+      user =>
+        user.adminWorkspace || user.deployArtifact || user.lifecycleArtifact
+    );
+  }
+
+  hasPermissionChanged(
+    userId: string,
+    permissionId: keyof IWorkspaceUserPermissions
+  ): boolean {
+    return this.usersPermissionsChanged.find(
+      (user: IWorkspaceUserRow) => user.id === userId
+    )[permissionId];
   }
 
   removeUser(id: string) {
     this.store$.dispatch(new Workspaces.DeleteUser({ id }));
+
+    this.usersFormGroup.disable();
   }
 
   trackByUser(i: number, user: IUserRow) {
@@ -592,14 +741,32 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         </div>
         <mat-dialog-content>
           <p fxLayout="column">
-            <span>This will delete <b>{{ data.name }}</b> along with its settings (members, permissions, descriptions).</span>
+            <span
+              >This will delete <b>{{ data.name }}</b> along with its settings
+              (members, permissions, descriptions).</span
+            >
             <span>Buses will be detached.</span>
           </p>
         </mat-dialog-content>
 
         <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
-          <button mat-button color="primary" (click)="close()" class="btn-cancel-delete-wks margin-right-x1 text-upper">Cancel</button>
-          <button mat-raised-button color="warn" (click)="delete()" [matDialogClose]="data.name" class="btn-confirm-delete-wks text-upper">Delete</button>
+          <button
+            mat-button
+            color="primary"
+            (click)="close()"
+            class="btn-cancel-delete-wks margin-right-x1 text-upper"
+          >
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="warn"
+            [matDialogClose]="data.name"
+            (click)="delete()"
+            class="btn-confirm-delete-wks text-upper"
+          >
+            Delete
+          </button>
         </mat-dialog-actions>
       </div>
     </div>
@@ -638,13 +805,31 @@ export class WorkspaceDeleteDialogComponent {
         </div>
         <mat-dialog-content>
           <p fxLayout="column">
-            <span>This will detach <b>{{ data.name }}</b>.</span>
+            <span
+              >This will detach <b>{{ data.name }}</b
+              >.</span
+            >
           </p>
         </mat-dialog-content>
 
         <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
-          <button mat-button color="primary" (click)="close()" class="btn-cancel-detach-bus-dialog margin-right-x1 text-upper">Cancel</button>
-          <button mat-raised-button color="primary" (click)="detach()" [matDialogClose]="data.name" class="btn-confirm-detach-bus-dialog text-upper">Detach</button>
+          <button
+            mat-button
+            color="primary"
+            (click)="close()"
+            class="btn-cancel-detach-bus-dialog margin-right-x1 text-upper"
+          >
+            Cancel
+          </button>
+          <button
+            mat-raised-button
+            color="primary"
+            [matDialogClose]="data.name"
+            (click)="detach()"
+            class="btn-confirm-detach-bus-dialog text-upper"
+          >
+            Detach
+          </button>
         </mat-dialog-actions>
       </div>
     </div>
@@ -681,22 +866,34 @@ export class BusDetachDialogComponent {
           </span>
         </div>
         <mat-dialog-content>
-          <mat-progress-bar *ngIf="importBusId" mode="indeterminate"></mat-progress-bar>
+          <mat-progress-bar
+            *ngIf="importBusId"
+            mode="indeterminate"
+          ></mat-progress-bar>
         </mat-dialog-content>
 
         <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
-          <button 
-            mat-button 
-            color="primary" 
-            [matDialogClose]="importBusId" 
-            [disabled]="isCancelingImportBus" 
-            (click)="cancel()" 
+          <button
+            mat-button
+            color="primary"
+            [matDialogClose]="importBusId"
+            (click)="cancel()"
+            [disabled]="isCancelingImportBus"
             class="btn-cancel-import-bus-dialog text-upper"
           >
-            <span *ngIf="isCancelingImportBus; else canCancel" fxLayout="row" fxLayoutAlign="start center">
-              Canceling <mat-spinner class="margin-left-x1" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+            <span
+              *ngIf="isCancelingImportBus; else canCancel"
+              fxLayout="row"
+              fxLayoutAlign="start center"
+            >
+              Canceling
+              <mat-spinner
+                [diameter]="16"
+                [strokeWidth]="1"
+                class="margin-left-x1"
+              ></mat-spinner>
             </span>
-            
+
             <ng-template #canCancel>
               <span class="text-upper cancel-bus-text-btn">Cancel</span>
             </ng-template>

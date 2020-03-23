@@ -488,7 +488,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card fxFlex fxLayout="column" class="card-users">
         <mat-card-title class="light-bold">Users</mat-card-title>
 
-        <div *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
+        <mat-card-content *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
           <app-message
             *ngIf="users.length === 1; else workspaceShared"
             type="info"
@@ -527,19 +527,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </span>
                 <mat-error>Select a user on the list</mat-error>
               </mat-form-field>
-  
+
               <mat-autocomplete #autocompleteUsers>
                 <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
                   {{ filteredUser }}
                 </mat-option>
               </mat-autocomplete>
-              
+  
               <button
                 mat-raised-button
                 color="primary"
                 [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
                 (click)="addUser()"
-                class="btn-add-user text-upper margin-bottom-x2"
+                class="btn-add-user text-upper"
               >
                 <span *ngIf="workspace.isAddingUserToWorkspace; else canAdd" fxLayout="row" fxLayoutAlign="start center">
                   Adding
@@ -553,176 +553,171 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </div>
           </form>
 
-          <table
-            *ngIf="currentUserId$ | async as currentUserId"
-            mat-table
-            matSort
-            [dataSource]="dataSource"
-            [matSortActive]="sortableColumn"
-            [matSortDirection]="sortDirection"
-            matSortDisableClear
-            class="users-table"
-          >
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                fxFlex="15"
-                fxLayoutAlign="start center"
-                class="mat-header-cell-user-name"
-              >
-                Name
-              </th>
-              <td
-                *matCellDef="let user"
-                mat-cell
-                fxFlex="15"
-                fxLayout="row"
-                fxLayoutAlign="start center"
-                class="cell-username-{{ user.id }}"
-              >
-                <span fxFlexFill fxLayout="row" fxLayoutAlign="start center">
-                  <app-generate-icon mat-list-avatar [size]="35" [text]="user.id"></app-generate-icon>
-                  <span class="margin-left-x1 user-name ellipsis">{{ user.name }}</span>
-                </span>
-              </td>
-            </ng-container>
-          
-            <!-- Id Column -->
-            <ng-container matColumnDef="id">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                fxFlex="15"
-                fxLayout="row"
-                fxLayoutAlign="center center"
-              >
-                Id
-              </th>
-              <td
-                mat-cell
-                *matCellDef="let user"
-                fxFlex="15"
-                fxLayout="row"
-                fxLayoutAlign="center center"
-                class="cell-userid-{{ user.id }}"
-              >
-                <span class="user-id ellipsis">{{ user.id }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Admin Workspace Column -->
-            <ng-container matColumnDef="adminWorkspace">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="center center"
-              >
-                Admin Workspace
-              </th>
-              <td
-                mat-cell
-                *matCellDef="let user"
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="center center"
-                class="cell-user-admin-wks-{{ user.id }}"
-              >
-                <mat-checkbox color="primary" [checked]="user.adminWorkspace"></mat-checkbox>
-              </td>
-            </ng-container>
-
-            <!-- Deploy Artifact Column -->
-            <ng-container matColumnDef="deployArtifact">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="center center"
-              >
-                Deploy Artifact
-              </th>
-              <td
-                mat-cell
-                *matCellDef="let user"
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="center center"
-                class="cell-user-deploy-artifact-{{ user.id }}"
-              >
-                <mat-checkbox color="primary" [checked]="user.deployArtifact"></mat-checkbox>
-              </td>
-            </ng-container>
-
-            <!-- Lifecycle Artifact Column -->
-            <ng-container matColumnDef="lifecycleArtifact">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="center center"
-              >
-                Lifecycle Artifact
-              </th>
-              <td
-                mat-cell
-                *matCellDef="let user"
-                fxFlex fxLayout="row"
-                fxLayoutAlign="center center"
-                class="cell-user-lifecycle-artifact-{{ user.id }}"
-              >
-                <mat-checkbox color="primary" [checked]="user.lifecycleArtifact"></mat-checkbox>
-              </td>
-            </ng-container>
-          
-            <!-- Action Column -->
-            <ng-container matColumnDef="action">
-              <th
-                mat-header-cell
-                *matHeaderCellDef
-                fxFlex
-                fxLayout="row"
-                fxLayoutAlign="end center"
-              >
-                Action
-              </th>
-              <td
-                mat-cell
-                *matCellDef="let user"
-                fxFlex
-                fxLayout="column"
-                fxLayoutAlign="center end"
-                class="cell-user-action-{{ user.id }}"
-              >
-                <button
-                  *ngIf="currentUserId !== user.id"
-                  mat-icon-button
-                  matTooltip="Delete"
-                  matTooltipPosition="before"
-                  [disabled]="workspace.isRemovingUserFromWorkspace"
-                  class="action-delete"
-                  (click)="removeUser(user.id)"
+          <form [formGroup]="usersFormGroup" (ngSubmit)="onSubmitUsersPermissions()">
+            <table
+              *ngIf="currentUserId$ | async as currentUserId"
+              mat-table
+              matSort
+              fxFlexFill
+              formArrayName="usersFormArray"
+              [dataSource]="usersFormArray.controls"
+              class="users-table"
+            >
+              <!-- Name Column -->
+              <ng-container matColumnDef="name">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  fxFlex="15"
+                  fxLayoutAlign="start center"
+                  class="mat-header-cell-user-name"
                 >
-                  <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
-                </button>
-              </td>
-            </ng-container>
-            
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let user; columns: displayedColumns;"
-              class="row-{{ user.id }} table-row"
-            ></tr>
-          </table>
-        </div>
+                  Name
+                </th>
+                <td
+                  *matCellDef="let user; let i = index;"
+                  mat-cell
+                  fxFlex="15"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  [formGroupName]="i"
+                  class="cell-username-{{ user.value.id }}"
+                >
+                  <span fxFlexFill fxLayout="row" fxLayoutAlign="start center">
+                    <app-generate-icon mat-list-avatar [size]="35" [text]="user.value.id"></app-generate-icon>
+                    <span class="margin-left-x1 user-name ellipsis">{{ user.value.name }}</span>
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Id Column -->
+              <ng-container matColumnDef="id">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  fxFlex="15"
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                >
+                  Id
+                </th>
+                <td
+                  mat-cell
+                  *matCellDef="let user; let i = index;"
+                  fxFlex="15"
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  [formGroupName]="i"
+                  class="cell-userid-{{ user.value.id }}"
+                >
+                  <span class="user-id ellipsis">{{ user.value.id }}</span>
+                </td>
+              </ng-container>
+              
+              <!-- Permissions Columns -->
+              <ng-container [matColumnDef]="permission.id" *ngFor="let permission of permissions;">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                >
+                  {{ permission.label }}
+                </th>
+                <td
+                  mat-cell
+                  *matCellDef="let user; let i = index;"
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  [formGroupName]="i"
+                  class="cell-user-{{ permission.id }}-{{ user.value.id }}"
+                >
+                  <span 
+                    *ngIf="isSavingUsersPermissions(users) && hasPermissionChanged(user.value.id, permission.id); else canCheck" 
+                    fxLayout="row" 
+                    fxLayoutAlign="start center"
+                  >
+                    <mat-spinner color="primary" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+                  </span>
+                  
+                  <ng-template #canCheck>
+                    <mat-checkbox
+                      [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
+                      [color]="getCheckBoxColor(users, permission.id, i)"
+                      [formControlName]="permission.id"
+                      (change)="onUserPermissionChange(users, permission.id, i)"
+                    ></mat-checkbox>
+                  </ng-template>
+                </td>
+              </ng-container>
+
+              <!-- Action Column -->
+              <ng-container matColumnDef="action">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="end center"
+                >
+                  Action
+                </th>
+                <td
+                  mat-cell
+                  *matCellDef="let user; let i = index;"
+                  fxFlex
+                  fxLayout="column"
+                  fxLayoutAlign="center end"
+                  [formGroupName]="i"
+                  class="cell-user-action-{{ user.value.id }}"
+                >
+                  <button
+                    *ngIf="currentUserId !== user.value.id"
+                    mat-icon-button
+                    matTooltip="Delete"
+                    matTooltipPosition="before"
+                    [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
+                    (click)="removeUser(user.value.id)"
+                    class="action-delete"
+                  >
+                    <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr
+                mat-row
+                *matRowDef="let user; columns: displayedColumns;"
+                class="row-{{ user.value.id }} table-row"
+              >
+              </tr>
+            </table>
+
+            <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
+              <button
+                mat-raised-button
+                type="submit"
+                color="primary"
+                [disabled]="hasAnyUserChanged() || isSavingUsersPermissions(users)"
+                class="btn-save-users-permissions text-upper"
+              >
+                <span *ngIf="isSavingUsersPermissions(users); else canSave" fxLayout="row" fxLayoutAlign="start center">
+                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
+                  Saving
+                </span>
+
+                <ng-template #canSave>
+                  <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
+                  <span class="text-upper">Save</span>
+                </ng-template>
+              </button>
+            </div>
+          </form>
+
+        </mat-card-content>
       </mat-card>
     </div>
   </div>

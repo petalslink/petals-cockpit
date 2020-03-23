@@ -22,7 +22,6 @@ import { map } from 'rxjs/operators';
 
 import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
-import { IUserWorkspaceBackend } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { IUserRow } from '@shared/state/users.interface';
 import { getUsersAllIds, getUsersById } from '@shared/state/users.selectors';
@@ -97,7 +96,7 @@ export function getCurrentWorkspace(store: IStore): IWorkspaceRow {
 const getCurrentWorkspaceUsersById = createSelector(
   (state: IStore) => getCurrentWorkspace(state).users,
   getUsersById,
-  (usersWks, usersById): IUserWorkspaceBackend[] => {
+  (usersWks, usersById): IWorkspaceUserRow[] => {
     return Object.values(usersWks.byId).reduce(
       (acc, user) => [
         ...acc,
@@ -107,6 +106,8 @@ const getCurrentWorkspaceUsersById = createSelector(
           adminWorkspace: usersWks.byId[user.id].adminWorkspace,
           deployArtifact: usersWks.byId[user.id].deployArtifact,
           lifecycleArtifact: usersWks.byId[user.id].lifecycleArtifact,
+          isSavingUserPermissions:
+            usersWks.byId[user.id].isSavingUserPermissions,
         },
       ],
       <IWorkspaceUserRow[]>[]
@@ -116,7 +117,7 @@ const getCurrentWorkspaceUsersById = createSelector(
 
 export function getCurrentWorkspaceUsers(
   store$: Store<IStore>
-): Observable<IUserWorkspaceBackend[]> {
+): Observable<IWorkspaceUserRow[]> {
   return store$.pipe(select(getCurrentWorkspaceUsersById));
 }
 

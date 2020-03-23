@@ -33,9 +33,15 @@ export interface IWorkspaceBackendDetailsCommon {
   description: string;
 }
 
-export interface IUserWorkspaceBackend extends IWorkspaceUserPermissions {
+export interface IWorkspaceUserPermissionsBackend {
+  adminWorkspace: boolean | undefined;
+  deployArtifact: boolean | undefined;
+  lifecycleArtifact: boolean | undefined;
+}
+
+export interface IWorkspaceUserBackend
+  extends IWorkspaceUserPermissionsBackend {
   id: string;
-  name: string;
 }
 
 export interface IWorkspaceBackend
@@ -48,7 +54,7 @@ export interface IWorkspaceBackend
 export interface IWorkspaceBackendDetails
   extends IWorkspaceBackendCommon,
     IWorkspaceBackendDetailsCommon {
-  users: IUserWorkspaceBackend[];
+  users: IWorkspaceUserBackend[];
 }
 export abstract class WorkspacesService {
   abstract fetchWorkspaces(): Observable<{
@@ -79,6 +85,12 @@ export abstract class WorkspacesService {
     workspaceId: string,
     userId: string
   ): Observable<IWorkspaceUserPermissions>;
+
+  abstract putUserPermissions(
+    workspaceId: string,
+    userId: string,
+    permissions: IWorkspaceUserPermissions
+  ): Observable<void>;
 
   abstract removeUser(workspaceId: string, userId: string): Observable<void>;
 
@@ -133,6 +145,19 @@ export class WorkspacesServiceImpl extends WorkspacesService {
     return this.http.post<IWorkspaceUserPermissions>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
       { id }
+    );
+  }
+
+  putUserPermissions(
+    workspaceId: string,
+    userId: string,
+    permissions: IWorkspaceUserPermissions
+  ) {
+    return this.http.put<void>(
+      `${environment.urlBackend}/users/${userId}/permissions`,
+      {
+        [workspaceId]: permissions,
+      }
     );
   }
 

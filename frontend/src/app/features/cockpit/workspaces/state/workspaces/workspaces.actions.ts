@@ -23,7 +23,7 @@ import {
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
 
-import { IWorkspaceUserPermissions } from './workspaces.interface';
+import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 
 export namespace Workspaces {
   export const CleanType = '[Workspaces] Clean';
@@ -182,24 +182,59 @@ export namespace Workspaces {
     constructor(public readonly payload: { search: string }) {}
   }
 
-  export const AddUserType = '[Workspaces] Add user';
-  export class AddUser implements Action {
-    readonly type = AddUserType;
+  export const AddWorkspaceUserType = '[Workspaces] Add user';
+  export class AddWorkspaceUser implements Action {
+    readonly type = AddWorkspaceUserType;
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const AddUserErrorType = '[Workspaces] Add user error';
-  export class AddUserError implements Action {
-    readonly type = AddUserErrorType;
+  export const AddWorkspaceUserErrorType = '[Workspaces] Add user error';
+  export class AddWorkspaceUserError implements Action {
+    readonly type = AddWorkspaceUserErrorType;
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const AddUserSuccessType = '[Workspaces] Add user success';
-  export class AddUserSuccess implements Action {
-    readonly type = AddUserSuccessType;
+  export const AddWorkspaceUserSuccessType = '[Workspaces] Add user success';
+  export class AddWorkspaceUserSuccess implements Action {
+    readonly type = AddWorkspaceUserSuccessType;
     constructor(
       public readonly payload: {
         id: string;
+        permissions: IWorkspaceUserPermissions;
+      }
+    ) {}
+  }
+
+  export const UpdateWorkspaceUserPermissionsType =
+    '[Workspaces] Update user permissions';
+  export class UpdateWorkspaceUserPermissions implements Action {
+    readonly type = UpdateWorkspaceUserPermissionsType;
+    constructor(
+      public readonly payload: {
+        userId: string;
+        permissions: IWorkspaceUserPermissions;
+      }
+    ) {}
+  }
+
+  export const UpdateWorkspaceUserPermissionsErrorType =
+    '[Workspaces] Update user permissions error';
+  export class UpdateWorkspaceUserPermissionsError implements Action {
+    readonly type = UpdateWorkspaceUserPermissionsErrorType;
+    constructor(
+      public readonly payload: {
+        userId: string;
+      }
+    ) {}
+  }
+
+  export const UpdateWorkspaceUserPermissionsSuccessType =
+    '[Workspaces] Update user permissions success';
+  export class UpdateWorkspaceUserPermissionsSuccess implements Action {
+    readonly type = UpdateWorkspaceUserPermissionsSuccessType;
+    constructor(
+      public readonly payload: {
+        userId: string;
         permissions: IWorkspaceUserPermissions;
       }
     ) {}
