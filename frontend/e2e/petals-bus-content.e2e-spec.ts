@@ -29,59 +29,6 @@
 //   });
 // });
 
-// describe(`Petals bus content`, () => {
-//   let workspace: WorkspacePage;
-
-//   beforeEach(() => {
-//     workspace = page.goToLogin().loginToWorkspace(`admin`, `admin`);
-//   });
-
-//   it(`should open the content page`, () => {
-//     const bus = workspace.openBus('Bus 0');
-//     expect(bus.title.getText()).toEqual('Bus 0');
-//   });
-
-//   it(`should have the containers information belonging to the bus`, () => {
-//     let bus = workspace.openBus('Bus 0');
-
-//     bus
-//       .getInfoPetalsServersMessage()
-//       .expectToBe('info', `Click on a container to access its page.`);
-
-//     // check that all containers are displayed
-//     expect(bus.containers.count()).toEqual(2);
-
-//     // check the description of the first container
-//     const c1 = bus.containers.get(0);
-//     expect(c1.$(`.swiper-description span.name`).getText()).toContain(`Cont 0`);
-//     expect(c1.$(`.swiper-description span.ip`).getText()).toContain(
-//       `Ip: 192.168.0.0`
-//     );
-//     expect(c1.$(`.swiper-description span.port`).getText()).toContain(
-//       `Port: 7700`
-//     );
-
-//     const c1p = bus.openContainer(0);
-
-//     expect(c1p.title.getText()).toEqual('Cont 0');
-
-//     bus = workspace.openBus('Bus 0');
-
-//     // check the description of the second container
-//     const c2 = bus.containers.get(1);
-//     expect(c2.$(`.swiper-description span.name`).getText()).toContain(`Cont 1`);
-//     expect(c2.$(`.swiper-description span.ip`).getText()).toContain(
-//       `Ip: 192.168.0.1`
-//     );
-//     expect(c2.$(`.swiper-description span.port`).getText()).toContain(
-//       `Port: 7700`
-//     );
-
-//     const c2p = bus.openContainer(1);
-
-//     expect(c2p.title.getText()).toEqual('Cont 1');
-//   });
-
 //   // TODO: test inconsistently failing
 //   // it(`should show unreachable containers on swiper component`, () => {
 //   //   const containersReachabilityStatus = page
