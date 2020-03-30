@@ -42,7 +42,7 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   sharedLibrary$: Observable<ISharedLibraryWithComponents>;
   workspaceId$: Observable<string>;
 
-  isDeleted: boolean;
+  isDeleted = false;
 
   constructor(private store$: Store<IStore>) {}
 

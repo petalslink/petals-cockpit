@@ -152,7 +152,7 @@ export class ArtifactsDeploymentComponent
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (hasContainerIdChanged(changes.container)) {
+    if (changes.container && hasContainerIdChanged(changes.container)) {
       this.deployArtifact.reset();
     }
   }

@@ -39,9 +39,10 @@ import { filter, takeUntil } from 'rxjs/operators';
 export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  isDeleted: boolean;
   serviceAssembly$: Observable<IServiceAssemblyWithSUsAndComponents>;
   workspaceId$: Observable<string>;
+
+  isDeleted = false;
 
   constructor(private store$: Store<IStore>) {}
 
