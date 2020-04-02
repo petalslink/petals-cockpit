@@ -17,6 +17,7 @@
 
 import { COMPONENT_DOM } from '../../support/component.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
+import { PETALS_TREE_DOM } from '../../support/petals.dom';
 import { SHARED_LIBRARY_DOM } from '../../support/shared-library.dom';
 
 describe('Shared-library', () => {
@@ -35,7 +36,7 @@ describe('Shared-library', () => {
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
       .click();
 
@@ -62,7 +63,7 @@ describe('Shared-library', () => {
 
     // unload the shared library
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
       .click();
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
@@ -72,7 +73,9 @@ describe('Shared-library', () => {
       .click();
 
     // sl is no longer in the list
-    cy.get('.mat-list-item-content').should('not.contain', 'SL 0');
+    cy
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
+      .should('not.contain', 'SL 0');
   });
 
   it('should show an info message when there is no related component', () => {
@@ -84,7 +87,7 @@ describe('Shared-library', () => {
 
     // check the app message
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
       .click({ force: true });
     cy
@@ -120,7 +123,7 @@ describe('Shared-library', () => {
 
     // check if the component is stopped
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
       .click({ force: true });
 
@@ -140,7 +143,7 @@ describe('Shared-library', () => {
 
     // unload the shared library
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
       .click();
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);

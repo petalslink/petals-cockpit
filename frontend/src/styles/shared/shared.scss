@@ -307,6 +307,59 @@ app-material-tree
   }
 }
 
+// all items elements in petals and services menu view ref
+// TODO: Remove above classes when mat-tree fully integrated
+mat-tree {
+  .mat-tree-node {
+    min-height: 24px;
+    height: 24px;
+  }
+
+  .element-info {
+    width: 95%;
+  }
+
+  .workspace-element-name {
+    margin-left: 5px;
+    font-size: 12px;
+  }
+
+  .tree-element-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tree-icon-svg {
+    width: 20px;
+  }
+
+  .tree-icon {
+    height: 19px;
+    font-size: 19px;
+  }
+
+  .btn-node {
+    background: transparent;
+    outline: none;
+    border: none;
+  }
+
+  .selected-element span {
+    font-weight: bold;
+  }
+
+  [class^='.btn-expandable'] {
+    width: 50px;
+  }
+}
+
+.rotate-minus-90 {
+  -ms-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+
 // this is changed to make tests pass
 // overflow on parent makes content not visible
 app-services-menu-view {
@@ -359,57 +412,6 @@ app-material-tree > .nav-list-tree > .item-list {
   .mat-list-item > .mat-list-item-content:hover,
   .mat-list-item > .mat-list-item-content:focus {
     @extend .color-primary-light-bold;
-  }
-
-  // customize categories of elements
-  .workspace-element-type-category-components > .mat-list-item-content,
-  .workspace-element-type-category-service-assemblies > .mat-list-item-content,
-  .workspace-element-type-category-shared-libraries > .mat-list-item-content {
-    @extend .text-upper;
-    font-weight: 500;
-
-    &:hover {
-      @extend .text-upper;
-      font-weight: 500;
-    }
-
-    .item-content > .arrow-size {
-      width: 16px;
-    }
-  }
-
-  // declare width for ellipsis
-  .workspace-element-type-bus
-    > .mat-list-item-content
-    > .item-content
-    > .item-name {
-    max-width: $sidebar-width - 54px;
-  }
-  .workspace-element-type-container
-    > .mat-list-item-content
-    > .item-content
-    > .item-name {
-    max-width: $sidebar-width - 68px;
-  }
-  .workspace-element-type-component
-    > .mat-list-item-content
-    > .item-content
-    > .item-name,
-  .workspace-element-type-service-assembly
-    > .mat-list-item-content
-    > .item-content
-    > .item-name,
-  .workspace-element-type-shared-library
-    > .mat-list-item-content
-    > .item-content
-    > .item-name {
-    max-width: $sidebar-width - 94px;
-  }
-  .workspace-element-type-service-unit
-    > .mat-list-item-content
-    > .item-content
-    > .item-name {
-    max-width: $sidebar-width - 122px;
   }
 }
 

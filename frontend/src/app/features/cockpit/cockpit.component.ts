@@ -22,7 +22,7 @@ import { Observable } from 'rxjs';
 import { IStore } from '@shared/state/store.interface';
 
 import {
-  getCurrentWorkspaceTree,
+  currentWorkspaceTree,
   WorkspaceElement,
 } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { Users } from '@shared/state/users.actions';
@@ -46,7 +46,7 @@ export class CockpitComponent implements OnInit, OnDestroy {
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
-    this.tree$ = this.store$.pipe(select(getCurrentWorkspaceTree));
+    this.tree$ = this.store$.pipe(select(currentWorkspaceTree));
     this.user$ = this.store$.pipe(getCurrentUser);
     this.isDisconnecting$ = this.store$.pipe(
       select(state => state.users.isDisconnecting)

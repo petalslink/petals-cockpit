@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { PETALS_TREE_DOM } from '../../support/petals.dom';
 import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
 import { COMPONENT_DOM } from './../../support/component.dom';
@@ -35,7 +36,7 @@ describe('Service-unit', () => {
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SU 0')
       .click();
 
@@ -115,6 +116,8 @@ describe('Service-unit', () => {
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
 
     // su is no longer in the list
-    cy.get('.mat-list-item-content').should('not.contain', 'SU 0');
+    cy
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
+      .should('not.contain', 'SU 0');
   });
 });

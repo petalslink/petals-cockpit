@@ -37,7 +37,7 @@ function foldOrUnfoldElementInTree(
 }
 
 Cypress.Commands.add('expectPetalsTreeToBe', tree => {
-  const treeNames = cy.get(PETALS_TREE_DOM.texts.itemsNames);
+  const treeNames = cy.get(PETALS_TREE_DOM.texts.treeElementsName);
   treeNames.should('have.length', tree.length);
   treeNames.each((_, index) => cy.contains(tree[index]));
 });

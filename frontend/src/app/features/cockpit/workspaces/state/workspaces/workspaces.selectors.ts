@@ -20,7 +20,6 @@ import { createSelector } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
 import { IUserWorkspaceBackend } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
@@ -148,12 +147,28 @@ export enum WorkspaceElementType {
   SLCATEGORY,
 }
 
-export interface WorkspaceElement extends TreeElement<WorkspaceElement> {
-  id: string;
-  type: WorkspaceElementType;
+export interface TreeElement {
+  level: number;
+  expandable: boolean;
 }
 
-const buildTree = createSelector(
+export interface WorkspaceElement {
+  id: string;
+  type: WorkspaceElementType;
+  name: string;
+  link?: string;
+  isFolded: boolean;
+  children?: WorkspaceElement[];
+  cssClass: string;
+  svgIcon?: string;
+  icon?: string;
+}
+
+export interface WorkspaceElementFlatNode
+  extends TreeElement,
+    WorkspaceElement {}
+
+export const currentWorkspaceTree = createSelector(
   getSelectedWorkspaceId,
   getBusesAllIds,
   getBusesById,
@@ -282,8 +297,8 @@ const buildTree = createSelector(
   }
 );
 
-export const getCurrentWorkspaceTree = createSelector(
-  buildTree,
+export const getCurrentWorkspaceTreeFiltered = createSelector(
+  currentWorkspaceTree,
   (state: IStore) => state.workspaces.searchPetals,
   (tree, search): WorkspaceElement[] => {
     if (typeof search !== 'string' || search === '') {

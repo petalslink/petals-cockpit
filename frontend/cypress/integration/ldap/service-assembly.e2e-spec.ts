@@ -18,6 +18,7 @@
 import { COMPONENT_DOM } from '../../support/component.dom';
 
 import { MESSAGE_DOM } from '../../support/message.dom';
+import { PETALS_TREE_DOM } from '../../support/petals.dom';
 import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
 
@@ -36,7 +37,7 @@ describe('Service-assembly', () => {
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
     cy
-      .get('.mat-list-item-content')
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SA 0')
       .click();
 
@@ -86,7 +87,9 @@ describe('Service-assembly', () => {
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
 
     // sa is no longer in the list
-    cy.get('.mat-list-item-content').should('not.contain', 'SA 0');
+    cy
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
+      .should('not.contain', 'SA 0');
   });
 
   it('should display read-only informations when deleted', () => {

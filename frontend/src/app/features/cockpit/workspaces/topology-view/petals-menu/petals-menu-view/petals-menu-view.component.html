@@ -13,11 +13,17 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div fxLayout="column" fxFlex class="menu-topology">
+<div fxFlex fxLayout="column" class="menu-topology">
   <div class="wrapper-search-add-bus">
     <form [formGroup]="searchForm">
-      <mat-form-field appearance="outline" fxFlex>
-        <input [appFocusInput]="focusSearchInput$" matInput placeholder="Search by name or host" formControlName="search" class="search">
+      <mat-form-field fxFlex appearance="outline">
+        <input
+          matInput
+          placeholder="Search by name or host"
+          formControlName="search"
+          [appFocusInput]="focusSearchInput$"
+          class="search"
+        >
         <span matPrefix>
           <fa-icon icon="search" class="icon-x2"></fa-icon>
         </span>
@@ -25,16 +31,98 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </form>
   </div>
 
-  <app-material-tree
-    [tree]="tree"
-    [search]="search"
-    [marginLeft]="14"
-    (evtToggleFold)="treeToggleFold($event)"
-    (evtSelect)="treeSelect($event)"
-  ></app-material-tree>
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="petals-tree">
+    <mat-tree-node
+      matTreeNodePadding
+      matTreeNodePaddingIndent=20
+      *matTreeNodeDef="let wksElement"
+      [routerLinkActive]="wksElement.link ? 'selected-element' : ''"
+      [ngClass]="wksElement.cssClass"
+      class="workspace-element-{{ wksElement.id }}"
+    >
+      <div class="element-info">
+        <div
+          *ngIf="!wksElement.cssClass.includes('category') else category"
+          fxFlexFill
+        >
+          <button
+            fxFlexFill
+            fxLayout="row"
+            fxLayoutAlign="start center"
+            [routerLink]="wksElement.link ? [wksElement.link] : []"
+            class="btn-node"
+          >
+            <span
+              [matTooltip]="wksElement.name"
+              class="margin-left-x1"
+            >
+              <mat-icon
+                *ngIf="wksElement.svgIcon"
+                fxFlex
+                mat-list-icon
+                color="primary"
+                [svgIcon]="wksElement.svgIcon"
+                class="tree-icon-svg"
+              ></mat-icon>
+              <mat-icon
+                *ngIf="wksElement.icon"
+                fxFlex
+                mat-list-icon
+                color="primary"
+                class="tree-icon"
+              >
+                {{ wksElement.icon }}
+              </mat-icon>
+            </span>
+
+            <span
+              appColorSearchedLetters
+              [text]="wksElement.name"
+              [search]="search"
+              classToApply="highlight"
+              class="workspace-element-name tree-element-name"
+            ></span>
+          </button>
+        </div>
+      </div>
+
+      <ng-template #category>
+        <button
+          fxFlex
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          (click)="toggleFold(wksElement)"
+          class="btn-node"
+        >
+          <span
+            appColorSearchedLetters
+            [text]="wksElement.name"
+            [search]="search"
+            classToApply="highlight"
+            class="tree-category-name tree-element-name text-upper margin-left-x1"
+          ></span>
+        </button>
+      </ng-template>
+
+      <button
+        *ngIf="wksElement.expandable"
+        fxFlex
+        fxLayoutAlign="end"
+        mat-icon-button
+        disableRipple
+        (click)="toggleFold(wksElement)"
+        [ngClass]="'btn-expandable-' + nodeTypes[wksElement.type].toLowerCase() + '-' + wksElement.id"
+      >
+        <mat-icon [ngClass]="{'rotate-minus-90': !treeControl.isExpanded(wksElement)}">
+          arrow_drop_down
+        </mat-icon>
+      </button>
+
+    </mat-tree-node>
+  </mat-tree>
 
   <app-message
-    *ngIf="tree.length === 0 && search"
+    *ngIf="(tree$ | async).length === 0 && search"
     type="info"
     msg="There is no match with &quot;{{ search }}&quot;."
     (evtClose)="focusSearch()"
