@@ -20,11 +20,11 @@ import flatMap from 'lodash-es/flatMap';
 
 import { IBusImport } from '@shared/services/buses.service';
 import {
-  IUserWorkspaceBackend,
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
 
+import { IWorkspaceUserRow } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { validContainers } from './backend-mock';
 import {
   Bus,
@@ -47,7 +47,7 @@ export class Workspace {
   public readonly name: string;
   public shortDescription: string;
   public description: string;
-  private readonly users = new Map<string, IUserWorkspaceBackend>();
+  private readonly users = new Map<string, IWorkspaceUserRow>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
   private readonly interfaces = new Map<string, Interface>();
@@ -55,13 +55,14 @@ export class Workspace {
   private readonly endpoints = new Map<string, Endpoint>();
 
   constructor(
-    users: IUserWorkspaceBackend[] = [
+    users: IWorkspaceUserRow[] = [
       {
         id: 'admin',
         name: 'Administrator',
         adminWorkspace: true,
         deployArtifact: true,
         lifecycleArtifact: true,
+        isSavingUserPermissions: false,
       },
     ],
     name?: string,
@@ -84,6 +85,7 @@ export class Workspace {
         adminWorkspace: user.adminWorkspace,
         deployArtifact: user.deployArtifact,
         lifecycleArtifact: user.lifecycleArtifact,
+        isSavingUserPermissions: user.isSavingUserPermissions,
       })
     );
 
@@ -139,11 +141,7 @@ export class Workspace {
     return BackendUser.getAll()
       .filter(user => this.getUsersIds().includes(user.id))
       .map(userWks => {
-        return {
-          id: userWks.id,
-          name: userWks.name,
-          isAdmin: userWks.isAdmin,
-        };
+        return { id: userWks.id, name: userWks.name, isAdmin: userWks.isAdmin };
       });
   }
 
@@ -198,19 +196,29 @@ export class Workspace {
     return Array.from(this.endpoints.values());
   }
 
-  addUser(user: BackendUser) {
-    this.users.set(user.id, user);
-  }
-
   addUserWithoutPermission(user: BackendUser) {
-    const workspaceUsers = {
+    const userWks = {
       id: user.id,
       name: user.name,
       adminWorkspace: false,
       deployArtifact: false,
       lifecycleArtifact: false,
+      isSavingUserPermissions: false,
     };
-    this.users.set(user.id, workspaceUsers);
+    this.users.set(user.id, userWks);
+  }
+
+  updateUserPermissions(user: IWorkspaceUserRow) {
+    const userWks = {
+      id: user.id,
+      name: user.name,
+      adminWorkspace: user.adminWorkspace,
+      deployArtifact: user.deployArtifact,
+      lifecycleArtifact: user.lifecycleArtifact,
+      isSavingUserPermissions: user.isSavingUserPermissions,
+    };
+
+    this.users.set(user.id, userWks);
   }
 
   removeUser(userId: string) {
@@ -608,7 +616,7 @@ export class Workspaces {
   }
 
   create(
-    users?: IUserWorkspaceBackend[],
+    users?: IWorkspaceUserRow[],
     name?: string,
     shortDescription?: string,
     description?: string
@@ -652,6 +660,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: true,
     deployArtifact: true,
     lifecycleArtifact: true,
+    isSavingUserPermissions: false,
   },
   {
     id: BackendUser.get('adminldap').id,
@@ -659,6 +668,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: true,
     deployArtifact: true,
     lifecycleArtifact: true,
+    isSavingUserPermissions: false,
   },
   {
     id: BackendUser.get('bescudie').id,
@@ -666,6 +676,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: false,
     deployArtifact: false,
     lifecycleArtifact: false,
+    isSavingUserPermissions: false,
   },
   {
     id: BackendUser.get('mrobert').id,
@@ -673,6 +684,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: false,
     deployArtifact: true,
     lifecycleArtifact: true,
+    isSavingUserPermissions: false,
   },
   {
     id: BackendUser.get('cchevalier').id,
@@ -680,6 +692,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: false,
     deployArtifact: true,
     lifecycleArtifact: false,
+    isSavingUserPermissions: false,
   },
   {
     id: BackendUser.get('vnoel').id,
@@ -687,6 +700,7 @@ const ws1 = workspacesService.create([
     adminWorkspace: false,
     deployArtifact: false,
     lifecycleArtifact: true,
+    isSavingUserPermissions: false,
   },
 ]);
 

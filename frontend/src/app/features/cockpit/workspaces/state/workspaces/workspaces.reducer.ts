@@ -20,6 +20,7 @@ import {
   IWorkspaceRow,
   IWorkspacesTable,
   IWorkspaceUserPermissions,
+  IWorkspaceUserRow,
   workspaceRowFactory,
   workspacesTableFactory,
   workspaceUserPermissionsFactory,
@@ -37,7 +38,6 @@ import {
 import { SseActions } from '@shared/services/sse.service';
 import { IUserBackend } from '@shared/services/users.service';
 import {
-  IUserWorkspaceBackend,
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
 } from '@shared/services/workspaces.service';
@@ -68,9 +68,12 @@ export namespace WorkspacesReducer {
     | Workspaces.SetServicesSearch
     | Workspaces.Deleted
     | Workspaces.Clean
-    | Workspaces.AddUser
-    | Workspaces.AddUserError
-    | Workspaces.AddUserSuccess
+    | Workspaces.AddWorkspaceUser
+    | Workspaces.AddWorkspaceUserError
+    | Workspaces.AddWorkspaceUserSuccess
+    | Workspaces.UpdateWorkspaceUserPermissions
+    | Workspaces.UpdateWorkspaceUserPermissionsError
+    | Workspaces.UpdateWorkspaceUserPermissionsSuccess
     | Workspaces.DeleteUser
     | Workspaces.DeleteUserError
     | Workspaces.DeleteUserSuccess
@@ -149,20 +152,29 @@ export namespace WorkspacesReducer {
       case Workspaces.CleanType: {
         return clean(table);
       }
-      case Workspaces.AddUserType: {
-        return addUser(table);
+      case Workspaces.AddWorkspaceUserType: {
+        return addWorkspaceUser(table);
       }
-      case Workspaces.AddUserErrorType: {
-        return addUserError(table);
+      case Workspaces.AddWorkspaceUserErrorType: {
+        return addWorkspaceUserError(table);
       }
-      case Workspaces.AddUserSuccessType: {
-        return addUserSuccess(table, action.payload);
+      case Workspaces.AddWorkspaceUserSuccessType: {
+        return addWorkspaceUserSuccess(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceUserPermissionsType: {
+        return updateWorkspaceUserPermissions(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceUserPermissionsErrorType: {
+        return updateWorkspaceUserPermissionsError(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceUserPermissionsSuccessType: {
+        return updateWorkspaceUserPermissionsSuccess(table, action.payload);
       }
       case Workspaces.DeleteUserType: {
-        return deleteUser(table, action.payload);
+        return deleteUser(table);
       }
       case Workspaces.DeleteUserErrorType: {
-        return deleteUserError(table, action.payload);
+        return deleteUserError(table);
       }
       case Workspaces.DeleteUserSuccessType: {
         return deleteUserSuccess(table, action.payload);
@@ -205,11 +217,11 @@ export namespace WorkspacesReducer {
               wks.users.reduce(
                 (users, user) => ({
                   ...users,
-                  [user]: <IUserWorkspaceBackend>{
+                  [user]: <IWorkspaceUserRow>{
                     name: payload.users[user].name,
                   },
                 }),
-                <{ [id: string]: IUserWorkspaceBackend }>{}
+                <{ [id: string]: IWorkspaceUserRow }>{}
               )
             ),
           },
@@ -284,14 +296,14 @@ export namespace WorkspacesReducer {
               payload.users.reduce(
                 (users, user) => ({
                   ...users,
-                  [user]: <IUserWorkspaceBackend>{
+                  [user]: <IWorkspaceUserRow>{
                     name:
                       table.byId[payload.id].users.allIds.length > 0
                         ? table.byId[payload.id].users.byId[user].name
                         : '',
                   },
                 }),
-                <{ [id: string]: IUserWorkspaceBackend }>{}
+                <{ [id: string]: IWorkspaceUserRow }>{}
               )
             )
           : emptyJsTable(),
@@ -337,14 +349,14 @@ export namespace WorkspacesReducer {
           payload.users.reduce(
             (users, user) => ({
               ...users,
-              [user.id]: <IUserWorkspaceBackend>{
+              [user.id]: <IWorkspaceUserRow>{
                 ...user,
                 adminWorkspace: user.adminWorkspace,
                 deployArtifact: user.deployArtifact,
                 lifecycleArtifact: user.lifecycleArtifact,
               },
             }),
-            <{ [id: string]: IUserWorkspaceBackend }>{}
+            <{ [id: string]: IWorkspaceUserRow }>{}
           )
         ),
       },
@@ -464,36 +476,37 @@ export namespace WorkspacesReducer {
       users: {
         allIds: workspace.users.allIds,
         byId: workspace.users.allIds.reduce(
-          (
-            acc: { [userId: string]: IUserWorkspaceBackend },
-            userId: string
-          ) => ({
+          (acc: { [userId: string]: IWorkspaceUserRow }, userId: string) => ({
             ...acc,
             [userId]: {
               id: userId,
               name: workspace.users.byId[userId].name,
+              adminWorkspace: undefined,
+              deployArtifact: undefined,
+              lifecycleArtifact: undefined,
+              isSavingUserPermissions: undefined,
             },
           }),
-          <{ [userId: string]: IUserWorkspaceBackend }>{}
+          <{ [userId: string]: IWorkspaceUserRow }>{}
         ),
       },
     };
   }
 }
 
-function addUser(table: IWorkspacesTable) {
+function addWorkspaceUser(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isAddingUserToWorkspace: true,
   });
 }
 
-function addUserError(table: IWorkspacesTable) {
+function addWorkspaceUserError(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isAddingUserToWorkspace: false,
   });
 }
 
-function addUserSuccess(
+function addWorkspaceUserSuccess(
   table: IWorkspacesTable,
   payload: { id: string; permissions: IWorkspaceUserPermissions }
 ): IWorkspacesTable {
@@ -510,13 +523,72 @@ function addUserSuccess(
   });
 }
 
-function deleteUser(table: IWorkspacesTable, payload: { id: string }) {
+function updateWorkspaceUserPermissions(
+  table: IWorkspacesTable,
+  payload: {
+    userId: string;
+  }
+): IWorkspacesTable {
+  return updateById(table, table.selectedWorkspaceId, {
+    users: {
+      ...updateById(
+        table.byId[table.selectedWorkspaceId].users,
+        payload.userId,
+        {
+          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+          isSavingUserPermissions: true,
+        }
+      ),
+    },
+  });
+}
+
+function updateWorkspaceUserPermissionsError(
+  table: IWorkspacesTable,
+  payload: {
+    userId: string;
+  }
+) {
+  return updateById(table, table.selectedWorkspaceId, {
+    users: {
+      ...updateById(
+        table.byId[table.selectedWorkspaceId].users,
+        payload.userId,
+        {
+          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+          isSavingUserPermissions: false,
+        }
+      ),
+    },
+  });
+}
+
+function updateWorkspaceUserPermissionsSuccess(
+  table: IWorkspacesTable,
+  payload: { userId: string; permissions: IWorkspaceUserPermissions }
+): IWorkspacesTable {
+  return updateById(table, table.selectedWorkspaceId, {
+    users: {
+      ...updateById(
+        table.byId[table.selectedWorkspaceId].users,
+        payload.userId,
+        {
+          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+          ...payload.permissions,
+          isSavingUserPermissions: false,
+        }
+      ),
+    },
+  });
+}
+
+function deleteUser(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isRemovingUserFromWorkspace: true,
   });
 }
 
-function deleteUserError(table: IWorkspacesTable, payload: { id: string }) {
+function deleteUserError(table: IWorkspacesTable) {
   return updateById(table, table.selectedWorkspaceId, {
     isRemovingUserFromWorkspace: false,
   });

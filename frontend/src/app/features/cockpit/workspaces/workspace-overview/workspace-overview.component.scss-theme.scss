@@ -17,6 +17,7 @@
 
 @mixin custom-workspace-overview-theme($theme) {
   $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
 
   .workspace-description-edit {
     div > .workspace-description-preview,
@@ -77,10 +78,28 @@
       }
     }
   }
+
   mat-card.card-users {
     table.users-table {
       .table-row:hover {
         background-color: mat-color($mat-grey, 200);
+      }
+    }
+
+    mat-checkbox.mat-checkbox-checked {
+      &.mat-accent {
+        svg.mat-checkbox-checkmark {
+          .mat-checkbox-checkmark-path {
+            // !important black color is needed because is not provided by mat-color to custom icon color of mat-checkbox
+            stroke: black !important;
+          }
+        }
+      }
+    }
+
+    mat-checkbox.unchecked {
+      .mat-checkbox-frame {
+        border-color: mat-color($accent);
       }
     }
   }

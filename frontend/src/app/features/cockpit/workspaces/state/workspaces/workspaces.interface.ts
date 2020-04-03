@@ -17,11 +17,11 @@
 
 import { emptyJsTable, JsTable } from '@shared/helpers/jstable.helper';
 import {
-  IUserWorkspaceBackend,
   IWorkspaceBackendCommon,
   IWorkspaceBackendDetailsCommon,
+  IWorkspaceUserBackend,
+  IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
-import { IUserUI } from '@shared/state/users.interface';
 
 export interface IWorkspaceUI {
   // from UI
@@ -39,23 +39,23 @@ export interface IWorkspaceRow extends IWorkspaceUI, IWorkspaceDetails {}
 export interface IWorkspace extends IWorkspaceBackendCommon {
   shortDescription: string;
   description: string;
-  users: JsTable<IUserWorkspaceBackend>;
+  users: JsTable<IWorkspaceUserRow>;
 }
 
 export interface IWorkspaceDetails
   extends IWorkspaceBackendCommon,
     IWorkspaceBackendDetailsCommon {
-  users: JsTable<IUserWorkspaceBackend>;
+  users: JsTable<IWorkspaceUserRow>;
 }
 
 // used within ws table
-export interface IWorkspaceUserRow extends IUserUI, IUserWorkspaceBackend {}
-
-export interface IWorkspaceUserPermissions {
-  adminWorkspace?: boolean;
-  deployArtifact?: boolean;
-  lifecycleArtifact?: boolean;
+export interface IWorkspaceUserRow extends IWorkspaceUserBackend {
+  name: string;
+  isSavingUserPermissions: boolean;
 }
+
+export interface IWorkspaceUserPermissions
+  extends IWorkspaceUserPermissionsBackend {}
 
 export function workspaceUserPermissionsFactory(): IWorkspaceUserPermissions {
   return {
@@ -76,7 +76,7 @@ export function workspaceRowFactory(): IWorkspaceRow {
     isSettingDescriptions: false,
     isAddingUserToWorkspace: false,
     isRemovingUserFromWorkspace: false,
-    users: emptyJsTable<IUserWorkspaceBackend>(),
+    users: emptyJsTable<IWorkspaceUserRow>(),
   };
 }
 

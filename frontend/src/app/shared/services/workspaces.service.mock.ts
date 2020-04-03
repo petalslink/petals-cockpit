@@ -20,6 +20,10 @@ import { Injectable } from '@angular/core';
 import { delay, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import {
+  IWorkspaceUserPermissions,
+  IWorkspaceUserRow,
+} from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { ADD_WKS_HTTP_ERROR_BACKEND, errorBackend } from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
 import { workspacesService } from '@mocks/workspaces-mock';
@@ -63,6 +67,7 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
             adminWorkspace: true,
             deployArtifact: true,
             lifecycleArtifact: true,
+            isSavingUserPermissions: true,
           },
         ],
         name,
@@ -112,6 +117,42 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       tap(_ => {
         const user: BackendUser = BackendUser.get(userId);
         workspacesService.get(workspaceId).addUserWithoutPermission(user);
+      })
+    );
+  }
+
+  putUserPermissions(
+    workspaceId: string,
+    userId: string,
+    permissions: IWorkspaceUserPermissions
+  ) {
+    const mock = this.usersService as UsersServiceMock;
+
+    // only used by the tests to verify a 409 conflict error coming from the backend
+    if (
+      mock.getCurrentUser().id === userId &&
+      !permissions.adminWorkspace &&
+      workspacesService
+        .get(workspaceId)
+        .getUsers()
+        .filter(user => user.adminWorkspace).length === 1
+    ) {
+      return helper.errorBackend(errorBackend, 409);
+    }
+
+    const userWithPermissions = {
+      id: userId,
+      adminWorkspace: permissions.adminWorkspace,
+      deployArtifact: permissions.deployArtifact,
+      lifecycleArtifact: permissions.lifecycleArtifact,
+    } as IWorkspaceUserRow;
+
+    return helper.response(204).pipe(
+      delay(environment.mock.httpDelay),
+      tap(_ => {
+        workspacesService
+          .get(workspaceId)
+          .updateUserPermissions(userWithPermissions);
       })
     );
   }

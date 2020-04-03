@@ -265,7 +265,7 @@ export class WorkspacesEffects {
 
   @Effect()
   addUser$: Observable<Action> = this.actions$.pipe(
-    ofType<Workspaces.AddUser>(Workspaces.AddUserType),
+    ofType<Workspaces.AddWorkspaceUser>(Workspaces.AddWorkspaceUserType),
     withLatestFrom(
       this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
     ),
@@ -273,7 +273,7 @@ export class WorkspacesEffects {
       this.workspacesService.addUser(workspaceId, action.payload.id).pipe(
         map(
           res =>
-            new Workspaces.AddUserSuccess({
+            new Workspaces.AddWorkspaceUserSuccess({
               id: action.payload.id,
               permissions: res,
             })
@@ -288,9 +288,54 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
-          return of(new Workspaces.AddUserError(action.payload));
+          return of(new Workspaces.AddWorkspaceUserError(action.payload));
         })
       )
+    )
+  );
+
+  @Effect()
+  updateUserPermissions$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.UpdateWorkspaceUserPermissions>(
+      Workspaces.UpdateWorkspaceUserPermissionsType
+    ),
+    withLatestFrom(
+      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
+    ),
+    mergeMap(([action, workspaceId]) =>
+      this.workspacesService
+        .putUserPermissions(
+          workspaceId,
+          action.payload.userId,
+          action.payload.permissions
+        )
+        .pipe(
+          map(
+            _ =>
+              new Workspaces.UpdateWorkspaceUserPermissionsSuccess(
+                action.payload
+              )
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.UpdateUserPermissions)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              `${action.payload.userId} permissions update failed`,
+              `${getErrorMessage(err)}`
+            );
+
+            return of(
+              new Workspaces.UpdateWorkspaceUserPermissionsError(action.payload)
+            );
+          })
+        )
     )
   );
 

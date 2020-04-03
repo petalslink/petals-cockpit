@@ -76,11 +76,11 @@ export const WORKSPACE_OVERVIEW_DOM = {
     cancelAttachBus: `${bsWksOverview} .btn-cancel-attach-bus`,
     importNewBus: `${bsWksOverview} .btn-import-new-bus`,
     addUserInWorkspace: `${bsWksOverview} .btn-add-user`,
+    savePermissionsBtn: `${bsWksOverview} .btn-save-users-permissions`,
   },
   formFields: {
     shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
     descriptionFormField: `${bsWksOverview} .workspace-description-edit .description-form-field`,
-
     ipFormField: `${bsWksOverview} .bus-import-edit .ip-form-field`,
     portFormField: `${bsWksOverview} .bus-import-edit .port-form-field`,
     usernameFormField: `${bsWksOverview} .bus-import-edit .username-form-field`,
@@ -116,23 +116,23 @@ export const WORKSPACE_OVERVIEW_DOM = {
   },
   table: {
     userTable: `${bsWksOverview} .users-table`,
-
-    headerTable: `${bsWksOverview} .mat-header-cell`,
-
-    rowUser: (userId: string) => `${bsWksOverview} .row-${userId}`,
-    allRow: `${bsWksOverview} .table-row`,
-
-    cellUserId: (userId: string) => `${bsWksOverview} .cell-userid-${userId}`,
-    cellUserName: (userId: string) =>
-      `${bsWksOverview} .cell-username-${userId}`,
-    cellUserAdminWorkspace: (userId: string) =>
-      `${bsWksOverview} .cell-user-admin-wks-${userId} .mat-checkbox-input`,
-    cellUserDeployArtifact: (userId: string) =>
-      `${bsWksOverview} .cell-user-deploy-artifact-${userId} .mat-checkbox-input`,
-    cellUserLifecycleArtifact: (userId: string) =>
-      `${bsWksOverview} .cell-user-lifecycle-artifact-${userId} .mat-checkbox-input`,
-    cellUserActionDelete: (userId: string) =>
-      `${bsWksOverview} .cell-user-action-${userId} .action-delete`,
+    texts: { headerTable: `${bsWksOverview} .mat-header-cell` },
+    rows: {
+      allRow: `${bsWksOverview} .table-row`,
+      userRow: (userId: string) => `${bsWksOverview} .row-${userId}`,
+    },
+    cells: {
+      userId: (userId: string) => `${bsWksOverview} .cell-userid-${userId}`,
+      userName: (userId: string) => `${bsWksOverview} .cell-username-${userId}`,
+      userAdminWorkspace: (userId: string) =>
+        `${bsWksOverview} .cell-user-adminWorkspace-${userId} mat-checkbox [type="checkbox"]`,
+      userDeployArtifact: (userId: string) =>
+        `${bsWksOverview} .cell-user-deployArtifact-${userId} mat-checkbox [type="checkbox"]`,
+      userLifecycleArtifact: (userId: string) =>
+        `${bsWksOverview} .cell-user-lifecycleArtifact-${userId} mat-checkbox [type="checkbox"]`,
+      userActionDelete: (userId: string) =>
+        `${bsWksOverview} .cell-user-action-${userId} .action-delete`,
+    },
   },
 };
 
