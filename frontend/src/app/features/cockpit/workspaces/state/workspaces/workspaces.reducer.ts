@@ -492,121 +492,121 @@ export namespace WorkspacesReducer {
       },
     };
   }
-}
 
-function addWorkspaceUser(table: IWorkspacesTable) {
-  return updateById(table, table.selectedWorkspaceId, {
-    isAddingUserToWorkspace: true,
-  });
-}
-
-function addWorkspaceUserError(table: IWorkspacesTable) {
-  return updateById(table, table.selectedWorkspaceId, {
-    isAddingUserToWorkspace: false,
-  });
-}
-
-function addWorkspaceUserSuccess(
-  table: IWorkspacesTable,
-  payload: { id: string; permissions: IWorkspaceUserPermissions }
-): IWorkspacesTable {
-  return updateById(table, table.selectedWorkspaceId, {
-    isAddingUserToWorkspace: false,
-    users: {
-      ...putById(
-        table.byId[table.selectedWorkspaceId].users,
-        payload.id,
-        { ...payload.permissions },
-        workspaceUserPermissionsFactory
-      ),
-    },
-  });
-}
-
-function updateWorkspaceUserPermissions(
-  table: IWorkspacesTable,
-  payload: {
-    userId: string;
+  function addWorkspaceUser(table: IWorkspacesTable) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: true,
+    });
   }
-): IWorkspacesTable {
-  return updateById(table, table.selectedWorkspaceId, {
-    users: {
-      ...updateById(
-        table.byId[table.selectedWorkspaceId].users,
-        payload.userId,
-        {
-          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
-          isSavingUserPermissions: true,
-        }
-      ),
-    },
-  });
-}
 
-function updateWorkspaceUserPermissionsError(
-  table: IWorkspacesTable,
-  payload: {
-    userId: string;
+  function addWorkspaceUserError(table: IWorkspacesTable) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: false,
+    });
   }
-) {
-  return updateById(table, table.selectedWorkspaceId, {
-    users: {
-      ...updateById(
-        table.byId[table.selectedWorkspaceId].users,
-        payload.userId,
-        {
-          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
-          isSavingUserPermissions: false,
-        }
-      ),
-    },
-  });
-}
 
-function updateWorkspaceUserPermissionsSuccess(
-  table: IWorkspacesTable,
-  payload: { userId: string; permissions: IWorkspaceUserPermissions }
-): IWorkspacesTable {
-  return updateById(table, table.selectedWorkspaceId, {
-    users: {
-      ...updateById(
-        table.byId[table.selectedWorkspaceId].users,
-        payload.userId,
-        {
-          ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
-          ...payload.permissions,
-          isSavingUserPermissions: false,
-        }
-      ),
-    },
-  });
-}
+  function addWorkspaceUserSuccess(
+    table: IWorkspacesTable,
+    payload: { id: string; permissions: IWorkspaceUserPermissions }
+  ): IWorkspacesTable {
+    return updateById(table, table.selectedWorkspaceId, {
+      isAddingUserToWorkspace: false,
+      users: {
+        ...putById(
+          table.byId[table.selectedWorkspaceId].users,
+          payload.id,
+          { ...payload.permissions },
+          workspaceUserPermissionsFactory
+        ),
+      },
+    });
+  }
 
-function deleteUser(table: IWorkspacesTable) {
-  return updateById(table, table.selectedWorkspaceId, {
-    isRemovingUserFromWorkspace: true,
-  });
-}
+  function updateWorkspaceUserPermissions(
+    table: IWorkspacesTable,
+    payload: {
+      userId: string;
+    }
+  ): IWorkspacesTable {
+    return updateById(table, table.selectedWorkspaceId, {
+      users: {
+        ...updateById(
+          table.byId[table.selectedWorkspaceId].users,
+          payload.userId,
+          {
+            ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+            isSavingUserPermissions: true,
+          }
+        ),
+      },
+    });
+  }
 
-function deleteUserError(table: IWorkspacesTable) {
-  return updateById(table, table.selectedWorkspaceId, {
-    isRemovingUserFromWorkspace: false,
-  });
-}
+  function updateWorkspaceUserPermissionsError(
+    table: IWorkspacesTable,
+    payload: {
+      userId: string;
+    }
+  ) {
+    return updateById(table, table.selectedWorkspaceId, {
+      users: {
+        ...updateById(
+          table.byId[table.selectedWorkspaceId].users,
+          payload.userId,
+          {
+            ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+            isSavingUserPermissions: false,
+          }
+        ),
+      },
+    });
+  }
 
-function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
-  return updateById(table, table.selectedWorkspaceId, {
-    isRemovingUserFromWorkspace: false,
-    users: {
-      ...removeById(table.byId[table.selectedWorkspaceId].users, payload.id),
-    },
-  });
-}
+  function updateWorkspaceUserPermissionsSuccess(
+    table: IWorkspacesTable,
+    payload: { userId: string; permissions: IWorkspaceUserPermissions }
+  ): IWorkspacesTable {
+    return updateById(table, table.selectedWorkspaceId, {
+      users: {
+        ...updateById(
+          table.byId[table.selectedWorkspaceId].users,
+          payload.userId,
+          {
+            ...table.byId[table.selectedWorkspaceId].users.byId[payload.userId],
+            ...payload.permissions,
+            isSavingUserPermissions: false,
+          }
+        ),
+      },
+    });
+  }
 
-function refreshServices(table: IWorkspacesTable) {
-  return { ...table, isFetchingServices: true };
-}
+  function deleteUser(table: IWorkspacesTable) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isRemovingUserFromWorkspace: true,
+    });
+  }
 
-function servicesUpdated(table: IWorkspacesTable) {
-  return { ...table, isFetchingServices: false };
+  function deleteUserError(table: IWorkspacesTable) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isRemovingUserFromWorkspace: false,
+    });
+  }
+
+  function deleteUserSuccess(table: IWorkspacesTable, payload: { id: string }) {
+    return updateById(table, table.selectedWorkspaceId, {
+      isRemovingUserFromWorkspace: false,
+      users: {
+        ...removeById(table.byId[table.selectedWorkspaceId].users, payload.id),
+      },
+    });
+  }
+
+  function refreshServices(table: IWorkspacesTable) {
+    return { ...table, isFetchingServices: true };
+  }
+
+  function servicesUpdated(table: IWorkspacesTable) {
+    return { ...table, isFetchingServices: false };
+  }
 }
