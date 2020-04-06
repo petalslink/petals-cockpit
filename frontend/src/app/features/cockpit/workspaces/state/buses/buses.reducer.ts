@@ -62,7 +62,7 @@ export namespace BusesReducer {
     | Buses.CancelImportError
     | Buses.CanceledImport
     | Buses.UpdateError
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = busesTableFactory(),
@@ -140,7 +140,7 @@ export namespace BusesReducer {
       case Buses.UpdateErrorType: {
         return updateError(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return busesTableFactory();
       }
       default:

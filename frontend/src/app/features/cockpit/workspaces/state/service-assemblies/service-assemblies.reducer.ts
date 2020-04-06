@@ -48,7 +48,7 @@ export namespace ServiceAssembliesReducer {
     | ServiceAssemblies.ChangeStateError
     | ServiceAssemblies.ChangeStateSuccess
     | ServiceAssemblies.Removed
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = serviceAssembliesTableFactory(),
@@ -85,7 +85,7 @@ export namespace ServiceAssembliesReducer {
       case ServiceAssemblies.ChangeStateSuccessType: {
         return changeStateSuccess(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return serviceAssembliesTableFactory();
       }
       default:

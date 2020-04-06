@@ -103,6 +103,9 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+
+    // the workspaces action clean is used to reinitialize the store when we are no longer in workspaces module
+    this.store$.dispatch(new Workspaces.CleanWorkspaces());
   }
 
   goToCreateWorkspace() {

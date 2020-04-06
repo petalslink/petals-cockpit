@@ -176,7 +176,7 @@ export class WorkspacesEffects {
       const data = action.payload;
 
       return batchActions([
-        new Workspaces.Clean(),
+        new Workspaces.CleanWorkspace(),
         new Workspaces.FetchSuccess(data.workspace),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),

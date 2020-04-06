@@ -44,7 +44,7 @@ export namespace ServiceUnitsReducer {
     | ServiceUnits.FetchDetailsError
     | ServiceUnits.FetchDetailsSuccess
     | ServiceUnits.Removed
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = serviceUnitsTableFactory(),
@@ -72,7 +72,7 @@ export namespace ServiceUnitsReducer {
       case ServiceUnits.RemovedType: {
         return removed(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return serviceUnitsTableFactory();
       }
       default:

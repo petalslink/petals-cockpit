@@ -51,7 +51,7 @@ export namespace SharedLibrariesReducer {
     | SharedLibraries.Removed
     | Containers.DeployComponentSuccess
     | Components.Removed
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = sharedLibrariesTableFactory(),
@@ -91,7 +91,7 @@ export namespace SharedLibrariesReducer {
       case Components.RemovedType: {
         return removeComponent(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return sharedLibrariesTableFactory();
       }
       default:

@@ -45,7 +45,7 @@ export namespace ServicesReducer {
     | Services.FetchDetailsError
     | Services.FetchDetailsSuccess
     | Services.Clean
-    | Workspaces.Clean
+    | Workspaces.CleanWorkspace
     | SseActions.ServicesUpdated
     | SseActions.BusDetached;
 
@@ -75,7 +75,7 @@ export namespace ServicesReducer {
       case Services.CleanType: {
         return servicesTableFactory();
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return servicesTableFactory();
       }
       case SseActions.ServicesUpdatedType: {

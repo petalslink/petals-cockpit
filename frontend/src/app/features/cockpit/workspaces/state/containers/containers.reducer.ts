@@ -71,7 +71,7 @@ export namespace ContainersReducer {
     | ServiceAssemblies.Removed
     | SharedLibraries.Added
     | SharedLibraries.Removed
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = containersTableFactory(),
@@ -165,7 +165,7 @@ export namespace ContainersReducer {
       case SharedLibraries.RemovedType: {
         return removeSharedLibrary(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return containersTableFactory();
       }
       default:
