@@ -1,3 +1,25 @@
+<a name="1.6.0"></a>
+# [1.6.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.5.0...v1.6.0) (2020-04-06)
+
+
+### Bug Fixes
+
+* **backend:** incorrect error message ([09e0e56](https://gitlab.com/linagora/petals-cockpit/commit/09e0e566e007b09dd5f0ae83739b4c81c1d0e496))
+* **frontend:** issues while switching views ([c301b0e](https://gitlab.com/linagora/petals-cockpit/commit/c301b0effcc34bf941e5bd40276bd388e6d27e25), [5665592](https://gitlab.com/linagora/petals-cockpit/commit/56655928cb6807ebe5a7d630eba09d58b38894d3)), closes [#660](https://gitlab.com/linagora/petals-cockpit/issues/660)
+
+
+
+### Features
+
+* **backend:** cli add-user now checks ldap for argument -l ([3089f54](https://gitlab.com/linagora/petals-cockpit/commit/3089f54e43809edc6c57da649c74dba7f828f94f)), closes [#505](https://gitlab.com/linagora/petals-cockpit/issues/505)
+* **backend:** cli add-user now adds user to existing workspace ([87a13da](https://gitlab.com/linagora/petals-cockpit/commit/87a13daf99464a0440f6344902a5a4dd0d511677)), closes [#639](https://gitlab.com/linagora/petals-cockpit/issues/639)
+* **backend:** cli add-user now handles workspace permissions ([21ac0f0](https://gitlab.com/linagora/petals-cockpit/commit/21ac0f035a7fc91ca83872b864ca48b5b140a85d)), closes [#657](https://gitlab.com/linagora/petals-cockpit/issues/657)
+* **frontend:** edit & save users permissions ([eeafdcf](https://gitlab.com/linagora/petals-cockpit/commit/eeafdcf2449b071b8710ab39d5581780ecff143e)), closes [#605](https://gitlab.com/linagora/petals-cockpit/issues/605) [#606](https://gitlab.com/linagora/petals-cockpit/issues/606) [#585](https://gitlab.com/linagora/petals-cockpit/issues/585) [#580](https://gitlab.com/linagora/petals-cockpit/issues/580)
+* **frontend:** refactor petals topology tree ([b5e51d8](https://gitlab.com/linagora/petals-cockpit/commit/b5e51d8842202958f9ece430ab58dba5f1342353)), closes [#664](https://gitlab.com/linagora/petals-cockpit/issues/664)
+
+
+
+
 <a name="1.5.0"></a>
 # [1.5.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.4.0...v1.5.0) (2020-03-16)
 
