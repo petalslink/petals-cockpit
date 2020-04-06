@@ -556,8 +556,19 @@ public class WorkspaceResource {
 
     @DELETE
     @Path("/users/{id}")
-    @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
     public void deleteUser(@NotEmpty @PathParam("id") String username) {
+        final boolean isAuthorized = this.profile.hasPermission(this.wsId, CockpitProfile.ADMIN_WORKSPACE);
+        final boolean hasOthersMembers = DSL.using(jooq).fetchExists(USERS_WORKSPACES,
+                USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).andNot(USERS_WORKSPACES.USERNAME.eq(username)));
+        final boolean isDeletingHimself = this.profile.getId().equals(username);
+
+        if (!hasOthersMembers && isDeletingHimself) {
+            throw new WebApplicationException("Last member can not be deleted! You must delete this workspace.",
+                    Status.FORBIDDEN);
+        } else if (!isAuthorized && !isDeletingHimself) {
+            throw new WebApplicationException(Status.FORBIDDEN);
+        }
+
         DSL.using(jooq).delete(USERS_WORKSPACES)
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(username))).execute();
     }
