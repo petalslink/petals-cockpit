@@ -316,7 +316,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'sa-flowable-vacation-sample-test.zip',
+        'sa-flowable-vacation-sample.zip',
         '.deploy-artifact input[type=file]'
       );
 
@@ -598,7 +598,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'petals-sl-hsql-1.8.0.10-test.zip',
+        'petals-sl-hsql-1.8.0.10.zip',
         '.deploy-artifact input[type=file]'
       );
 
@@ -855,7 +855,7 @@ describe('Container', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'petals-bc-sql-1.6.3-SNAPSHOT-red-green-test.zip',
+        'petals-bc-sql-1.6.3-SNAPSHOT-red-green.zip',
         '.deploy-artifact input[type=file]'
       );
 
