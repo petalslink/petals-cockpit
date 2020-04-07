@@ -65,7 +65,7 @@ describe('Shared-library', () => {
     cy
       .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
       .contains('SL 0')
-      .click();
+      .click({ force: true });
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
     cy
       .get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn)
