@@ -336,14 +336,10 @@ describe('Container', () => {
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
-
       cy
-        .get(`.mat-progress-bar`, { timeout: 15000 })
-        .should('be.visible')
-        .and('have.attr', 'aria-valuenow', '100');
-
-      cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value)
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
+          timeout: 15000,
+        })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -622,14 +618,10 @@ describe('Container', () => {
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
-
       cy
-        .get(`.mat-progress-bar`, { timeout: 15000 })
-        .should('be.visible')
-        .and('have.attr', 'aria-valuenow', '100');
-
-      cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value)
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
+          timeout: 15000,
+        })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -883,14 +875,10 @@ describe('Container', () => {
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
-
       cy
-        .get(`.mat-progress-bar`, { timeout: 15000 })
-        .should('be.visible')
-        .and('have.attr', 'aria-valuenow', '100');
-
-      cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value)
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
+          timeout: 15000,
+        })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
