@@ -291,23 +291,25 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
     @Test
     public void deleteUserFromExistingWorkspace() {
+        resource.setCurrentProfile(new CockpitProfile(ADMIN, resource.db().configuration()));
+
         addUser("user1");
 
         resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1", false, false, false));
 
-        Response add = resource.target("/workspaces/1/users/user1").request().delete();
-        assertThat(add.getStatus()).isEqualTo(204);
+        Response delete = resource.target("/workspaces/1/users/user1").request().delete();
+        assertThat(delete.getStatus()).isEqualTo(204);
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
 
         // deleting an non-workspace user should work
-        Response add2 = resource.target("/workspaces/1/users/user1").request().delete();
-        assertThat(add2.getStatus()).isEqualTo(204);
+        Response delete2 = resource.target("/workspaces/1/users/user1").request().delete();
+        assertThat(delete2.getStatus()).isEqualTo(204);
 
         // non-existing user should work also
-        Response add3 = resource.target("/workspaces/1/users/user2").request().delete();
-        assertThat(add3.getStatus()).isEqualTo(204);
+        Response delete3 = resource.target("/workspaces/1/users/user2").request().delete();
+        assertThat(delete3.getStatus()).isEqualTo(204);
 
         // the other workspace wasn't touched
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
@@ -316,17 +318,39 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
     @Test
     public void deleteUserFromNonExistingWorkspaceForbidden() {
-        Response add = resource.target("/workspaces/3/users/user1").request().delete();
-        assertThat(add.getStatus()).isEqualTo(403);
+        Response delete = resource.target("/workspaces/3/users/user1").request().delete();
+        assertThat(delete.getStatus()).isEqualTo(403);
     }
 
     @Test
     public void deleteUserFromExistingWorkspaceForbidden() {
-        Response add = resource.target("/workspaces/2/users/anotheruser").request().delete();
-        assertThat(add.getStatus()).isEqualTo(403);
+        Response delete = resource.target("/workspaces/2/users/anotheruser").request().delete();
+        assertThat(delete.getStatus()).isEqualTo(403);
 
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 2L)).hasNumberOfRows(4)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("anotheruser");
+    }
+
+    @Test
+    public void leaveWorkspace() {
+        addUser("user1");
+
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1", true, false, false));
+
+        Response delete = resource.target("/workspaces/1/users/admin").request().delete();
+        assertThat(delete.getStatus()).isEqualTo(204);
+
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("user1");
+    }
+
+    @Test
+    public void leaveWorkspaceLastMemberForbidden() {
+        Response delete = resource.target("/workspaces/1/users/admin").request().delete();
+
+        assertThat(delete.getStatus()).isEqualTo(403);
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
     }
 
     @Test

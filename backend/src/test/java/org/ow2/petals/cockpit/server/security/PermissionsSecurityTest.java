@@ -155,6 +155,16 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
+    public void adminWorkspaceCanLeaveWorkspace() {
+        isAllowed(ADMINWORKSPACE, "/workspaces/1/users/ADMINWORKSPACE", HttpMethod.DELETE, null);
+    }
+
+    @Test
+    public void notAdminWorkspaceCanLeaveWorkspace() {
+        isAllowed(DEPLOYPERMISSION, "/workspaces/1/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
+    }
+
+    @Test
     public void adminWorkspaceCanNotDeleteUsersOnOtherWorkspace() {
         isForbidden(ADMINWORKSPACE, "/workspaces/2/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
     }
