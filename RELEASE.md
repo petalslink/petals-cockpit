@@ -1,17 +1,10 @@
 # Release process
 
 ## GIT
-- pull the master branch
-- create a branch from master named product/release-X.X.X
-- change the version to a stable number in the 3 pom.xml: `mvn versions:set -DnewVersion=X.X.X`
-- change the version to the next number in the package.json
-- change the version in the appropriate places in the README.md
-- generate the changelog from within frontend directory:
-```
-conventional-changelog -p angular -i ../CHANGELOG.md -s
-```
-*(conventional-changelog can be installed like that `yarn global add conventional-changelog-cli`)*
-- verify the content of CHANGELOG.md and adapt it!
+**Bump version :**
+
+- execute `Release.sh` (may need permissions) and choose `1 - Bump version to release`
+- when the script is done, verify the content of CHANGELOG.md and adapt it!
 - commit all of it with message: `chore: bump version to X.X.X`
 - push with branch named product/release-X.X.X
 - merge
@@ -21,11 +14,9 @@ Tag name: vX.X.X
 Create from: master
 Messages: Release version X.X.X
 ```
-- pull the master branch
-- create a branch from master named product/development-Y.Y.Y where Y.Y.Y is the next version, it should not have zeros before numbers to generate the changelog correctly (1.04.0 should be 1.4.0)
-- prepare for next development version (bump to Y.Y.Y-SNAPSHOT in poms and to Y.Y.Y-alpha in package.json)
-- commit with message: `chore: prepare for next development`
-- push with branch named product/development-Y.Y.Y
+**Prepare for development :** 
+- execute `Release.sh` (may need permissions) and choose `2 - Prepare for development`
+- follow steps and confirm
 - merge
 
 ## DOCKER
