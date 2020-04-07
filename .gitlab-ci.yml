@@ -11,6 +11,7 @@
 
 stages:
   - build
+  - report
   - package
   - integration
 
@@ -101,8 +102,24 @@ build-backend:
     paths:
       - backend-apidocs
       - $M2_STAGING_DIRECTORY
+      - "**/target"
   tags:
     - docker
+
+
+sonar-backend:
+  <<: *mvn-java-8
+  variables:
+    GIT_DEPTH: "0"
+  stage: report
+  allow_failure: true
+  dependencies:
+    - build-backend
+  only:
+    - master
+  script:
+    - maven_build --file backend/pom.xml sonar:sonar -Dsonar.projectKey=petals-cockpit-backend
+
 
 check-frontend:
   <<: *node-java-yarn
@@ -154,12 +171,30 @@ test-frontend:
     - time yarn cypress:e2e-no-ldap
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - frontend/coverage/lcov.info
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed once we stop relying on protractor
   retry: 1
   tags:
     - docker
 
+
+sonar-frontend:
+  <<: *node-java-yarn
+  variables:
+    GIT_DEPTH: "0"
+  stage: report
+  allow_failure: true
+  dependencies:
+    - test-frontend
+  only:
+    - master
+  script:
+    - cd frontend
+    - yarn run sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL
 
 build-frontend:
   <<: *node-java-yarn
