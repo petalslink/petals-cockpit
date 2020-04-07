@@ -461,14 +461,9 @@ describe('Component', () => {
         .should('be.visible');
 
       cy
-        .get(`.mat-progress-bar`, {
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
           timeout: 15000,
         })
-        .should('be.visible')
-        .and('have.attr', 'aria-valuenow', '100');
-
-      cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value)
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
