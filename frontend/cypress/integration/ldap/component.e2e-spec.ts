@@ -437,7 +437,7 @@ describe('Component', () => {
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
-        'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT-test.zip',
+        'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT.zip',
         '.deploy-su input[type=file]'
       );
 
@@ -461,14 +461,9 @@ describe('Component', () => {
         .should('be.visible');
 
       cy
-        .get(`.mat-progress-bar`, {
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
           timeout: 15000,
         })
-        .should('be.visible')
-        .and('have.attr', 'aria-valuenow', '100');
-
-      cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value)
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -479,7 +474,7 @@ describe('Component', () => {
       cy.expectNotification(
         'success',
         'Service Unit Deployed',
-        `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT-test has been successfully deployed`
+        `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT has been successfully deployed`
       );
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
