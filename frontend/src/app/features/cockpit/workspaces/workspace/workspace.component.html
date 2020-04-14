@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   [isLargeScreen]="isLargeScreen$ | async"
   [ui]="ui$ | async"
   [workspace]="workspace$ | async"
-  [workspacesIdsNames]="workspacesIdsNames$ | async"
+  [workspacesList]="workspacesList$ | async"
 ></app-header>
 
 <div
@@ -25,4 +25,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   fxFlex
   [style.display]="!(isFetchingWorkspace$ | async) ? null : 'none'"
   class="page-workspace"
-  ><router-outlet></router-outlet></div>
+><router-outlet></router-outlet></div>

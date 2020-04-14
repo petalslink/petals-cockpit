@@ -25,6 +25,7 @@ import {
   catchError,
   filter,
   map,
+  mapTo,
   mergeMap,
   switchMap,
   tap,
@@ -40,6 +41,7 @@ import { SseActions, SseService } from '@shared/services/sse.service';
 import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
+import { getCurrentUser } from '@shared/state/users.selectors';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { Components } from '@wks/state/components/components.actions';
 import { Containers } from '@wks/state/containers/containers.actions';
@@ -387,6 +389,27 @@ export class WorkspacesEffects {
         })
       )
     )
+  );
+
+  @Effect({ dispatch: false })
+  deleteUserSuccess$: Observable<void> = this.actions$.pipe(
+    ofType<Workspaces.DeleteUserSuccess>(Workspaces.DeleteUserSuccessType),
+    withLatestFrom(
+      this.store$.pipe(getCurrentUser),
+      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
+    ),
+    tap(([action, currentUser, workspaceId]) => {
+      if (currentUser.id === action.payload.id) {
+        this.router.navigate(['/workspaces'], {
+          queryParams: { page: 'list' },
+        });
+        this.notifications.success(
+          'User deleted',
+          'You are no longer in workspace ' + workspaceId
+        );
+      }
+    }),
+    mapTo(null)
   );
 
   @Effect()

@@ -30,7 +30,7 @@ import {
   IWorkspace,
   IWorkspaces,
 } from './state/workspaces/workspaces.interface';
-import { getWorkspaces } from './state/workspaces/workspaces.selectors';
+import { getCurrentUserWorkspaces } from './state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-workspaces',
@@ -58,7 +58,7 @@ export class WorkspacesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.workspaces$ = this.store$.pipe(getWorkspaces);
+    this.workspaces$ = this.store$.pipe(getCurrentUserWorkspaces);
     this.user$ = this.store$.pipe(getCurrentUser);
 
     this.route.queryParams

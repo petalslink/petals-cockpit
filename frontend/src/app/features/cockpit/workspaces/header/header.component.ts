@@ -23,8 +23,10 @@ import {
 } from '@angular/core';
 
 import { IUi } from '@shared/state/ui.interface';
-import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
-import { IWorkspacesIdsNames } from '@wks/state/workspaces/workspaces.selectors';
+import {
+  IWorkspace,
+  IWorkspaces,
+} from '@wks/state/workspaces/workspaces.interface';
 
 @Component({
   selector: 'app-header',
@@ -36,7 +38,7 @@ export class HeaderComponent implements OnInit {
   @Input() isLargeScreen: boolean;
   @Input() ui: IUi;
   @Input() workspace: IWorkspace;
-  @Input() workspacesIdsNames: { list: IWorkspacesIdsNames[] };
+  @Input() workspacesList: IWorkspaces;
 
   constructor() {}
 
