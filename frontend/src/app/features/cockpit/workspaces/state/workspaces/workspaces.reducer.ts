@@ -67,7 +67,8 @@ export namespace WorkspacesReducer {
     | Workspaces.SetPetalsSearch
     | Workspaces.SetServicesSearch
     | Workspaces.Deleted
-    | Workspaces.Clean
+    | Workspaces.CleanWorkspace
+    | Workspaces.CleanWorkspaces
     | Workspaces.AddWorkspaceUser
     | Workspaces.AddWorkspaceUserError
     | Workspaces.AddWorkspaceUserSuccess
@@ -149,8 +150,11 @@ export namespace WorkspacesReducer {
       case Workspaces.DeletedType: {
         return deleted(table, action.payload);
       }
-      case Workspaces.CleanType: {
-        return clean(table);
+      case Workspaces.CleanWorkspaceType: {
+        return cleanWorkspace(table);
+      }
+      case Workspaces.CleanWorkspacesType: {
+        return workspacesTableFactory();
       }
       case Workspaces.AddWorkspaceUserType: {
         return addWorkspaceUser(table);
@@ -451,7 +455,7 @@ export namespace WorkspacesReducer {
     };
   }
 
-  function clean(table: IWorkspacesTable) {
+  function cleanWorkspace(table: IWorkspacesTable) {
     if (table.isSelectedWorkspaceDeleted && table.selectedWorkspaceId) {
       return {
         ...removeById(table, table.selectedWorkspaceId),

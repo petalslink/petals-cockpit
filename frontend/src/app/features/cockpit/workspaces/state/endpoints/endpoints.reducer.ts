@@ -45,7 +45,7 @@ export namespace EndpointsReducer {
     | Endpoints.FetchDetailsError
     | Endpoints.FetchDetailsSuccess
     | Endpoints.Clean
-    | Workspaces.Clean
+    | Workspaces.CleanWorkspace
     | SseActions.ServicesUpdated
     | SseActions.BusDetached;
 
@@ -75,7 +75,7 @@ export namespace EndpointsReducer {
       case Endpoints.CleanType: {
         return endpointsTableFactory();
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return endpointsTableFactory();
       }
       case SseActions.ServicesUpdatedType: {

@@ -93,8 +93,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
     this.onDestroy$.complete();
 
-    // the workspaces action clean is used to reinitialize the store when we are no longer in a workspace
-    this.store$.dispatch(new Workspaces.Clean());
+    // the workspaces action clean is used to reinitialize a partial store when we are no longer in a workspace
+    this.store$.dispatch(new Workspaces.CleanWorkspace());
   }
 }
 

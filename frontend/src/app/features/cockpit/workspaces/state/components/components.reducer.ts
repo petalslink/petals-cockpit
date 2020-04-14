@@ -64,7 +64,7 @@ export namespace ComponentsReducer {
     | Components.CleanServiceUnitDeploymentError
     | ServiceUnits.Added
     | ServiceUnits.Removed
-    | Workspaces.Clean;
+    | Workspaces.CleanWorkspace;
 
   export function reducer(
     table = componentsTableFactory(),
@@ -137,7 +137,7 @@ export namespace ComponentsReducer {
       case ServiceUnits.RemovedType: {
         return removeServiceUnit(table, action.payload);
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return componentsTableFactory();
       }
       default:

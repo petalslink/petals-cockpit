@@ -26,9 +26,15 @@ import {
 import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 
 export namespace Workspaces {
-  export const CleanType = '[Workspaces] Clean';
-  export class Clean implements Action {
-    readonly type = CleanType;
+  export const CleanWorkspaceType = '[Workspaces] Clean workspace';
+  export class CleanWorkspace implements Action {
+    readonly type = CleanWorkspaceType;
+    constructor() {}
+  }
+
+  export const CleanWorkspacesType = '[Workspaces] Clean workspaces';
+  export class CleanWorkspaces implements Action {
+    readonly type = CleanWorkspacesType;
     constructor() {}
   }
 

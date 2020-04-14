@@ -45,7 +45,7 @@ export namespace InterfacesReducer {
     | Interfaces.FetchDetailsError
     | Interfaces.FetchDetailsSuccess
     | Interfaces.Clean
-    | Workspaces.Clean
+    | Workspaces.CleanWorkspace
     | SseActions.ServicesUpdated
     | SseActions.BusDetached;
 
@@ -75,7 +75,7 @@ export namespace InterfacesReducer {
       case Interfaces.CleanType: {
         return interfacesTableFactory();
       }
-      case Workspaces.CleanType: {
+      case Workspaces.CleanWorkspaceType: {
         return interfacesTableFactory();
       }
       case SseActions.ServicesUpdatedType: {
