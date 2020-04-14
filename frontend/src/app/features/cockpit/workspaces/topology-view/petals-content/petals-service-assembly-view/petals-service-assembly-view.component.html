@@ -69,7 +69,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </mat-card-content>
 
-        <app-message *ngIf="sa.errorChangeState" type="error" [msg]="sa.errorChangeState" class="error-change-state"></app-message>
+        <app-message
+          *ngIf="sa.errorChangeState"
+          type="error"
+          [msg]="sa.errorChangeState"
+          [isFullWidth]="true"
+          class="error-change-state"
+        ></app-message>
       </mat-card>
 
       <mat-card fxFlex class="card-related-elements">

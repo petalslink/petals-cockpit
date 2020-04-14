@@ -72,7 +72,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </div>
         </mat-card-content>
 
-        <app-message type="error" [msg]="component.updateError" class="error-change-state margin-bottom-x1"></app-message>
+        <app-message
+          type="error"
+          [msg]="component.updateError"
+          [isFullWidth]="true"
+          class="error-change-state margin-bottom-x1"
+        ></app-message>
 
         <mat-card-content>
           <span fxLayout="row" class="mat-body-2 margin-bottom-x1">Parameters</span>
@@ -135,126 +140,125 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           *ngIf="component.sharedLibraries.length > 0 || component.serviceUnits.length > 0; else noRelatedElements"
         >
           <mat-card-content>
-            <div fxLayout="column"  fxLayout.gt-sm="row" fxLayoutGap="20px">
-              <div
-                fxFlex
-                fxFlex.gt-sm="none"
-                fxLayout="row"
-                fxLayoutAlign="start center"
-                class="margin-top-x1"
-              >
-                <span fxFlexFill>Shared libraries</span>
+            <div fxLayout="column" fxLayoutGap="20px">
+              <div fxLayout="column"  fxLayout.gt-md="row" fxLayoutGap="20px">
+                <div
+                  fxFlex
+                  fxFlex.gt-sm="none"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  class="margin-top-x1"
+                >
+                  <div fxFlex="0 0 140px" fxFlexFill>Shared libraries</div>
 
-                <ng-template #noSl>
-                  <app-message
-                    type="info"
-                    msg="This component doesn't use any shared library."
-                    fxFlex
-                    fxFlexFill
-                    [isClosable]="false"
-                    class="info-no-sl"
-                  ></app-message>
-                </ng-template>
-              </div>
-
-              <ng-container *ngIf="component.sharedLibraries.length > 0; else noSl">
-                <div fxLayout="column" class="shared-libraries">
-                  <div
-                    fxLayout="row wrap"
-                    fxLayoutGap="10"
-                  >
-                    <span
-                      *ngFor="let sl of component.sharedLibraries"
+                  <ng-template #noSl>
+                    <app-message
+                      type="info"
+                      msg="This component doesn't use any shared library."
+                      fxFlex
                       fxFlexFill
-                      class="shared-library"
-                    >
-                      <a
-                        color="primary"
-                        mat-stroked-button
-                        matTooltipPosition="above"
-                        [matTooltip]="sl.name"
-                        [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
-                        class="btn-sl ellipsis"
-                      >
-                        {{ sl.name }}
-                      </a>
-                    </span>
-                  </div>
+                      [isClosable]="false"
+                      class="info-no-sl"
+                    ></app-message>
+                  </ng-template>
                 </div>
-              </ng-container>
 
-            </div>
-          </mat-card-content>
-
-          <mat-card-content>
-            <div fxLayout="column"  fxLayout.gt-md="row" fxLayoutGap="20px">
-              <div
-                fxFlex
-                fxFlex.gt-md="none"
-                fxLayout="row"
-                fxLayoutAlign="start center"
-                class="margin-top-x1"
-              >
-                <span fxFlexFill>Services units</span>
-
-                <ng-template #noSu>
-                  <app-message
-                    type="info"
-                    msg="This component doesn't have any service unit."
-                    fxFlex
-                    fxFlexFill
-                    [isClosable]="false"
-                    class="info-no-su"
-                  ></app-message>
-                </ng-template>
-              </div>
-
-              <ng-container *ngIf="component.serviceUnits.length > 0 else noSu">
-                <div fxLayout="column" class="service-units">
-                  <div
-                    fxLayout="column"
-                    fxLayout.gt-md="row wrap"
-                    fxLayoutGap="0"
-                    fxLayoutGap.gt-md="24px"
-                  >
-                    <div *ngFor="let su of component.serviceUnits" class="service-unit">
+                <ng-container *ngIf="component.sharedLibraries.length > 0; else noSl">
+                  <div fxLayout="column" class="shared-libraries">
+                    <div
+                      fxLayout="row wrap"
+                      fxLayoutGap="10"
+                    >
                       <span
-                        fxFlex="calc(25% - 24px)"
-                        fxFlex.gt-md="calc(33.3% - 24px)"
-                        fxLayout="row"
-                        fxLayoutAlign="start center"
+                        *ngFor="let sl of component.sharedLibraries"
+                        fxFlexFill
+                        class="shared-library"
                       >
                         <a
                           color="primary"
                           mat-stroked-button
                           matTooltipPosition="above"
-                          [matTooltip]="su.name"
-                          [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
-                          class="btn-su"
+                          [matTooltip]="sl.name"
+                          [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'shared-libraries', sl.id]"
+                          class="btn-sl ellipsis"
                         >
-                          <span fxFlex class="su-name ellipsis">{{ su.name }}</span>
-                        </a>
-                        <app-led
-                          matTooltipPosition="above"
-                          [color]="getLedColorFromState(su.serviceAssembly.state)"
-                          [matTooltip]="su.serviceAssembly.state"
-                          class="su-led"
-                        ></app-led>
-                        <a
-                          mat-icon-button
-                          matTooltipPosition="above"
-                          [matTooltip]="su.serviceAssembly.name"
-                          [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
-                          class="btn-fab-sa"
-                        >
-                          <mat-icon svgIcon="sa" color="primary" class="icon-x3"></mat-icon>
+                          {{ sl.name }}
                         </a>
                       </span>
                     </div>
                   </div>
-                </div>
-              </ng-container>
+                </ng-container>
 
+              </div>
+
+              <div fxLayout="column"  fxLayout.gt-md="row" fxLayoutGap="20px">
+                <div
+                  fxFlex
+                  fxFlex.gt-md="none"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  class="margin-top-x1"
+                >
+                  <div fxFlex="0 0 140px" fxFlexFill>Services units</div>
+
+                  <ng-template #noSu>
+                    <app-message
+                      type="info"
+                      msg="This component doesn't have any service unit."
+                      fxFlex
+                      fxFlexFill
+                      [isClosable]="false"
+                      class="info-no-su"
+                    ></app-message>
+                  </ng-template>
+                </div>
+
+                <ng-container *ngIf="component.serviceUnits.length > 0 else noSu">
+                  <div fxLayout="column" class="service-units">
+                    <div
+                      fxLayout="column"
+                      fxLayout.gt-md="row wrap"
+                      fxLayoutGap="0"
+                      fxLayoutGap.gt-md="24px"
+                    >
+                      <div *ngFor="let su of component.serviceUnits" class="service-unit">
+                        <span
+                          fxFlex="calc(25% - 24px)"
+                          fxFlex.gt-md="calc(33.3% - 24px)"
+                          fxLayout="row"
+                          fxLayoutAlign="start center"
+                        >
+                          <a
+                            color="primary"
+                            mat-stroked-button
+                            matTooltipPosition="above"
+                            [matTooltip]="su.name"
+                            [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-units', su.id]"
+                            class="btn-su"
+                          >
+                            <span fxFlex class="su-name ellipsis">{{ su.name }}</span>
+                          </a>
+                          <app-led
+                            matTooltipPosition="above"
+                            [color]="getLedColorFromState(su.serviceAssembly.state)"
+                            [matTooltip]="su.serviceAssembly.state"
+                            class="su-led"
+                          ></app-led>
+                          <a
+                            mat-icon-button
+                            matTooltipPosition="above"
+                            [matTooltip]="su.serviceAssembly.name"
+                            [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'service-assemblies', su.serviceAssembly.id]"
+                            class="btn-fab-sa"
+                          >
+                            <mat-icon svgIcon="sa" color="primary" class="icon-x3"></mat-icon>
+                          </a>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
             </div>
           </mat-card-content>
         </ng-container>
@@ -268,7 +272,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </ng-template>
       </mat-card>
-
+      
       <app-su-deployment [component]="component"></app-su-deployment>
     </div>
   </div>

@@ -22,7 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div fxLayout="column" class="when-no-file-selected">
       <mat-card-content fxLayout="column" class="card-content-no-selected-info">
         <p class="msg-about-upload">{{ message }}</p>
-        <app-message *ngIf="error" type="error" [msg]="error" class="error-upload"></app-message>
+        <app-message
+          *ngIf="error"
+          type="error"
+          [msg]="error"
+          [isFullWidth]="true"
+          class="error-upload"
+        ></app-message>
       </mat-card-content>
     </div>
 

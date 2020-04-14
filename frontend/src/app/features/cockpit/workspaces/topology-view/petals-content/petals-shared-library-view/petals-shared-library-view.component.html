@@ -51,7 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
               <span>Unload</span>
             </button>
-            <app-message type="error" [msg]="sl.errorChangeState"></app-message>
+            <app-message type="error" [msg]="sl.errorChangeState" [isFullWidth]="true"></app-message>
           </div>
         </mat-card-content>
       </mat-card>

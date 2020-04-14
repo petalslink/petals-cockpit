@@ -27,12 +27,18 @@ mat-dialog-content {
   margin-bottom: 0;
 }
 
+.not-full-width {
+  display: inline-block;
+}
+
+.full-width {
+  display: flex;
+}
+
 // all types of messages
 @mixin msg-content($bg, $color) {
   padding: 12px;
   word-break: break-word;
-  display: inline-block;
-  width: 100%;
   background-color: $bg;
   color: $color;
 }
@@ -63,7 +69,6 @@ mat-dialog-content {
 @mixin msg-dialog-type($color) {
   word-break: break-word;
   display: inline-block;
-  width: 100%;
   color: $color;
 }
 
