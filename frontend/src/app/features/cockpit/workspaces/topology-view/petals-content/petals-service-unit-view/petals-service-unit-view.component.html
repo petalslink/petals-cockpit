@@ -36,16 +36,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <div
             fxLayout="row"
             fxLayout.lt-md="column"
-            fxLayoutGap="20px"
+            fxLayoutGap.lt-md="20px"
+            fxLayoutAlign="start center"
             class="margin-top-x1"
           >
-            <span fxLayoutAlign="start center">Service Assembly</span>
+            <div fxFlex="0 0 140px" fxFlex.lt-md="none" fxFlexFill>Service Assembly</div>
 
-            <span
-              fxFlex="calc(25% - 24px)"
+            <div
               fxLayoutGap="5px"
-              fxFlex.gt-md="calc(33.3% - 24px)"
               fxLayout="row"
+              fxFlexFill
               fxLayoutAlign="start center"
             >
               <a
@@ -63,23 +63,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 [matTooltip]="su.serviceAssembly.state"
                 class="sa-led"
               ></app-led>
-            </span>
+            </div>
           </div>
 
           <div
-            fxLayout.gt-md="row"
-            fxLayoutGap="65px"
+            fxLayout="row"
             fxLayout.lt-md="column"
             fxLayoutGap.lt-md="20px"
+            fxLayoutAlign="start center"
             class="margin-top-x1"
           >
-            <span fxLayoutAlign="start center">Component</span>
+            <div fxFlex="0 0 140px" fxFlex.lt-md="none" fxFlexFill>Component</div>
 
-            <span
-              fxFlex="calc(25% - 24px)"
+            <div
               fxLayoutGap="5px"
-              fxFlex.gt-md="calc(33.3% - 24px)"
               fxLayout="row"
+              fxFlexFill
               fxLayoutAlign="start center"
             >
               <a
@@ -97,7 +96,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 [matTooltip]="su.serviceAssembly.state"
                 class="comp-led"
               ></app-led>
-            </span>
+            </div>
           </div>
         </div>
       </mat-card-content>

@@ -389,8 +389,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </mat-form-field>
               </div>
 
-              <app-message type="error" [msg]="getError()" class="error-import-details"></app-message>
-
+              <app-message
+                type="error"
+                [msg]="getError()"
+                [isFullWidth]="true"
+                class="error-import-details"
+              ></app-message>
             </mat-card-content>
           </div>
 

@@ -37,6 +37,7 @@ export class MessageComponent implements OnInit, OnChanges {
   @Input() msg: string;
   @Input() type: 'error' | 'warning' | 'info' | 'success';
   @Input() isClosable? = true;
+  @Input() isFullWidth = false;
   @Input() maxLength = 200;
   @Output() evtClose = new EventEmitter();
 

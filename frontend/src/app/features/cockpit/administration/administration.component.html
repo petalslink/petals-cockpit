@@ -168,7 +168,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     msg="You are the last administrator remaining."
                     [isClosable]="false"
                     class="info-admin-edit"
-                ></app-message>
+                  ></app-message>
+
                   <mat-action-row
                     fxLayoutAlign="center center"
                     fxLayout.lt-md="column wrap"
@@ -207,10 +208,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <div class="central-content">
         <mat-card>
           <app-message
-          type="warning"
-          msg="You are not an administrator."
-          [isClosable]="false"
-          class="warning-not-admin"
+            type="warning"
+            msg="You are not an administrator."
+            [isClosable]="false"
+            [isFullWidth]="true"
+            class="warning-not-admin"
           ></app-message>
         </mat-card>
       </div>
