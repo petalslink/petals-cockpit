@@ -87,6 +87,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
     usernameFormField: `${bsWksOverview} .bus-import-edit .username-form-field`,
     passwordFormField: `${bsWksOverview} .bus-import-edit .pwd-form-field`,
     passphraseFormField: `${bsWksOverview} .bus-import-edit .passphrase-form-field`,
+    addUserFormField: `${bsWksOverview} .add-user-form-field`,
   },
   inputs: {
     ip: `${bs} input[formcontrolname="ip"]`,
@@ -111,6 +112,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
     shortDescription: `${bsWksOverview} .short-description-text`,
     description: `${bsWksOverview} .description-text`,
     descriptionPreview: `${bsWksOverview} .workspace-description-preview`,
+    candidateListIds: `.mat-option span`,
   },
   textArea: {
     shortDescriptionTextarea: `${bsWksOverview} textarea.short-description-wks`,
