@@ -1,3 +1,14 @@
+<a name="1.7.0"></a>
+# [1.7.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.6.0...v1.7.0) (2020-04-27)
+
+
+### Features
+
+* **backend:** users can leave workspaces ([d9029ce](https://gitlab.com/linagora/petals-cockpit/commit/d9029ce0864ab426026d12baea985ac0ab221c02)), closes [#667](https://gitlab.com/linagora/petals-cockpit/issues/667)
+* **frontend:** align related component element and resize message boxes ([36d266f](https://gitlab.com/linagora/petals-cockpit/commit/36d266f105e03c06218e3466c36f4c5bb8965cb3)), closes [#651](https://gitlab.com/linagora/petals-cockpit/issues/651) [#659](https://gitlab.com/linagora/petals-cockpit/issues/659)
+
+
+
 <a name="1.6.0"></a>
 # [1.6.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.5.0...v1.6.0) (2020-04-06)
 

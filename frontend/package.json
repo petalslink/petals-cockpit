@@ -1,6 +1,6 @@
 {
   "name": "petals-cockpit",
-  "version": "1.7.0-alpha",
+  "version": "1.7.0",
   "license": "MIT",
   "scripts": {
     "ng": "ng",
