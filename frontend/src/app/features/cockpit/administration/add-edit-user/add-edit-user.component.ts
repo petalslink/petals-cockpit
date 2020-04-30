@@ -186,12 +186,13 @@ export class AddEditUserComponent implements OnInit, OnDestroy, OnChanges {
           title: 'Remove admin role?',
           message:
             'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+          confirmButtonText: 'REMOVE',
         },
       })
       .beforeClose()
       .pipe(
-        tap(res => {
-          if (res) {
+        tap(confirm => {
+          if (confirm) {
             this.evtSubmit.emit(value);
           } else {
             this.evtCancel.emit();
