@@ -19,7 +19,6 @@
 const bs = `app-administration`;
 const bsAddEditUser = `app-add-edit-user`;
 const bsAddLdapUser = `app-add-ldap-user`;
-const bsEditAdminModal = `app-confirm-message-dialog-component`;
 
 export const ADMINISTRATION_DOM = {
   texts: {
@@ -71,15 +70,5 @@ export const ADD_LDAP_USER_DOM = {
   buttons: {
     deleteBtn: `.btn-delete-form`,
     adminBtn: `.btn-user-isadmin`,
-  },
-};
-
-export const EDIT_ADMIN_DIALOG_DOM = {
-  text: {
-    message: `${bsEditAdminModal} .data-msg`,
-  },
-  buttons: {
-    remove: `${bsEditAdminModal} .btn-confirm-modal`,
-    cancel: `${bsEditAdminModal} .btn-cancel-modal`,
   },
 };

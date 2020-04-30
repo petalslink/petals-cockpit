@@ -19,8 +19,8 @@ import {
   ADD_EDIT_USER_DOM,
   ADD_LDAP_USER_DOM,
   ADMINISTRATION_DOM,
-  EDIT_ADMIN_DIALOG_DOM,
 } from '../../support/administration.dom';
+import { CONFIRM_DIALOG_DOM } from '../../support/confirm-modal.dom';
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
@@ -769,12 +769,12 @@ describe(`Administration`, () => {
         .click();
 
       cy
-        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
         .contains(
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
-      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.remove).click();
+      cy.get(CONFIRM_DIALOG_DOM.buttons.confirm).click();
 
       cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
       cy.url().should('include', 'workspaces?page=list');
@@ -811,12 +811,12 @@ describe(`Administration`, () => {
         .click();
 
       cy
-        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
         .contains(
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
-      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.cancel).click();
+      cy.get(CONFIRM_DIALOG_DOM.buttons.cancel).click();
 
       cy
         .get(`.exp-pnl-user-admin`)
@@ -1176,12 +1176,12 @@ describe(`Administration`, () => {
         .should('not.have.class', 'mat-checked');
 
       cy
-        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
         .contains(
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
-      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.remove).click();
+      cy.get(CONFIRM_DIALOG_DOM.buttons.confirm).click();
 
       cy.get(PETALS_COCKPIT_DOM.buttons.goToAdminPage).should('not.be.visible');
       cy.url().should('include', 'workspaces?page=list');
@@ -1213,12 +1213,12 @@ describe(`Administration`, () => {
         .should('not.have.class', 'mat-checked');
 
       cy
-        .get(EDIT_ADMIN_DIALOG_DOM.text.message)
+        .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
         .contains(
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
-      cy.get(EDIT_ADMIN_DIALOG_DOM.buttons.cancel).click();
+      cy.get(CONFIRM_DIALOG_DOM.buttons.cancel).click();
 
       cy
         .get(`.exp-pnl-user-adminldap`)
