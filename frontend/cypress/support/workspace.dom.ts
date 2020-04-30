@@ -134,6 +134,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
         `${bsWksOverview} .cell-user-lifecycleArtifact-${userId} mat-checkbox [type="checkbox"]`,
       userActionDelete: (userId: string) =>
         `${bsWksOverview} .cell-user-action-${userId} .action-delete`,
+      currentUserDelete: `${bsWksOverview} .action-leave-wks`,
     },
   },
 };

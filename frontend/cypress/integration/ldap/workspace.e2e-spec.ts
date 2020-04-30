@@ -16,6 +16,7 @@
  */
 
 import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
+import { CONFIRM_DIALOG_DOM } from '../../support/confirm-modal.dom';
 import { HEADER_DOM } from '../../support/header.dom';
 import {
   expectedEndpointsTreeWks0,
@@ -1528,20 +1529,60 @@ describe('Workspace', () => {
         .should('be.visible');
     });
 
-    it('should not be able to remove himself from workspace users', () => {
+    it('should leave a workspace', () => {
       const currentUser = 'admin';
-      // expect to have names, id for all users sorted in asc order
+
+      // user to delete should exist in the table
       cy
         .get(WORKSPACE_OVERVIEW_DOM.table.rows.userRow(currentUser))
         .should('exist');
 
-      // can not add ourself
-      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
-
-      cy.get(`mat-option span`).should('not.contain', currentUser);
+      // should not be last member
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.rows.allRow)
+        .should('have.length.gt', 1);
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(currentUser))
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+        .should('not.be.disabled')
+        .click({ force: true });
+
+      cy
+        .get(CONFIRM_DIALOG_DOM.text.title)
+        .should('be.visible')
+        .contains('Leave this workspace?');
+
+      cy
+        .get(CONFIRM_DIALOG_DOM.text.message)
+        .should('be.visible')
+        .contains(
+          'You will no longer be member of this workspace.\nYou will be redirected to the workspaces selection page.'
+        );
+
+      cy.get(CONFIRM_DIALOG_DOM.buttons.confirm).click();
+
+      cy.url().should('include', 'workspaces?page=list');
+    });
+
+    it('should not leave a workspace if last member', () => {
+      // change workspace
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy.expectWorkspacesListMenuToBe(['Workspace 0', 'Workspace 1']);
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 0`)
+        .click();
+
+      cy.expectLocationToBe('/workspaces/idWks0');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
         .should('not.exist');
     });
 
