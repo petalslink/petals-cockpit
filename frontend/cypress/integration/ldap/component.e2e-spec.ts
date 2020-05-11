@@ -19,8 +19,9 @@ import {
   COMPONENT_DOM,
   SERVICE_UNIT_DEPLOYMENT_DOM,
 } from '../../support/component.dom';
-import { expectedTreeBeforeDeploy } from '../../support/helper.const';
+import { expectedDefaultTree } from '../../support/helper.const';
 import { MESSAGE_DOM } from '../../support/message.dom';
+import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
   UPLOAD_DOM,
@@ -47,7 +48,10 @@ describe('Component', () => {
 
   it('should display read-only informations when deleted', () => {
     cy.getElementInPetalsTree(`component`, `Comp 2`).click();
+
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
+
+    cy.expectPetalsTreeToBe(expectedDefaultTree);
 
     cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
@@ -58,6 +62,8 @@ describe('Component', () => {
       .contains('This component has been removed')
       .scrollIntoView()
       .should('be.visible');
+
+    cy.getElementInPetalsTree(`component`, `Comp 2`).should('not.exist');
   });
 
   describe('Related Elements', () => {
@@ -178,11 +184,10 @@ describe('Component', () => {
       cy.get(COMPONENT_DOM.lifecycle.parameters).should('be.not.visible');
 
       // should have start, uninstall, and unload if stopped
-      cy.expectPossibleStatesListToBe(COMPONENT_DOM.buttons.allActionsStates, [
-        `Start`,
-        `Uninstall`,
-        `Unload`,
-      ]);
+      cy.expectPossibleStatesListToBe(
+        COMPONENT_DOM.buttons.allActionsStates,
+        possibleStatesList
+      );
 
       // should have info message when component is stopped
       cy.expectMessageToBe(
@@ -211,11 +216,96 @@ describe('Component', () => {
       );
 
       // should have start, uninstall, and unload if shutdown
-      cy.expectPossibleStatesListToBe(COMPONENT_DOM.buttons.allActionsStates, [
-        `Start`,
-        `Uninstall`,
-        `Unload`,
-      ]);
+      cy.expectPossibleStatesListToBe(
+        COMPONENT_DOM.buttons.allActionsStates,
+        possibleStatesList
+      );
+    });
+
+    it('should unload a component only if its SA are unload', () => {
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Started');
+
+      // should have stop if started
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+
+      cy.expectPossibleStatesListToBe(
+        COMPONENT_DOM.buttons.allActionsStates,
+        possibleStatesList
+      );
+
+      cy
+        .get(COMPONENT_DOM.buttons.actionState('unload'))
+        .children()
+        .should('be.disabled');
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .should('have.length', 2)
+        .eq(0)
+        .trigger('mouseenter');
+
+      cy.get('mat-tooltip-component').should('contain', 'SA 0');
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .should('have.length', 2)
+        .eq(1)
+        .trigger('mouseenter');
+
+      cy.get('mat-tooltip-component').should('contain', 'SA 2');
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .eq(0)
+        .click();
+
+      cy.expectLocationToBe(
+        `/workspaces/idWks0/petals/service-assemblies/idSa0`
+      );
+
+      cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
+      cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
+
+      // sa 0 is no longer in the list
+      cy.getElementInPetalsTree(`service-assembly`, `SA 0`).should('not.exist');
+
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.serviceAssemblies)
+        .should('have.length', 1)
+        .eq(0)
+        .click();
+
+      cy.expectLocationToBe(
+        `/workspaces/idWks0/petals/service-assemblies/idSa2`
+      );
+      cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
+      cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
+
+      // sa 2 is no longer in the list
+      cy.getElementInPetalsTree(`service-assembly`, `SA 2`).should('not.exist');
+
+      cy.getElementInPetalsTree(`component`, `Comp 0`).click();
+      cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.actionState('unload'))
+        .children()
+        .should('be.enabled')
+        .click();
+
+      cy
+        .get(MESSAGE_DOM.texts.msgWarning)
+        .contains('This component has been removed')
+        .scrollIntoView()
+        .should('be.visible');
+
+      cy.getElementInPetalsTree(`component`, `Comp 0`).should('not.exist');
     });
 
     it('should update runtime parameters when component state is started', () => {
@@ -238,6 +328,7 @@ describe('Component', () => {
     });
 
     it('should update install parameters when component state is loaded', () => {
+      cy.get(COMPONENT_DOM.buttons.setParameters).should('be.disabled');
       cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
       cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
 
@@ -265,6 +356,35 @@ describe('Component', () => {
 
       // httpThreadPoolSizeMax should be updated on runtime parameter
       cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10123`);
+    });
+
+    it('should display an error if component change state (install) fails', () => {
+      cy.get(COMPONENT_DOM.buttons.setParameters).should('be.disabled');
+
+      cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
+      cy.get(COMPONENT_DOM.buttons.actionState('uninstall')).click();
+
+      cy
+        .getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`)
+        .clear()
+        .type(`666`);
+
+      cy
+        .get(COMPONENT_DOM.buttons.setParameters)
+        .should('be.enabled')
+        .click();
+
+      cy.expectMessageToBe(
+        `.error-change-state`,
+        'error',
+        `[Mock message] An error happened when trying to change the parameters of that component`
+      );
+
+      cy.get(COMPONENT_DOM.buttons.actionState('install')).click();
+
+      cy.get(COMPONENT_DOM.buttons.actionState('start')).click();
+
+      cy.getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`);
     });
   });
 
@@ -400,7 +520,7 @@ describe('Component', () => {
         `An error occurred while deploying service-unit-deploy-error.zip`
       );
 
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
 
@@ -424,7 +544,13 @@ describe('Component', () => {
     });
 
     it('should deploy a service-unit', () => {
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy
+        .getElementInPetalsTree(
+          `service-unit`,
+          `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`
+        )
+        .should('not.exist');
 
       cy
         .get(SERVICE_UNIT_DEPLOYMENT_DOM.card)
@@ -434,12 +560,24 @@ describe('Component', () => {
 
       cy.get(UPLOAD_DOM.buttons.deploy).should('not.be.visible');
 
+      cy.get(UPLOAD_DOM.buttons.cancelFileName).should('not.be.visible');
+
       cy.get(`app-snackbar-deployment-progress`).should('not.be.visible');
 
       cy.uploadFile(
         'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT.zip',
         '.deploy-su input[type=file]'
       );
+
+      // check the new content of the deployment card with the new service-unit deployment
+      cy.contains(UPLOAD_DOM.texts.titleCard, 'Service Unit Deployment');
+
+      cy.contains(
+        UPLOAD_DOM.texts.fileName,
+        'su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT.zip'
+      );
+
+      cy.get(UPLOAD_DOM.buttons.cancelFileName).should('be.visible');
 
       cy
         .get(UPLOAD_DOM.buttons.deploy, {
@@ -456,6 +594,7 @@ describe('Component', () => {
       );
 
       cy.get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value).should('be.visible');
+
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
@@ -465,11 +604,17 @@ describe('Component', () => {
           timeout: 15000,
         })
         .should('not.be.visible');
+
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('not.be.visible');
 
-      cy.expectPetalsTreeToBe(expectedTreeAfterDeploySU);
+      cy
+        .getElementInPetalsTree(
+          `service-unit`,
+          `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`
+        )
+        .should('exist');
 
       cy.expectNotification(
         'success',
@@ -481,45 +626,11 @@ describe('Component', () => {
     });
   });
 
-  const expectedTreeAfterDeploySU = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `SU 0`,
-    `SU 2`,
-    `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`,
-    `Comp 1`,
-    `SU 1`,
-    `SU 3`,
-    `Comp 2`,
-    `Service Assemblies`,
-    `SA 0`,
-    `SA 1`,
-    `SA 2`,
-    `sa-su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`,
-    `Shared Libraries`,
-    `SL 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
-  ];
-
   const expectedParametersListSortByName = [
     `httpPort`,
     `httpsEnabled`,
     `httpThreadPoolSizeMax`,
   ];
+
+  const possibleStatesList = [`Start`, `Uninstall`, `Unload`];
 });

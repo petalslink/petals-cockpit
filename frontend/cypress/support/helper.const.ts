@@ -48,7 +48,7 @@ export const expectedEndpointsTreeWks0 = [
   `edpt-89p82661-test-31o4-l391-04`,
 ];
 
-export const expectedTreeBeforeDeploy = [
+export const expectedDefaultTree = [
   `Bus 0`,
   `Cont 0`,
   `Components`,

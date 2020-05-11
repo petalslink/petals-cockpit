@@ -129,7 +129,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     parameters: { [key: string]: string }
   ) {
     // in order to simulate an error, at least for E2E tests
-    if (parameters['httpThreadPoolSizeMax'] === 'error') {
+    if (parameters['httpThreadPoolSizeMax'] === '666') {
       return helper.errorBackend(
         '[Mock message] An error happened when trying to change the parameters of that component',
         400
