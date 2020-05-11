@@ -65,6 +65,11 @@ declare namespace Cypress {
     expectBusListToBe(list: string[]): any;
     expectDetachBusListToBe(list: string[]): any;
     openDialogToDeleteWks(): any;
+    updateWorkspaceName(
+      workspaceNameText: string,
+      hintLabel?: string,
+      errorLabel?: string
+    ): any;
     updateDescription(shortDescriptionText: string, hintLabel?: string): any;
     updateShortDescription(
       shortDescriptionText: string,
