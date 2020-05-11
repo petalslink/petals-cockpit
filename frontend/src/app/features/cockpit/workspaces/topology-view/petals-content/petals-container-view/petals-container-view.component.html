@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" fxFlexFill class="wrapper-content">
-  <div fxLayout="column" fxFlex class="content">
+  <div fxLayout="column" class="content">
     <div *ngIf="container$ | async as container" fxLayout="column" fxLayoutGap="20px">
 
       <mat-card
@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             fxLayout="column"
             [fxFlex.gt-md]="!container.isReachable ? '100' : '35'"
             class="container-infos"
-            >
+          >
             <div class="title-about-wrapper">
               <mat-card-title class="light-bold title-about">About {{ container.name }}</mat-card-title>
             </div>
