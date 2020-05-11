@@ -18,7 +18,7 @@
     "prettier:check": "yarn run prettier:base-files --list-different",
     "prettier:fix": "yarn run prettier:base-files --write",
     "copyrights:check": "yarn run copyrights:fix --dry",
-    "copyrights:fix": "node generate-headers.js",
+    "copyrights:fix": "node check-and-fix.js.",
     "e2e": "ng e2e -c dev-e2e petals-cockpit-e2e",
     "e2e:ci": "ng e2e -c prod-e2e-ci petals-cockpit-e2e",
     "e2e:product": "ng e2e petals-cockpit-actual-e2e",
