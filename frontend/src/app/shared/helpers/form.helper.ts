@@ -56,7 +56,11 @@ interface IValidationMessages {
   };
   workspaceName?: {
     required: string;
+    maxLength: string;
     existingWorkspaceWithSimilarName: string;
+  };
+  shortDescription?: {
+    maxLength: string;
   };
 }
 
@@ -94,7 +98,11 @@ const validationMessages: IValidationMessages = {
   },
   workspaceName: {
     required: 'Required!',
+    maxLength: 'Max 100 characters!',
     existingWorkspaceWithSimilarName: 'Existing workspace with similar name',
+  },
+  shortDescription: {
+    maxLength: 'Max 200 characters!',
   },
 };
 
@@ -126,29 +134,6 @@ export function getFormErrors(
   }
 
   return formFieldsCopy;
-}
-
-export function enableAllFormFields(form: FormGroup) {
-  _enableOrDisableAllFormFields(form, true);
-}
-
-export function disableAllFormFields(form: FormGroup) {
-  _enableOrDisableAllFormFields(form, false);
-}
-
-export function _enableOrDisableAllFormFields(
-  form: FormGroup,
-  enable: boolean
-) {
-  for (const key in form.controls) {
-    if (form.controls.hasOwnProperty(key)) {
-      if (enable) {
-        form.controls[key].enable();
-      } else {
-        form.controls[key].disable();
-      }
-    }
-  }
 }
 
 export class FormErrorStateMatcher implements ErrorStateMatcher {

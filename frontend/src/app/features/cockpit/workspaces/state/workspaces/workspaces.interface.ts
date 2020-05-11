@@ -27,7 +27,8 @@ export interface IWorkspaceUI {
   // from UI
   isRemoving: boolean;
   isFetchingDetails: boolean;
-  isSettingDescriptions: boolean;
+  isUpdatingDetails: boolean;
+  isEditDetailsMode: boolean;
   isAddingUserToWorkspace: boolean;
   isRemovingUserFromWorkspace: boolean;
 }
@@ -73,7 +74,8 @@ export function workspaceRowFactory(): IWorkspaceRow {
     description: undefined,
     isRemoving: false,
     isFetchingDetails: false,
-    isSettingDescriptions: false,
+    isUpdatingDetails: false,
+    isEditDetailsMode: false,
     isAddingUserToWorkspace: false,
     isRemovingUserFromWorkspace: false,
     users: emptyJsTable<IWorkspaceUserRow>(),

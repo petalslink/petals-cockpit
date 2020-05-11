@@ -19,10 +19,12 @@
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
 
-  .workspace-description-edit {
-    div > .workspace-description-preview,
-    div > .msg-no-description {
-      background-color: mat-color($mat-grey, 50);
+  mat-card.card-workspace-details {
+    mat-card-content.workspace-details-edit {
+      div > .workspace-description-preview,
+      div > .msg-no-description {
+        background-color: mat-color($mat-grey, 50);
+      }
     }
   }
 

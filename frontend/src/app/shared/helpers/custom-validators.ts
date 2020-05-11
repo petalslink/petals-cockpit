@@ -16,35 +16,27 @@
  */
 
 import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
-import { getWorkspacesIdsNames } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
+import {
+  getSelectedWorkspaceId,
+  getWorkspacesIdsNames,
+} from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { select, Store } from '@ngrx/store';
 import { IStore } from '@shared/state/store.interface';
 import { getUsersAllIds } from '@shared/state/users.selectors';
+import { combineLatest } from 'rxjs';
 import { first, map } from 'rxjs/operators';
 
 export class CustomValidators {
   static isIp(c: AbstractControl) {
     const ipRegexp = /^(?!0)(?!.*\.$)((1?\d?\d|25[0-5]|2[0-4]\d)(\.|$)){4}$/;
 
-    return ipRegexp.test(c.value)
-      ? null
-      : {
-          isIp: {
-            valid: false,
-          },
-        };
+    return ipRegexp.test(c.value) ? null : { isIp: { valid: false } };
   }
 
   static isPort(c: AbstractControl) {
     const portRegexp = /^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$/;
 
-    return portRegexp.test(c.value)
-      ? null
-      : {
-          isPort: {
-            valid: false,
-          },
-        };
+    return portRegexp.test(c.value) ? null : { isPort: { valid: false } };
   }
 
   static isPortOrNull(c: AbstractControl) {
@@ -59,11 +51,14 @@ export class CustomValidators {
     store$: Store<IStore>
   ): AsyncValidatorFn {
     return (control: AbstractControl) =>
-      store$.pipe(
-        getWorkspacesIdsNames,
+      combineLatest(
+        store$.pipe(select(getSelectedWorkspaceId)),
+        store$.pipe(getWorkspacesIdsNames)
+      ).pipe(
         first(),
-        map(workspaceIdNames => {
+        map(([currentWorkspaceId, workspaceIdNames]) => {
           return workspaceIdNames.list
+            .filter(wks => wks.id !== currentWorkspaceId)
             .map(wks => this.cleanWorkspaceName(wks.name))
             .includes(this.cleanWorkspaceName(control.value))
             ? { existingWorkspaceWithSimilarName: true }

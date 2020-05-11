@@ -58,9 +58,10 @@ export namespace WorkspacesReducer {
     | Workspaces.FetchDetails
     | Workspaces.FetchDetailsError
     | Workspaces.FetchDetailsSuccess
-    | Workspaces.SetDescriptions
-    | Workspaces.SetDescriptionsError
-    | Workspaces.SetDescriptionsSuccess
+    | Workspaces.EditWorkspaceDetails
+    | Workspaces.UpdateWorkspaceDetails
+    | Workspaces.UpdateWorkspaceDetailsError
+    | Workspaces.UpdateWorkspaceDetailsSuccess
     | Workspaces.Delete
     | Workspaces.DeleteError
     | Workspaces.DeleteSuccess
@@ -123,14 +124,17 @@ export namespace WorkspacesReducer {
       case Workspaces.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
-      case Workspaces.SetDescriptionsType: {
-        return setDescriptions(table, action.payload);
+      case Workspaces.EditWorkspaceDetailsType: {
+        return editWorkspaceDetails(table, action.payload);
       }
-      case Workspaces.SetDescriptionsErrorType: {
-        return setDescriptionsError(table, action.payload);
+      case Workspaces.UpdateWorkspaceDetailsType: {
+        return updateWorkspaceDetails(table, action.payload);
       }
-      case Workspaces.SetDescriptionsSuccessType: {
-        return setDescriptionsSuccess(table, action.payload);
+      case Workspaces.UpdateWorkspaceDetailsErrorType: {
+        return updateWorkspaceDetailsError(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceDetailsSuccessType: {
+        return updateWorkspaceDetailsSuccess(table, action.payload);
       }
       case Workspaces.DeleteType: {
         return deletee(table, action.payload);
@@ -376,30 +380,42 @@ export namespace WorkspacesReducer {
     return updateById(table, payload.id, { isFetchingDetails: false });
   }
 
-  function setDescriptions(table: IWorkspacesTable, payload: { id: string }) {
-    return updateById(table, payload.id, {
-      isSettingDescriptions: true,
-    });
-  }
-
-  function setDescriptionsSuccess(
+  function editWorkspaceDetails(
     table: IWorkspacesTable,
-    payload: { id: string; shortDescription: string; description: string }
+    payload: { id: string; isEditDetailsMode: boolean }
   ) {
     return updateById(table, payload.id, {
-      shortDescription: payload.shortDescription,
-      description: payload.description,
-      isSettingDescriptions: false,
+      isEditDetailsMode: payload.isEditDetailsMode,
     });
   }
 
-  function setDescriptionsError(
+  function updateWorkspaceDetails(
     table: IWorkspacesTable,
     payload: { id: string }
   ) {
+    return updateById(table, payload.id, { isUpdatingDetails: true });
+  }
+
+  function updateWorkspaceDetailsSuccess(
+    table: IWorkspacesTable,
+    payload: {
+      id: string;
+      name: string;
+      shortDescription: string;
+      description: string;
+    }
+  ) {
     return updateById(table, payload.id, {
-      isSettingDescriptions: false,
+      ...payload,
+      isUpdatingDetails: false,
     });
+  }
+
+  function updateWorkspaceDetailsError(
+    table: IWorkspacesTable,
+    payload: { id: string }
+  ) {
+    return updateById(table, payload.id, { isUpdatingDetails: false });
   }
 
   function setPetalsSearch(
