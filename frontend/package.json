@@ -14,7 +14,7 @@
     "tslint:check": "tslint --project ./tsconfig.json",
     "tslint:fix": "yarn run tslint:check --fix",
     "prettier:base": "yarn run prettier --single-quote --trailing-comma es5",
-    "prettier:base-files": "yarn run prettier:base './{e2e,src,cypress}/**/*.{js,scss,ts}'",
+    "prettier:base-files": "yarn run prettier:base './{e2e,src,cypress}/**/*.{js,scss,ts}' './check-and-fix.js'",
     "prettier:check": "yarn run prettier:base-files --list-different",
     "prettier:fix": "yarn run prettier:base-files --write",
     "copyrights:check": "yarn run copyrights:fix --dry",

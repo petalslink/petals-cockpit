@@ -10,38 +10,27 @@ const sourceFolders = [
   './src/styles',
   './src/mocks',
   './e2e',
-  './cypress'
+  './cypress',
 ];
 
 // individual files
 const sourceFiles = {
-  ts: [
-    './src/main.ts'
-  ],
+  ts: ['./src/main.ts'],
 
-  js: [
-    './protractor.conf.js',
-    './gulpfile.js',
-    './src/karma.conf.js'
-  ],
+  js: ['./protractor.conf.js', './gulpfile.js', './src/karma.conf.js'],
 
-  scss: [
-    './src/styles.scss'
-  ],
+  scss: ['./src/styles.scss'],
 
-  html: []
+  html: [],
 };
 
-const headerRegex = new RegExp('(Copyright \\(C\\) )(\\d\\d\\d\\d)(-\\d\\d\\d\\d)?( Linagora)');
+const headerRegex = new RegExp(
+  '(Copyright \\(C\\) )(\\d\\d\\d\\d)(-\\d\\d\\d\\d)?( Linagora)'
+);
 
-const headers = [
-  {ts: null},
-  {scss: null},
-  {html: null}
-];
+const headers = [{ ts: null }, { scss: null }, { html: null }];
 
-headers.ts =
-`/**
+headers.ts = `/**
  * Copyright (C) ${currentYear} Linagora
  *
  * This program is free software: you can redistribute it and/or modify
@@ -62,8 +51,7 @@ headers.ts =
 headers.js = headers.ts;
 headers.scss = headers.ts;
 
-headers.html =
-`<!-- Copyright (C) ${currentYear} Linagora
+headers.html = `<!-- Copyright (C) ${currentYear} Linagora
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -82,7 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->`;
 
 // arguments
 const args = {
-  dry: false
+  dry: false,
 };
 
 process.argv.forEach(arg => {
@@ -96,27 +84,19 @@ process.argv.forEach(arg => {
 const generateFileTree = (dir, filelist) => {
   let files = fs.readdirSync(dir);
 
-  filelist = filelist || {ts: [], js: [], scss: [], html: []};
+  filelist = filelist || { ts: [], js: [], scss: [], html: [] };
 
-  files.forEach((file) => {
+  files.forEach(file => {
     if (fs.statSync(path.join(dir, file)).isDirectory()) {
       filelist = generateFileTree(path.join(dir, file), filelist);
-    }
-
-    else {
+    } else {
       if (file.endsWith('.ts')) {
         filelist.ts.push(path.join(dir, file));
-      }
-
-      else if (file.endsWith('.js')) {
+      } else if (file.endsWith('.js')) {
         filelist.js.push(path.join(dir, file));
-      }
-
-      else if (file.endsWith('.scss')) {
+      } else if (file.endsWith('.scss')) {
         filelist.scss.push(path.join(dir, file));
-      }
-
-      else if (file.endsWith('.html')) {
+      } else if (file.endsWith('.html')) {
         filelist.html.push(path.join(dir, file));
       }
     }
@@ -130,20 +110,26 @@ const generateFileTree = (dir, filelist) => {
 const checkHeaderAndInjectIfNeeded = (fileType, filePath, header, stats) => {
   let file = fs.readFileSync(filePath).toString();
   let noHeader = true;
-  let fileChanged = file.replace(headerRegex, (match, p1, p2, p3, p4, offset, string) => {
-    let headerStart = p1, firstYear = p2, secondYear = p3, headerEnd = p4;
-    let date = currentYear;
+  let fileChanged = file.replace(
+    headerRegex,
+    (match, p1, p2, p3, p4, offset, string) => {
+      let headerStart = p1,
+        firstYear = p2,
+        secondYear = p3,
+        headerEnd = p4;
+      let date = currentYear;
 
-    noHeader = false;
+      noHeader = false;
 
-    if (secondYear) {
-      date = `${firstYear}-${currentYear}`;
-    } else if (firstYear !== currentYear) {
-      date = `${firstYear}-${currentYear}`;
+      if (secondYear) {
+        date = `${firstYear}-${currentYear}`;
+      } else if (firstYear !== currentYear) {
+        date = `${firstYear}-${currentYear}`;
+      }
+
+      return `${headerStart}${date}${headerEnd}`;
     }
-
-    return `${headerStart}${date}${headerEnd}`;
-  })
+  );
 
   if (noHeader) {
     fileChanged = `${header}\n\n${file}`;
@@ -167,7 +153,7 @@ const main = () => {
     .reduce((previous, current) => {
       let rslt = {};
 
-      Object.keys(previous).forEach((fileType) => {
+      Object.keys(previous).forEach(fileType => {
         rslt[fileType] = [...previous[fileType], ...current[fileType]];
       });
 
@@ -177,32 +163,44 @@ const main = () => {
   // generate the file tree
   let fileTree = {};
 
-  Object
-    .keys(sourceFoldersFlattened)
-    .forEach((fileType) => {
-      fileTree[fileType] = [...sourceFiles[fileType], ...sourceFoldersFlattened[fileType]]
-    });
+  Object.keys(sourceFoldersFlattened).forEach(fileType => {
+    fileTree[fileType] = [
+      ...sourceFiles[fileType],
+      ...sourceFoldersFlattened[fileType],
+    ];
+  });
 
   // init stats
   let stats = {};
-  Object.keys(fileTree).forEach((fileType) => stats[fileType] = 0);
+  Object.keys(fileTree).forEach(fileType => (stats[fileType] = 0));
 
   // for each type of file
-  Object.keys(fileTree).forEach((fileType) => {
+  Object.keys(fileTree).forEach(fileType => {
     let filesPath = fileTree[fileType];
 
     // save split header here otherwise the split will happen
     // as many time as we call checkHeaderAndInjectIfNeeded function
     let header = headers[fileType];
 
-    filesPath.forEach(filePath => checkHeaderAndInjectIfNeeded(fileType, filePath, header, stats));
+    filesPath.forEach(filePath =>
+      checkHeaderAndInjectIfNeeded(fileType, filePath, header, stats)
+    );
   });
 
-  let headerOnEveryFile = Object.keys(stats).map(fileType => stats[fileType]).reduce((previous, current) => previous + current) === 0;
+  let headerOnEveryFile =
+    Object.keys(stats)
+      .map(fileType => stats[fileType])
+      .reduce((previous, current) => previous + current) === 0;
 
   // display stats
   Object.keys(stats).forEach(fileType =>
-    console.log(`${args.dry && stats[fileType] > 0 ? '[ERROR] ': ''}${stats[fileType]} ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${args.dry ? `don't have a header` : `updated`}`)
+    console.log(
+      `${args.dry && stats[fileType] > 0 ? '[ERROR] ' : ''}${
+        stats[fileType]
+      } ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${
+        args.dry ? `don't have a header` : `updated`
+      }`
+    )
   );
 
   if (!headerOnEveryFile) {
