@@ -25,6 +25,7 @@
   </parent>
 
   <artifactId>petals-cockpit</artifactId>
+  <name>Petals Cockpit - Cockpit</name>
   <packaging>jar</packaging>
 
   <dependencies>
