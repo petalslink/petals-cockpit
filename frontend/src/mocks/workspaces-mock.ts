@@ -44,7 +44,7 @@ function toObj<A>(arr: { toObj: () => A }[]): A {
 export class Workspace {
   private static cpt = 0;
   public readonly id: string;
-  public readonly name: string;
+  public name: string;
   public shortDescription: string;
   public description: string;
   private readonly users = new Map<string, IWorkspaceUserRow>();

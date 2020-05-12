@@ -66,9 +66,9 @@ export const WORKSPACE_ELEMENT_DOM = {
 export const WORKSPACE_OVERVIEW_DOM = {
   buttons: {
     openDialogDeleteWks: `${bsWksOverview} .btn-delete-wks`,
-    addEditDescriptions: `${bsWksOverview} .btn-add-edit-descriptions`,
-    cancelDescriptions: `${bsWksOverview} .btn-cancel-descriptions`,
-    saveDescriptions: `${bsWksOverview} .btn-save-descriptions`,
+    addEditWorkspaceDetails: `${bsWksOverview} .btn-add-edit-workspace-details`,
+    cancelEditWorkspaceDetails: `${bsWksOverview} .btn-cancel-edit-workspace-details`,
+    saveWorkspaceDetails: `${bsWksOverview} .btn-save-workspace-details`,
     editDetachBus: `${bsWksOverview} .btn-detach-bus`,
     cancelDetachBus: `${bsWksOverview} .btn-cancel-detach-bus`,
     openDialogDetachBus: `${bsWksOverview} .btn-open-detach-bus-dialog`,
@@ -79,8 +79,9 @@ export const WORKSPACE_OVERVIEW_DOM = {
     savePermissionsBtn: `${bsWksOverview} .btn-save-users-permissions`,
   },
   formFields: {
-    shortDescriptionFormField: `${bsWksOverview} .workspace-short-description-edit .short-description-form-field`,
-    descriptionFormField: `${bsWksOverview} .workspace-description-edit .description-form-field`,
+    workspaceNameFormField: `${bsWksOverview} .wks-name-form-field`,
+    shortDescriptionFormField: `${bsWksOverview} .short-description-form-field`,
+    descriptionFormField: `${bsWksOverview} .description-form-field`,
     ipFormField: `${bsWksOverview} .bus-import-edit .ip-form-field`,
     portFormField: `${bsWksOverview} .bus-import-edit .port-form-field`,
     usernameFormField: `${bsWksOverview} .bus-import-edit .username-form-field`,
@@ -94,6 +95,7 @@ export const WORKSPACE_OVERVIEW_DOM = {
     password: `${bs} input[formcontrolname="password"]`,
     passphrase: `${bs} input[formcontrolname="passphrase"]`,
     userSearchCtrl: `${bsWksOverview} input[formcontrolname="userSearchCtrl"]`,
+    workspaceName: `${bsWksOverview} input[formcontrolname="workspaceName"]`,
   },
   listGridItem: {
     itemBus: `${bsWksOverview} .bus-grid-item .bus-item .bus-link`,
@@ -106,9 +108,9 @@ export const WORKSPACE_OVERVIEW_DOM = {
   texts: {
     busNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-link .bus-footer .bus-name`,
     busDetachNames: `${bsWksOverview} .bus-grid-item .bus-item .bus-detach .bus-footer .bus-name`,
-    shortDescription: `${bsWksOverview} .workspace-short-description .short-description .short-description-text`,
-    description: `${bsWksOverview} .workspace-description .description .description-text`,
-    descriptionPreview: `${bsWksOverview} .workspace-description-edit div .workspace-description-preview`,
+    shortDescription: `${bsWksOverview} .short-description-text`,
+    description: `${bsWksOverview} .description-text`,
+    descriptionPreview: `${bsWksOverview} .workspace-description-preview`,
   },
   textArea: {
     shortDescriptionTextarea: `${bsWksOverview} textarea.short-description-wks`,

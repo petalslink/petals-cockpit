@@ -82,7 +82,7 @@ describe('Workspace', () => {
       );
 
     cy
-      .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
       .should('be.visible');
     cy
       .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDeleteWks)
@@ -449,9 +449,137 @@ describe('Workspace', () => {
     });
   });
 
-  describe('Descriptions', () => {
+  describe('Details', () => {
     beforeEach(() => {
       cy.expectLocationToBe(`/workspaces/idWks0`);
+    });
+
+    it('should not update workspace details', () => {
+      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
+        .should('contain', `This is short description for the Workspace 0.`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
+        .should(
+          'contain',
+          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+        );
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+        .should('be.disabled');
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName).type('bla bla bla');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+        .should('be.enabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+        .type(`bla bla bla`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+        .type(`bla bla bla`);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.cancelEditWorkspaceDetails).click();
+
+      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
+        .should('contain', `This is short description for the Workspace 0.`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
+        .scrollIntoView()
+        .should(
+          'contain',
+          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+        );
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+        .should('be.disabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName)
+        .should('have.value', `Workspace 0`)
+        .clear()
+        .type(`UPDATE_WKS_HTTP_ERROR_BACKEND`);
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails).click();
+
+      cy.expectNotification(
+        'error',
+        'Workspace',
+        `An error occurred while updating workspace details.`
+      );
+
+      // should stay in edit mode view when an error occurred from the backend and keep the current changes
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName)
+        .should('have.value', `UPDATE_WKS_HTTP_ERROR_BACKEND`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+        .should('be.visible');
+    });
+
+    it('should update workspace name', () => {
+      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName)
+        .scrollIntoView()
+        .should('have.value', `Workspace 0`)
+        .and('be.enabled');
+
+      cy.updateWorkspaceName(`PedRoBot's family`, `17/100`, null);
+
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .should('contain', `PedRoBot's famil...`);
+    });
+
+    it('should have 100 characters max available to the workspace name', () => {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName)
+        .should('have.value', `Workspace 0`)
+        .and('be.enabled');
+
+      cy.updateWorkspaceName(
+        `ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO`,
+        `100/100`
+      );
+
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .should('contain', `ZA WARUDO ZA WAR...`);
     });
 
     it('should have the workspace descriptions', () => {
@@ -466,59 +594,11 @@ describe('Workspace', () => {
         );
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .should('be.visible');
       cy
         .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDeleteWks)
         .should('be.visible');
-    });
-
-    it('should not update the short description', () => {
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
-        .should('contain', `This is short description for the Workspace 0.`);
-
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-        .should('be.visible')
-        .click();
-
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-        .expectFocused()
-        .type(`bla bla bla`);
-
-      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.cancelDescriptions).click();
-
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
-        .should('contain', `This is short description for the Workspace 0.`);
-    });
-
-    it('should not updated the description', () => {
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
-        .should(
-          'contain',
-          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
-        );
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
-        .should('be.visible')
-        .click();
-
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
-        .type(`bla bla bla`);
-
-      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.cancelDescriptions).click();
-
-      cy
-        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
-        .should(
-          'contain',
-          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
-        );
     });
 
     it('should update the short description', () => {
@@ -527,7 +607,7 @@ describe('Workspace', () => {
         .should('contain', `This is short description for the Workspace 0.`);
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .should('be.visible')
         .click();
 
@@ -548,7 +628,7 @@ describe('Workspace', () => {
 
     it('should have 200 characters max available to the short description textarea', () => {
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .should('be.visible')
         .click();
 
@@ -559,8 +639,8 @@ describe('Workspace', () => {
 
       cy.updateShortDescription(
         `Lorem ipsum dolor sit amet, consectetur adipiscing elit. In sed imperdiet nisl, eu fringilla diam. Duis interdum ex ligula, non pharetra odio commodo nec.`,
-        null,
-        `Max 200 characters!`
+        `200/200`,
+        null
       );
 
       cy
@@ -580,7 +660,7 @@ describe('Workspace', () => {
         );
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .should('be.visible')
         .click();
 
@@ -617,7 +697,7 @@ describe('Workspace', () => {
         );
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .should('be.visible')
         .click();
 
@@ -644,7 +724,7 @@ describe('Workspace', () => {
 
     it('should have info messages when no descriptions', () => {
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .find(`.edit-text-btn`)
         .should('contain', 'Edit')
         .and('be.visible')
@@ -680,7 +760,7 @@ describe('Workspace', () => {
         .should('be.empty');
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
         .should('be.enabled')
         .click();
 
@@ -699,7 +779,7 @@ describe('Workspace', () => {
       );
 
       cy
-        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditDescriptions)
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
         .find(`.add-text-btn`)
         .should('contain', 'Add')
         .and('be.visible');

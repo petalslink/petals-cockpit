@@ -17,45 +17,43 @@
 
 :host {
   height: 100%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .selected-workspace {
   font-weight: bold;
 }
 
-.description,
-.workspace-description-edit {
-  word-break: break-word;
-  white-space: pre-line;
-}
-
-mat-card-content.workspace-description {
-  margin-bottom: -16px;
-}
-
-mat-card-content.workspace-short-description > .short-description {
-  word-break: break-word;
-  white-space: pre-line;
-}
-
-.short-description-form-field,
-.description-form-field {
-  textarea {
-    min-height: 80px;
-    margin: 0;
-    padding: 0;
-    resize: none;
-    border: none;
-    overflow: auto;
-    word-break: break-word;
-    white-space: pre-line;
+mat-card.card-workspace-details {
+  mat-card-content.workspace-details {
+    .short-description,
+    .description {
+      word-break: break-word;
+    }
   }
-}
 
-.custom-border {
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+  mat-card-content.workspace-details-edit {
+    word-break: break-word;
+    margin-bottom: 0;
+
+    mat-form-field.short-description-form-field,
+    mat-form-field.description-form-field {
+      textarea {
+        min-height: 80px;
+        margin: 0;
+        padding: 0;
+        resize: none;
+        border: none;
+        overflow: auto;
+        word-break: break-word;
+      }
+    }
+  }
+
+  div > .workspace-description-preview > p {
+    margin: 0;
+  }
 }
 
 mat-card.card-buses {
@@ -67,9 +65,12 @@ mat-card.card-buses {
     }
   }
 
-  mat-form-field.passphrase-form-field,
-  mat-form-field.pwd-form-field {
+  mat-form-field.form-field-gt-xs {
     margin-top: -24px;
+  }
+
+  mat-card-content.bus-import-details-edit {
+    margin-bottom: 0;
   }
 
   mat-card-content > div.bus-grid-item > div.bus-item {
@@ -122,17 +123,19 @@ mat-card.card-buses {
   }
 }
 
-.user-name,
-.user-id {
-  word-break: break-word;
-}
-
-.add-user-form-field {
-  mat-icon {
-    padding-right: 8px;
+mat-card.card-users {
+  .user-name,
+  .user-id {
+    word-break: break-word;
   }
-}
 
-.btn-add-user {
-  margin-bottom: 15px;
+  .add-user-form-field {
+    mat-icon {
+      padding-right: 8px;
+    }
+  }
+
+  .btn-add-user {
+    margin-bottom: 15px;
+  }
 }

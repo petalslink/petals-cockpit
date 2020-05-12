@@ -31,12 +31,18 @@ import {
 import { Actions, ofType } from '@ngrx/effects';
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subject } from 'rxjs';
-import { filter, first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import {
+  distinctUntilChanged,
+  filter,
+  first,
+  map,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
 import { CustomValidators } from '@shared/helpers/custom-validators';
 import {
-  disableAllFormFields,
-  enableAllFormFields,
   FormErrorStateMatcher,
   getFormErrors,
 } from '@shared/helpers/form.helper';
@@ -73,30 +79,31 @@ import {
 })
 export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
+  matcher = new FormErrorStateMatcher();
 
   // delete workspace
   workspace$: Observable<IWorkspaceRow>;
   isRemoving = false;
 
-  // workspace descriptions
-  isFocusShortDescriptionTextarea = false;
-  shortDescription: string = null;
-  description: string = null;
-  isEditingDescriptions = false;
-  isSettingDescriptions = false;
+  // edit workspace details
+  wksDetailsFormGroup: FormGroup;
+  editWksDetailsFormErrors = {
+    workspaceName: '',
+    shortDescription: '',
+    description: '',
+  };
 
   // buses
   buses$: Observable<{ list: IBusRow[] }>;
   buses: IBusRow[];
 
   // import/attach bus
-  busImportForm: FormGroup;
-  importBusMatcher = new FormErrorStateMatcher();
+  busImportFormGroup: FormGroup;
   isEditingImportBus = false;
   isImportingBus = false;
   disabledCancelBtn = false;
   disabledAttachBtn = false;
-  formErrors = {
+  editBusFormErrors = {
     ip: '',
     port: '',
     username: '',
@@ -106,7 +113,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   importBusId: string;
   importBusError: string = null;
   importError: string = null;
-  formDefault = {
+  busFormDefault = {
     ip: 'localhost',
     port: 7700,
     username: 'petals',
@@ -176,30 +183,26 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       tap(buses => (this.buses = buses.list))
     );
 
+    this.createFormImportBus();
+
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
       map(user => user.map(u => u.id).sort())
     );
-
-    this.addUserFormGroup = this.fb.group({
-      userSearchCtrl: [
-        '',
-        Validators.required,
-        [SharedValidator.isStringInObsArrayValidator(this.appUsers$)],
-      ],
-    });
 
     this.currentUserId$ = this.store$.pipe(
       getCurrentUser,
       map(user => user.id)
     );
 
+    this.createFormAddUser();
+
     this.workspace$ = this.store$.pipe(
       select(getCurrentWorkspace),
       tap(wks => {
         wks.isAddingUserToWorkspace
-          ? this.addUserFormGroup.get('userSearchCtrl').disable()
-          : this.addUserFormGroup.get('userSearchCtrl').enable();
+          ? this.addUserFormGroup.disable()
+          : this.addUserFormGroup.enable();
       })
     );
 
@@ -217,6 +220,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           });
 
           this.updateUsersFormGroup(users);
+          this.usersFormGroup.enable();
         }
       })
     );
@@ -228,34 +232,33 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy$),
         tap(id => {
           // we reinit these in case one change workspace while editing
-          this.shortDescription = null;
-          this.description = null;
-
           this.importBusError = null;
           this.importError = null;
 
-          this.isEditingDescriptions = false;
-          this.isSettingDescriptions = false;
-          this.isFocusShortDescriptionTextarea = false;
+          this.addUserFormGroup.reset();
+
+          this.store$.dispatch(
+            new Workspaces.EditWorkspaceDetails({
+              id,
+              isEditDetailsMode: false,
+            })
+          );
           this.store$.dispatch(new Workspaces.FetchDetails({ id }));
         })
       )
       .subscribe();
 
+    this.createFormUpdateWorkspaceDetails();
+
     this.workspace$
       .pipe(
         takeUntil(this.onDestroy$),
-        // only when we are setting the descriptions and it has finished
-        filter(wks => !wks.isSettingDescriptions && this.isSettingDescriptions),
-        tap(_ => {
-          this.shortDescription = null;
-          this.description = null;
-
-          this.isEditingDescriptions = false;
-
-          // we reinit these, and it will show the current value of the descriptions in the store
-          this.isSettingDescriptions = false;
-          this.isFocusShortDescriptionTextarea = false;
+        map(wks => wks.isUpdatingDetails),
+        distinctUntilChanged(),
+        tap(isUpdatingDetails => {
+          isUpdatingDetails
+            ? this.wksDetailsFormGroup.disable()
+            : this.wksDetailsFormGroup.enable();
         })
       )
       .subscribe();
@@ -270,12 +273,9 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .pipe(
         ofType(Workspaces.AddWorkspaceUserSuccessType),
         takeUntil(this.onDestroy$),
-        // reset the form
         tap(_ => this.addUserFormGroup.reset())
       )
       .subscribe();
-
-    this.createFormImportBus();
 
     this.store$
       .pipe(
@@ -287,7 +287,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           } else if (error.importError) {
             this.importError = error.importError;
           }
-          enableAllFormFields(this.busImportForm);
+
           this.disabledCancelBtn = false;
           this.disabledAttachBtn = false;
         })
@@ -300,11 +300,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
         takeUntil(this.onDestroy$),
         tap(isImportingBus => {
           this.isImportingBus = isImportingBus;
-          if (isImportingBus) {
-            disableAllFormFields(this.busImportForm);
-          } else {
-            enableAllFormFields(this.busImportForm);
-          }
+
+          isImportingBus
+            ? this.busImportFormGroup.disable()
+            : this.busImportFormGroup.enable();
         })
       )
       .subscribe();
@@ -349,54 +348,106 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * All functions used for the management part of the current workspace (edit workspace descriptions).
+   * All functions used for the management part of the current workspace (edit workspace details).
    */
-  editDescriptions() {
-    this.isEditingDescriptions = true;
-    this.workspace$
+  createFormUpdateWorkspaceDetails() {
+    this.wksDetailsFormGroup = this.fb.group({
+      workspaceName: [
+        '',
+        Validators.compose([Validators.required, Validators.maxLength(100)]),
+        CustomValidators.existingWorkspaceWithSimilarNameValidator(this.store$),
+      ],
+      shortDescription: ['', Validators.maxLength(200)],
+      description: '',
+    });
+
+    this.wksDetailsFormGroup.valueChanges
       .pipe(
-        first(),
-        tap(wks => {
-          this.description = wks.description;
-          this.shortDescription = wks.shortDescription;
-          this.isFocusShortDescriptionTextarea = true;
+        takeUntil(this.onDestroy$),
+        tap(() => {
+          this.editWksDetailsFormErrors = getFormErrors(
+            this.wksDetailsFormGroup,
+            this.editWksDetailsFormErrors
+          );
         })
       )
       .subscribe();
   }
 
-  cancelDescriptions() {
-    this.description = null;
-    this.shortDescription = null;
+  editWorkspaceDetails(id: string) {
+    this.store$.dispatch(
+      new Workspaces.EditWorkspaceDetails({
+        id,
+        isEditDetailsMode: true,
+      })
+    );
 
-    this.isEditingDescriptions = false;
-    this.isSettingDescriptions = false;
-    this.isFocusShortDescriptionTextarea = false;
+    this.workspace$
+      .pipe(
+        first(),
+        tap(wks => {
+          this.wksDetailsFormGroup.get('workspaceName').setValue(wks.name);
+          this.wksDetailsFormGroup.get('description').setValue(wks.description);
+          this.wksDetailsFormGroup
+            .get('shortDescription')
+            .setValue(wks.shortDescription);
+        })
+      )
+      .subscribe();
   }
 
-  saveDescriptions() {
-    const description = this.description;
-    const shortDescription = this.shortDescription;
+  cancelEditWorkspaceDetails(id: string) {
+    this.store$.dispatch(
+      new Workspaces.EditWorkspaceDetails({
+        id,
+        isEditDetailsMode: false,
+      })
+    );
+  }
+
+  onSubmitWorkspaceDetails() {
     this.workspace$
       .pipe(
         first(),
         tap(wks => {
           this.store$.dispatch(
-            new Workspaces.SetDescriptions({
+            new Workspaces.UpdateWorkspaceDetails({
               id: wks.id,
-              shortDescription,
-              description,
+              name: this.wksDetailsFormGroup.value.workspaceName,
+              shortDescription: this.wksDetailsFormGroup.value.shortDescription,
+              description: this.wksDetailsFormGroup.value.description,
             })
           );
-          this.isSettingDescriptions = true;
         })
       )
       .subscribe();
   }
 
+  hasWorkspaceDetailsChanged(
+    name: string,
+    shortDescription: string,
+    description: string
+  ): boolean {
+    return (
+      name !== this.wksDetailsFormGroup.value.workspaceName ||
+      shortDescription !== this.wksDetailsFormGroup.value.shortDescription ||
+      description !== this.wksDetailsFormGroup.value.description
+    );
+  }
+
   /**
    * All functions used for the users management part in the current workspace (add, remove user).
    */
+  createFormAddUser() {
+    this.addUserFormGroup = this.fb.group({
+      userSearchCtrl: [
+        '',
+        Validators.required,
+        [SharedValidator.isStringInObsArrayValidator(this.appUsers$)],
+      ],
+    });
+  }
+
   filterUsers(search: string, users: string[]) {
     return search ? users.filter(user => user.includes(search)) : users;
   }
@@ -650,7 +701,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
    * All functions used for the bus list management part in the current workspace (attach bus).
    */
   createFormImportBus() {
-    this.busImportForm = this.fb.group({
+    this.busImportFormGroup = this.fb.group({
       ip: '',
       port: ['', CustomValidators.isPortOrNull],
       username: '',
@@ -658,18 +709,21 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       passphrase: '',
     });
 
-    this.busImportForm.valueChanges
+    this.busImportFormGroup.valueChanges
       .pipe(
         takeUntil(this.onDestroy$),
         tap(() => {
-          this.formErrors = getFormErrors(this.busImportForm, this.formErrors);
+          this.editBusFormErrors = getFormErrors(
+            this.busImportFormGroup,
+            this.editBusFormErrors
+          );
         })
       )
       .subscribe();
   }
 
   resetFormImportBus() {
-    this.busImportForm.reset();
+    this.busImportFormGroup.reset();
     this.store$.dispatch(new Buses.CleanImport());
 
     this.importError = null;
@@ -699,25 +753,18 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * [mat-form-field] does not remove mat-form-field-invalid class on FormGroup reset.
-   * Use (click) instead (ngSubmit) to call onSubmit method solved the problem.
-   * Use also type="reset" instead type="submit" solved the invalid form after getting error
-   * from sse and cancel import bus overview.
-   * See https://github.com/angular/components/issues/4190
-   */
-  onSubmit({ value }: { value: IBusImport; valid: boolean }) {
+  onSubmitBus({ value }: { value: IBusImport; valid: boolean }) {
     this.disabledCancelBtn = true;
     this.disabledAttachBtn = true;
 
     const importBusDefault: IBusImport = {
-      ip: value.ip ? value.ip : this.formDefault.ip,
-      port: value.port ? value.port : this.formDefault.port,
-      username: value.username ? value.username : this.formDefault.username,
-      password: value.password ? value.password : this.formDefault.password,
+      ip: value.ip ? value.ip : this.busFormDefault.ip,
+      port: value.port ? value.port : this.busFormDefault.port,
+      username: value.username ? value.username : this.busFormDefault.username,
+      password: value.password ? value.password : this.busFormDefault.password,
       passphrase: value.passphrase
         ? value.passphrase
-        : this.formDefault.passphrase,
+        : this.busFormDefault.passphrase,
     };
 
     this.store$.dispatch(new Buses.Post(importBusDefault));

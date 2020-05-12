@@ -24,7 +24,11 @@ import {
   IWorkspaceUserPermissions,
   IWorkspaceUserRow,
 } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
-import { ADD_WKS_HTTP_ERROR_BACKEND, errorBackend } from '@mocks/backend-mock';
+import {
+  ADD_WKS_HTTP_ERROR_BACKEND,
+  errorBackend,
+  UPDATE_WKS_HTTP_ERROR_BACKEND,
+} from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
 import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
@@ -89,7 +93,18 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
     ).pipe(delay(environment.mock.httpDelay));
   }
 
-  setDescriptions(id: string, shortDescription: string, description: string) {
+  putWorkspaceDetails(
+    id: string,
+    name: string,
+    shortDescription: string,
+    description: string
+  ) {
+    // only used by the tests to verify an error coming from the backend...
+    if (name === UPDATE_WKS_HTTP_ERROR_BACKEND) {
+      return helper.errorBackend(errorBackend, 500);
+    }
+
+    workspacesService.get(id).name = name;
     workspacesService.get(id).shortDescription = shortDescription;
     workspacesService.get(id).description = description;
     return helper.response(204).pipe(delay(environment.mock.httpDelay));

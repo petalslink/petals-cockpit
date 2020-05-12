@@ -13,128 +13,61 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<div
-  *ngIf="workspace$ | async as workspace"
-  fxLayout="column"
-  fxFlexFill
-  class="wrapper-content"
->
-  <div fxFlex class="content">
-    <div fxLayout="column" fxLayoutGap="20px">
-
-      <mat-card>
-        <mat-card-title class="light-bold">Short Description</mat-card-title>
-
-        <mat-card-content
-          *ngIf="!isEditingDescriptions; else shortDescriptionEdit"
-          fxLayout="column"
-          class="workspace-short-description"
-        >
-          <div *ngIf="workspace.shortDescription; else noShortDescription" fxFlexFill class="short-description">
-            <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
-          </div>
-          <ng-template #noShortDescription>
-            <app-message
-              type="info"
-              msg="This workspace doesn't have any short description."
-              [isClosable]="false"
-              class="info-no-short-description"
-            ></app-message>
-          </ng-template>
-        </mat-card-content>
-
-        <ng-template #shortDescriptionEdit>
-          <mat-card-content fxLayout="column">
-            <div fxFlexFill class="workspace-short-description-edit">
-              <mat-form-field appearance="outline" fxFlexFill class="short-description-form-field">
-                <textarea
-                  #txtShortDescription
-                  matInput
-                  matTextareaAutosize
-                  maxLength="200"
-                  placeholder="Add short description to the current workspace"
-                  [appFocusInputIfLargeScreen]="isFocusShortDescriptionTextarea"
-                  [disabled]="isSettingDescriptions"
-                  [(ngModel)]="shortDescription"
-                  class="short-description-wks"
-                ></textarea>
-                <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxLength">
-                  {{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
-                <ng-template #isMaxLength>
-                  <mat-error>Max 200 characters!</mat-error>
-                </ng-template>
-              </mat-form-field>
-            </div>
-          </mat-card-content>
+<div fxFlexFill fxLayout="column" class="wrapper-content">
+  <div
+    *ngIf="workspace$ | async as workspace"
+    fxLayout="column"
+    fxLayoutGap="20px"
+    class="content"
+  >
+    <mat-card fxFlex class="card-workspace-details">
+      <mat-card-content *ngIf="!workspace.isEditDetailsMode; else workspaceDetailsEdit" class="workspace-details">
+        <mat-card-title class="light-bold">Short description</mat-card-title>
+        <!-- Short description overview -->
+        <div *ngIf="workspace.shortDescription; else noShortDescription" class="short-description">
+          <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
+        </div>
+        <ng-template #noShortDescription>
+          <app-message
+            type="info"
+            msg="This workspace doesn't have any short description."
+            [isClosable]="false"
+            class="info-no-short-description"
+          ></app-message>
         </ng-template>
 
-        <mat-card-title class="light-bold margin-top-x1">Description</mat-card-title>
-
-        <mat-card-content
-          *ngIf="!isEditingDescriptions; else descriptionEdit"
-          fxLayout="column"
-          class="workspace-description">
-          <div *ngIf="workspace.description; else noDescription" fxFlexFill class="description">
-            <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
-          </div>
-          <ng-template #noDescription>
-            <app-message
-              type="info"
-              msg="This workspace doesn't have any description."
-              [isClosable]="false"
-              class="info-no-description margin-bottom-x2"
-            ></app-message>
-          </ng-template>
-        </mat-card-content>
-
-        <ng-template #descriptionEdit>
-          <mat-card-content fxLayout="column">
-            <div fxFlexFill class="workspace-description-edit">
-              <mat-form-field appearance="outline" fxFlexFill class="description-form-field">
-                <textarea
-                  matInput
-                  matTextareaAutosize
-                  placeholder="Add description to the current workspace"
-                  [disabled]="isSettingDescriptions"
-                  [(ngModel)]="description"
-                  class="description-wks"
-                ></textarea>
-                <mat-hint>Supports Standard Markdown Syntax</mat-hint>
-              </mat-form-field>
-              <div fxFlexFill>
-                <span
-                  *ngIf="description; else nothingToPreview"
-                  fxFlex [innerHTML]="description | MarkdownToHtml"
-                  class="workspace-description-preview padding-x1"
-                ></span>
-                <ng-template #nothingToPreview>
-                  <div fxFlexFill fxFlex class="msg-no-description padding-x1">Nothing to preview</div>
-                </ng-template>
-              </div>
-            </div>
-          </mat-card-content>
+        <mat-card-title class="light-bold margin-top-x2">Description</mat-card-title>
+        <!-- Description overview -->
+        <div *ngIf="workspace.description; else noDescription" class="description">
+          <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
+        </div>
+        <ng-template #noDescription>
+          <app-message
+            type="info"
+            msg="This workspace doesn't have any description."
+            [isClosable]="false"
+            class="info-no-description margin-bottom-x1"
+          ></app-message>
         </ng-template>
 
-        <mat-card-actions
-          *ngIf="!isEditingDescriptions; else descriptionsBtnEdit"
-          fxFlexFill
-          fxLayoutAlign="end center"
-        >
+        <!-- Edit or delete workspace -->
+        <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
           <button
-            mat-raised-button type="button"
+            mat-raised-button
+            type="button"
             color="primary"
-            (click)="editDescriptions()"
-            class="btn-add-edit-descriptions text-upper margin-right-x1"
+            (click)="editWorkspaceDetails(workspace.id)"
+            class="btn-add-edit-workspace-details text-upper margin-right-x1"
           >
             <span
-              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addDescriptions"
+              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addWorkspaceDetails"
               fxLayout="row"
               fxLayoutAlign="start center"
             >
               <mat-icon class="margin-right-x1">edit</mat-icon>
               <span class="edit-text-btn">Edit</span>
             </span>
-            <ng-template #addDescriptions>
+            <ng-template #addWorkspaceDetails>
               <span fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon class="margin-right-x1">add</mat-icon>
                 <span class="add-text-btn">Add</span>
@@ -154,41 +87,143 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <span class="text-upper">Delete this workspace</span>
             </span>
           </button>
-        </mat-card-actions>
+        </div>
+      </mat-card-content>
 
-        <ng-template #descriptionsBtnEdit>
-          <mat-card-actions *ngIf="isEditingDescriptions" fxFlexFill fxLayoutAlign="end center">
-            <button
-              mat-button
-              type="button"
-              color="primary"
-              [disabled]="isSettingDescriptions"
-              (click)="cancelDescriptions()"
-              class="btn-cancel-descriptions text-upper margin-right-x1"
+      <ng-template #workspaceDetailsEdit>
+        <form
+          novalidate
+          [formGroup]="wksDetailsFormGroup"
+          (ngSubmit)="onSubmitWorkspaceDetails()"
+          class="workspace-details-form"
+        >
+          <mat-card-title class="light-bold">Workspace details</mat-card-title>
+          <mat-card-content class="workspace-details-edit">
+            <!-- Edit workspace name -->
+            <mat-form-field
+              fxFlexFill
+              appearance="outline"
+              floatLabel="always"
+              class="wks-name-form-field"
             >
-              Cancel
-            </button>
-            <button
-              mat-raised-button
-              type="button"
-              color="primary"
-              (click)="saveDescriptions()"
-              [disabled]="isSettingDescriptions || (description === workspace.description && shortDescription === workspace.shortDescription)"
-              class="btn-save-descriptions text-upper"
+              <mat-label>Name</mat-label>
+              <input
+                #workspaceNameInput
+                matInput
+                type="text"
+                maxlength="100"
+                placeholder="Set a name to the current workspace"
+                formControlName="workspaceName"
+                [appFocusInputIfLargeScreen]="true"
+                [errorStateMatcher]="matcher"
+                class="name-wks"
+              >
+              <mat-hint *ngIf="!editWksDetailsFormErrors.workspaceName">
+                {{ wksDetailsFormGroup.value['workspaceName']?.length || 0 }}/{{ workspaceNameInput.maxLength }}
+              </mat-hint>
+              <mat-error *ngIf="editWksDetailsFormErrors.workspaceName">
+                {{ editWksDetailsFormErrors.workspaceName }}
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Edit short description -->
+            <mat-form-field
+              fxFlexFill
+              appearance="outline"
+              floatLabel="always"
+              class="short-description-form-field margin-top-x1"
             >
-              <span fxLayout="row" fxLayoutAlign="start center">
-                <fa-icon class="margin-right-x1 icon-x2" icon="check"></fa-icon>
-                <span class="text-upper">Save</span>
-              </span>
-            </button>
-          </mat-card-actions>
-        </ng-template>
+              <mat-label>Short Description</mat-label>
+              <textarea
+                #txtShortDescription
+                matInput
+                matTextareaAutosize
+                maxLength="200"
+                placeholder="Add short description to the current workspace"
+                formControlName="shortDescription"
+                class="short-description-wks"
+              ></textarea>
+              <mat-hint *ngIf="!editWksDetailsFormErrors.shortDescription">
+                {{ wksDetailsFormGroup.value['shortDescription']?.length || 0 }}/{{ txtShortDescription.maxLength }}
+              </mat-hint>
+              <mat-error *ngIf="editWksDetailsFormErrors.shortDescription">
+                {{ editWksDetailsFormErrors.shortDescription }}
+              </mat-error>
+            </mat-form-field>
 
-      </mat-card>
+            <!-- Edit description -->
+            <mat-form-field
+              fxFlexFill
+              appearance="outline"
+              floatLabel="always"
+              class="description-form-field margin-top-x1"
+            >
+              <mat-label>Description</mat-label>
+              <textarea
+                #txtDescription
+                matInput
+                matTextareaAutosize
+                placeholder="Add description to the current workspace"
+                formControlName="description"
+                class="description-wks"
+              ></textarea>
+              <mat-hint>Supports Standard Markdown Syntax</mat-hint>
+            </mat-form-field>
 
-      <mat-card *ngIf="buses$ | async as buses" class="card-buses">
-        <mat-card-title class="light-bold">Bus list</mat-card-title>
-        <mat-card-content fxLayout="column">
+            <!-- Description preview -->
+            <div fxFlexFill>
+              <span
+                *ngIf="txtDescription.value; else nothingToPreview"
+                fxFlex
+                [innerHTML]="txtDescription.value | MarkdownToHtml"
+                class="workspace-description-preview padding-x1"
+              ></span>
+              <ng-template #nothingToPreview>
+                <span fxFlex class="msg-no-description padding-x1">Nothing to preview</span>
+              </ng-template>
+            </div>
+
+            <!-- Cancel or save workspace details -->
+            <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
+              <button
+                mat-button
+                type="button"
+                color="primary"
+                [disabled]="workspace.isUpdatingDetails"
+                (click)="cancelEditWorkspaceDetails(workspace.id)"
+                class="btn-cancel-edit-workspace-details text-upper margin-right-x1"
+              >
+                Cancel
+              </button>
+              <button
+                mat-raised-button
+                type="submit"
+                color="primary"
+                [disabled]="!hasWorkspaceDetailsChanged(workspace.name, workspace.shortDescription, workspace.description) ||
+                workspace.isUpdatingDetails ||
+                wksDetailsFormGroup.invalid"
+                class="btn-save-workspace-details text-upper"
+              >
+                <span *ngIf="workspace.isUpdatingDetails; else canSave" fxLayout="row" fxLayoutAlign="start center">
+                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
+                  Saving
+                </span>
+
+                <ng-template #canSave>
+                  <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
+                  <span class="text-upper">Save</span>
+                </ng-template>
+              </button>
+            </div>
+          </mat-card-content>
+        </form>
+      </ng-template>
+    </mat-card>
+
+    <mat-card fxFlex class="card-buses">
+      <mat-card-title class="light-bold">Bus list</mat-card-title>
+      <div *ngIf="buses$ | async as buses" fxFlexFill>
+        <mat-card-content>
           <div
             *ngIf="buses.list.length; else noBuses"
             fxLayout="row wrap"
@@ -284,11 +319,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </ng-template>
         </mat-card-content>
 
-        <form class="bus-import-form" novalidate (ngSubmit)="onSubmit(busImportForm)" [formGroup]="busImportForm">
-          <div *ngIf="isEditingImportBus" class="margin-top-x2">
+        <form novalidate [formGroup]="busImportFormGroup" (ngSubmit)="onSubmitBus(busImportFormGroup)" class="bus-import-form">
+          <div *ngIf="isEditingImportBus" class="margin-top-x1">
             <mat-card-title class="light-bold">Import bus details</mat-card-title>
-
-            <mat-card-content>
+            <mat-card-content class="bus-import-details-edit">
               <div
                 fxLayout="row wrap"
                 fxLayout.lt-sm="column"
@@ -305,7 +339,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <mat-label>IP or hostname</mat-label>
                   <input
                     type="text"
-                    placeholder="{{formDefault.ip}}"
+                    placeholder="{{busFormDefault.ip}}"
                     matInput
                     appFocusInputIfLargeScreen
                     formControlName="ip"
@@ -325,15 +359,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <input
                     matInput
                     type="text"
-                    placeholder="{{ formDefault.port }}"
+                    placeholder="{{ busFormDefault.port }}"
                     formControlName="port"
-                    [errorStateMatcher]="importBusMatcher"
+                    [errorStateMatcher]="matcher"
                   >
                   <span matPrefix>
                     <fa-icon icon="ethernet" class="icon-x2"></fa-icon>
                   </span>
-                  <mat-error *ngIf="formErrors.port">
-                    {{ formErrors.port }}
+                  <mat-error *ngIf="editBusFormErrors.port">
+                    {{ editBusFormErrors.port }}
                   </mat-error>
                 </mat-form-field>
 
@@ -347,7 +381,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   <input
                     matInput
                     type="text"
-                    placeholder="{{formDefault.username}}"
+                    placeholder="{{busFormDefault.username}}"
                     formControlName="username"
                   >
                   <span matPrefix>
@@ -359,11 +393,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   appearance="outline"
                   floatLabel="always"
                   fxFlex="36%"
-                  [ngClass.gt-xs]="'pwd-form-field'"
+                  [ngClass.gt-xs]="'form-field-gt-xs'"
                   class="pwd-form-field"
                 >
                   <mat-label>Password</mat-label>
-                  <input type="password" placeholder="{{formDefault.password}}" matInput formControlName="password">
+                  <input type="password" placeholder="{{busFormDefault.password}}" matInput formControlName="password">
                   <span matPrefix>
                     <fa-icon icon="key" class="icon-x2"></fa-icon>
                   </span>
@@ -373,14 +407,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   appearance="outline"
                   floatLabel="always"
                   fxFlex="64%"
-                  [ngClass.gt-xs]="'passphrase-form-field'"
+                  [ngClass.gt-xs]="'form-field-gt-xs'"
                   class="passphrase-form-field"
                 >
                   <mat-label>Topology passphrase</mat-label>
                   <input
                     matInput
                     type="password"
-                    placeholder="{{formDefault.passphrase}}"
+                    placeholder="{{busFormDefault.passphrase}}"
                     formControlName="passphrase"
                   >
                   <span matPrefix>
@@ -398,7 +432,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             </mat-card-content>
           </div>
 
-          <mat-card-actions fxFlexFill fxLayoutAlign="end center">
+          <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
             <!-- Attach Bus -->
             <button
               *ngIf="!isEditingImportBus && !isEditingBusList; else attachBusBtnEdit"
@@ -430,7 +464,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 mat-raised-button
                 type="submit"
                 color="primary"
-                [disabled]="disabledAttachBtn || busImportForm.invalid || isImportingBus || importBusId"
+                [disabled]="disabledAttachBtn || busImportFormGroup.invalid || isImportingBus || importBusId"
                 class="btn-import-new-bus text-upper"
               >
                 <span *ngIf="isImportingBus; else canImport" fxLayout="row" fxLayoutAlign="start center">
@@ -452,7 +486,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               type="button"
               color="accent"
               (click)="editDetachBus()"
-              class="btn-detach-bus margin-right-x1 text-upper"
+              class="btn-detach-bus text-upper"
             >
               <span fxLayout="row" fxLayoutAlign="start center">
                 <fa-icon icon="unlink" class="margin-right-x1 icon-x1"></fa-icon>
@@ -485,244 +519,243 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </span>
               </button>
             </ng-template>
-          </mat-card-actions>
+          </div>
         </form>
-      </mat-card>
+      </div>
+    </mat-card>
 
-      <mat-card fxFlex fxLayout="column" class="card-users">
-        <mat-card-title class="light-bold">Users</mat-card-title>
+    <mat-card fxFlex class="card-users">
+      <mat-card-title class="light-bold">Users</mat-card-title>
+      <mat-card-content *ngIf="users$ | async as users" class="workspace-users">
+        <app-message
+          *ngIf="users.length === 1; else workspaceShared"
+          type="info"
+          msg="You are the only one using this workspace."
+          [isClosable]="false"
+          class="info-user-workspace"
+        ></app-message>
 
-        <mat-card-content *ngIf="users$ | async as users" fxLayout="column" class="workspace-users">
+        <ng-template #workspaceShared>
           <app-message
-            *ngIf="users.length === 1; else workspaceShared"
             type="info"
-            msg="You are the only one using this workspace."
+            msg="{{users.length}} people are using this workspace."
             [isClosable]="false"
-            class="info-user-workspace"
+            class="info-user-workspace-shared"
           ></app-message>
+        </ng-template>
 
-          <ng-template #workspaceShared>
-            <app-message
-              type="info"
-              msg="{{users.length}} people are using this workspace."
-              [isClosable]="false"
-              class="info-user-workspace-shared"
-            ></app-message>
-          </ng-template>
-
-          <form [formGroup]="addUserFormGroup" class="margin-top-x1">
-            <div fxLayout="row" fxLayoutAlign="start center">
-              <mat-form-field
-                appearance="outline"
-                floatLabel="always"
-                class="add-user-form-field margin-right-x1"
-              >
-                <mat-label>User to add</mat-label>
-                <input
-                  matInput
-                  required
-                  formControlName="userSearchCtrl"
-                  [matAutocomplete]="autocompleteUsers"
-                >
-                <span matPrefix>
-                  <mat-icon class="icon-x2">
-                    <fa-icon icon="user-astronaut"></fa-icon>
-                  </mat-icon>
-                </span>
-                <mat-error>Select a user on the list</mat-error>
-              </mat-form-field>
-
-              <mat-autocomplete #autocompleteUsers>
-                <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
-                  {{ filteredUser }}
-                </mat-option>
-              </mat-autocomplete>
-  
-              <button
-                mat-raised-button
-                color="primary"
-                [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
-                (click)="addUser()"
-                class="btn-add-user text-upper"
-              >
-                <span *ngIf="workspace.isAddingUserToWorkspace; else canAdd" fxLayout="row" fxLayoutAlign="start center">
-                  Adding
-                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
-                </span>
-
-                <ng-template #canAdd>
-                  <span class="text-upper add-user-text-btn">Add</span>
-                </ng-template>
-              </button>
-            </div>
-          </form>
-
-          <form [formGroup]="usersFormGroup" (ngSubmit)="onSubmitUsersPermissions()">
-            <table
-              *ngIf="currentUserId$ | async as currentUserId"
-              mat-table
-              matSort
-              fxFlexFill
-              formArrayName="usersFormArray"
-              [dataSource]="usersFormArray.controls"
-              class="users-table"
+        <form [formGroup]="addUserFormGroup" class="margin-top-x1">
+          <div fxLayout="row" fxLayoutAlign="start center">
+            <mat-form-field
+              appearance="outline"
+              floatLabel="always"
+              class="add-user-form-field margin-right-x1"
             >
-              <!-- Name Column -->
-              <ng-container matColumnDef="name">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  fxFlex="15"
-                  fxLayoutAlign="start center"
-                  class="mat-header-cell-user-name"
-                >
-                  Name
-                </th>
-                <td
-                  *matCellDef="let user; let i = index;"
-                  mat-cell
-                  fxFlex="15"
-                  fxLayout="row"
-                  fxLayoutAlign="start center"
-                  [formGroupName]="i"
-                  class="cell-username-{{ user.value.id }}"
-                >
-                  <span fxFlexFill fxLayout="row" fxLayoutAlign="start center">
-                    <app-generate-icon mat-list-avatar [size]="35" [text]="user.value.id"></app-generate-icon>
-                    <span class="margin-left-x1 user-name ellipsis">{{ user.value.name }}</span>
-                  </span>
-                </td>
-              </ng-container>
-
-              <!-- Id Column -->
-              <ng-container matColumnDef="id">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  fxFlex="15"
-                  fxLayout="row"
-                  fxLayoutAlign="center center"
-                >
-                  Id
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let user; let i = index;"
-                  fxFlex="15"
-                  fxLayout="row"
-                  fxLayoutAlign="center center"
-                  [formGroupName]="i"
-                  class="cell-userid-{{ user.value.id }}"
-                >
-                  <span class="user-id ellipsis">{{ user.value.id }}</span>
-                </td>
-              </ng-container>
-              
-              <!-- Permissions Columns -->
-              <ng-container [matColumnDef]="permission.id" *ngFor="let permission of permissions;">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  fxFlex
-                  fxLayout="row"
-                  fxLayoutAlign="center center"
-                >
-                  {{ permission.label }}
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let user; let i = index;"
-                  fxFlex
-                  fxLayout="row"
-                  fxLayoutAlign="center center"
-                  [formGroupName]="i"
-                  class="cell-user-{{ permission.id }}-{{ user.value.id }}"
-                >
-                  <span 
-                    *ngIf="isSavingUsersPermissions(users) && hasPermissionChanged(user.value.id, permission.id); else canCheck" 
-                    fxLayout="row" 
-                    fxLayoutAlign="start center"
-                  >
-                    <mat-spinner color="primary" [diameter]="16" [strokeWidth]="1"></mat-spinner>
-                  </span>
-                  
-                  <ng-template #canCheck>
-                    <mat-checkbox
-                      [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
-                      [color]="getCheckBoxColor(users, permission.id, i)"
-                      [formControlName]="permission.id"
-                      (change)="onUserPermissionChange(users, permission.id, i)"
-                    ></mat-checkbox>
-                  </ng-template>
-                </td>
-              </ng-container>
-
-              <!-- Action Column -->
-              <ng-container matColumnDef="action">
-                <th
-                  mat-header-cell
-                  *matHeaderCellDef
-                  fxFlex
-                  fxLayout="row"
-                  fxLayoutAlign="end center"
-                >
-                  Action
-                </th>
-                <td
-                  mat-cell
-                  *matCellDef="let user; let i = index;"
-                  fxFlex
-                  fxLayout="column"
-                  fxLayoutAlign="center end"
-                  [formGroupName]="i"
-                  class="cell-user-action-{{ user.value.id }}"
-                >
-                  <button
-                    *ngIf="currentUserId !== user.value.id"
-                    mat-icon-button
-                    matTooltip="Delete"
-                    matTooltipPosition="before"
-                    [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
-                    (click)="removeUser(user.value.id)"
-                    class="action-delete"
-                  >
-                    <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
-                  </button>
-                </td>
-              </ng-container>
-
-              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let user; columns: displayedColumns;"
-                class="row-{{ user.value.id }} table-row"
+              <mat-label>User to add</mat-label>
+              <input
+                matInput
+                required
+                formControlName="userSearchCtrl"
+                [matAutocomplete]="autocompleteUsers"
               >
-              </tr>
-            </table>
+              <span matPrefix>
+                <mat-icon class="icon-x2">
+                  <fa-icon icon="user-astronaut"></fa-icon>
+                </mat-icon>
+              </span>
+              <mat-error>Select a user on the list</mat-error>
+            </mat-form-field>
 
-            <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
-              <button
-                mat-raised-button
-                type="submit"
-                color="primary"
-                [disabled]="hasAnyUserChanged() || isSavingUsersPermissions(users)"
-                class="btn-save-users-permissions text-upper"
+            <mat-autocomplete #autocompleteUsers>
+              <mat-option *ngFor="let filteredUser of filteredUsers$ | async" [value]="filteredUser">
+                {{ filteredUser }}
+              </mat-option>
+            </mat-autocomplete>
+
+            <button
+              mat-raised-button
+              color="primary"
+              [disabled]="addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
+              (click)="addUser()"
+              class="btn-add-user text-upper"
+            >
+              <span *ngIf="workspace.isAddingUserToWorkspace; else canAdd" fxLayout="row" fxLayoutAlign="start center">
+                Adding
+                <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-left-x1"></mat-spinner>
+              </span>
+
+              <ng-template #canAdd>
+                <span class="text-upper add-user-text-btn">Add</span>
+              </ng-template>
+            </button>
+          </div>
+        </form>
+
+        <form [formGroup]="usersFormGroup" (ngSubmit)="onSubmitUsersPermissions()">
+          <table
+            *ngIf="currentUserId$ | async as currentUserId"
+            mat-table
+            matSort
+            fxFlexFill
+            formArrayName="usersFormArray"
+            [dataSource]="usersFormArray.controls"
+            class="users-table"
+          >
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                fxFlex="15"
+                fxLayoutAlign="start center"
+                class="mat-header-cell-user-name"
               >
-                <span *ngIf="isSavingUsersPermissions(users); else canSave" fxLayout="row" fxLayoutAlign="start center">
-                  <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
-                  Saving
+                Name
+              </th>
+              <td
+                *matCellDef="let user; let i = index;"
+                mat-cell
+                fxFlex="15"
+                fxLayout="row"
+                fxLayoutAlign="start center"
+                [formGroupName]="i"
+                class="cell-username-{{ user.value.id }}"
+              >
+                <span fxFlexFill fxLayout="row" fxLayoutAlign="start center">
+                  <app-generate-icon mat-list-avatar [size]="35" [text]="user.value.id"></app-generate-icon>
+                  <span class="margin-left-x1 user-name ellipsis">{{ user.value.name }}</span>
                 </span>
+              </td>
+            </ng-container>
 
-                <ng-template #canSave>
-                  <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
-                  <span class="text-upper">Save</span>
+            <!-- Id Column -->
+            <ng-container matColumnDef="id">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                fxFlex="15"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+              >
+                Id
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let user; let i = index;"
+                fxFlex="15"
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                [formGroupName]="i"
+                class="cell-userid-{{ user.value.id }}"
+              >
+                <span class="user-id ellipsis">{{ user.value.id }}</span>
+              </td>
+            </ng-container>
+            
+            <!-- Permissions Columns -->
+            <ng-container [matColumnDef]="permission.id" *ngFor="let permission of permissions;">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="center center"
+              >
+                {{ permission.label }}
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let user; let i = index;"
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                [formGroupName]="i"
+                class="cell-user-{{ permission.id }}-{{ user.value.id }}"
+              >
+                <span
+                  *ngIf="isSavingUsersPermissions(users) && hasPermissionChanged(user.value.id, permission.id); else canCheck"
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                >
+                  <mat-spinner color="primary" [diameter]="16" [strokeWidth]="1"></mat-spinner>
+                </span>
+                
+                <ng-template #canCheck>
+                  <mat-checkbox
+                    [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
+                    [color]="getCheckBoxColor(users, permission.id, i)"
+                    [formControlName]="permission.id"
+                    (change)="onUserPermissionChange(users, permission.id, i)"
+                  ></mat-checkbox>
                 </ng-template>
-              </button>
-            </div>
-          </form>
+              </td>
+            </ng-container>
 
-        </mat-card-content>
-      </mat-card>
-    </div>
+            <!-- Action Column -->
+            <ng-container matColumnDef="action">
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                fxFlex
+                fxLayout="row"
+                fxLayoutAlign="end center"
+              >
+                Action
+              </th>
+              <td
+                mat-cell
+                *matCellDef="let user; let i = index;"
+                fxFlex
+                fxLayout="column"
+                fxLayoutAlign="center end"
+                [formGroupName]="i"
+                class="cell-user-action-{{ user.value.id }}"
+              >
+                <button
+                  *ngIf="currentUserId !== user.value.id"
+                  mat-icon-button
+                  matTooltip="Delete"
+                  matTooltipPosition="before"
+                  [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
+                  (click)="removeUser(user.value.id)"
+                  class="action-delete"
+                >
+                  <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let user; columns: displayedColumns;"
+              class="row-{{ user.value.id }} table-row"
+            >
+            </tr>
+          </table>
+
+          <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
+            <button
+              mat-raised-button
+              type="submit"
+              color="primary"
+              [disabled]="hasAnyUserChanged() || isSavingUsersPermissions(users)"
+              class="btn-save-users-permissions text-upper"
+            >
+              <span *ngIf="isSavingUsersPermissions(users); else canSave" fxLayout="row" fxLayoutAlign="start center">
+                <mat-spinner [diameter]="16" [strokeWidth]="1" class="margin-right-x1"></mat-spinner>
+                Saving
+              </span>
+
+              <ng-template #canSave>
+                <fa-icon icon="check" class="margin-right-x1 icon-x2"></fa-icon>
+                <span class="text-upper">Save</span>
+              </ng-template>
+            </button>
+          </div>
+        </form>
+
+      </mat-card-content>
+    </mat-card>
   </div>
 </div>

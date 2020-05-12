@@ -15,8 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 
 <div fxLayout="column" class="margin-top-x4">
-  <form [formGroup]="newWksForm">
-
+  <form [formGroup]="newWksFormGroup">
     <div fxLayout="column" fxFlex class="workspace-create margin-top-x1">
       <div fxFlex class="margin-top-x1">
         <mat-form-field appearance="outline" fxFlexFill class="add-workspace-form-field">
@@ -31,9 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             [errorStateMatcher]="matcher"
             required
           >
-          <mat-hint *ngIf="workspaceNameInput.value?.length !== 100; else isMaxNameLength">{{ workspaceNameInput.value?.length || 0 }}/100</mat-hint>
+          <mat-hint *ngIf="workspaceNameInput.value?.length !== workspaceNameInput.maxLength else isMaxNameLength">
+            {{ workspaceNameInput.value?.length || 0 }}/100
+          </mat-hint>
           <ng-template #isMaxNameLength>
-            <mat-error>Max 100 characters!</mat-error>
+            <mat-error>Max {{ workspaceNameInput.maxLength }} characters!</mat-error>
           </ng-template>
           <span matPrefix><mat-icon class="icon-x2"><fa-icon class="far" [icon]="['far','folder']"></fa-icon></mat-icon></span>
           <mat-error *ngIf="formErrors.workspaceName">{{ formErrors.workspaceName }}</mat-error>
@@ -53,22 +54,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             formControlName="shortDescription"
             class="description-wks"
           ></textarea>
-          <mat-hint *ngIf="txtShortDescription.value?.length !== 200; else isMaxDescLength">{{ txtShortDescription.value?.length || 0 }}/200</mat-hint>
+          <mat-hint *ngIf="txtShortDescription.value?.length !== txtShortDescription.maxLength else isMaxDescLength">
+            {{ txtShortDescription.value?.length || 0 }}/200
+          </mat-hint>
           <ng-template #isMaxDescLength>
-            <mat-error>Max 200 characters!</mat-error>
+            <mat-error>Max {{ txtShortDescription.maxLength }} characters!</mat-error>
           </ng-template>
         </mat-form-field>
       </div>
 
       <app-message
-        class="error-create-wks-details"
         type="error"
         [isFullWidth]="true"
         [msg]="msgError"
+        class="error-create-wks-details"
       ></app-message>
 
       <div fxLayout="row" fxLayoutAlign="end center" class="margin-top-x1">
-        <button mat-raised-button color="primary" (click)="doSubmit()" class="btn-add-workspace" [disabled]="newWksForm.invalid || !canCreate">
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="newWksFormGroup.invalid || !canCreate"
+          (click)="doSubmit()"
+          class="btn-add-workspace"
+        >
           <span fxLayout="row" fxLayoutAlign="center center">
             <mat-icon fxLayoutAlign="center end" class="icon-x2 margin-right-x1"><fa-icon icon="folder-plus"></fa-icon></mat-icon>
             <span
@@ -88,6 +97,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </button>
       </div>
     </div>
-
   </form>
 </div>

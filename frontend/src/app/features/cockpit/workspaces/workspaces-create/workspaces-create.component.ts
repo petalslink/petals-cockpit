@@ -52,13 +52,13 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   @Input()
   set msgErrorInput(value: string) {
     this.msgError = value;
-    if (this.newWksForm !== undefined) {
+    if (this.newWksFormGroup !== undefined) {
       const formValues: {
         workspaceName: string;
         shortDescription: string;
-      } = this.newWksForm.value;
+      } = this.newWksFormGroup.value;
 
-      this.newWksForm = this.fb.group({
+      this.newWksFormGroup = this.fb.group({
         workspaceName: {
           value: formValues.workspaceName,
           disabled: false,
@@ -74,7 +74,7 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   @Output()
   evtCreate = new EventEmitter<{ name?: string; shortDescription?: string }>();
 
-  newWksForm: FormGroup;
+  newWksFormGroup: FormGroup;
 
   formErrors = {
     workspaceName: '',
@@ -86,10 +86,10 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
-    this.newWksForm = this.fb.group({
+    this.newWksFormGroup = this.fb.group({
       workspaceName: [
         '',
-        Validators.compose([Validators.required, Validators.maxLength(200)]),
+        Validators.compose([Validators.required, Validators.maxLength(100)]),
         CustomValidators.existingWorkspaceWithSimilarNameValidator(this.store$),
       ],
       shortDescription: '',
@@ -97,11 +97,14 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
 
     this.reset();
 
-    this.newWksForm.valueChanges
+    this.newWksFormGroup.valueChanges
       .pipe(
         takeUntil(this.onDestroy$),
         tap(() => {
-          this.formErrors = getFormErrors(this.newWksForm, this.formErrors);
+          this.formErrors = getFormErrors(
+            this.newWksFormGroup,
+            this.formErrors
+          );
         })
       )
       .subscribe();
@@ -113,7 +116,7 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
   }
 
   reset() {
-    this.newWksForm.reset({
+    this.newWksFormGroup.reset({
       workspaceName: '',
       shortDescription: '',
     });
@@ -121,13 +124,13 @@ export class WorkspacesCreateComponent implements OnInit, OnDestroy {
 
   doSubmit() {
     const value: { name: string; shortDescription: string } = {
-      name: this.newWksForm.value.workspaceName,
-      shortDescription: this.newWksForm.value.shortDescription,
+      name: this.newWksFormGroup.value.workspaceName,
+      shortDescription: this.newWksFormGroup.value.shortDescription,
     };
 
     this.evtCreate.emit(value);
 
-    this.newWksForm = this.fb.group({
+    this.newWksFormGroup = this.fb.group({
       workspaceName: { value: value.name, disabled: true },
       shortDescription: { value: value.shortDescription, disabled: true },
     });

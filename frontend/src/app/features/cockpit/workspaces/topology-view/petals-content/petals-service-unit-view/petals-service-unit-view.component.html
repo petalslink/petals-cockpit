@@ -14,7 +14,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxFlexFill fxLayout="column" class="wrapper-content">
-  <div *ngIf="serviceUnit$ | async as su" fxLayout="column" fxLayoutGap="20px" class="content">
+  <div
+    *ngIf="serviceUnit$ | async as su"
+    fxLayout="column"
+    fxLayoutGap="20px"
+    class="content"
+  >
     <mat-card fxFlex class="card-component-lifecycle">
       <mat-card-title class="light-bold su-name">About {{ su.name }}</mat-card-title>
 

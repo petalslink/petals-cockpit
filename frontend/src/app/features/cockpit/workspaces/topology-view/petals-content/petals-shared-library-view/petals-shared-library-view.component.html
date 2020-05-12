@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   [isHoverVisible]="isDeleted"
   [message]="'This shared library has been removed'"
 >
-  <div fxLayout="column" fxFlexFill class="wrapper-content">
+  <div fxFlexFill fxLayout="column" class="wrapper-content">
     <div
       *ngIf="sharedLibrary$ | async as sl"
       fxLayout="column"

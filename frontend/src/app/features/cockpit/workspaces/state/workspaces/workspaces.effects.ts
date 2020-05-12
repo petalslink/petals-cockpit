@@ -214,31 +214,56 @@ export class WorkspacesEffects {
   );
 
   @Effect()
-  setDescriptions$: Observable<Action> = this.actions$.pipe(
-    ofType<Workspaces.SetDescriptions>(Workspaces.SetDescriptionsType),
+  updateWorkspaceDetails$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.UpdateWorkspaceDetails>(
+      Workspaces.UpdateWorkspaceDetailsType
+    ),
     switchMap(action =>
       this.workspacesService
-        .setDescriptions(
+        .putWorkspaceDetails(
           action.payload.id,
+          action.payload.name,
           action.payload.shortDescription,
           action.payload.description
         )
         .pipe(
-          map(_ => new Workspaces.SetDescriptionsSuccess(action.payload)),
+          map(
+            _ => new Workspaces.UpdateWorkspaceDetailsSuccess(action.payload)
+          ),
           catchError((err: HttpErrorResponse) => {
             if (environment.debug) {
               console.group();
               console.warn(
-                `Error catched in workspaces.effects: ofType(Workspaces.SetDescriptions)`
+                `Error catched in workspaces.effects: ofType(Workspaces.UpdateWorkspaceDetails)`
               );
               console.error(err);
               console.groupEnd();
             }
 
-            return of(new Workspaces.SetDescriptionsError(action.payload));
+            this.notifications.error(
+              `Workspace`,
+              `An error occurred while updating workspace details.`
+            );
+
+            return of(
+              new Workspaces.UpdateWorkspaceDetailsError(action.payload)
+            );
           })
         )
     )
+  );
+
+  @Effect()
+  updateWorkspaceDetailsSuccess$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.UpdateWorkspaceDetailsSuccess>(
+      Workspaces.UpdateWorkspaceDetailsSuccessType
+    ),
+    map(action => {
+      return new Workspaces.EditWorkspaceDetails({
+        id: action.payload.id,
+        isEditDetailsMode: false,
+      });
+    })
   );
 
   @Effect()

@@ -117,31 +117,43 @@ export namespace Workspaces {
     constructor(public readonly payload: IWorkspaceBackendDetails) {}
   }
 
-  export const SetDescriptionsType = '[Workspaces] Set descriptions';
-  export class SetDescriptions implements Action {
-    readonly type = SetDescriptionsType;
+  export const EditWorkspaceDetailsType = '[Workspaces] Edit workspace details';
+  export class EditWorkspaceDetails implements Action {
+    readonly type = EditWorkspaceDetailsType;
+    constructor(
+      public readonly payload: { id: string; isEditDetailsMode: boolean }
+    ) {}
+  }
+
+  export const UpdateWorkspaceDetailsType =
+    '[Workspaces] Update workspace details';
+  export class UpdateWorkspaceDetails implements Action {
+    readonly type = UpdateWorkspaceDetailsType;
     constructor(
       public readonly payload: {
         id: string;
+        name: string;
         shortDescription: string;
         description: string;
       }
     ) {}
   }
 
-  export const SetDescriptionsErrorType = '[Workspaces] Set descriptions error';
-  export class SetDescriptionsError implements Action {
-    readonly type = SetDescriptionsErrorType;
+  export const UpdateWorkspaceDetailsErrorType =
+    '[Workspaces] Update workspace details error';
+  export class UpdateWorkspaceDetailsError implements Action {
+    readonly type = UpdateWorkspaceDetailsErrorType;
     constructor(public readonly payload: { id: string }) {}
   }
 
-  export const SetDescriptionsSuccessType =
-    '[Workspaces] Set descriptions success';
-  export class SetDescriptionsSuccess implements Action {
-    readonly type = SetDescriptionsSuccessType;
+  export const UpdateWorkspaceDetailsSuccessType =
+    '[Workspaces] Update workspace details success';
+  export class UpdateWorkspaceDetailsSuccess implements Action {
+    readonly type = UpdateWorkspaceDetailsSuccessType;
     constructor(
       public readonly payload: {
         id: string;
+        name: string;
         shortDescription: string;
         description: string;
       }

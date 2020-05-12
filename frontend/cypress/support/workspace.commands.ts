@@ -116,15 +116,47 @@ Cypress.Commands.add('expectDetachBusListToBe', listGridItemDetachBusNames => {
 });
 
 Cypress.Commands.add(
+  'updateWorkspaceName',
+  (workspaceNameText, hintLabel?, errorLabel?) => {
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName)
+      .clear()
+      .expectFocused()
+      .type(workspaceNameText);
+
+    if (hintLabel) {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.formFields.workspaceNameFormField)
+        .find(`.mat-hint`)
+        .should('contain', hintLabel);
+    }
+    if (errorLabel) {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.formFields.workspaceNameFormField)
+        .find(`.mat-error`)
+        .should('contain', errorLabel);
+    }
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+      .should('be.enabled')
+      .click();
+  }
+);
+
+Cypress.Commands.add(
   'updateShortDescription',
   (shortDescriptionText, hintLabel?, errorLabel?) => {
     cy
-      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
       .should('be.disabled');
 
     cy
       .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
-      .expectFocused()
       .type(shortDescriptionText);
 
     if (hintLabel) {
@@ -141,14 +173,16 @@ Cypress.Commands.add(
     }
 
     cy
-      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
       .should('be.enabled')
       .click();
   }
 );
 
 Cypress.Commands.add('updateDescription', (descriptionText, hintLabel?) => {
-  cy.get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions).should('be.disabled');
+  cy
+    .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
+    .should('be.disabled');
 
   cy
     .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
@@ -162,7 +196,7 @@ Cypress.Commands.add('updateDescription', (descriptionText, hintLabel?) => {
   }
 
   cy
-    .get(WORKSPACE_OVERVIEW_DOM.buttons.saveDescriptions)
+    .get(WORKSPACE_OVERVIEW_DOM.buttons.saveWorkspaceDetails)
     .should('be.enabled')
     .click();
 });
