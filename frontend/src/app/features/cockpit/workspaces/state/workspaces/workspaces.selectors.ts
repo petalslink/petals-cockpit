@@ -85,6 +85,191 @@ export function getCurrentUserWorkspaces(
   );
 }
 
+export interface IBreadcrumb {
+  id?: string;
+  name: string;
+  type: string;
+  svgIcon?: string;
+  icon?: string;
+}
+
+export const getCurrentBreadcrumb = createSelector(
+  (state: IStore) => getCurrentWorkspace(state),
+  getBusesById,
+  getContainersById,
+  getComponentsById,
+  getServiceUnitsById,
+  getServiceAssembliesById,
+  getSharedLibrariesById,
+  (
+    currentWorkspace: IWorkspaceRow,
+    allBuses: any,
+    allCont: any,
+    allComp: any,
+    allSu: any,
+    allSa: any,
+    allSl: any,
+    url: string
+  ): IBreadcrumb[] => {
+    if (url.endsWith('/workspaces/' + currentWorkspace.id)) {
+      return [
+        {
+          id: currentWorkspace.id,
+          name: currentWorkspace.name,
+          type: 'workspaces',
+          icon: 'folder',
+        },
+      ];
+    }
+
+    // topology breadcrumbs
+    if (url.includes('/workspaces/' + currentWorkspace.id + '/petals')) {
+      const mainBreadcrumbs: IBreadcrumb[] = [
+        {
+          id: currentWorkspace.id,
+          name: currentWorkspace.name,
+          type: 'workspaces',
+          icon: 'folder',
+        },
+        {
+          name: 'Topology',
+          type: 'category',
+        },
+      ];
+      if (url.endsWith('petals')) {
+        return mainBreadcrumbs;
+      } else {
+        const splitUrl = url.split('/');
+        const currentItemId = splitUrl[splitUrl.length - 1];
+
+        if (url.includes('petals/buses')) {
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allBuses[currentItemId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+        } else if (url.includes('petals/containers')) {
+          mainBreadcrumbs.push({
+            id: allBuses[allCont[currentItemId].busId].id,
+            name: allBuses[allCont[currentItemId].busId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allCont[currentItemId].name,
+            type: 'containers',
+            icon: `dns`,
+          });
+        } else if (url.includes('petals/components')) {
+          mainBreadcrumbs.push({
+            id: allBuses[allCont[allComp[currentItemId].containerId].busId].id,
+            name:
+              allBuses[allCont[allComp[currentItemId].containerId].busId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+          mainBreadcrumbs.push({
+            id: allCont[allComp[currentItemId].containerId].id,
+            name: allCont[allComp[currentItemId].containerId].name,
+            type: 'containers',
+            icon: `dns`,
+          });
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allComp[currentItemId].name,
+            type: 'components',
+            svgIcon: `component`,
+          });
+        } else if (url.includes('petals/service-units')) {
+          mainBreadcrumbs.push({
+            id: allBuses[allCont[allSu[currentItemId].containerId].busId].id,
+            name:
+              allBuses[allCont[allSu[currentItemId].containerId].busId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+          mainBreadcrumbs.push({
+            id: allCont[allSu[currentItemId].containerId].id,
+            name: allCont[allSu[currentItemId].containerId].name,
+            type: 'containers',
+            icon: `dns`,
+          });
+          mainBreadcrumbs.push({
+            id: allComp[allSu[currentItemId].componentId].id,
+            name: allComp[allSu[currentItemId].componentId].name,
+            type: 'components',
+            svgIcon: `component`,
+          });
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allSu[currentItemId].name,
+            type: 'service-units',
+            svgIcon: `su`,
+          });
+        } else if (url.includes('petals/service-assemblies')) {
+          mainBreadcrumbs.push({
+            id: allBuses[allCont[allSa[currentItemId].containerId].busId].id,
+            name:
+              allBuses[allCont[allSa[currentItemId].containerId].busId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+          mainBreadcrumbs.push({
+            id: allCont[allSa[currentItemId].containerId].id,
+            name: allCont[allSa[currentItemId].containerId].name,
+            type: 'containers',
+            icon: `dns`,
+          });
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allSa[currentItemId].name,
+            type: 'service-assemblies',
+            svgIcon: `sa`,
+          });
+        } else if (url.includes('petals/shared-libraries')) {
+          mainBreadcrumbs.push({
+            id: allBuses[allCont[allSl[currentItemId].containerId].busId].id,
+            name:
+              allBuses[allCont[allSl[currentItemId].containerId].busId].name,
+            type: 'buses',
+            svgIcon: `bus`,
+          });
+          mainBreadcrumbs.push({
+            id: allCont[allSl[currentItemId].containerId].id,
+            name: allCont[allSl[currentItemId].containerId].name,
+            type: 'containers',
+            icon: `dns`,
+          });
+          return mainBreadcrumbs.concat({
+            id: currentItemId,
+            name: allSl[currentItemId].name,
+            type: 'shared-libraries',
+            svgIcon: `sl`,
+          });
+        }
+      }
+    }
+
+    // services breadcrumbs
+    if (url.includes('/workspaces/' + currentWorkspace.id + '/services')) {
+      return [
+        {
+          id: currentWorkspace.id,
+          name: currentWorkspace.name,
+          type: 'workspaces',
+          icon: 'folder',
+        },
+        {
+          name: 'Service',
+          type: 'category',
+        },
+      ];
+    }
+  }
+);
+
 // -----------------------------------------------------------
 
 export function getCurrentWorkspace(store: IStore): IWorkspaceRow {

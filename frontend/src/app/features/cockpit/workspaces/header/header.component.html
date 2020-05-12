@@ -16,6 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <div *ngIf="workspace.id" fxLayout="column" class="toolbar mat-elevation-z4">
   <mat-toolbar role="header">
     <app-menu [selectedWksId]="workspace.id" [workspacesList]="workspacesList"></app-menu>
-    <app-breadcrumb [workspace]="workspace"></app-breadcrumb>
+    <app-breadcrumb [workspace]="workspace" [breadcrumbList]="breadcrumbList"></app-breadcrumb>
   </mat-toolbar>
 </div>

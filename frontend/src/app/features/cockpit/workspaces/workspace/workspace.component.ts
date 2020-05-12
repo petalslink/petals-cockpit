@@ -17,11 +17,18 @@
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { select, Store } from '@ngrx/store';
 
 import { Observable, Subject } from 'rxjs';
-import { filter, switchMap, takeUntil, tap } from 'rxjs/operators';
+import {
+  filter,
+  startWith,
+  switchMap,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 
 import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { IStore } from '@shared/state/store.interface';
@@ -32,8 +39,10 @@ import {
   IWorkspaces,
 } from '@wks/state/workspaces/workspaces.interface';
 import {
+  getCurrentBreadcrumb,
   getCurrentUserWorkspaces,
   getCurrentWorkspace,
+  IBreadcrumb,
 } from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
@@ -49,6 +58,8 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   workspace$: Observable<IWorkspaceRow>;
   isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
+
+  breadcrumbList: IBreadcrumb[];
 
   constructor(
     private store$: Store<IStore>,
@@ -86,6 +97,25 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
               })
             )
         )
+      )
+      .subscribe();
+
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.onDestroy$),
+        startWith({
+          url: this.router.url,
+        }),
+        tap((evt: NavigationEnd) => {
+          this.store$
+            .pipe(
+              select(getCurrentBreadcrumb, evt.url),
+              take(1),
+              tap(breadcrumbList => (this.breadcrumbList = breadcrumbList))
+            )
+            .subscribe();
+        })
       )
       .subscribe();
 
