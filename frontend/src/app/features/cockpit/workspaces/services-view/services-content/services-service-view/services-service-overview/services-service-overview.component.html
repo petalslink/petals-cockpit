@@ -15,10 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="content">
   <div fxLayout="column" class="central-content">
-    
+
     <mat-card fxFlex class="card-service-details">
       <mat-list class="about-service">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-service"></span>
           <span matLine class="text-upper margin-left-x1"><b>About</b></span>
@@ -26,10 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-list-item class="item-service-content">
           <p fxLayout="row" fxLayoutAlign="start center">
-            <mat-icon 
-              color="primary" 
-              svgIcon="namespace" 
-              matTooltip="Namespace" 
+            <mat-icon
+              color="primary"
+              svgIcon="namespace"
+              matTooltip="Namespace"
               matTooltipPosition="above"
             ></mat-icon>
             <span fxFlex class="margin-left-x1 item-namespace break">{{ service.namespace }}</span>
@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-list>
 
       <mat-nav-list class="nav-list-service-interfaces">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-interface"></span>
           <span matLine class="text-upper margin-left-x1"><b>Interfaces</b></span>
@@ -50,19 +50,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <a>
               <p fxLayout="row" fxLayoutAlign="start center">
                 <span class="item-localpart break">{{ interface.localpart }}</span>
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="gotoDetails" 
-                  class="margin-left-x1" 
-                  matTooltip="Go to interface" 
+                <mat-icon
+                  color="primary"
+                  svgIcon="gotoDetails"
+                  class="margin-left-x1"
+                  matTooltip="Go to interface"
                   matTooltipPosition="after"
                 ></mat-icon>
               </p>
               <p fxLayout="row" fxLayoutAlign="start center">
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="namespace" 
-                  matTooltip="Namespace" 
+                <mat-icon
+                  color="primary"
+                  svgIcon="namespace"
+                  matTooltip="Namespace"
                   matTooltipPosition="above"
                 ></mat-icon>
                 <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-divider inset *ngIf="!isLast"></mat-divider>
 
         </ng-container>
-        
+
       </mat-nav-list>
 
       <mat-nav-list class="nav-list-service-endpoints">
@@ -91,11 +91,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <p fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon color="primary" svgIcon="component"></mat-icon>
                 <span class="margin-left-x1 item-name break">{{ endpoint.name }}</span>
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="gotoDetails" 
-                  class="margin-left-x1" 
-                  matTooltip="Go to endpoint" 
+                <mat-icon
+                  color="primary"
+                  svgIcon="gotoDetails"
+                  class="margin-left-x1"
+                  matTooltip="Go to endpoint"
                   matTooltipPosition="above"
                 ></mat-icon>
               </p>
@@ -103,11 +103,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-list-item>
 
           <mat-divider inset *ngIf="!isLast"></mat-divider>
-          
+
         </ng-container>
 
       </mat-nav-list>
     </mat-card>
-    
+
   </div>
 </div>

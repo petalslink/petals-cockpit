@@ -13,16 +13,16 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-header 
-  [isLargeScreen]="isLargeScreen$ | async" 
-  [ui]="ui$ | async" 
+<app-header
+  [isLargeScreen]="isLargeScreen$ | async"
+  [ui]="ui$ | async"
   [workspace]="workspace$ | async"
   [workspacesIdsNames]="workspacesIdsNames$ | async"
 ></app-header>
 
-<div 
-  fxLayout="column" 
-  fxFlex 
+<div
+  fxLayout="column"
+  fxFlex
   [style.display]="!(isFetchingWorkspace$ | async) ? null : 'none'"
   class="page-workspace"
   ><router-outlet></router-outlet></div>

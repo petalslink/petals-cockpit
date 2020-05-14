@@ -24,6 +24,7 @@ const sourceFiles = {
   html: [],
 };
 
+const trailingWhitespacesRegex = /[ \t]+$/gm;
 const headerRegex = new RegExp(
   '(Copyright \\(C\\) )(\\d\\d\\d\\d)(-\\d\\d\\d\\d)?( Linagora)'
 );
@@ -71,11 +72,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->`;
 // arguments
 const args = {
   dry: false,
+  copyrights: false,
+  whitespaces: false,
 };
 
 process.argv.forEach(arg => {
-  if (arg === '--dry') {
-    args.dry = true;
+  switch (arg) {
+    case '--dry':
+      args.dry = true;
+      break;
+    case '--copyrights':
+      args.copyrights = true;
+      break;
+    case '--whitespaces':
+      args.whitespaces = true;
+      break;
   }
 });
 
@@ -103,6 +114,25 @@ const generateFileTree = (dir, filelist) => {
   });
 
   return filelist;
+};
+
+const checkTrailingWhitespacesAndCleanIfNeeded = (
+  fileType,
+  filePath,
+  stats
+) => {
+  let file = fs.readFileSync(filePath).toString();
+  let fileChanged = file.replace(trailingWhitespacesRegex, '');
+
+  if (file === fileChanged) {
+    return;
+  }
+
+  stats[fileType]++;
+
+  if (!args.dry) {
+    fs.writeFileSync(filePath, fileChanged);
+  }
 };
 
 // check if a header is already available and
@@ -171,39 +201,74 @@ const main = () => {
   });
 
   // init stats
-  let stats = {};
-  Object.keys(fileTree).forEach(fileType => (stats[fileType] = 0));
+  let copyrightsStats = {};
+  let trailingWhitespacesStats = {};
+  Object.keys(fileTree).forEach(fileType => {
+    copyrightsStats[fileType] = 0;
+    trailingWhitespacesStats[fileType] = 0;
+  });
 
   // for each type of file
   Object.keys(fileTree).forEach(fileType => {
     let filesPath = fileTree[fileType];
 
     // save split header here otherwise the split will happen
-    // as many time as we call checkHeaderAndInjectIfNeeded function
+    // as many time as we call check functions
     let header = headers[fileType];
 
-    filesPath.forEach(filePath =>
-      checkHeaderAndInjectIfNeeded(fileType, filePath, header, stats)
-    );
+    filesPath.forEach(filePath => {
+      if (args.whitespaces) {
+        checkTrailingWhitespacesAndCleanIfNeeded(
+          fileType,
+          filePath,
+          trailingWhitespacesStats
+        );
+      }
+      if (args.copyrights) {
+        checkHeaderAndInjectIfNeeded(
+          fileType,
+          filePath,
+          header,
+          copyrightsStats
+        );
+      }
+    });
   });
 
-  let headerOnEveryFile =
-    Object.keys(stats)
-      .map(fileType => stats[fileType])
-      .reduce((previous, current) => previous + current) === 0;
+  const noFileWithTrailingWhitespaces = Object.keys(trailingWhitespacesStats)
+    .map(fileType => trailingWhitespacesStats[fileType])
+    .every(count => count === 0);
+  const headerOnEveryFile = Object.keys(copyrightsStats)
+    .map(fileType => copyrightsStats[fileType])
+    .every(count => count === 0);
 
   // display stats
-  Object.keys(stats).forEach(fileType =>
-    console.log(
-      `${args.dry && stats[fileType] > 0 ? '[ERROR] ' : ''}${
-        stats[fileType]
-      } ${fileType} file${stats[fileType] > 1 ? 's' : ''} ${
-        args.dry ? `don't have a header` : `updated`
-      }`
-    )
-  );
+  if (args.whitespaces) {
+    console.log('Trailing whitespaces:');
+    Object.keys(trailingWhitespacesStats).forEach(fileType =>
+      console.log(
+        `${
+          args.dry && trailingWhitespacesStats[fileType] > 0 ? '[ERROR] ' : ''
+        }${trailingWhitespacesStats[fileType]} ${fileType} file${
+          trailingWhitespacesStats[fileType] > 1 ? 's' : ''
+        } ${args.dry ? `have trailing whitespaces` : `cleaned`}`
+      )
+    );
+  }
+  if (args.copyrights) {
+    console.log('Copyrights:');
+    Object.keys(copyrightsStats).forEach(fileType =>
+      console.log(
+        `${args.dry && copyrightsStats[fileType] > 0 ? '[ERROR] ' : ''}${
+          copyrightsStats[fileType]
+        } ${fileType} file${copyrightsStats[fileType] > 1 ? 's' : ''} ${
+          args.dry ? `don't have a header` : `updated`
+        }`
+      )
+    );
+  }
 
-  if (!headerOnEveryFile) {
+  if (!headerOnEveryFile || !noFileWithTrailingWhitespaces) {
     process.exit(1);
   }
 

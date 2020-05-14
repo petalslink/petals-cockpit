@@ -32,23 +32,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-card-content>
     </div>
 
-    <mat-card-actions 
-      fxFlexFill 
-      fxLayoutAlign="end center" 
+    <mat-card-actions
+      fxFlexFill
+      fxLayoutAlign="end center"
       class="wrapper-btn-select-file"
     >
-      <input 
-        #selectFile 
-        type="file" 
-        name="choose-file-hidden" 
-        [accept]="acceptedFileType" 
-        (change)="fileChange($event)" 
+      <input
+        #selectFile
+        type="file"
+        name="choose-file-hidden"
+        [accept]="acceptedFileType"
+        (change)="fileChange($event)"
         required
       >
       <button
         mat-raised-button
         color="primary"
-        [disabled]="(percentage < 100 && !error) || (selectedFileInformation && !isFileParsed)" 
+        [disabled]="(percentage < 100 && !error) || (selectedFileInformation && !isFileParsed)"
         (click)="selectFile.click()"
         class="btn-choose-file text-upper"
       >

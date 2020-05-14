@@ -15,52 +15,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="content">
   <div fxLayout="column" class="central-content">
-    
+
     <mat-card fxFlex class="card-endpoint-details">
       <mat-nav-list class="nav-list-endpoint-location">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-endpoint"></span>
           <span matLine class="text-upper margin-left-x1"><b>Location</b></span>
         </div>
-        
+
         <mat-list-item class="item-endpoint-bus" [routerLink]="['/workspaces', workspaceId, 'petals', 'buses', endpoint.bus.id]">
           <p fxLayout="row" fxLayoutAlign="start center">
             <mat-icon color="primary" svgIcon="bus"></mat-icon>
             <span class="margin-left-x1 bus-name break">{{ endpoint.bus.name }}</span>
-            <mat-icon 
-              color="primary" 
-              svgIcon="gotoDetails" 
-              class="margin-left-x1" 
-              matTooltip="Go to bus" 
+            <mat-icon
+              color="primary"
+              svgIcon="gotoDetails"
+              class="margin-left-x1"
+              matTooltip="Go to bus"
               matTooltipPosition="above"
             ></mat-icon>
           </p>
         </mat-list-item>
-        
+
         <mat-list-item class="item-endpoint-container" [routerLink]="['/workspaces', workspaceId, 'petals', 'containers', endpoint.container.id]">
           <p fxLayout="row" fxLayoutAlign="start center">
             <mat-icon color="primary">dns</mat-icon>
             <span class="margin-left-x1 container-name break">{{ endpoint.container.name }}</span>
-            <mat-icon 
-              color="primary" 
-              svgIcon="gotoDetails" 
-              class="margin-left-x1" 
-              matTooltip="Go to container" 
+            <mat-icon
+              color="primary"
+              svgIcon="gotoDetails"
+              class="margin-left-x1"
+              matTooltip="Go to container"
               matTooltipPosition="above"
             ></mat-icon>
           </p>
         </mat-list-item>
-        
+
         <mat-list-item class="item-endpoint-component" [routerLink]="['/workspaces', workspaceId, 'petals', 'components', endpoint.component.id]">
           <p fxLayout="row" fxLayoutAlign="start center">
             <mat-icon color="primary" svgIcon="component"></mat-icon>
             <span class="margin-left-x1 component-name break">{{ endpoint.component.name }}</span>
-            <mat-icon 
-              color="primary" 
-              svgIcon="gotoDetails" 
-              class="margin-left-x1" 
-              matTooltip="Go to component" 
+            <mat-icon
+              color="primary"
+              svgIcon="gotoDetails"
+              class="margin-left-x1"
+              matTooltip="Go to component"
               matTooltipPosition="above"
             ></mat-icon>
           </p>
@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-nav-list>
 
       <mat-nav-list class="nav-list-endpoint-service">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-service"></span>
           <span matLine class="text-upper margin-left-x1"><b>Service</b></span>
@@ -79,27 +79,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <a>
             <p fxLayout="row" fxLayoutAlign="start center">
               <span class="item-localpart break">{{ endpoint.service.localpart }}</span>
-              <mat-icon 
-                color="primary" 
-                svgIcon="gotoDetails" 
-                class="margin-left-x1" 
-                matTooltip="Go to service" 
+              <mat-icon
+                color="primary"
+                svgIcon="gotoDetails"
+                class="margin-left-x1"
+                matTooltip="Go to service"
                 matTooltipPosition="after"
               ></mat-icon>
             </p>
             <p fxLayout="row" fxLayoutAlign="start center">
-              <mat-icon 
-                color="primary" 
-                svgIcon="namespace" 
-                matTooltip="Namespace" 
+              <mat-icon
+                color="primary"
+                svgIcon="namespace"
+                matTooltip="Namespace"
                 matTooltipPosition="above"
               ></mat-icon>
               <span fxFlex class="margin-left-x1 item-namespace break">{{ endpoint.service.namespace }}</span>
             </p>
           </a>
-          
+
         </mat-list-item>
-        
+
       </mat-nav-list>
 
       <mat-nav-list class="nav-list-endpoint-interfaces">
@@ -116,19 +116,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <a>
               <p fxLayout="row" fxLayoutAlign="start center">
                 <span class="item-localpart break">{{ interface.localpart }}</span>
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="gotoDetails" 
-                  class="margin-left-x1" 
-                  matTooltip="Go to interface" 
+                <mat-icon
+                  color="primary"
+                  svgIcon="gotoDetails"
+                  class="margin-left-x1"
+                  matTooltip="Go to interface"
                   matTooltipPosition="after"
                 ></mat-icon>
               </p>
               <p fxLayout="row" matTooltip="Namespace" matTooltipPosition="above">
-                <mat-icon 
-                  color="primary" 
-                  svgIcon="namespace" 
-                  matTooltip="Namespace" 
+                <mat-icon
+                  color="primary"
+                  svgIcon="namespace"
+                  matTooltip="Namespace"
                   matTooltipPosition="above"
                 ></mat-icon>
                 <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
@@ -137,11 +137,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-list-item>
 
           <mat-divider inset *ngIf="!isLast"></mat-divider>
-          
+
         </ng-container>
 
       </mat-nav-list>
     </mat-card>
-    
+
   </div>
 </div>

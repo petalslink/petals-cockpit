@@ -15,9 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-workspace-element [resourceObservable]="endpoint$" deletedMessage="This endpoint has been removed" #we>
 
-  <app-services-endpoint-overview 
-    *appWorkspaceElementTab="'Overview'" 
-    [endpoint]="we.resource" 
+  <app-services-endpoint-overview
+    *appWorkspaceElementTab="'Overview'"
+    [endpoint]="we.resource"
     [workspaceId]="workspaceId$ | async"
     fxFlexFill
   ></app-services-endpoint-overview>
