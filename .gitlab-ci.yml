@@ -11,6 +11,7 @@
 
 stages:
   - build
+  - report
   - package
   - integration
 
@@ -41,13 +42,13 @@ variables:
     # see https://github.com/yarnpkg/yarn/issues/986 or https://github.com/yarnpkg/yarn/issues/988 for optimizing
     - yarn config set cache-folder $PWD/$YARN_CACHE_DIRECTORY --global
     - yarn global add spa-http-server
-    - du -hs $PWD/$YARN_CACHE_DIRECTORY || true
+    - du --human-readable --summarize $PWD/$YARN_CACHE_DIRECTORY || true
     - cd frontend
     - export PATH=`yarn bin`:$PATH
     - time yarn --frozen-lockfile --link-duplicates --non-interactive
     - yarn run webdriver-manager update --versions.chrome=73.0.3683.68
     - ./node_modules/protractor/bin/webdriver-manager update --versions.chrome=73.0.3683.68
-    - du -hs node_modules || true
+    - du --human-readable --summarize node_modules || true
     - cd ..
   cache:
     key: node-yarn
@@ -89,20 +90,36 @@ build-backend:
   script:
     # let's lock the version used for SNAPSHOT dependencies to
     # ensure they are the same in the other jobs
-    - maven -pl backend -am versions:lock-snapshots
+    - maven --projects backend --also-make versions:lock-snapshots
     # deploy to the staging directory
     # ignore liquibase info logs flooding (to prevent gitlab log size hitting its default limit)
     # See issue https://gitlab.com/linagora/petals-cockpit/issues/544
-    - maven_build -pl backend -am deploy | grep -vE "^INFO  \[.*\] liquibase.*$"
+    - maven_build --projects backend --also-make deploy | grep -vE "^INFO  \[.*\] liquibase.*$"
     # build the docs
-    - maven -pl backend -am com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
+    - maven --projects backend --also-make com.webcohesion.enunciate:enunciate-slim-maven-plugin:docs && mv backend/target/site/apidocs backend-apidocs || true # this can fail
   artifacts:
     expire_in: 1 week
     paths:
       - backend-apidocs
       - $M2_STAGING_DIRECTORY
+      - "**/target"
   tags:
     - docker
+
+
+sonar-backend:
+  <<: *mvn-java-8
+  variables:
+    GIT_DEPTH: "0"
+  stage: report
+  allow_failure: true
+  dependencies:
+    - build-backend
+  only:
+    - master
+  script:
+    - maven_build --file backend/pom.xml sonar:sonar -Dsonar.projectKey=petals-cockpit-backend
+
 
 check-frontend:
   <<: *node-java-yarn
@@ -140,7 +157,7 @@ test-frontend:
     - nohup http-server --push-state --silent -p 4200 dist &
     # save the PID as we run it in background
     - echo $! > pid-nohup.txt
-    - sleep 5
+    - sleep 5s
     - time yarn cypress:e2e-ldap
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
@@ -150,16 +167,34 @@ test-frontend:
     - nohup http-server --push-state --silent -p 4200 dist &
     # save the PID as we run it in background
     - echo $! > pid-nohup.txt
-    - sleep 5
+    - sleep 5s
     - time yarn cypress:e2e-no-ldap
     - kill -9 $(cat pid-nohup.txt)
     - rm pid-nohup.txt
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - frontend/coverage/lcov.info
   # Protractor tests are unstable and may fail unexpectedly
   # this workaround has to be removed once we stop relying on protractor
   retry: 1
   tags:
     - docker
 
+
+sonar-frontend:
+  <<: *node-java-yarn
+  variables:
+    GIT_DEPTH: "0"
+  stage: report
+  allow_failure: true
+  dependencies:
+    - test-frontend
+  only:
+    - master
+  script:
+    - cd frontend
+    - yarn run sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL
 
 build-frontend:
   <<: *node-java-yarn
@@ -173,7 +208,7 @@ build-frontend:
     - cd frontend
     # build the final frontend for the product
     - time yarn run build:product:ci && mv dist ../frontend-dist
-    - du -hs ../frontend-dist
+    - du --human-readable --summarize ../frontend-dist
   artifacts:
     expire_in: 1 week
     paths:
@@ -192,7 +227,7 @@ build-frontend-pages:
     - cd frontend
     # build the demo for the gitlab pages
     - time yarn run build:demo:ci && mv dist ../frontend-demo || true # this can fail
-    - du -hs ../frontend-demo || true
+    - du --human-readable --summarize ../frontend-demo || true
   artifacts:
     expire_in: 1 day
     paths:
@@ -210,8 +245,8 @@ build-frontend-pages:
   script:
     - mv frontend-dist frontend/dist
     - maven dependency:purge-local-repository --non-recursive -DmanualInclude="org.ow2.petals:petals-cockpit-server,org.ow2.petals:petals-cockpit-parent" -DreResolve=false -DsnapshotsOnly=true
-    - maven -pl cockpit verify antrun:run@build-product-dist
-    - export COCKPIT_VERSION=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed -E 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
+    - maven --projects cockpit verify antrun:run@build-product-dist
+    - export COCKPIT_VERSION=`ls cockpit/target/petals-cockpit-*-capsule.jar | sed --regexp-extended 's/.*petals-cockpit-(.*)-capsule.jar/\1/'`
     # see https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1664
     - echo $COCKPIT_VERSION > version.txt
     - mv cockpit/target/dist petals-cockpit-$COCKPIT_VERSION

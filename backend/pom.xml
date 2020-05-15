@@ -25,6 +25,7 @@
   </parent>
 
   <artifactId>petals-cockpit-server</artifactId>
+  <name>Petals Cockpit - Backend</name>
   <packaging>jar</packaging>
 
   <properties>
