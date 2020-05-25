@@ -15,10 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <div fxLayout="column" class="content">
   <div fxLayout="column" class="central-content">
-    
+
     <mat-card fxFlex class="card-interface-details">
       <mat-list class="about-interface">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-interface"></span>
           <span matLine class="text-upper margin-left-x1"><b>About</b></span>
@@ -26,10 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <mat-list-item class="item-interface-content">
           <p fxLayout="row" fxLayoutAlign="start center">
-            <mat-icon 
-              color="primary" 
-              svgIcon="namespace" 
-              matTooltip="Namespace" 
+            <mat-icon
+              color="primary"
+              svgIcon="namespace"
+              matTooltip="Namespace"
               matTooltipPosition="above"
             ></mat-icon>
             <span fxFlex class="margin-left-x1 item-namespace break">{{ interface.namespace }}</span>
@@ -39,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-list>
 
       <mat-nav-list class="nav-list-interface-services">
-        
+
         <div fxLayout="row" fxLayoutAlign="start center" class="text-upper">
           <span matCardAvatar class="img-card-service"></span>
           <span matLine class="text-upper margin-left-x1"><b>Services</b></span>
@@ -55,10 +55,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 </span>
               </p>
               <p fxLayout="row" fxLayoutAlign="start center">
-                <mat-icon 
-                  color="primary" 
+                <mat-icon
+                  color="primary"
                   svgIcon="namespace"
-                  matTooltip="Namespace" 
+                  matTooltip="Namespace"
                   matTooltipPosition="above"
                 ></mat-icon>
                 <span fxFlex class="margin-left-x1 item-namespace break">{{ service.namespace }}</span>
@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           <mat-divider inset *ngIf="!isLast"></mat-divider>
 
         </ng-container>
-        
+
       </mat-nav-list>
 
       <mat-nav-list class="nav-list-interface-endpoints">
@@ -87,11 +87,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <p fxLayout="row" fxLayoutAlign="start center">
                 <mat-icon color="primary" svgIcon="component"></mat-icon>
                 <span class="margin-left-x1 item-name break">{{ endpoint.name }}</span>
-                <mat-icon 
-                  class="margin-left-x1" 
-                  color="primary" 
+                <mat-icon
+                  class="margin-left-x1"
+                  color="primary"
                   svgIcon="gotoDetails"
-                  matTooltip="Go to endpoint" 
+                  matTooltip="Go to endpoint"
                   matTooltipPosition="above"
                 ></mat-icon>
               </p>
@@ -99,11 +99,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           </mat-list-item>
 
           <mat-divider inset *ngIf="!isLast"></mat-divider>
-          
+
         </ng-container>
 
       </mat-nav-list>
     </mat-card>
-    
+
   </div>
 </div>

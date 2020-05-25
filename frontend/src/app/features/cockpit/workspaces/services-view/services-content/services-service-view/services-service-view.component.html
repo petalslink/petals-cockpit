@@ -15,9 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <app-workspace-element [resourceObservable]="service$" deletedMessage="This service has been removed" #we>
 
-  <app-services-service-overview 
-    *appWorkspaceElementTab="'Overview'" 
-    [service]="we.resource" 
+  <app-services-service-overview
+    *appWorkspaceElementTab="'Overview'"
+    [service]="we.resource"
     [workspaceId]="workspaceId$ | async"
     fxFlexFill
   ></app-services-service-overview>

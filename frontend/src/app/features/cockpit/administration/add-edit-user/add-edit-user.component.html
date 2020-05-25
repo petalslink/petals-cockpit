@@ -16,10 +16,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <form novalidate [formGroup]="userManagementForm">
   <div fxLayout="column" class="user-form">
     <div fxLayout="column wrap" fxLayoutGap="10px">
-      <div 
-        fxLayoutAlign="start center" 
-        fxLayoutAlign.md="center center" 
-        fxLayoutAlign.sm="center center" 
+      <div
+        fxLayoutAlign="start center"
+        fxLayoutAlign.md="center center"
+        fxLayoutAlign.sm="center center"
         class="margin-top-x1"
       >
         <mat-form-field *ngIf="!editUser" fxFlex fxFlex.md="50%" fxFlex.sm="50%">
@@ -43,11 +43,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </mat-form-field>
       </div>
       <div fxLayoutAlign="flex-end center" fxLayoutAlign.md="center center" fxLayoutAlign.sm="center center">
-        <mat-slide-toggle 
+        <mat-slide-toggle
           fxLayoutAlign="end center"
           fxLayoutAlign.md="center center"
           fxLayoutAlign.sm="center center"
-          color="primary" 
+          color="primary"
           formControlName="isAdmin"
           [disabled]="isLastAdmin && currentUser.id === editUser.id"
         >
@@ -64,7 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       ></app-message>
     </div>
 
-    <mat-action-row 
+    <mat-action-row
       fxLayoutAlign="end center"
       fxLayoutAlign.md="center center"
       fxLayoutAlign.sm="center center"
@@ -76,11 +76,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         <mat-icon color="primary">cancel</mat-icon>
         <span class="cancel-name">Cancel</span>
       </button>
-      <button 
-        *ngIf="editUser" 
+      <button
+        *ngIf="editUser"
         mat-raised-button
-        type="button" 
-        (click)="doDelete()" 
+        type="button"
+        (click)="doDelete()"
         [disabled]="!canDelete"
         class="btn-delete-form text-upper"
       >

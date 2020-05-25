@@ -22,9 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 </button>
 
 <mat-menu #menu="matMenu" fxLayout="column" fxLayoutAlign="center start" backdropClass="menu" [overlapTrigger]="false">
-  <a 
-    fxLayoutAlign="start center" 
-    mat-menu-item 
+  <a
+    fxLayoutAlign="start center"
+    mat-menu-item
     (click)="goToWorkspacesList()"
     class="menu-item-back-wks-list"
   >
@@ -35,11 +35,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   </a>
 
   <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
-  
+
   <div *ngIf="workspacesIdsNames" class="item-list">
     <a
       *ngFor="let workspace of workspacesIdsNames.list"
-      fxLayoutAlign="start center" 
+      fxLayoutAlign="start center"
       mat-menu-item
       [routerLink]="['/workspaces', workspace.id]"
       routerLinkActive="active"
@@ -55,9 +55,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
 
-  <a 
-    fxLayoutAlign="start center" 
-    mat-menu-item 
+  <a
+    fxLayoutAlign="start center"
+    mat-menu-item
     (click)="goToCreateWorkspace()"
     class="menu-item-create-wks"
   >

@@ -651,7 +651,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 <span class="user-id ellipsis">{{ user.value.id }}</span>
               </td>
             </ng-container>
-            
+
             <!-- Permissions Columns -->
             <ng-container [matColumnDef]="permission.id" *ngFor="let permission of permissions;">
               <th
@@ -679,7 +679,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 >
                   <mat-spinner color="primary" [diameter]="16" [strokeWidth]="1"></mat-spinner>
                 </span>
-                
+
                 <ng-template #canCheck>
                   <mat-checkbox
                     [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
