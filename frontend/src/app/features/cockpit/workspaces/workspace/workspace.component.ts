@@ -27,11 +27,13 @@ import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces
 import { IStore } from '@shared/state/store.interface';
 import { IUi } from '@shared/state/ui.interface';
 import { isLargeScreen } from '@shared/state/ui.selectors';
-import { IWorkspaceRow } from '@wks/state/workspaces/workspaces.interface';
 import {
+  IWorkspaceRow,
+  IWorkspaces,
+} from '@wks/state/workspaces/workspaces.interface';
+import {
+  getCurrentUserWorkspaces,
   getCurrentWorkspace,
-  getWorkspacesIdsNames,
-  IWorkspacesIdsNames,
 } from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
@@ -43,7 +45,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   ui$: Observable<IUi>;
-  workspacesIdsNames$: Observable<{ list: IWorkspacesIdsNames[] }>;
+  workspacesList$: Observable<IWorkspaces>;
   workspace$: Observable<IWorkspaceRow>;
   isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
@@ -55,7 +57,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.workspacesIdsNames$ = this.store$.pipe(getWorkspacesIdsNames);
+    this.workspacesList$ = this.store$.pipe(
+      getCurrentUserWorkspaces,
+      filter(wksList => wksList !== undefined)
+    );
 
     this.isLargeScreen$ = this.store$.pipe(isLargeScreen);
 

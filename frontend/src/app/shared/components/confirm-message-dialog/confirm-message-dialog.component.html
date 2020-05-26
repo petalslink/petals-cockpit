@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <div fxLayout="row" matDialogTitle fxLayoutAlign="start start">
       <span fxLayoutAlign="start center">
         <mat-icon color="accent">warning</mat-icon>
-        <span class="margin-left-x1">{{ data.title }}</span>
+        <span class="data-title margin-left-x1">{{ data.title }}</span>
       </span>
     </div>
 
@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </mat-dialog-content>
 
     <mat-dialog-actions fxLayout="row" fxLayoutAlign="end center">
-      <button mat-button color="primary" (click)="close()" class="btn-cancel-modal">CANCEL</button>
-      <button mat-raised-button color="primary" (click)="confirm()" class="btn-confirm-modal">REMOVE</button>
+      <button mat-button color="primary" (click)="close()" class="btn-cancel-modal">{{ data.cancelButtonText ? data.cancelButtonText : 'CANCEL' }}</button>
+      <button mat-raised-button color="primary" (click)="confirm()" class="btn-confirm-modal">{{ data.confirmButtonText ? data.confirmButtonText : 'CONFIRM' }}</button>
     </mat-dialog-actions>
   </div>
 </div>

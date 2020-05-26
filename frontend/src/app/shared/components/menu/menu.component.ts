@@ -19,13 +19,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   Input,
-  OnInit,
   ViewEncapsulation,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { IWorkspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { Subject } from 'rxjs';
-
-import { IWorkspacesIdsNames } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-menu',
@@ -34,39 +31,29 @@ import { IWorkspacesIdsNames } from '@feat/cockpit/workspaces/state/workspaces/w
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
 })
-export class MenuComponent implements OnInit {
+export class MenuComponent {
   onDestroy$ = new Subject<void>();
 
-  private _workspacesIdsNames: { list: IWorkspacesIdsNames[] };
+  workspacesListMenu: IWorkspaces;
 
   // 28 characters max > width size of menu panel
   @Input() maxLength = 28;
   @Input() selectedWksId: string;
-  @Input('workspacesIdsNames')
-  set workspacesIdsNames(workspacesIdsNames: { list: IWorkspacesIdsNames[] }) {
-    this._workspacesIdsNames = {
+
+  @Input('workspacesList')
+  set workspacesList(workspacesListInput: IWorkspaces) {
+    this.workspacesListMenu = {
+      ...workspacesListInput,
       list: [
-        workspacesIdsNames.list.find(
+        workspacesListInput.list.find(
           selectedWks => selectedWks.id === this.selectedWksId
         ),
-        ...workspacesIdsNames.list.filter(wks => wks.id !== this.selectedWksId),
+        ...workspacesListInput.list.filter(
+          wks => wks.id !== this.selectedWksId
+        ),
       ],
     };
   }
 
-  get workspacesIdsNames() {
-    return this._workspacesIdsNames;
-  }
-
-  constructor(private router: Router) {}
-
-  ngOnInit() {}
-
-  goToWorkspacesList() {
-    this.router.navigate(['/workspaces'], { queryParams: { page: 'list' } });
-  }
-
-  goToCreateWorkspace() {
-    this.router.navigate(['/workspaces'], { queryParams: { page: 'create' } });
-  }
+  constructor() {}
 }

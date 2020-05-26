@@ -17,8 +17,8 @@
 
 import { AbstractControl, AsyncValidatorFn } from '@angular/forms';
 import {
+  getAllWorkspaces,
   getSelectedWorkspaceId,
-  getWorkspacesIdsNames,
 } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { select, Store } from '@ngrx/store';
 import { IStore } from '@shared/state/store.interface';
@@ -53,7 +53,7 @@ export class CustomValidators {
     return (control: AbstractControl) =>
       combineLatest(
         store$.pipe(select(getSelectedWorkspaceId)),
-        store$.pipe(getWorkspacesIdsNames)
+        store$.pipe(getAllWorkspaces)
       ).pipe(
         first(),
         map(([currentWorkspaceId, workspaceIdNames]) => {

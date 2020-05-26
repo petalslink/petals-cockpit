@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2017-2020 Linagora
+ * Copyright (C) 2018-2020 Linagora
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -15,32 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Input,
-  OnInit,
-} from '@angular/core';
-
-import { IUi } from '@shared/state/ui.interface';
-import {
-  IWorkspace,
-  IWorkspaces,
-} from '@wks/state/workspaces/workspaces.interface';
-
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class HeaderComponent implements OnInit {
-  @Input() isLargeScreen: boolean;
-  @Input() ui: IUi;
-  @Input() workspace: IWorkspace;
-  @Input() workspacesList: IWorkspaces;
-
-  constructor() {}
-
-  ngOnInit() {}
-}
+export const CONFIRM_DIALOG_DOM = {
+  text: {
+    title: `.data-title`,
+    message: `.data-msg`,
+  },
+  buttons: {
+    confirm: `.btn-confirm-modal`,
+    cancel: `.btn-cancel-modal`,
+  },
+};

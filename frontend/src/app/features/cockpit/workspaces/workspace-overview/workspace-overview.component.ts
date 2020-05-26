@@ -41,6 +41,8 @@ import {
   tap,
 } from 'rxjs/operators';
 
+import { ConfirmMessageDialogComponent } from '@shared/components/confirm-message-dialog/confirm-message-dialog.component';
+
 import { CustomValidators } from '@shared/helpers/custom-validators';
 import {
   FormErrorStateMatcher,
@@ -129,7 +131,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   // workspace users management
   users$: Observable<IWorkspaceUserRow[]>;
-  currentUserId$: Observable<string>;
+  currentUserId: string;
   appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
@@ -190,10 +192,14 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       map(user => user.map(u => u.id).sort())
     );
 
-    this.currentUserId$ = this.store$.pipe(
-      getCurrentUser,
-      map(user => user.id)
-    );
+    this.store$
+      .pipe(
+        getCurrentUser,
+        tap(user => {
+          this.currentUserId = user.id;
+        })
+      )
+      .subscribe();
 
     this.createFormAddUser();
 
@@ -576,9 +582,34 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   removeUser(id: string) {
-    this.store$.dispatch(new Workspaces.DeleteUser({ id }));
+    const currentUserSelfRemoving = this.currentUserId === id;
 
-    this.usersFormGroup.disable();
+    if (currentUserSelfRemoving) {
+      this.dialog
+        .open(ConfirmMessageDialogComponent, {
+          data: {
+            title: 'Leave this workspace?',
+            message:
+              'You will no longer be member of this workspace.\nYou will be redirected to the workspaces selection page.',
+            confirmButtonText: 'LEAVE',
+          },
+        })
+        .beforeClose()
+        .pipe(
+          tap(confirm => {
+            if (confirm) {
+              this.store$.dispatch(new Workspaces.DeleteUser({ id }));
+              this.usersFormGroup.disable();
+            } else {
+              this.usersFormGroup.enable();
+            }
+          })
+        )
+        .subscribe();
+    } else {
+      this.store$.dispatch(new Workspaces.DeleteUser({ id }));
+      this.usersFormGroup.disable();
+    }
   }
 
   trackByUser(i: number, user: IUserRow) {

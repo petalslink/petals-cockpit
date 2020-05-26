@@ -140,12 +140,13 @@ export class AdministrationComponent implements OnInit, OnDestroy {
             title: 'Remove admin role?',
             message:
               'You will no longer be admin.\nYou will be redirected to the workspaces selection page.',
+            confirmButtonText: 'REMOVE',
           },
         })
         .beforeClose()
         .pipe(
-          tap(result => {
-            if (result) {
+          tap(confirm => {
+            if (confirm) {
               this.store$.dispatch(new Users.Modify({ id, changes }));
             } else {
               this.isAdministratorChecked = true;

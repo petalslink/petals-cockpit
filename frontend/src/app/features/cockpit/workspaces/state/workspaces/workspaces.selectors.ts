@@ -17,13 +17,17 @@
 
 import { select, Store } from '@ngrx/store';
 import { createSelector } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
 import { IUserRow } from '@shared/state/users.interface';
-import { getUsersAllIds, getUsersById } from '@shared/state/users.selectors';
+import {
+  getConnectedUser,
+  getUsersAllIds,
+  getUsersById,
+} from '@shared/state/users.selectors';
 import { IBusRow } from '@wks/state/buses/buses.interface';
 import { getBusesAllIds, getBusesById } from '@wks/state/buses/buses.selectors';
 import { IComponentRow } from '@wks/state/components/components.interface';
@@ -46,33 +50,9 @@ export function getSelectedWorkspaceId(state: IStore) {
   return state.workspaces.selectedWorkspaceId;
 }
 
-export function getWorkspacesIdsNames(
+export function getAllWorkspaces(
   store$: Store<IStore>
-): Observable<{ list: IWorkspacesIdsNames[] }> {
-  return store$.pipe(
-    select(state => state.workspaces),
-    map(workspaces => {
-      return {
-        list: workspaces.allIds
-          .map(id => {
-            const name = workspaces.byId[id].name;
-            return {
-              id,
-              name,
-            };
-          })
-          .sort((a, b) => a.name.localeCompare(b.name)),
-      };
-    })
-  );
-}
-
-export interface IWorkspacesIdsNames {
-  id: string;
-  name: string;
-}
-
-export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
+): Observable<IWorkspaces> {
   return store$.pipe(
     select(state => state.workspaces),
     map(workspaces => {
@@ -80,6 +60,25 @@ export function getWorkspaces(store$: Store<IStore>): Observable<IWorkspaces> {
         ...workspaces,
         list: workspaces.allIds
           .map(wksId => workspaces.byId[wksId])
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      };
+    })
+  );
+}
+
+export function getCurrentUserWorkspaces(
+  store$: Store<IStore>
+): Observable<IWorkspaces> {
+  return combineLatest(
+    store$.pipe(select(state => state.workspaces)),
+    store$.pipe(select(getConnectedUser))
+  ).pipe(
+    map(([workspaces, currentUser]) => {
+      return {
+        ...workspaces,
+        list: workspaces.allIds
+          .map(wksId => workspaces.byId[wksId])
+          .filter(wks => wks.users.allIds.includes(currentUser.id))
           .sort((a, b) => a.name.localeCompare(b.name)),
       };
     })

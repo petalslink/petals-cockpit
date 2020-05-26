@@ -593,7 +593,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
         <form [formGroup]="usersFormGroup" (ngSubmit)="onSubmitUsersPermissions()">
           <table
-            *ngIf="currentUserId$ | async as currentUserId"
             mat-table
             matSort
             fxFlexFill
@@ -712,7 +711,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 class="cell-user-action-{{ user.value.id }}"
               >
                 <button
-                  *ngIf="currentUserId !== user.value.id"
+                  *ngIf="currentUserId !== user.value.id; else leaveWorkspace"
                   mat-icon-button
                   matTooltip="Delete"
                   matTooltipPosition="before"
@@ -722,6 +721,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 >
                   <fa-icon icon="trash-alt" class="icon-x1"></fa-icon>
                 </button>
+
+                <ng-template #leaveWorkspace>
+                  <div
+                    *ngIf="users.length > 1"
+                    matTooltip="Leave this workspace"
+                    matTooltipPosition="before"
+                  >
+                  <!-- blur is a workaround to avoid focusing after closing the modal -->
+                    <button
+                      mat-icon-button
+                      onclick="this.blur()"
+                      [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
+                      (click)="removeUser(user.value.id)"
+                      class="action-leave-wks"
+                    >
+                      <fa-icon icon="sign-out-alt" class="icon-x1"></fa-icon>
+                    </button>
+                  </div>
+                </ng-template>
+
               </td>
             </ng-container>
 

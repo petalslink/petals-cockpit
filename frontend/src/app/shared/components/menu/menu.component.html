@@ -25,7 +25,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <a
     fxLayoutAlign="start center"
     mat-menu-item
-    (click)="goToWorkspacesList()"
+    [routerLink]="['/workspaces']"
+    [queryParams]="{page: 'list'}"
     class="menu-item-back-wks-list"
   >
     <span fxLayout="row" fxLayoutAlign="center center">
@@ -34,17 +35,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </span>
   </a>
 
-  <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
+  <mat-divider *ngIf="workspacesListMenu"></mat-divider>
 
-  <div *ngIf="workspacesIdsNames" class="item-list">
+  <div *ngIf="workspacesListMenu" class="item-list">
     <a
-      *ngFor="let workspace of workspacesIdsNames.list"
+      *ngFor="let workspace of workspacesListMenu.list"
       fxLayoutAlign="start center"
       mat-menu-item
-      [routerLink]="['/workspaces', workspace.id]"
       routerLinkActive="active"
-      class="menu-item-wks-name"
+      [routerLink]="['/workspaces', workspace.id]"
       [disabled]="workspace.id === selectedWksId"
+      class="menu-item-wks-name"
     >
       <span fxLayout="row" fxLayoutAlign="center center">
         <mat-icon class="margin-right-x1 icon-x1 icon-wks">folder</mat-icon>
@@ -53,12 +54,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </a>
   </div>
 
-  <mat-divider *ngIf="workspacesIdsNames"></mat-divider>
+  <mat-divider *ngIf="workspacesListMenu"></mat-divider>
 
   <a
     fxLayoutAlign="start center"
     mat-menu-item
-    (click)="goToCreateWorkspace()"
+    [routerLink]="['/workspaces']"
+    [queryParams]="{page: 'create'}"
     class="menu-item-create-wks"
   >
     <span fxLayout="row" fxLayoutAlign="center center">
