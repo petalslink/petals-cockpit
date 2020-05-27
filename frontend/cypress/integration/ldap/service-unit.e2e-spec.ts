@@ -41,6 +41,14 @@ describe('Service-unit', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Topology`,
+      `Bus 0`,
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+    ]);
   });
 
   it('should have all su informations', () => {

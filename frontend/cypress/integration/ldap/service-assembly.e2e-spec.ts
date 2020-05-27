@@ -42,6 +42,13 @@ describe('Service-assembly', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Topology`,
+      `Bus 0`,
+      `Cont 0`,
+      `SA 0`,
+    ]);
   });
 
   it('should have all sa informations', () => {

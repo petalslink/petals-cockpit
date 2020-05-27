@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from './breadcrumb.dom';
+
 Cypress.Commands.add(
   'expectFocused',
   {
@@ -61,6 +63,30 @@ Cypress.Commands.add('expectMessageToBe', (element, type, message) => {
     .parent()
     .parent('.msg-content')
     .should('have.class', type);
+});
+
+Cypress.Commands.add('expectBreadcrumbsToBe', elements => {
+  cy.get(BREADCRUMB_DOM.texts.itemName).should('have.length', elements.length);
+
+  for (let i = 0; i < elements.length; i++) {
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(i)
+      .should('contain', elements[i]);
+  }
+
+  if (elements.length === 2) {
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(1)
+      .find('div')
+      .should('have.class', 'breadcrumb-category');
+  } else {
+    cy
+      .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+      .last()
+      .should('have.class', 'active-link');
+  }
 });
 
 Cypress.Commands.add('checkLifecycleState', (element, state) => {

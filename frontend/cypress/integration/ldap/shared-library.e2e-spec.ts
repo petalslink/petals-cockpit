@@ -41,6 +41,13 @@ describe('Shared-library', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Topology`,
+      `Bus 0`,
+      `Cont 0`,
+      `SL 0`,
+    ]);
   });
 
   it('should have shared-library details', () => {

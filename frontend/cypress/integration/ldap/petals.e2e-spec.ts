@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
 import { expectedInitializedWks0Tree } from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
@@ -310,6 +311,37 @@ describe(`Petals`, () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/service-units/idSu0`);
+  });
+
+  it(`should redirect when clicking on breadcrumbs element`, () => {
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy
+      .get('app-sidebar')
+      .find('.btn-topology')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+
+    cy.getElementInPetalsTree(`service-unit`, `SU 0`).click();
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Topology`,
+      `Bus 0`,
+      `Cont 0`,
+      `Comp 0`,
+      `SU 0`,
+    ]);
+
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(2)
+      .should('contain', `Bus 0`)
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
   });
 
   const treeWithCont0Folded = [
