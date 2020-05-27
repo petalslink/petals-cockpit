@@ -33,8 +33,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       class="breadcrumb-item-link"
     >
       <div fxLayout="row" fxLayoutAlign="start center">
-        <mat-icon *ngIf="breadcrumb.svgIcon" mat-list-icon color="primary" [svgIcon]="breadcrumb.svgIcon" class="breadcrumb-icon"></mat-icon>
-        <mat-icon *ngIf="breadcrumb.icon" mat-list-icon color="primary" class="breadcrumb-icon">{{ breadcrumb.icon }}</mat-icon>
+        <mat-icon *ngIf="breadcrumb.svgIcon && isLargeScreen" mat-list-icon color="primary" [svgIcon]="breadcrumb.svgIcon" class="breadcrumb-icon"></mat-icon>
+        <mat-icon *ngIf="breadcrumb.icon && isLargeScreen" mat-list-icon color="primary" class="breadcrumb-icon">{{ breadcrumb.icon }}</mat-icon>
         <h4 class="margin-left-x1 breadcrumb-name">
           {{ (breadcrumb.type === 'workspaces' ? workspace.name : breadcrumb.name) | shorten: maxLength:'...' }}
         </h4>

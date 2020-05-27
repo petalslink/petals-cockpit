@@ -35,6 +35,7 @@ export class BreadcrumbComponent implements OnInit {
   @Input() maxLength = 16;
   @Input() workspace: IWorkspace;
   @Input() breadcrumbList: IBreadcrumb[];
+  @Input() isLargeScreen: boolean;
 
   constructor() {}
 
