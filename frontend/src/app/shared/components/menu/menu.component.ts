@@ -21,7 +21,10 @@ import {
   Input,
   ViewEncapsulation,
 } from '@angular/core';
-import { IWorkspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
+import {
+  IWorkspace,
+  IWorkspaces,
+} from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -44,16 +47,20 @@ export class MenuComponent {
   set workspacesList(workspacesListInput: IWorkspaces) {
     this.workspacesListMenu = {
       ...workspacesListInput,
-      list: [
-        workspacesListInput.list.find(
-          selectedWks => selectedWks.id === this.selectedWksId
-        ),
-        ...workspacesListInput.list.filter(
-          wks => wks.id !== this.selectedWksId
-        ),
-      ],
+      list: workspacesListInput.list.sort(
+        this.selectedWorkspaceFirst.bind(this)
+      ),
     };
   }
 
   constructor() {}
+
+  selectedWorkspaceFirst(wks1: IWorkspace, wks2: IWorkspace): number {
+    if (wks1.id === this.selectedWksId) {
+      return -1;
+    } else if (wks2.id === this.selectedWksId) {
+      return 1;
+    }
+    return 0;
+  }
 }

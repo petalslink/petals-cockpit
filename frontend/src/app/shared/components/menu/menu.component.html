@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
   <mat-divider *ngIf="workspacesListMenu"></mat-divider>
 
-  <div *ngIf="workspacesListMenu" class="item-list">
+  <div *ngIf="workspacesListMenu && workspacesListMenu.list.length > 0" class="item-list">
     <a
       *ngFor="let workspace of workspacesListMenu.list"
       fxLayoutAlign="start center"
