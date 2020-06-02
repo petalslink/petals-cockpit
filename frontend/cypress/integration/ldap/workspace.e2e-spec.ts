@@ -580,7 +580,7 @@ describe('Workspace', () => {
       cy
         .get(BREADCRUMB_DOM.texts.itemName)
         .eq(0)
-        .should('contain', `PedRoBot's famil...`);
+        .should('contain', `PedRoBot's family`);
     });
 
     it('should have 100 characters max available to the workspace name', () => {
@@ -602,7 +602,10 @@ describe('Workspace', () => {
       cy
         .get(BREADCRUMB_DOM.texts.itemName)
         .eq(0)
-        .should('contain', `ZA WARUDO ZA WAR...`);
+        .should(
+          'contain',
+          `ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO `
+        );
     });
 
     it('should have the workspace descriptions', () => {

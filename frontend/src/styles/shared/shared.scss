@@ -40,6 +40,14 @@ mat-sidenav-container > mat-sidenav-content.mat-drawer-content {
   margin-left: $sidebar-width;
 }
 
+.toolbar {
+  position: fixed;
+  z-index: 10;
+  width: calc(100% - 64px);
+  left: 64px;
+  top: 0;
+}
+
 app-material-tree {
   max-width: $sidebar-width;
 }

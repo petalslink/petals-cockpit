@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-.toolbar {
-  position: fixed;
-  z-index: 10;
-  width: 100%;
-  left: 64px;
+app-breadcrumb {
+  position: absolute;
+  left: calc(16px + 40px);
+  width: calc(100% - 2 * 16px - 40px);
 }

@@ -16,6 +16,15 @@
  */
 
 nav.breadcrumb {
+  &,
+  & .breadcrumb-item,
+  & .breadcrumb-item-link,
+  & .breadcrumb-category,
+  & .breadcrumb-category-name,
+  & .breadcrumb-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   div.breadcrumb-item {
     div.breadcrumb-category {
       min-width: 0;
@@ -53,5 +62,10 @@ nav.breadcrumb {
     .breadcrumb-category-name {
       font-weight: bold;
     }
+  }
+
+  /* Fix svg icons reduced by flex layout */
+  .mat-icon {
+    min-width: 24px;
   }
 }
