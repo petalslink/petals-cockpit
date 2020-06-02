@@ -1,6 +1,7 @@
 {
   "/api": {
     "target": "http://localhost:8484/",
-    "secure": false
+    "secure": false,
+    "timeout": 3600000
   }
 }
