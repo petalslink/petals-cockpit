@@ -15,13 +15,4 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export enum ELed {
-  GREEN = 'GREEN',
-  RED = 'RED',
-  YELLOW = 'YELLOW',
-  GREY = 'GREY',
-  BLACK = 'BLACK',
-  WHITE = 'WHITE',
-}
-
-export type Led = keyof typeof ELed;
+export type Led = 'green' | 'red' | 'yellow' | 'grey' | 'black' | 'white';

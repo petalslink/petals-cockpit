@@ -313,6 +313,8 @@ mat-tree {
   .mat-tree-node {
     min-height: 24px;
     height: 24px;
+    outline: none;
+    border: none;
   }
 
   .element-info {
@@ -322,6 +324,10 @@ mat-tree {
   .workspace-element-name {
     margin-left: 5px;
     font-size: 12px;
+  }
+
+  .workspace-element-state-led {
+    position: fixed;
   }
 
   .tree-element-name {

@@ -34,12 +34,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="petals-tree">
     <mat-tree-node
       matTreeNodePadding
-      matTreeNodePaddingIndent=20
+      matTreeNodePaddingIndent="20"
       *matTreeNodeDef="let wksElement"
       [routerLinkActive]="wksElement.link ? 'selected-element' : ''"
+      [routerLink]="wksElement.link ? [wksElement.link] : []"
       [ngClass]="wksElement.cssClass"
-      class="workspace-element-{{ wksElement.id }}"
+      class="workspace-element-node"
     >
+      <app-led
+        *ngIf="wksElement.state"
+        [matTooltip]="wksElement.state"
+        [color]="getLedColorFromState(wksElement.state)"
+        [ngStyle]="{'margin-left.px': wksElement.level * -20 + 5}"
+        class="workspace-element-state-led {{ wksElement.state.toLowerCase() }}"
+      ></app-led>
       <div class="element-info">
         <div
           *ngIf="!wksElement.cssClass.includes('category') else category"
@@ -49,7 +57,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             fxFlexFill
             fxLayout="row"
             fxLayoutAlign="start center"
-            [routerLink]="wksElement.link ? [wksElement.link] : []"
             class="btn-node"
           >
             <span
@@ -82,6 +89,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               classToApply="highlight"
               class="workspace-element-name tree-element-name"
             ></span>
+
+            <fa-icon
+              *ngIf="nodeTypes[wksElement.type] === 'CONTAINER' && !wksElement.isReachable"
+              [matTooltip]="'This container is not reachable!'"
+              matTooltipPosition="right"
+              icon="unlink"
+              class="tree-icon-unreachable"
+            ></fa-icon>
           </button>
         </div>
       </div>

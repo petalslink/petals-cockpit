@@ -35,6 +35,7 @@ import {
 import { Buses } from '@feat/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from '@feat/cockpit/workspaces/state/components/components.actions';
 import { Containers } from '@feat/cockpit/workspaces/state/containers/containers.actions';
+import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
@@ -195,5 +196,9 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
           break;
       }
     }
+  }
+
+  getLedColorFromState(state: any) {
+    return stateToLedColor(state);
   }
 }

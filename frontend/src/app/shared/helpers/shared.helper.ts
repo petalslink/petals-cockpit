@@ -25,6 +25,7 @@ import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
 import { flatMap, last, map, startWith } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { Led } from '@shared/components/led/led.interface';
 import { ComponentState } from '@shared/services/components.service';
 import { HttpProgress } from '@shared/services/http-progress-tracker.service';
 import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
@@ -58,7 +59,7 @@ export function isNot(e: object): (object: any) => boolean {
 
 export const stateToLedColor = (
   state: ComponentState | EServiceAssemblyState | ESharedLibraryState
-) => {
+): Led => {
   switch (state) {
     case 'Started': {
       return 'green';

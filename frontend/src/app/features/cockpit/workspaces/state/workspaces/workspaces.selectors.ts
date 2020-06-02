@@ -157,11 +157,13 @@ export interface WorkspaceElement {
   type: WorkspaceElementType;
   name: string;
   link?: string;
-  isFolded: boolean;
-  children?: WorkspaceElement[];
-  cssClass: string;
+  state?: string;
+  isReachable?: boolean;
   svgIcon?: string;
   icon?: string;
+  cssClass: string;
+  isFolded: boolean;
+  children?: WorkspaceElement[];
 }
 
 export interface WorkspaceElementFlatNode
@@ -207,6 +209,7 @@ export const currentWorkspaceTree = createSelector(
             type: WorkspaceElementType.CONTAINER,
             name: container.name,
             link: `${baseUrl}/containers/${container.id}`,
+            isReachable: container.isReachable,
             isFolded: container.isFolded,
             cssClass: `workspace-element-type-container`,
             icon: `dns`,
@@ -227,6 +230,7 @@ export const currentWorkspaceTree = createSelector(
                         type: WorkspaceElementType.COMPONENT,
                         name: component.name,
                         link: `${baseUrl}/components/${component.id}`,
+                        state: component.state,
                         isFolded: component.isFolded,
                         cssClass: `workspace-element-type-component`,
                         svgIcon: `component`,
@@ -241,6 +245,10 @@ export const currentWorkspaceTree = createSelector(
                               link: `${baseUrl}/service-units/${
                                 serviceUnit.id
                               }`,
+                              state:
+                                serviceAssembliesByIds[
+                                  serviceUnit.serviceAssemblyId
+                                ].state,
                               isFolded: serviceUnit.isFolded,
                               cssClass: `workspace-element-type-service-unit`,
                               svgIcon: `su`,
@@ -265,6 +273,7 @@ export const currentWorkspaceTree = createSelector(
                           link: `${baseUrl}/service-assemblies/${
                             serviceAssembly.id
                           }`,
+                          state: serviceAssembly.state,
                           isFolded: serviceAssembly.isFolded,
                           cssClass: `workspace-element-type-service-assembly`,
                           svgIcon: `sa`,

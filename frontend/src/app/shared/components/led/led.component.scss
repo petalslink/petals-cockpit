@@ -34,7 +34,7 @@
   }
 
   &.yellow {
-    @include led(#ffee58);
+    @include led(gold);
   }
 
   &.grey {
