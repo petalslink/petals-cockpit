@@ -558,12 +558,18 @@ public class WorkspaceResource {
     @Path("/users/{id}")
     public void deleteUser(@NotEmpty @PathParam("id") String username) {
         final boolean isAuthorized = this.profile.hasPermission(this.wsId, CockpitProfile.ADMIN_WORKSPACE);
-        final boolean hasOthersMembers = DSL.using(jooq).fetchExists(USERS_WORKSPACES,
-                USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).andNot(USERS_WORKSPACES.USERNAME.eq(username)));
         final boolean isDeletingHimself = this.profile.getId().equals(username);
+        final boolean isLastMember = !DSL.using(jooq).fetchExists(USERS_WORKSPACES, USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)
+            .and(USERS_WORKSPACES.USERNAME.ne(username)));
+        final boolean isLastAdminWorkspace = !DSL.using(jooq).fetchExists(USERS_WORKSPACES, USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)
+            .and(USERS_WORKSPACES.USERNAME.ne(username)
+            .and(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION.isTrue())));
 
-        if (!hasOthersMembers && isDeletingHimself) {
+        if (isLastMember) {
             throw new WebApplicationException("Last member can not be deleted! You must delete this workspace.",
+                    Status.FORBIDDEN);
+        } else if (isLastAdminWorkspace) {
+            throw new WebApplicationException("At least one administrator workspace must remain!",
                     Status.FORBIDDEN);
         } else if (!isAuthorized && !isDeletingHimself) {
             throw new WebApplicationException(Status.FORBIDDEN);
