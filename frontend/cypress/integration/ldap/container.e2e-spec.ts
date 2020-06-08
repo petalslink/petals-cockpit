@@ -16,7 +16,7 @@
  */
 
 import { ARTIFACT_DEPLOYMENT_DOM } from '../../support/container.dom';
-import { expectedTreeBeforeDeploy } from '../../support/helper.const';
+import { expectedDefaultTree } from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
@@ -303,7 +303,7 @@ describe('Container', () => {
     });
 
     it('should deploy a service-assembly', () => {
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
 
       cy
         .get(`.card-artifact-deployment`)
@@ -583,7 +583,7 @@ describe('Container', () => {
     });
 
     it('should deploy a shared-library', () => {
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
 
       cy
         .get(`.card-artifact-deployment`)
@@ -801,7 +801,7 @@ describe('Container', () => {
         `An error occurred while deploying component-deploy-error.zip`
       );
 
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
 
@@ -838,7 +838,7 @@ describe('Container', () => {
     });
 
     it('should deploy a component', () => {
-      cy.expectPetalsTreeToBe(expectedTreeBeforeDeploy);
+      cy.expectPetalsTreeToBe(expectedDefaultTree);
 
       cy
         .get(`.card-artifact-deployment`)
