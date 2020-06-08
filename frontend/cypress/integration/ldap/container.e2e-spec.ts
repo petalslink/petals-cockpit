@@ -16,7 +16,10 @@
  */
 
 import { ARTIFACT_DEPLOYMENT_DOM } from '../../support/container.dom';
-import { expectedDefaultTree } from '../../support/helper.const';
+import {
+  expectedInitializedWks0Tree,
+  expectedInitializedWks1Tree,
+} from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
@@ -162,6 +165,8 @@ describe('Container', () => {
 
     // we can only check if the graph is not visible
     cy.get('.container-list-graph').should('not.be.visible');
+
+    cy.expectPetalsTreeToBe(expectedInitializedWks1Tree);
   });
 
   describe('Artifact Deployment', () => {
@@ -303,7 +308,7 @@ describe('Container', () => {
     });
 
     it('should deploy a service-assembly', () => {
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
       cy
         .get(`.card-artifact-deployment`)
@@ -583,7 +588,7 @@ describe('Container', () => {
     });
 
     it('should deploy a shared-library', () => {
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
       cy
         .get(`.card-artifact-deployment`)
@@ -801,7 +806,7 @@ describe('Container', () => {
         `An error occurred while deploying component-deploy-error.zip`
       );
 
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
 
@@ -838,7 +843,7 @@ describe('Container', () => {
     });
 
     it('should deploy a component', () => {
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
       cy
         .get(`.card-artifact-deployment`)
@@ -1199,110 +1204,110 @@ describe('Container', () => {
     ];
 
     const expectedTreeAfterDeploySA = [
-      `Bus 0`,
-      `Cont 0`,
-      `Components`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `su1-sa-flowable-vacation-sample`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      `su2-sa-flowable-vacation-sample`,
-      `Comp 2`,
-      `Service Assemblies`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `sa-flowable-vacation-sample`,
-      `Shared Libraries`,
-      `SL 0`,
-      `Cont 1`,
-      `Components`,
-      `Comp 3`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 4`,
-      `SU 5`,
-      `SU 7`,
-      `Comp 5`,
-      `Service Assemblies`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Shared Libraries`,
-      `SL 1`,
+      { elementName: `Bus 0` },
+      { elementName: `Cont 0` },
+      { elementName: `Components` },
+      { elementName: `Comp 0`, state: 'Started' },
+      { elementName: `SU 0`, state: 'Started' },
+      { elementName: `SU 2`, state: 'Started' },
+      { elementName: `su1-sa-flowable-vacation-sample`, state: 'Shutdown' },
+      { elementName: `Comp 1`, state: 'Started' },
+      { elementName: `SU 1`, state: 'Started' },
+      { elementName: `SU 3`, state: 'Started' },
+      { elementName: `su2-sa-flowable-vacation-sample`, state: 'Shutdown' },
+      { elementName: `Comp 2`, state: 'Started' },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 0`, state: 'Started' },
+      { elementName: `SA 1`, state: 'Started' },
+      { elementName: `SA 2`, state: 'Started' },
+      { elementName: `sa-flowable-vacation-sample`, state: 'Shutdown' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 0` },
+      { elementName: `Cont 1` },
+      { elementName: `Components` },
+      { elementName: `Comp 3`, state: 'Started' },
+      { elementName: `SU 4`, state: 'Started' },
+      { elementName: `SU 6`, state: 'Started' },
+      { elementName: `Comp 4`, state: 'Started' },
+      { elementName: `SU 5`, state: 'Started' },
+      { elementName: `SU 7`, state: 'Started' },
+      { elementName: `Comp 5`, state: 'Started' },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 3`, state: 'Started' },
+      { elementName: `SA 4`, state: 'Started' },
+      { elementName: `SA 5`, state: 'Started' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 1` },
     ];
 
     const expectedTreeAfterDeploySL = [
-      `Bus 0`,
-      `Cont 0`,
-      `Components`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      `Comp 2`,
-      `Service Assemblies`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `Shared Libraries`,
-      `SL 0`,
-      `petals-sl-hsql`,
-      `Cont 1`,
-      `Components`,
-      `Comp 3`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 4`,
-      `SU 5`,
-      `SU 7`,
-      `Comp 5`,
-      `Service Assemblies`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Shared Libraries`,
-      `SL 1`,
+      { elementName: `Bus 0` },
+      { elementName: `Cont 0` },
+      { elementName: `Components` },
+      { elementName: `Comp 0`, state: 'Started' },
+      { elementName: `SU 0`, state: 'Started' },
+      { elementName: `SU 2`, state: 'Started' },
+      { elementName: `Comp 1`, state: 'Started' },
+      { elementName: `SU 1`, state: 'Started' },
+      { elementName: `SU 3`, state: 'Started' },
+      { elementName: `Comp 2`, state: 'Started' },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 0`, state: 'Started' },
+      { elementName: `SA 1`, state: 'Started' },
+      { elementName: `SA 2`, state: 'Started' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 0` },
+      { elementName: `petals-sl-hsql` },
+      { elementName: `Cont 1` },
+      { elementName: `Components` },
+      { elementName: `Comp 3`, state: 'Started' },
+      { elementName: `SU 4`, state: 'Started' },
+      { elementName: `SU 6`, state: 'Started' },
+      { elementName: `Comp 4`, state: 'Started' },
+      { elementName: `SU 5`, state: 'Started' },
+      { elementName: `SU 7`, state: 'Started' },
+      { elementName: `Comp 5`, state: 'Started' },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 3`, state: 'Started' },
+      { elementName: `SA 4`, state: 'Started' },
+      { elementName: `SA 5`, state: 'Started' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 1` },
     ];
 
     const expectedTreeAfterDeployComp = [
-      `Bus 0`,
-      `Cont 0`,
-      `Components`,
-      `Comp 0`,
-      `SU 0`,
-      `SU 2`,
-      `Comp 1`,
-      `SU 1`,
-      `SU 3`,
-      `Comp 2`,
-      `petals-bc-sql`,
-      `Service Assemblies`,
-      `SA 0`,
-      `SA 1`,
-      `SA 2`,
-      `Shared Libraries`,
-      `SL 0`,
-      `Cont 1`,
-      `Components`,
-      `Comp 3`,
-      `SU 4`,
-      `SU 6`,
-      `Comp 4`,
-      `SU 5`,
-      `SU 7`,
-      `Comp 5`,
-      `Service Assemblies`,
-      `SA 3`,
-      `SA 4`,
-      `SA 5`,
-      `Shared Libraries`,
-      `SL 1`,
+      { elementName: `Bus 0` },
+      { elementName: `Cont 0` },
+      { elementName: `Components` },
+      { elementName: `Comp 0`, state: 'Started' },
+      { elementName: `SU 0`, state: 'Started' },
+      { elementName: `SU 2`, state: 'Started' },
+      { elementName: `Comp 1`, state: 'Started' },
+      { elementName: `SU 1`, state: 'Started' },
+      { elementName: `SU 3`, state: 'Started' },
+      { elementName: `Comp 2`, state: 'Started' },
+      { elementName: `petals-bc-sql` },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 0`, state: 'Started' },
+      { elementName: `SA 1`, state: 'Started' },
+      { elementName: `SA 2`, state: 'Started' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 0` },
+      { elementName: `Cont 1` },
+      { elementName: `Components` },
+      { elementName: `Comp 3`, state: 'Started' },
+      { elementName: `SU 4`, state: 'Started' },
+      { elementName: `SU 6`, state: 'Started' },
+      { elementName: `Comp 4`, state: 'Started' },
+      { elementName: `SU 5`, state: 'Started' },
+      { elementName: `SU 7`, state: 'Started' },
+      { elementName: `Comp 5`, state: 'Started' },
+      { elementName: `Service Assemblies` },
+      { elementName: `SA 3`, state: 'Started' },
+      { elementName: `SA 4`, state: 'Started' },
+      { elementName: `SA 5`, state: 'Started' },
+      { elementName: `Shared Libraries` },
+      { elementName: `SL 1` },
     ];
   });
 });

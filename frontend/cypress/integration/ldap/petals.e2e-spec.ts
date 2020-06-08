@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { expectedInitializedWks0Tree } from '../../support/helper.const';
 import { MENU_DOM } from '../../support/menu.dom';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
@@ -22,40 +23,6 @@ import { PETALS_DOM, PETALS_TREE_DOM } from '../../support/petals.dom';
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
 
 describe(`Petals`, () => {
-  const expectedTreeNames = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `SU 0`,
-    `SU 2`,
-    `Comp 1`,
-    `SU 1`,
-    `SU 3`,
-    `Comp 2`,
-    `Service Assemblies`,
-    `SA 0`,
-    `SA 1`,
-    `SA 2`,
-    `Shared Libraries`,
-    `SL 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
-  ];
-
   beforeEach(() => {
     cy.visit(`/login`);
   });
@@ -81,7 +48,7 @@ describe(`Petals`, () => {
     // expect to not have bus selected
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     // TODO: check if no bus is selected
   });
@@ -100,9 +67,7 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_TREE_DOM.navTree.navTreePetals);
 
-    const treeNames = cy.get(PETALS_TREE_DOM.texts.workspaceElementsName);
-
-    treeNames.each((_, index) => cy.contains(expectedTreeNames[index]));
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
   });
 
   it(`should fold and unfold Petals Buses/Containers/Components/SUs`, () => {
@@ -120,13 +85,13 @@ describe(`Petals`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy.get(PETALS_TREE_DOM.buttons.expandableBtn('bus', 'idBus0')).click();
 
     cy.get(PETALS_TREE_DOM.buttons.expandableBtn('bus', 'idBus0')).click();
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy
       .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
@@ -138,7 +103,7 @@ describe(`Petals`, () => {
       .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
       .click();
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy
       .get(PETALS_TREE_DOM.buttons.expandableBtn('component', 'idComp0'))
@@ -150,7 +115,7 @@ describe(`Petals`, () => {
       .get(PETALS_TREE_DOM.buttons.expandableBtn('component', 'idComp0'))
       .click();
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy
       .get(PETALS_TREE_DOM.buttons.expandableBtn('sacategory', 'idCont0'))
@@ -162,7 +127,7 @@ describe(`Petals`, () => {
       .get(PETALS_TREE_DOM.buttons.expandableBtn('sacategory', 'idCont0'))
       .click();
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
   });
 
   it(`should unfold found element when searching in Petals menu`, () => {
@@ -181,7 +146,13 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_DOM.inputs.search).type(`su 0`);
 
-    const treeFiltered = [`Bus 0`, `Cont 0`, `Components`, `Comp 0`, `SU 0`];
+    const treeFiltered = [
+      { elementName: `Bus 0` },
+      { elementName: `Cont 0` },
+      { elementName: `Components` },
+      { elementName: `Comp 0`, state: 'Started' },
+      { elementName: `SU 0`, state: 'Started' },
+    ];
 
     cy.expectPetalsTreeToBe(treeFiltered);
   });
@@ -211,7 +182,7 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_DOM.inputs.search).should('be.empty');
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy
       .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
@@ -223,7 +194,7 @@ describe(`Petals`, () => {
       .get(PETALS_TREE_DOM.buttons.expandableBtn('container', 'idCont0'))
       .click();
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
   });
 
   it(`should reset search bar if we go to other location than the topology view`, () => {
@@ -268,7 +239,7 @@ describe(`Petals`, () => {
 
     cy.get(PETALS_DOM.inputs.search).should('be.empty');
 
-    cy.expectPetalsTreeToBe(expectedTreeNames);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
   });
 
   it(`should filter by bus, container, component, su and categories when searching in Petals menu`, () => {
@@ -297,7 +268,7 @@ describe(`Petals`, () => {
       .clear()
       .type(`u`);
 
-    cy.expectPetalsTreeToBe(availableBusesFiltered);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy.expectHighlightedElementToBe(elementsHighlighted);
 
@@ -342,129 +313,98 @@ describe(`Petals`, () => {
   });
 
   const treeWithCont0Folded = [
-    `Bus 0`,
-    `Cont 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Cont 1` },
+    { elementName: `Components` },
+    { elementName: `Comp 3`, state: 'Started' },
+    { elementName: `SU 4`, state: 'Started' },
+    { elementName: `SU 6`, state: 'Started' },
+    { elementName: `Comp 4`, state: 'Started' },
+    { elementName: `SU 5`, state: 'Started' },
+    { elementName: `SU 7`, state: 'Started' },
+    { elementName: `Comp 5`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 3`, state: 'Started' },
+    { elementName: `SA 4`, state: 'Started' },
+    { elementName: `SA 5`, state: 'Started' },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 1` },
   ];
 
   const treeWithComp0Folded = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `Comp 1`,
-    `SU 1`,
-    `SU 3`,
-    `Comp 2`,
-    `Service Assemblies`,
-    `SA 0`,
-    `SA 1`,
-    `SA 2`,
-    `Shared Libraries`,
-    `SL 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Components` },
+    { elementName: `Comp 0`, state: 'Started' },
+    { elementName: `Comp 1`, state: 'Started' },
+    { elementName: `SU 1`, state: 'Started' },
+    { elementName: `SU 3`, state: 'Started' },
+    { elementName: `Comp 2`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 0`, state: 'Started' },
+    { elementName: `SA 1`, state: 'Started' },
+    { elementName: `SA 2`, state: 'Started' },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 0` },
+    { elementName: `Cont 1` },
+    { elementName: `Components` },
+    { elementName: `Comp 3`, state: 'Started' },
+    { elementName: `SU 4`, state: 'Started' },
+    { elementName: `SU 6`, state: 'Started' },
+    { elementName: `Comp 4`, state: 'Started' },
+    { elementName: `SU 5`, state: 'Started' },
+    { elementName: `SU 7`, state: 'Started' },
+    { elementName: `Comp 5`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 3`, state: 'Started' },
+    { elementName: `SA 4`, state: 'Started' },
+    { elementName: `SA 5`, state: 'Started' },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 1` },
   ];
 
   const treeWithSasFolded = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `SU 0`,
-    `SU 2`,
-    `Comp 1`,
-    `SU 1`,
-    `SU 3`,
-    `Comp 2`,
-    `Service Assemblies`,
-    `Shared Libraries`,
-    `SL 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Components` },
+    { elementName: `Comp 0`, state: 'Started' },
+    { elementName: `SU 0`, state: 'Started' },
+    { elementName: `SU 2`, state: 'Started' },
+    { elementName: `Comp 1`, state: 'Started' },
+    { elementName: `SU 1`, state: 'Started' },
+    { elementName: `SU 3`, state: 'Started' },
+    { elementName: `Comp 2`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 0` },
+    { elementName: `Cont 1` },
+    { elementName: `Components` },
+    { elementName: `Comp 3`, state: 'Started' },
+    { elementName: `SU 4`, state: 'Started' },
+    { elementName: `SU 6`, state: 'Started' },
+    { elementName: `Comp 4`, state: 'Started' },
+    { elementName: `SU 5`, state: 'Started' },
+    { elementName: `SU 7`, state: 'Started' },
+    { elementName: `Comp 5`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 3`, state: 'Started' },
+    { elementName: `SA 4`, state: 'Started' },
+    { elementName: `SA 5`, state: 'Started' },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 1` },
   ];
 
-  const availableBusesFilteredComp0 = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `SU 0`,
-    `SU 2`,
-  ];
-
-  const availableBusesFiltered = [
-    `Bus 0`,
-    `Cont 0`,
-    `Components`,
-    `Comp 0`,
-    `SU 0`,
-    `SU 2`,
-    `Comp 1`,
-    `SU 1`,
-    `SU 3`,
-    `Comp 2`,
-    `Service Assemblies`,
-    `SA 0`,
-    `SA 1`,
-    `SA 2`,
-    `Shared Libraries`,
-    `SL 0`,
-    `Cont 1`,
-    `Components`,
-    `Comp 3`,
-    `SU 4`,
-    `SU 6`,
-    `Comp 4`,
-    `SU 5`,
-    `SU 7`,
-    `Comp 5`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
-    `Shared Libraries`,
-    `SL 1`,
+  const availableBusesFilteredComp0: {
+    elementName: string;
+    state?: string;
+  }[] = [
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Components` },
+    { elementName: `Comp 0`, state: 'Started' },
+    { elementName: `SU 0`, state: 'Started' },
+    { elementName: `SU 2`, state: 'Started' },
   ];
 
   const elementsHighlighted = [
@@ -479,17 +419,20 @@ describe(`Petals`, () => {
     `SU 7`,
   ];
 
-  const availableSasCategoriesFiltered = [
-    `Bus 0`,
-    `Cont 0`,
-    `Service Assemblies`,
-    `SA 0`,
-    `SA 1`,
-    `SA 2`,
-    `Cont 1`,
-    `Service Assemblies`,
-    `SA 3`,
-    `SA 4`,
-    `SA 5`,
+  const availableSasCategoriesFiltered: {
+    elementName: string;
+    state?: string;
+  }[] = [
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 0`, state: 'Started' },
+    { elementName: `SA 1`, state: 'Started' },
+    { elementName: `SA 2`, state: 'Started' },
+    { elementName: `Cont 1` },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 3`, state: 'Started' },
+    { elementName: `SA 4`, state: 'Started' },
+    { elementName: `SA 5`, state: 'Started' },
   ];
 });

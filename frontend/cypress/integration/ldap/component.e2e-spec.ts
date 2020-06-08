@@ -19,7 +19,7 @@ import {
   COMPONENT_DOM,
   SERVICE_UNIT_DEPLOYMENT_DOM,
 } from '../../support/component.dom';
-import { expectedDefaultTree } from '../../support/helper.const';
+import { expectedInitializedWks0Tree } from '../../support/helper.const';
 import { MESSAGE_DOM } from '../../support/message.dom';
 import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
 import {
@@ -51,7 +51,7 @@ describe('Component', () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
 
-    cy.expectPetalsTreeToBe(expectedDefaultTree);
+    cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
     cy.get(COMPONENT_DOM.buttons.actionState('stop')).click();
 
@@ -225,7 +225,7 @@ describe('Component', () => {
     it('should unload a component only if its SA are unload', () => {
       cy.getElementInPetalsTree(`component`, `Comp 0`).click();
       cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
       cy.checkLifecycleState(COMPONENT_DOM.lifecycle.state, 'Started');
 
       // should have stop if started
@@ -245,7 +245,7 @@ describe('Component', () => {
         .get(COMPONENT_DOM.buttons.serviceAssemblies)
         .should('have.length', 2)
         .eq(0)
-        .trigger('mouseenter');
+        .trigger('mouseenter', { force: true });
 
       cy.get('mat-tooltip-component').should('contain', 'SA 0');
 
@@ -253,14 +253,14 @@ describe('Component', () => {
         .get(COMPONENT_DOM.buttons.serviceAssemblies)
         .should('have.length', 2)
         .eq(1)
-        .trigger('mouseenter');
+        .trigger('mouseenter', { force: true });
 
       cy.get('mat-tooltip-component').should('contain', 'SA 2');
 
       cy
         .get(COMPONENT_DOM.buttons.serviceAssemblies)
         .eq(0)
-        .click();
+        .click({ force: true });
 
       cy.expectLocationToBe(
         `/workspaces/idWks0/petals/service-assemblies/idSa0`
@@ -520,7 +520,7 @@ describe('Component', () => {
         `An error occurred while deploying service-unit-deploy-error.zip`
       );
 
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
 
@@ -544,7 +544,7 @@ describe('Component', () => {
     });
 
     it('should deploy a service-unit', () => {
-      cy.expectPetalsTreeToBe(expectedDefaultTree);
+      cy.expectPetalsTreeToBe(expectedInitializedWks0Tree);
       cy
         .getElementInPetalsTree(
           `service-unit`,
@@ -623,8 +623,52 @@ describe('Component', () => {
       );
 
       cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
+
+      cy.expectPetalsTreeToBe(expectedTreeAfterDeploySU);
     });
   });
+
+  const expectedTreeAfterDeploySU = [
+    { elementName: `Bus 0` },
+    { elementName: `Cont 0` },
+    { elementName: `Components` },
+    { elementName: `Comp 0`, state: 'Started' },
+    { elementName: `SU 0`, state: 'Started' },
+    { elementName: `SU 2`, state: 'Started' },
+    {
+      elementName: `su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`,
+      state: 'Shutdown',
+    },
+    { elementName: `Comp 1`, state: 'Started' },
+    { elementName: `SU 1`, state: 'Started' },
+    { elementName: `SU 3`, state: 'Started' },
+    { elementName: `Comp 2`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 0`, state: 'Started' },
+    { elementName: `SA 1`, state: 'Started' },
+    { elementName: `SA 2`, state: 'Started' },
+    {
+      elementName: `sa-su-soap-demande-deplacement-consume-1.0.0-SNAPSHOT`,
+      state: 'Shutdown',
+    },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 0` },
+    { elementName: `Cont 1` },
+    { elementName: `Components` },
+    { elementName: `Comp 3`, state: 'Started' },
+    { elementName: `SU 4`, state: 'Started' },
+    { elementName: `SU 6`, state: 'Started' },
+    { elementName: `Comp 4`, state: 'Started' },
+    { elementName: `SU 5`, state: 'Started' },
+    { elementName: `SU 7`, state: 'Started' },
+    { elementName: `Comp 5`, state: 'Started' },
+    { elementName: `Service Assemblies` },
+    { elementName: `SA 3`, state: 'Started' },
+    { elementName: `SA 4`, state: 'Started' },
+    { elementName: `SA 5`, state: 'Started' },
+    { elementName: `Shared Libraries` },
+    { elementName: `SL 1` },
+  ];
 
   const expectedParametersListSortByName = [
     `httpPort`,

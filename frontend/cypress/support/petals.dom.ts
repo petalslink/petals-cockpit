@@ -25,6 +25,7 @@ export const PETALS_DOM = {
 
 export const PETALS_TREE_DOM = {
   navTree: { navTreePetals: `${bs} .mat-tree` },
+  allNodes: `${bs} .workspace-element-node`,
   buttons: {
     workspaceElementBtn: `${bs} .btn-node`,
     // type = bus, container, component, serviceassembly, serviceunit, sharedlibrary, compcategory, sacategory, slcategory
@@ -32,9 +33,11 @@ export const PETALS_TREE_DOM = {
       `${bs} .btn-expandable-${type}-${elementId}`,
   },
   texts: {
-    treeElementsName: `${bs} .tree-element-name`,
+    treeElementsName: `.tree-element-name`,
     workspaceElementsName: `${bs} .workspace-element-name`,
     categoriesName: `${bs} .tree-category-name`,
     itemsHighlights: `${bs} .highlight`,
   },
+  stateLed: `.workspace-element-state-led`,
+  unreachableIcon: `.tree-icon-unreachable`,
 };
