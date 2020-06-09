@@ -338,8 +338,8 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1", true, false, false));
 
         Response delete = resource.target("/workspaces/1/users/admin").request().delete();
-        assertThat(delete.getStatus()).isEqualTo(204);
 
+        assertThat(delete.getStatus()).isEqualTo(204);
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("user1");
     }
@@ -350,6 +350,19 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
 
         assertThat(delete.getStatus()).isEqualTo(403);
         assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(1)
+                .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
+    }
+
+    @Test
+    public void leaveWorkspaceLastAdministratorForbidden() {
+        addUser("user1");
+
+        resource.db().executeInsert(new UsersWorkspacesRecord(1L, "user1", false, false, false));
+
+        Response delete = resource.target("/workspaces/1/users/admin").request().delete();
+
+        assertThat(delete.getStatus()).isEqualTo(403);
+        assertThat(requestBy(USERS_WORKSPACES.WORKSPACE_ID, 1L)).hasNumberOfRows(2)
                 .column(USERS_WORKSPACES.USERNAME.getName()).value().isEqualTo("admin");
     }
 

@@ -54,6 +54,8 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     public static final NewUser LIFECYCLEPERMISSION = new NewUser("LIFECYCLEPERMISSION", "LIFECYCLEPERMISSION",
             "LIFECYCLEPERMISSION", false);
 
+    public static final NewUser ALLPERMISSIONS = new NewUser("ALLPERMISSIONS", "ALLPERMISSIONS", "ALLPERMISSIONS", false);
+
     private void setUpWorkspace(long wsId, String wsName, String... users) {
         app.db().executeInsert(new WorkspacesRecord(wsId, wsName, "", ""));
         for (String user : users) {
@@ -98,10 +100,12 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
         addUser(ADMINWORKSPACE);
         addUser(DEPLOYPERMISSION);
         addUser(LIFECYCLEPERMISSION);
-        setUpWorkspace(1L, "test", "ADMINWORKSPACE", "DEPLOYPERMISSION", "LIFECYCLEPERMISSION");
+        addUser(ALLPERMISSIONS);
+        setUpWorkspace(1L, "test", "ADMINWORKSPACE", "DEPLOYPERMISSION", "LIFECYCLEPERMISSION", "ALLPERMISSIONS");
         changeUserPermissionsWorkspace(1L, "ADMINWORKSPACE", true, false, false);
         changeUserPermissionsWorkspace(1L, "DEPLOYPERMISSION", false, true, false);
         changeUserPermissionsWorkspace(1L, "LIFECYCLEPERMISSION", false, false, true);
+        changeUserPermissionsWorkspace(1L, "ALLPERMISSIONS", true, true, true);
     }
 
     @Test
@@ -155,8 +159,14 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
-    public void adminWorkspaceCanLeaveWorkspace() {
+    public void notLastAdminWorkspaceCanLeaveWorkspace() {
         isAllowed(ADMINWORKSPACE, "/workspaces/1/users/ADMINWORKSPACE", HttpMethod.DELETE, null);
+    }
+
+    @Test
+    public void lastAdminWorkspaceCanNotLeaveWorkspace() {
+        app.db().executeDelete(new UsersWorkspacesRecord(1L, "ALLPERMISSIONS" , true, true, true));
+        isForbidden(ADMINWORKSPACE, "/workspaces/1/users/ADMINWORKSPACE", HttpMethod.DELETE, null);
     }
 
     @Test
