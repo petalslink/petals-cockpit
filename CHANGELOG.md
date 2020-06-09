@@ -1,3 +1,19 @@
+<a name="1.8.0"></a>
+# [1.8.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.7.0...v1.8.0) (2020-06-09)
+
+
+### Bug Fixes
+
+* **frontend:** remove unused horizontal scrollbar in SU view ([38214f5](https://gitlab.com/linagora/petals-cockpit/commit/38214f54c1a7b6299e61e71b91740e0b63d1b09a)), closes [#678](https://gitlab.com/linagora/petals-cockpit/issues/678)
+
+
+### Features
+
+* **frontend:** add leave workspace button ([41811d2](https://gitlab.com/linagora/petals-cockpit/commit/41811d2d36c598540c96573a014722623bce46c4)), closes [#668](https://gitlab.com/linagora/petals-cockpit/issues/668)
+* **frontend:** add state text in SA view ([2efd961](https://gitlab.com/linagora/petals-cockpit/commit/2efd961f0147b667018eb1ca3e4eba323cb7c9e2)), closes [#669](https://gitlab.com/linagora/petals-cockpit/issues/669)
+
+
+
 <a name="1.7.0"></a>
 # [1.7.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.6.0...v1.7.0) (2020-04-27)
 
@@ -503,8 +519,8 @@ Show and modify component configuration parameters, closes [#184](https://gitlab
 ### Features
 
 * **product:** add workspace descriptions ([fccfdce](https://gitlab.com/linagora/petals-cockpit/commit/fccfdce)), closes [#299](https://gitlab.com/linagora/petals-cockpit/issues/299) [#300](https://gitlab.com/linagora/petals-cockpit/issues/300) [#298](https://gitlab.com/linagora/petals-cockpit/issues/298)
-* **product:** deploy component from a container ([e499168](https://gitlab.com/linagora/petals-cockpit/commit/e499168), [97692cc](https://gitlab.com/linagora/petals-cockpit/commit/97692cc)), closes [#239](https://gitlab.com/linagora/petals-cockpit/issues/239) [#235](https://gitlab.com/linagora/petals-cockpit/issues/235) [#182](https://gitlab.com/linagora/petals-cockpit/issues/182) 
-* **product:** install components with parameters ([8f7b1e4](https://gitlab.com/linagora/petals-cockpit/commit/8f7b1e4), [ae9aee1](https://gitlab.com/linagora/petals-cockpit/commit/ae9aee1)), closes [#304](https://gitlab.com/linagora/petals-cockpit/issues/304) [#303](https://gitlab.com/linagora/petals-cockpit/issues/303) [#183](https://gitlab.com/linagora/petals-cockpit/issues/183) 
+* **product:** deploy component from a container ([e499168](https://gitlab.com/linagora/petals-cockpit/commit/e499168), [97692cc](https://gitlab.com/linagora/petals-cockpit/commit/97692cc)), closes [#239](https://gitlab.com/linagora/petals-cockpit/issues/239) [#235](https://gitlab.com/linagora/petals-cockpit/issues/235) [#182](https://gitlab.com/linagora/petals-cockpit/issues/182)
+* **product:** install components with parameters ([8f7b1e4](https://gitlab.com/linagora/petals-cockpit/commit/8f7b1e4), [ae9aee1](https://gitlab.com/linagora/petals-cockpit/commit/ae9aee1)), closes [#304](https://gitlab.com/linagora/petals-cockpit/issues/304) [#303](https://gitlab.com/linagora/petals-cockpit/issues/303) [#183](https://gitlab.com/linagora/petals-cockpit/issues/183)
 * **product:**  delete bus ([eaa08a2](https://gitlab.com/linagora/petals-cockpit/commit/eaa08a2)), closes [#301](https://gitlab.com/linagora/petals-cockpit/issues/301)
 * **frontend:** move component and SU deployment in Operations tab ([0eac167](https://gitlab.com/linagora/petals-cockpit/commit/0eac167), [1dd6664](https://gitlab.com/linagora/petals-cockpit/commit/1dd6664)), closes [#307](https://gitlab.com/linagora/petals-cockpit/issues/307) [#308](https://gitlab.com/linagora/petals-cockpit/issues/308)
 
