@@ -33,12 +33,10 @@ import {
 import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
 
 describe('Workspace', () => {
-  beforeEach(() => {
+  it('should reset workspace overview when changing workspaces', () => {
     cy.visit(`/login`);
     cy.login('admin', 'admin');
-  });
 
-  it('should reset workspace overview when changing workspaces', () => {
     cy.expectLocationToBe(`/workspaces/idWks0`);
 
     cy
@@ -99,13 +97,209 @@ describe('Workspace', () => {
   });
 
   it('should logout after logging in', () => {
+    cy.visit(`/login`);
+    cy.login('admin', 'admin');
     cy.logout();
 
     cy.expectNotification('success', 'Log out !', `You're now disconnected.`);
   });
 
+  it('should allow adminCockpit to act as adminWorkspace', () => {
+    cy.visit(`/login`);
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy
+      .get(MENU_DOM.buttons.toggleMenu)
+      .should('be.visible')
+      .click();
+
+    cy.expectWorkspacesListMenuToBe(['Workspace 0', 'Workspace 1']);
+
+    cy
+      .get(MENU_DOM.links.itemsWksNames)
+      .find(MENU_DOM.texts.wksNames)
+      .contains(`Workspace 1`)
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks1`);
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDeleteWks)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.editDetachBus)
+      .should('not.be.disabled');
+
+    expectedDefaultUserDetailsList.forEach((user, index) => {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(user.id))
+        .should('not.be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(user.id))
+        .should('not.be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(user.id))
+        .should('not.be.disabled');
+
+      if (index !== 0 && user.id !== 'admin') {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(user.id))
+          .should('not.be.disabled');
+      } else {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+          .should('not.be.disabled');
+      }
+    });
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+      .should('be.disabled');
+
+    // remove adminWorkspace permission to user called 'admin'
+    cy
+      .get('.cell-user-adminWorkspace-admin')
+      .find('mat-checkbox')
+      .scrollIntoView()
+      .should('be.visible');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('admin'))
+      .should('be.checked')
+      .and('not.be.disabled')
+      .click({ force: true })
+      .should('not.be.checked');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+      .should('not.be.disabled')
+      .click();
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDeleteWks)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus)
+      .should('not.be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.editDetachBus)
+      .should('not.be.disabled');
+
+    expectedDefaultUserDetailsList.forEach((user, index) => {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(user.id))
+        .should('not.be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(user.id))
+        .should('not.be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(user.id))
+        .should('not.be.disabled');
+
+      if (index !== 0 && user.id !== 'admin') {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(user.id))
+          .should('not.be.disabled');
+      } else {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+          .should('not.be.disabled');
+      }
+    });
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+      .should('be.disabled');
+  });
+
+  it('should have restricted actions when connected user is not adminWorkspace', () => {
+    cy.visit(`/login`);
+    cy.login('cchevalier', 'cchevalier');
+
+    cy
+      .get(WORKSPACES_LIST_DOM.texts.workspaceName)
+      .contains(`Workspace 1`)
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks1`);
+
+    cy
+      .get('.cell-user-adminWorkspace-cchevalier')
+      .find('mat-checkbox')
+      .scrollIntoView()
+      .should('be.visible')
+      .should('not.be.checked');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+      .should('be.disabled');
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.openDialogDeleteWks)
+      .should('be.disabled');
+    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).should('be.disabled');
+    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editDetachBus).should('be.disabled');
+
+    expectedDefaultUserDetailsList.forEach((user, index) => {
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(user.id))
+        .should('be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(user.id))
+        .should('be.disabled');
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(user.id))
+        .should('be.disabled');
+
+      if (index !== 0 && user.id !== 'cchevalier') {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(user.id))
+          .should('be.disabled');
+      } else {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+          .should('not.be.disabled');
+      }
+    });
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+      .should('be.disabled');
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+      .should('be.disabled');
+
+    cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.disabled');
+  });
+
   describe('Menu', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+      cy.login('admin', 'admin');
+
       cy.expectLocationToBe(`/workspaces/idWks0`);
     });
 
@@ -463,6 +657,9 @@ describe('Workspace', () => {
 
   describe('Details', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+      cy.login('admin', 'admin');
+
       cy.expectLocationToBe(`/workspaces/idWks0`);
     });
 
@@ -814,6 +1011,9 @@ describe('Workspace', () => {
 
   describe('Buses', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+      cy.login('admin', 'admin');
+
       cy.expectLocationToBe(`/workspaces/idWks0`);
       cy.expectBusListToBe([`Bus 0`]);
     });
@@ -1394,6 +1594,11 @@ describe('Workspace', () => {
 
   describe('Users', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+      cy.login('admin', 'admin');
+
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
       cy
         .get(MENU_DOM.buttons.toggleMenu)
         .should('be.visible')
@@ -1928,51 +2133,6 @@ describe('Workspace', () => {
         .should('be.disabled');
     });
 
-    const expectedDefaultUserDetailsList = [
-      {
-        id: 'admin',
-        name: 'Administrator',
-        adminWorkspace: true,
-        deployArtifact: true,
-        lifecycleArtifact: true,
-      },
-      {
-        id: 'adminldap',
-        name: 'Administrator LDAP',
-        adminWorkspace: true,
-        deployArtifact: true,
-        lifecycleArtifact: true,
-      },
-      {
-        id: 'bescudie',
-        name: 'Bertrand ESCUDIE',
-        adminWorkspace: false,
-        deployArtifact: false,
-        lifecycleArtifact: false,
-      },
-      {
-        id: 'cchevalier',
-        name: 'Christophe CHEVALIER',
-        adminWorkspace: false,
-        deployArtifact: true,
-        lifecycleArtifact: false,
-      },
-      {
-        id: 'mrobert',
-        name: 'Maxime ROBERT',
-        adminWorkspace: false,
-        deployArtifact: true,
-        lifecycleArtifact: true,
-      },
-      {
-        id: 'vnoel',
-        name: 'Victor NOEL',
-        adminWorkspace: false,
-        deployArtifact: false,
-        lifecycleArtifact: true,
-      },
-    ];
-
     const expectedFullUserDetailsList = [
       {
         id: 'admin',
@@ -2034,4 +2194,49 @@ describe('Workspace', () => {
       'Action',
     ];
   });
+
+  const expectedDefaultUserDetailsList = [
+    {
+      id: 'admin',
+      name: 'Administrator',
+      adminWorkspace: true,
+      deployArtifact: true,
+      lifecycleArtifact: true,
+    },
+    {
+      id: 'adminldap',
+      name: 'Administrator LDAP',
+      adminWorkspace: true,
+      deployArtifact: true,
+      lifecycleArtifact: true,
+    },
+    {
+      id: 'bescudie',
+      name: 'Bertrand ESCUDIE',
+      adminWorkspace: false,
+      deployArtifact: false,
+      lifecycleArtifact: false,
+    },
+    {
+      id: 'cchevalier',
+      name: 'Christophe CHEVALIER',
+      adminWorkspace: false,
+      deployArtifact: true,
+      lifecycleArtifact: false,
+    },
+    {
+      id: 'mrobert',
+      name: 'Maxime ROBERT',
+      adminWorkspace: false,
+      deployArtifact: true,
+      lifecycleArtifact: true,
+    },
+    {
+      id: 'vnoel',
+      name: 'Victor NOEL',
+      adminWorkspace: false,
+      deployArtifact: false,
+      lifecycleArtifact: true,
+    },
+  ];
 });
