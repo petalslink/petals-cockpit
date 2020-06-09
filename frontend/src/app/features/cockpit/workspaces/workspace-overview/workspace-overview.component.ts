@@ -52,7 +52,6 @@ import { IBusImport } from '@shared/services/buses.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
 import { IUserRow } from '@shared/state/users.interface';
-import { getCurrentUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { IBusRow } from '@wks/state/buses/buses.interface';
@@ -68,6 +67,7 @@ import {
   IWorkspaceUserRow,
 } from '@wks/state/workspaces/workspaces.interface';
 import {
+  getConnectedUserWks,
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
   getUsersNotInCurrentWorkspace,
@@ -131,11 +131,11 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   // workspace users management
   users$: Observable<IWorkspaceUserRow[]>;
-  currentUserId: string;
   appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
   usersFormGroup: FormGroup;
+  currentUser: IWorkspaceUserRow;
 
   displayedColumns: string[] = [
     'name',
@@ -196,9 +196,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.store$
       .pipe(
-        getCurrentUser,
+        select(getConnectedUserWks),
+        takeUntil(this.onDestroy$),
         tap(user => {
-          this.currentUserId = user.id;
+          this.currentUser = user;
         })
       )
       .subscribe();
@@ -219,7 +220,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       tap(users => {
         if (!this.isSavingUsersPermissions(users)) {
           this.isLastAdminRemaining = !users.some(
-            user => user.id !== this.currentUserId && user.adminWorkspace
+            user => user.id !== this.currentUser.id && user.adminWorkspace
           );
 
           this.usersPermissionsChanged = users.map(user => {
@@ -356,6 +357,12 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     if (this.busSelected) {
       this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+    }
+  }
+
+  hasPermission(permissionId: keyof IWorkspaceUserPermissions) {
+    if (this.currentUser) {
+      return this.currentUser[permissionId];
     }
   }
 
@@ -588,7 +595,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   removeUser(id: string) {
-    const currentUserSelfRemoving = this.currentUserId === id;
+    const currentUserSelfRemoving = this.currentUser.id === id;
 
     if (currentUserSelfRemoving) {
       this.dialog
@@ -606,7 +613,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
             if (confirm) {
               this.store$.dispatch(new Workspaces.DeleteUser({ id }));
               this.usersFormGroup.disable();
-            } else {
+            } else if (this.hasPermission('adminWorkspace')) {
               this.usersFormGroup.enable();
             }
           })
