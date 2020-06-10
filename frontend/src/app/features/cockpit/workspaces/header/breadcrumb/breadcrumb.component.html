@@ -29,9 +29,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <a
         *ngIf="breadcrumb.type != 'category'; else category"
         mat-button
-        [routerLink]="breadcrumb.type === 'workspaces' ? ['/workspaces', workspace.id] : ['/workspaces', workspace.id, 'petals', breadcrumb.type, breadcrumb.id]"
         routerLinkActive="active-link"
+        [routerLink]="breadcrumb.type === 'workspaces' ? ['/workspaces', workspace.id] : ['/workspaces', workspace.id, 'petals', breadcrumb.type, breadcrumb.id]"
         [routerLinkActiveOptions]="{exact:true}"
+        [matTooltip]="breadcrumb.name"
+        [matTooltipShowDelay]="1000"
         class="breadcrumb-item-link"
       >
         <div fxLayout="row" fxLayoutAlign="start center">
