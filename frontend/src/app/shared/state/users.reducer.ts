@@ -67,6 +67,7 @@ export namespace UsersReducer {
     | Users.DisconnectError
     | Users.Disconnected
     | Workspaces.FetchWorkspaceUserPermissionsSuccess
+    | Workspaces.UpdateWorkspaceUserPermissionsSuccess
     | Workspaces.CleanCurrentUserWorkspacePermissions;
 
   export function reducer(
@@ -151,6 +152,9 @@ export namespace UsersReducer {
       }
       case Workspaces.FetchWorkspaceUserPermissionsSuccessType: {
         return setWorkspacePermissions(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceUserPermissionsSuccessType: {
+        return updateCurrentUserPermissionIfNeeded(table, action.payload);
       }
       case Workspaces.CleanCurrentUserWorkspacePermissionsType: {
         return cleanWorkspacePermissions(table);
@@ -359,5 +363,14 @@ export namespace UsersReducer {
     const connectedUserWithouPermissions = { ...table.connectedUser };
     delete connectedUserWithouPermissions.workspacePermissions;
     return { ...table, connectedUser: connectedUserWithouPermissions };
+  }
+
+  function updateCurrentUserPermissionIfNeeded(
+    table: IUsersTable,
+    payload: { userId: string; permissions: IWorkspaceUserPermissionsBackend }
+  ) {
+    return table.connectedUser.id === payload.userId
+      ? setWorkspacePermissions(table, payload.permissions)
+      : table;
   }
 }
