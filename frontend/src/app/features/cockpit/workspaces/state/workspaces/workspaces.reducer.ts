@@ -302,15 +302,18 @@ export namespace WorkspacesReducer {
         table.allIds.length > 0
           ? toJsTable(
               payload.users.reduce(
-                (users, user) => ({
-                  ...users,
-                  [user]: <IWorkspaceUserRow>{
-                    name:
-                      table.byId[payload.id].users.allIds.length > 0
-                        ? table.byId[payload.id].users.byId[user].name
-                        : '',
-                  },
-                }),
+                (users, user) => {
+                  const userWithoutName = {
+                    ...table.byId[payload.id].users.byId[user],
+                  };
+                  if (table.byId[payload.id].users.allIds.length === 0) {
+                    delete userWithoutName.name;
+                  }
+                  return {
+                    ...users,
+                    [user]: userWithoutName,
+                  };
+                },
                 <{ [id: string]: IWorkspaceUserRow }>{}
               )
             )

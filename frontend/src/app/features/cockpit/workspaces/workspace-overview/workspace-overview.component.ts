@@ -51,7 +51,8 @@ import {
 import { IBusImport } from '@shared/services/buses.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
-import { IUserRow } from '@shared/state/users.interface';
+import { ICurrentUser, IUserRow } from '@shared/state/users.interface';
+import { getConnectedUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { IBusRow } from '@wks/state/buses/buses.interface';
@@ -67,7 +68,6 @@ import {
   IWorkspaceUserRow,
 } from '@wks/state/workspaces/workspaces.interface';
 import {
-  getConnectedUserWks,
   getCurrentWorkspace,
   getCurrentWorkspaceUsers,
   getUsersNotInCurrentWorkspace,
@@ -135,7 +135,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
   usersFormGroup: FormGroup;
-  currentUser: IWorkspaceUserRow;
+  currentUser: ICurrentUser;
 
   displayedColumns: string[] = [
     'name',
@@ -196,7 +196,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.store$
       .pipe(
-        select(getConnectedUserWks),
+        select(getConnectedUser),
         takeUntil(this.onDestroy$),
         tap(user => {
           this.currentUser = user;
@@ -262,7 +262,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.createFormUpdateWorkspaceDetails();
-
     this.workspace$
       .pipe(
         takeUntil(this.onDestroy$),
@@ -361,8 +360,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   hasPermission(permissionId: keyof IWorkspaceUserPermissions) {
-    if (this.currentUser) {
-      return this.currentUser[permissionId];
+    if (this.currentUser.workspacePermissions) {
+      return this.currentUser.workspacePermissions[permissionId];
     }
   }
 

@@ -316,4 +316,11 @@ export namespace Workspaces {
     readonly type = FetchWorkspaceUserPermissionsErrorType;
     constructor() {}
   }
+
+  export const CleanCurrentUserWorkspacePermissionsType =
+    '[Workspaces] Clean current user permissions';
+  export class CleanCurrentUserWorkspacePermissions implements Action {
+    readonly type = CleanCurrentUserWorkspacePermissionsType;
+    constructor() {}
+  }
 }

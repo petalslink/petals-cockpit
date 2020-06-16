@@ -179,6 +179,7 @@ export class WorkspacesEffects {
 
       return batchActions([
         new Workspaces.CleanWorkspace(),
+        new Workspaces.CleanCurrentUserWorkspacePermissions(),
         new Workspaces.FetchSuccess(data.workspace),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),
