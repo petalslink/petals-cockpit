@@ -87,6 +87,15 @@ export abstract class WorkspacesService {
     userId: string
   ): Observable<IWorkspaceUserPermissions>;
 
+  abstract getUserPermissions(
+    userId: string,
+    wksId: string
+  ): Observable<{
+    permissions: {
+      [wksId: string]: IWorkspaceUserPermissionsBackend;
+    };
+  }>;
+
   abstract putUserPermissions(
     workspaceId: string,
     userId: string,
@@ -153,6 +162,19 @@ export class WorkspacesServiceImpl extends WorkspacesService {
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
       { id }
     );
+  }
+
+  getUserPermissions(
+    userId: string,
+    wksId?: string
+  ): Observable<{
+    permissions: {
+      [wksId: string]: IWorkspaceUserPermissionsBackend;
+    };
+  }> {
+    return this.http.get<{
+      permissions: { [wksId: string]: IWorkspaceUserPermissionsBackend };
+    }>(`${environment.urlBackend}/users/${userId}/permissions?wsId=${wksId}`);
   }
 
   putUserPermissions(

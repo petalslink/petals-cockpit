@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
@@ -28,6 +29,7 @@ import {
   IUserNew,
   IUserSetup,
 } from '@shared/services/users.service';
+import { IWorkspaceUserPermissionsBackend } from '@shared/services/workspaces.service';
 import { Users } from './users.actions';
 import {
   IUserLDAP,
@@ -63,7 +65,8 @@ export namespace UsersReducer {
     | Users.ConnectSuccess
     | Users.Disconnect
     | Users.DisconnectError
-    | Users.Disconnected;
+    | Users.Disconnected
+    | Workspaces.FetchWorkspaceUserPermissionsSuccess;
 
   export function reducer(
     table = usersTableFactory(),
@@ -144,6 +147,9 @@ export namespace UsersReducer {
       }
       case Users.DisconnectedType: {
         return usersTableFactory();
+      }
+      case Workspaces.FetchWorkspaceUserPermissionsSuccessType: {
+        return setWorkspacePermissions(table, action.payload);
       }
       default:
         return table;
@@ -329,6 +335,19 @@ export namespace UsersReducer {
     return {
       ...table,
       isDisconnecting: false,
+    };
+  }
+
+  function setWorkspacePermissions(
+    table: IUsersTable,
+    payload: IWorkspaceUserPermissionsBackend
+  ): IUsersTable {
+    return {
+      ...table,
+      connectedUser: {
+        ...table.connectedUser,
+        workspacePermissions: payload,
+      },
     };
   }
 }

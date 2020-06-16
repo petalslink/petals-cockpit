@@ -21,6 +21,7 @@ import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
   IWorkspaceBackendDetails,
+  IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
 
 import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
@@ -293,5 +294,26 @@ export namespace Workspaces {
   export class RefreshServicesSuccess implements Action {
     readonly type = RefreshServicesSuccessType;
     constructor(public readonly payload: { id: string }) {}
+  }
+
+  export const FetchWorkspaceUserPermissionsType =
+    '[Workspaces] Fetch current user permissions';
+  export class FetchWorkspaceUserPermissions implements Action {
+    readonly type = FetchWorkspaceUserPermissionsType;
+    constructor(public readonly payload: { currentUserId: string }) {}
+  }
+
+  export const FetchWorkspaceUserPermissionsSuccessType =
+    '[Workspaces] Fetch current user permissions success';
+  export class FetchWorkspaceUserPermissionsSuccess implements Action {
+    readonly type = FetchWorkspaceUserPermissionsSuccessType;
+    constructor(public readonly payload: IWorkspaceUserPermissionsBackend) {}
+  }
+
+  export const FetchWorkspaceUserPermissionsErrorType =
+    '[Workspaces] Fetch current user permissions error';
+  export class FetchWorkspaceUserPermissionsError implements Action {
+    readonly type = FetchWorkspaceUserPermissionsErrorType;
+    constructor() {}
   }
 }

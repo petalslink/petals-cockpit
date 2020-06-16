@@ -194,6 +194,17 @@ export class WorkspacesEffects {
   );
 
   @Effect()
+  fetchWorkspaceSuccess$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.FetchSuccess>(Workspaces.FetchSuccessType),
+    withLatestFrom(this.store$.pipe(getCurrentUser)),
+    map(([_, currentUser]) => {
+      return new Workspaces.FetchWorkspaceUserPermissions({
+        currentUserId: currentUser.id,
+      });
+    })
+  );
+
+  @Effect()
   fetchWorkspaceDetails$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.FetchDetails>(Workspaces.FetchDetailsType),
     switchMap(action =>
@@ -347,7 +358,7 @@ export class WorkspacesEffects {
             if (environment.debug) {
               console.group();
               console.warn(
-                'Error catched in workspace.effects: ofType(Workspaces.UpdateUserPermissions)'
+                'Error catched in workspace.effects: ofType(Workspaces.UpdateWorkspaceUserPermissions)'
               );
               console.error(err);
               console.groupEnd();
@@ -361,6 +372,45 @@ export class WorkspacesEffects {
             return of(
               new Workspaces.UpdateWorkspaceUserPermissionsError(action.payload)
             );
+          })
+        )
+    )
+  );
+
+  @Effect()
+  fetchUserPermissions$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.FetchWorkspaceUserPermissions>(
+      Workspaces.FetchWorkspaceUserPermissionsType
+    ),
+    withLatestFrom(
+      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
+    ),
+    mergeMap(([action, workspaceId]) =>
+      this.workspacesService
+        .getUserPermissions(action.payload.currentUserId, workspaceId)
+        .pipe(
+          map(
+            response =>
+              new Workspaces.FetchWorkspaceUserPermissionsSuccess(
+                response.permissions[workspaceId]
+              )
+          ),
+          catchError((err: HttpErrorResponse) => {
+            if (environment.debug) {
+              console.group();
+              console.warn(
+                'Error catched in workspace.effects: ofType(Workspaces.FetchWorkspaceUserPermissions)'
+              );
+              console.error(err);
+              console.groupEnd();
+            }
+
+            this.notifications.error(
+              `Fetch workspace user permissions failed`,
+              `${getErrorMessage(err)}`
+            );
+
+            return of(new Workspaces.FetchWorkspaceUserPermissionsError());
           })
         )
     )

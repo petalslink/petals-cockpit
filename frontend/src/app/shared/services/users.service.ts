@@ -21,6 +21,7 @@ import { Observable } from 'rxjs';
 import { mapTo } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { IWorkspaceUserPermissionsBackend } from '@shared/services/workspaces.service';
 import { IUserLDAP } from '@shared/state/users.interface';
 
 export interface IUserBackend {
@@ -33,6 +34,7 @@ export interface ICurrentUserBackend extends IUserBackend {
   lastWorkspace: string;
   isAdmin: boolean;
   isFromLdap: boolean;
+  workspacePermissions?: IWorkspaceUserPermissionsBackend;
 }
 
 export interface IUserLogin {
