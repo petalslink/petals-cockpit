@@ -191,7 +191,10 @@ describe(`Workspaces`, () => {
     cy.expectLocationToBe(`/workspaces/idWks2`);
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 2');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 2');
 
     cy.openDialogToDeleteWks();
 

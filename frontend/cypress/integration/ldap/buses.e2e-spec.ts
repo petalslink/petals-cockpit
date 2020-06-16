@@ -31,6 +31,8 @@ describe('Buses', () => {
     cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
+
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Bus 0`]);
   });
 
   it('should have info message when no description', () => {

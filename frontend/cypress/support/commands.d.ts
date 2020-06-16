@@ -156,6 +156,7 @@ declare namespace Cypress {
       element: string,
       listOfPossibleState: string[]
     ): any;
+    expectBreadcrumbsToBe(elements: string[]): any;
     checkLifecycleState(element: string, state: string): any;
 
     uploadFile(fileName: string, selector: string): any;

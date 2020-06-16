@@ -32,6 +32,7 @@ describe(`Service`, () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services`);
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Service`]);
   });
 
   it(`should contain the service details overview with interfaces and endpoints`, () => {

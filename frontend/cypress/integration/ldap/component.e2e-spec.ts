@@ -44,6 +44,14 @@ describe('Component', () => {
     cy.getElementInPetalsTree(`component`, `Comp 0`).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Topology`,
+      `Bus 0`,
+      `Cont 0`,
+      `Comp 0`,
+    ]);
   });
 
   it('should display read-only informations when deleted', () => {

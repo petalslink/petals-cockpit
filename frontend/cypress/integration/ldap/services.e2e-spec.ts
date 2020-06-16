@@ -51,6 +51,7 @@ describe(`Services`, () => {
 
     // expect to not have service, interface or endpoint selected
     cy.expectLocationToBe(`/workspaces/idWks0/services`);
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Service`]);
 
     cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
 
@@ -74,7 +75,10 @@ describe(`Services`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/services`);
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy.expectInterfacesTreeToBe(expectedInterfacesTreeWks0);
 
@@ -326,7 +330,10 @@ describe(`Services`, () => {
     cy.login('admin', 'admin');
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy
       .get('app-sidebar')
@@ -365,7 +372,10 @@ describe(`Services`, () => {
     cy.login('admin', 'admin');
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy
       .get('app-sidebar')
@@ -395,7 +405,10 @@ describe(`Services`, () => {
     cy.login('admin', 'admin');
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy
       .get('app-sidebar')
@@ -425,7 +438,10 @@ describe(`Services`, () => {
     cy.login('admin', 'admin');
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy
       .get('app-sidebar')
@@ -491,7 +507,10 @@ describe(`Services`, () => {
     cy.login('admin', 'admin');
 
     // expect to have workspace name
-    cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(0)
+      .should('contain', 'Workspace 0');
 
     cy
       .get('app-sidebar')

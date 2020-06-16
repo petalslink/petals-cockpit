@@ -16,7 +16,21 @@
  */
 
 nav.breadcrumb {
+  &,
+  & .breadcrumb-item,
+  & .breadcrumb-item-link,
+  & .breadcrumb-category,
+  & .breadcrumb-category-name,
+  & .breadcrumb-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   div.breadcrumb-item {
+    div.breadcrumb-category {
+      min-width: 0;
+      padding: 2px 6px;
+    }
+
     a.breadcrumb-item-link {
       min-width: 0;
       padding: 2px 6px;
@@ -29,12 +43,29 @@ nav.breadcrumb {
       &.active-link {
         div {
           z-index: 1;
-          h4.item-name {
+          mat-icon.breadcrumb-icon {
+            z-index: 1;
+          }
+          h4.breadcrumb-name {
             z-index: 2;
             font-weight: normal;
           }
         }
       }
     }
+
+    .item-split,
+    .breadcrumb-category-name {
+      user-select: none;
+    }
+
+    .breadcrumb-category-name {
+      font-weight: bold;
+    }
+  }
+
+  /* Fix svg icons reduced by flex layout */
+  .mat-icon {
+    min-width: 24px;
   }
 }

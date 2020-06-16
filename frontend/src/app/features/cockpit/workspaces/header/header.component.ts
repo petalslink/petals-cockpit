@@ -27,6 +27,7 @@ import {
   IWorkspace,
   IWorkspaces,
 } from '@wks/state/workspaces/workspaces.interface';
+import { IBreadcrumb } from '@wks/state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-header',
@@ -39,6 +40,7 @@ export class HeaderComponent implements OnInit {
   @Input() ui: IUi;
   @Input() workspace: IWorkspace;
   @Input() workspacesList: IWorkspaces;
+  @Input() breadcrumbList: IBreadcrumb[];
 
   constructor() {}
 

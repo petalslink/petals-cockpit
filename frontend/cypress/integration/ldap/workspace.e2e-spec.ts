@@ -137,6 +137,7 @@ describe('Workspace', () => {
         .click();
 
       cy.expectLocationToBe(`/workspaces/idWks1`);
+      cy.expectBreadcrumbsToBe([`Workspace 1`]);
 
       // ========== Step 2 ==========
       // open menu and check if the next workspace is selected and disabled
@@ -299,10 +300,14 @@ describe('Workspace', () => {
       cy.get(BREADCRUMB_DOM.nav).should('be.visible');
 
       // expect to have workspace name
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', 'Workspace 0');
       // expect to have router link active
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+        .eq(0)
         .should('have.class', 'active-link');
 
       cy
@@ -363,10 +368,14 @@ describe('Workspace', () => {
       cy.get(`.cdk-overlay-backdrop`).click();
 
       // expect to have workspace name
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', 'Workspace 0');
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', 'Workspace 0');
       // expect to have router link inactive
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+        .eq(0)
         .should('not.have.class', 'active-link')
         .click();
 
@@ -375,6 +384,7 @@ describe('Workspace', () => {
       // expect to have router link active
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+        .eq(0)
         .should('have.class', 'active-link');
 
       // open menu
@@ -402,6 +412,7 @@ describe('Workspace', () => {
       // expect to have router link active again
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+        .eq(0)
         .should('have.class', 'active-link');
     });
 
@@ -456,7 +467,10 @@ describe('Workspace', () => {
     });
 
     it('should not update workspace details', () => {
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', `Workspace 0`);
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
@@ -494,7 +508,10 @@ describe('Workspace', () => {
 
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.cancelEditWorkspaceDetails).click();
 
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', `Workspace 0`);
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
@@ -542,7 +559,10 @@ describe('Workspace', () => {
     });
 
     it('should update workspace name', () => {
-      cy.get(BREADCRUMB_DOM.texts.itemName).should('contain', `Workspace 0`);
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', `Workspace 0`);
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
@@ -559,7 +579,8 @@ describe('Workspace', () => {
 
       cy
         .get(BREADCRUMB_DOM.texts.itemName)
-        .should('contain', `PedRoBot's famil...`);
+        .eq(0)
+        .should('contain', `PedRoBot's family`);
     });
 
     it('should have 100 characters max available to the workspace name', () => {
@@ -580,7 +601,11 @@ describe('Workspace', () => {
 
       cy
         .get(BREADCRUMB_DOM.texts.itemName)
-        .should('contain', `ZA WARUDO ZA WAR...`);
+        .eq(0)
+        .should(
+          'contain',
+          `ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO ZA WARUDO `
+        );
     });
 
     it('should have the workspace descriptions', () => {
@@ -992,6 +1017,7 @@ describe('Workspace', () => {
 
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
+        .eq(0)
         .should('not.have.class', 'active-link')
         .click();
 
@@ -999,8 +1025,8 @@ describe('Workspace', () => {
 
       cy
         .get(BREADCRUMB_DOM.buttons.breadcrumbItemLink)
-        .should('have.class', 'active-link')
-        .click();
+        .eq(0)
+        .should('have.class', 'active-link');
 
       cy.get(WORKSPACE_OVERVIEW_DOM.buttons.editImportBus).click();
 

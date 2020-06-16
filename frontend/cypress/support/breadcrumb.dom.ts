@@ -22,6 +22,6 @@ export const BREADCRUMB_DOM = {
   buttons: { breadcrumbItemLink: `${bs} .breadcrumb-item-link` },
   nav: `${bs} .breadcrumb`,
   texts: {
-    itemName: `${bs} .item-name`,
+    itemName: `${bs} .breadcrumb-item`,
   },
 };

@@ -23,6 +23,7 @@ import {
 } from '@angular/core';
 
 import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
+import { IBreadcrumb } from '../../state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-breadcrumb',
@@ -31,18 +32,10 @@ import { IWorkspace } from '@wks/state/workspaces/workspaces.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BreadcrumbComponent implements OnInit {
-  private _workspace: IWorkspace;
-
   @Input() maxLength = 16;
-
-  @Input('workspace')
-  set workspace(workspace: IWorkspace) {
-    this._workspace = workspace;
-  }
-
-  get workspace() {
-    return this._workspace;
-  }
+  @Input() workspace: IWorkspace;
+  @Input() breadcrumbList: IBreadcrumb[];
+  @Input() isLargeScreen: boolean;
 
   constructor() {}
 

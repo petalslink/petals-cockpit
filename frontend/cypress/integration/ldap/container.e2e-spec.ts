@@ -45,6 +45,7 @@ describe('Container', () => {
 
   it('should have the container details overview with system info and container reachabilities', () => {
     cy.getElementInPetalsTree(`container`, `Cont 0`).click();
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Bus 0`, `Cont 0`]);
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
 
@@ -102,6 +103,7 @@ describe('Container', () => {
     cy.expectLocationToBe(`/workspaces/idWks2/petals/buses/idBus2`);
 
     cy.getElementInPetalsTree(`container`, `Cont 4`).click();
+    cy.expectBreadcrumbsToBe([`Min Workspace`, `Topology`, `Bus 2`, `Cont 4`]);
 
     cy
       .get('.container-ip')
@@ -150,6 +152,7 @@ describe('Container', () => {
     cy.get(WORKSPACE_OVERVIEW_DOM.listGridItem.itemBus).click();
 
     cy.getElementInPetalsTree(`container`, `Cont 3`).click();
+    cy.expectBreadcrumbsToBe([`Workspace 1`, `Topology`, `Bus 1`, `Cont 3`]);
 
     cy
       .get('.container-ip')
@@ -172,6 +175,7 @@ describe('Container', () => {
   describe('Artifact Deployment', () => {
     beforeEach(() => {
       cy.getElementInPetalsTree(`container`, `Cont 0`).click();
+      cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Bus 0`, `Cont 0`]);
 
       cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
     });
