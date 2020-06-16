@@ -108,7 +108,9 @@ declare namespace Cypress {
     expectWorkspacesListMenuToBe(list: string[]): any;
 
     // petals.commands
-    expectPetalsTreeToBe(tree: string[]): any;
+    expectPetalsTreeToBe(
+      tree: { elementName: string; state?: string; unreachable?: boolean }[]
+    ): any;
     getElementInPetalsTree(type: string, name: string): any;
     foldElementInTree(type: string, name: string): any;
     unfoldElementInTree(type: string, name: string): any;
