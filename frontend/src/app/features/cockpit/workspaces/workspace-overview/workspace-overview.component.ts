@@ -170,6 +170,8 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     lifecycleArtifact: boolean;
   }[];
 
+  isLastAdminRemaining = false;
+
   constructor(
     private fb: FormBuilder,
     private store$: Store<IStore>,
@@ -216,6 +218,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       takeUntil(this.onDestroy$),
       tap(users => {
         if (!this.isSavingUsersPermissions(users)) {
+          this.isLastAdminRemaining = !users.some(
+            user => user.id !== this.currentUserId && user.adminWorkspace
+          );
+
           this.usersPermissionsChanged = users.map(user => {
             return {
               id: user.id,
