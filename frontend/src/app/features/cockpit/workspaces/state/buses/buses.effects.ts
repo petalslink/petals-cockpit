@@ -173,7 +173,7 @@ export class BusesEffects {
     ofType<SseActions.BusImportError>(SseActions.BusImportErrorType),
     map(action => {
       const busInError = action.payload;
-      this.notifications.alert(
+      this.notifications.error(
         `Bus import error`,
         `The import of a bus from the IP ${busInError.ip}:${
           busInError.port
