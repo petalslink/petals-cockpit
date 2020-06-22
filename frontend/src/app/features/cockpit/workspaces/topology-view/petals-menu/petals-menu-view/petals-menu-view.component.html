@@ -140,6 +140,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     *ngIf="(tree$ | async).length === 0 && search"
     type="info"
     msg="There is no match with &quot;{{ search }}&quot;."
+    [isFullWidth]="true"
     (evtClose)="focusSearch()"
     class="info no-match"
   ></app-message>
