@@ -75,6 +75,7 @@ import {
   UploadComponent,
 } from './components/upload/upload.component';
 import { ColorSearchedLettersDirective } from './directives/color-searched-letters.directive';
+import { DisableControlDirective } from './directives/disable-control.directive';
 import { FocusInputIfLargeScreenDirective } from './directives/focus-input-based-on-screen-size.directive';
 import { FocusInputDirective } from './directives/focus-input.directive';
 import { TruncateStringPipe } from './helpers/truncate-string.pipe';
@@ -200,6 +201,7 @@ export const imports = [
 export const declarations = [
   GenerateIconComponent,
   ColorSearchedLettersDirective,
+  DisableControlDirective,
   NotFound404Component,
   LedComponent,
   LoadingComponent,

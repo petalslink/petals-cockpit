@@ -560,6 +560,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 required
                 formControlName="userSearchCtrl"
                 [matAutocomplete]="autocompleteUsers"
+                [appDisableControl]="!hasPermission('adminWorkspace')"
               >
               <span matPrefix>
                 <mat-icon class="icon-x2">
@@ -573,7 +574,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <mat-option
                 *ngFor="let filteredUser of filteredUsers$ | async"
                 [value]="filteredUser"
-                [disabled]="!hasPermission('adminWorkspace')"
               >
                 {{ filteredUser }}
               </mat-option>
@@ -691,9 +691,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
                     [color]="getCheckBoxColor(users, permission.id, i)"
                     [formControlName]="permission.id"
-                    [disabled]="!hasPermission('adminWorkspace')"
+                    [appDisableControl]="!hasPermission('adminWorkspace')"
                     (change)="onUserPermissionChange(users, permission.id, i)"
-                    ></mat-checkbox>
+                  ></mat-checkbox>
                 </ng-template>
               </td>
             </ng-container>

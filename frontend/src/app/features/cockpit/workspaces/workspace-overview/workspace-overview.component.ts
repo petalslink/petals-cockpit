@@ -191,7 +191,15 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
-      map(user => user.map(u => u.id).sort())
+      map(users => {
+        // TODO: we should not retrieve the cockpit users if the current user has not adminWorkspace
+        // See: https://gitlab.com/linagora/petals-cockpit/-/issues/692
+        if (!this.hasPermission('adminWorkspace')) {
+          this.addUserFormGroup.reset();
+          this.addUserFormGroup.disable();
+        }
+        return users.map(u => u.id).sort();
+      })
     );
 
     this.store$
@@ -233,7 +241,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           });
 
           this.updateUsersFormGroup(users);
-          this.usersFormGroup.enable();
         }
       })
     );
@@ -556,12 +563,20 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     index: number
   ) {
     const userForm = this.usersFormArray.controls[index].value;
-    return usersStored.find(
-      user =>
-        user.id === userForm.id && user[permissionId] === userForm[permissionId]
-    )
-      ? 'primary'
-      : 'accent';
+    if (
+      this.hasPermission('adminWorkspace') &&
+      userForm.hasOwnProperty(permissionId)
+    ) {
+      return usersStored.find(
+        user =>
+          user.id === userForm.id &&
+          user[permissionId] === userForm[permissionId]
+      )
+        ? 'primary'
+        : 'accent';
+    } else {
+      return 'primary';
+    }
   }
 
   isUnchecked(
@@ -569,12 +584,17 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     userForm: FormGroup,
     permissionId: keyof IWorkspaceUserPermissions
   ) {
-    return usersStored.find(
-      user =>
-        user.id === userForm.value.id &&
-        user[permissionId] &&
-        !userForm.value[permissionId]
-    );
+    if (
+      this.hasPermission('adminWorkspace') &&
+      userForm.value.hasOwnProperty(permissionId)
+    ) {
+      return usersStored.find(
+        user =>
+          user.id === userForm.value.id &&
+          user[permissionId] &&
+          !userForm.value[permissionId]
+      );
+    }
   }
 
   hasAnyUserChanged(): boolean {
