@@ -33,15 +33,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
             <mat-card-content>
               <div fxLayout="column">
-                <p fxLayout="column" class="margin-top-x1">
+                <p fxLayout="column">
                   <span class="mat-body-2">IP or hostname</span>
                   <span class="container-ip">{{ container.ip }}</span>
                 </p>
-                <p fxLayout="column" class="margin-top-x1">
+                <p fxLayout="column">
                   <span class="mat-body-2">Connection port</span>
                   <span class="container-port">{{ container.port }}</span>
                 </p>
-                <p *ngIf="container.isReachable" fxLayout="column" class="margin-top-x1">
+                <p *ngIf="container.isReachable" fxLayout="column">
                   <span class="mat-body-2">System Info</span>
                   <span class="container-system-info">{{ container.systemInfo }}</span>
                 </p>

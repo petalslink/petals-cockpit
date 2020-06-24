@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card fxFlex class="card-component-lifecycle">
         <mat-card-title class="light-bold title-about">About {{ component.name }}</mat-card-title>
 
-        <mat-card-content class="margin-top-x1">
-          <span fxLayout="row" class="mat-body-2 margin-bottom-x0">State</span>
+        <mat-card-content class="margin-top-x1" fxLayout="column" fxLayoutGap.lt-md="10px">
+          <span class="mat-body-2">State</span>
 
           <div fxLayout="column" fxLayout.gt-sm="row" fxLayoutAlign="center start" fxLayoutAlign.gt-sm="start center" fxLayoutGap="20px">
             <div fxFlex="100" fxFlex.gt-sm="none" fxLayout="row" fxLayoutAlign="start center" class="component-state">

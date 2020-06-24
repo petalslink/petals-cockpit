@@ -22,15 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card fxFlex class="card-component-lifecycle">
         <mat-card-title class="light-bold sa-name">About {{ sa.name }}</mat-card-title>
 
-        <mat-card-content>
-          <app-message
-            type="info"
-            msg="Changing the state of a SA will affect its SUs."
-            [isClosable]="false"
-            class="info-lifecycle-sa margin-top-x1"
-          ></app-message>
-
-          <span fxLayout="row" class="mat-body-2 margin-top-x2">State</span>
+        <mat-card-content fxLayout="column" fxLayoutGap.lt-md="10px" class="margin-top-x1">
+          <span class="mat-body-2">State</span>
 
           <div
             fxLayout="column"
@@ -38,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             fxLayoutAlign="center start"
             fxLayoutAlign.gt-sm="start center"
             fxLayoutGap="20px"
+            class="margin-bottom-x2"
           >
             <div fxFlex="100" fxFlex.gt-sm="none" fxLayout="row" fxLayoutAlign="start center" class="sa-state">
               <span>{{ sa.state }}</span>
@@ -45,7 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               <app-led [color]="getLedColorFromState(sa.state)" class="margin-left-x1 led-sa"></app-led>
             </div>
 
-            <div *ngIf="sa.state" fxFlex fxLayoutGap="10px" class="list-actions-name">
+            <div *ngIf="sa.state" fxLayoutGap="10px" class="list-actions-name">
               <span
                 *ngFor="let possibleState of getPossibleStateActions(sa.state); trackBy:trackBySaState"
                 fxFlexFill
@@ -68,6 +62,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               </span>
             </div>
           </div>
+          <app-message
+            type="info"
+            msg="Changing the state of a SA will affect its SUs."
+            [isClosable]="false"
+            class="info-lifecycle-sa"
+          ></app-message>
         </mat-card-content>
 
         <app-message
