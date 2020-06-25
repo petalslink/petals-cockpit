@@ -1473,7 +1473,8 @@ describe('Workspace', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
       cy
-        .get(`mat-option span`)
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('have.length', 1)
         .contains(userToAdd)
         .should('be.visible')
         .click();
@@ -1514,6 +1515,58 @@ describe('Workspace', () => {
       cy
         .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
         .should('be.disabled');
+
+      // expect to have 7 users present in the list
+
+      expectedFullUserDetailsList.forEach(user => {
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userId(user.id))
+          .should('contain', user.id);
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userName(user.id))
+          .should('contain', user.name);
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace(user.id))
+          .should(user.adminWorkspace ? 'be.checked' : 'not.be.checked');
+        cy
+          .get(WORKSPACE_OVERVIEW_DOM.table.cells.userDeployArtifact(user.id))
+          .should(user.deployArtifact ? 'be.checked' : 'not.be.checked');
+        cy
+          .get(
+            WORKSPACE_OVERVIEW_DOM.table.cells.userLifecycleArtifact(user.id)
+          )
+          .should(user.lifecycleArtifact ? 'be.checked' : 'not.be.checked');
+      });
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('have.length', 0);
+    });
+
+    it('should not be possible to add a non-existent cockpit user', () => {
+      const userToAdd = 'toto';
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.empty');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl)
+        .click()
+        .type(userToAdd);
+
+      // remove focus to create error
+      cy.get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace).focus();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.formFields.addUserFormField)
+        .should('have.class', 'ng-invalid');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('be.disabled');
     });
 
     it('should remove workspace user from workspace users', () => {
@@ -1527,7 +1580,9 @@ describe('Workspace', () => {
       // user to delete can not be added
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
-      cy.get(`mat-option span`).should('not.contain', userToDelete);
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('not.contain', userToDelete);
 
       cy
         .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(userToDelete))
@@ -1550,9 +1605,57 @@ describe('Workspace', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
 
       cy
-        .get(`mat-option span`)
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
         .contains(userToDelete)
         .should('be.visible');
+    });
+
+    it('should update candidate list members', () => {
+      const candidateMemberDefault = 'cdeneux';
+      const candidateListIdsMemberAfterDelete = ['cdeneux', 'bescudie'];
+      const candidateMemberAfterAdd = 'bescudie';
+      const userToDelete = 'bescudie';
+      const userToAdd = 'cdeneux';
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('have.length', 1)
+        .contains(candidateMemberDefault);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete(userToDelete))
+        .click({ force: true });
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('have.length', 2)
+        .each((_, index) =>
+          cy.contains(candidateListIdsMemberAfterDelete[index])
+        );
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .contains(userToAdd)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl)
+        .should('have.value', userToAdd);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace)
+        .should('not.be.disabled')
+        .click();
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).click();
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.candidateListIds)
+        .should('have.length', 1)
+        .contains(candidateMemberAfterAdd);
     });
 
     it('should leave a workspace', () => {
@@ -1823,6 +1926,58 @@ describe('Workspace', () => {
         adminWorkspace: false,
         deployArtifact: false,
         lifecycleArtifact: true,
+      },
+    ];
+
+    const expectedFullUserDetailsList = [
+      {
+        id: 'admin',
+        name: 'Administrator',
+        adminWorkspace: true,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'adminldap',
+        name: 'Administrator LDAP',
+        adminWorkspace: true,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'bescudie',
+        name: 'Bertrand ESCUDIE',
+        adminWorkspace: false,
+        deployArtifact: false,
+        lifecycleArtifact: false,
+      },
+      {
+        id: 'cchevalier',
+        name: 'Christophe CHEVALIER',
+        adminWorkspace: false,
+        deployArtifact: true,
+        lifecycleArtifact: false,
+      },
+      {
+        id: 'mrobert',
+        name: 'Maxime ROBERT',
+        adminWorkspace: false,
+        deployArtifact: true,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'vnoel',
+        name: 'Victor NOEL',
+        adminWorkspace: false,
+        deployArtifact: false,
+        lifecycleArtifact: true,
+      },
+      {
+        id: 'cdeneux',
+        name: 'Christophe DENEUX',
+        adminWorkspace: false,
+        deployArtifact: false,
+        lifecycleArtifact: false,
       },
     ];
 
