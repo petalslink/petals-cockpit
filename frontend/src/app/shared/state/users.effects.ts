@@ -47,7 +47,7 @@ export class UsersEffects {
     private actions$: Actions,
     private router: Router,
     private usersService: UsersService,
-    private notification: NotificationsService,
+    private notifications: NotificationsService,
     private store$: Store<IStore>
   ) {}
 
@@ -177,7 +177,7 @@ export class UsersEffects {
         this.router.navigate(['/workspaces'], {
           queryParams: { page: 'list' },
         });
-        this.notification.success(
+        this.notifications.success(
           'Role updated',
           'You are no longer administrator'
         );
@@ -242,7 +242,7 @@ export class UsersEffects {
       this.usersService.disconnectUser().pipe(
         map(() => {
           this.router.navigate(['/login']);
-          this.notification.remove();
+          this.notifications.remove();
           return new Users.DisconnectSuccess();
         }),
         catchError((err: HttpErrorResponse) => {
@@ -265,7 +265,7 @@ export class UsersEffects {
   disconnectUserSuccess$: Observable<Action> = this.actions$.pipe(
     ofType<Users.DisconnectSuccess>(Users.DisconnectSuccessType),
     tap(() =>
-      this.notification.success('Log out !', `You're now disconnected.`)
+      this.notifications.success('Log out !', `You're now disconnected.`)
     )
   );
 
