@@ -45,6 +45,8 @@ import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate
 @SuppressWarnings("null")
 public class PermissionsSecurityTest extends AbstractSecurityTest {
 
+    public static final NewUser ADMINCOCKPIT = new NewUser("ADMINCOCKPIT", "ADMINCOCKPIT", "ADMINCOCKPIT", true);
+
     public static final NewUser ADMINWORKSPACE = new NewUser("ADMINWORKSPACE", "ADMINWORKSPACE", "ADMINWORKSPACE",
             false);
 
@@ -101,11 +103,18 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
         addUser(DEPLOYPERMISSION);
         addUser(LIFECYCLEPERMISSION);
         addUser(ALLPERMISSIONS);
-        setUpWorkspace(1L, "test", "ADMINWORKSPACE", "DEPLOYPERMISSION", "LIFECYCLEPERMISSION", "ALLPERMISSIONS");
+        addUser(ADMINCOCKPIT);
+        setUpWorkspace(1L, "test", "ADMINWORKSPACE", "DEPLOYPERMISSION", "LIFECYCLEPERMISSION", "ALLPERMISSIONS",
+                "ADMINCOCKPIT");
         changeUserPermissionsWorkspace(1L, "ADMINWORKSPACE", true, false, false);
         changeUserPermissionsWorkspace(1L, "DEPLOYPERMISSION", false, true, false);
         changeUserPermissionsWorkspace(1L, "LIFECYCLEPERMISSION", false, false, true);
         changeUserPermissionsWorkspace(1L, "ALLPERMISSIONS", true, true, true);
+    }
+
+    @Test
+    public void adminCockpitCanUpdateWorkspace() {
+        isAllowed(ADMINCOCKPIT, "/workspaces/1", HttpMethod.PUT, Entity.json(new WorkspaceUpdate("", "", "")));
     }
 
     @Test
@@ -124,6 +133,11 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
+    public void adminCockpitCanDeleteHisWorkspace() {
+        isAllowed(ADMINCOCKPIT, "/workspaces/1", HttpMethod.DELETE, null);
+    }
+
+    @Test
     public void adminWorkspaceCanDeleteHisWorkspace() {
         isAllowed(ADMINWORKSPACE, "/workspaces/1", HttpMethod.DELETE, null);
     }
@@ -139,6 +153,11 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     }
 
     @Test
+    public void adminCockpitCanAddUsers() {
+        isAllowed(ADMINCOCKPIT, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
+    }
+
+    @Test
     public void adminWorkspaceCanAddUsers() {
         isAllowed(ADMINWORKSPACE, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
     }
@@ -151,6 +170,11 @@ public class PermissionsSecurityTest extends AbstractSecurityTest {
     @Test
     public void notAdminWorkspaceCanNotAddUsers() {
         isForbidden(DEPLOYPERMISSION, "/workspaces/1/users", HttpMethod.POST, Entity.json(new AddUser("test")));
+    }
+
+    @Test
+    public void adminCockpitCanDeleteUsers() {
+        isAllowed(ADMINCOCKPIT, "/workspaces/1/users/DEPLOYPERMISSION", HttpMethod.DELETE, null);
     }
 
     @Test
