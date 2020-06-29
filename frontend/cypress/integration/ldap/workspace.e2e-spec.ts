@@ -1715,6 +1715,50 @@ describe('Workspace', () => {
         .should('not.exist');
     });
 
+    it('should not be possible to leave workspace if current user is last admin remaining', () => {
+      // check leave button behaviour if delete user
+      cy.get(WORKSPACE_OVERVIEW_DOM.table.userTable).scrollIntoView();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('adminldap'))
+        .should('be.checked');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+        .should('be.enabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userActionDelete('adminldap'))
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+        .should('be.disabled');
+
+      // check leave button behaviour if update user
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('bescudie'))
+        .should('not.be.checked')
+        .click({
+          force: true,
+        })
+        .should('be.checked');
+
+      // Current user leave workspace should be still disabled if change is not save.
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+        .should('be.disabled');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.savePermissionsBtn)
+        .should('be.enabled')
+        .click();
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.table.cells.currentUserDelete)
+        .should('be.enabled');
+    });
+
     it('should edit and update workspace users permissions from workspace users', () => {
       cy.get(WORKSPACE_OVERVIEW_DOM.table.userTable).scrollIntoView();
 

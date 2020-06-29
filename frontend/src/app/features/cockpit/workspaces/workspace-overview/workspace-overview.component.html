@@ -732,7 +732,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     <button
                       mat-icon-button
                       onclick="this.blur()"
-                      [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
+                      [disabled]="workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users) || isLastAdminRemaining"
                       (click)="removeUser(user.value.id)"
                       class="action-leave-wks"
                     >
