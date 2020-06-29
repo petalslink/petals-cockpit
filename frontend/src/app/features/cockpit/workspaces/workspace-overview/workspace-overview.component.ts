@@ -194,7 +194,10 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       map(users => {
         // TODO: we should not retrieve the cockpit users if the current user has not adminWorkspace
         // See: https://gitlab.com/linagora/petals-cockpit/-/issues/692
-        if (!this.hasPermission('adminWorkspace')) {
+        if (
+          !this.hasPermission('adminWorkspace') &&
+          !this.currentUser.isAdmin
+        ) {
           this.addUserFormGroup.reset();
           this.addUserFormGroup.disable();
         }
