@@ -24,9 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <mat-card-title class="light-bold su-name">About {{ su.name }}</mat-card-title>
 
       <mat-card-content class="margin-top-x1">
-        <span fxLayout="row" class="mat-body-2 margin-bottom-x1">State</span>
+        <span class="mat-body-2 margin-bottom-x1">State</span>
 
-        <div fxLayout="row" fxLayoutAlign="start center">
+        <div fxLayoutAlign="start center" class="margin-top-x1">
           <span class="su-state">{{ su.serviceAssembly.state }}</span>
           <app-led [color]="getLedColorFromState(su.serviceAssembly.state)" class="su-state-led margin-left-x1"></app-led>
         </div>
