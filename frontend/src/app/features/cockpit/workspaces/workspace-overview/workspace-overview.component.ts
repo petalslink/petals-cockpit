@@ -194,10 +194,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       map(users => {
         // TODO: we should not retrieve the cockpit users if the current user has not adminWorkspace
         // See: https://gitlab.com/linagora/petals-cockpit/-/issues/692
-        if (
-          !this.hasPermission('adminWorkspace') &&
-          !this.currentUser.isAdmin
-        ) {
+        if (!this.isAllowedAs('adminWorkspace')) {
           this.addUserFormGroup.reset();
           this.addUserFormGroup.disable();
         }
@@ -369,9 +366,20 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     }
   }
 
-  hasPermission(permissionId: keyof IWorkspaceUserPermissions) {
+  /**
+   * Returns if the user is allowed to act as the permission given in parameter.
+   * Cockpit admins are allowed to act as workspace admins.
+   */
+  isAllowedAs(permissionId: keyof IWorkspaceUserPermissions) {
     if (this.currentUser.workspacePermissions) {
-      return this.currentUser.workspacePermissions[permissionId];
+      if (permissionId === 'adminWorkspace') {
+        return (
+          this.currentUser.workspacePermissions[permissionId] ||
+          this.currentUser.isAdmin
+        );
+      } else {
+        return this.currentUser.workspacePermissions[permissionId];
+      }
     }
   }
 
@@ -567,7 +575,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   ) {
     const userForm = this.usersFormArray.controls[index].value;
     if (
-      this.hasPermission('adminWorkspace') &&
+      this.isAllowedAs('adminWorkspace') &&
       userForm.hasOwnProperty(permissionId)
     ) {
       return usersStored.find(
@@ -588,7 +596,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     permissionId: keyof IWorkspaceUserPermissions
   ) {
     if (
-      this.hasPermission('adminWorkspace') &&
+      this.isAllowedAs('adminWorkspace') &&
       userForm.value.hasOwnProperty(permissionId)
     ) {
       return usersStored.find(
@@ -635,7 +643,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
             if (confirm) {
               this.store$.dispatch(new Workspaces.DeleteUser({ id }));
               this.usersFormGroup.disable();
-            } else if (this.hasPermission('adminWorkspace')) {
+            } else if (this.isAllowedAs('adminWorkspace')) {
               this.usersFormGroup.enable();
             }
           })
