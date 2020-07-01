@@ -17,6 +17,7 @@
 package org.ow2.petals.cockpit.server.bundles.security;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import javax.validation.constraints.NotNull;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.pac4j.core.authorization.authorizer.Authorizer;
+import org.pac4j.core.authorization.authorizer.OrAuthorizer;
 import org.pac4j.core.client.Client;
 import org.pac4j.core.context.DefaultAuthorizers;
 import org.pac4j.core.matching.PathMatcher;
@@ -89,8 +92,12 @@ public abstract class CockpitSecurityBundle<C extends Configuration> extends Pac
 
         pac4jConf.setHttpActionAdapter(new HttpActionAdapter303());
 
-        pac4jConf.getAuthorizers().put(ADMIN_AUTHORIZER, new AdminCockpitAuthorizer<CockpitProfile>());
-        pac4jConf.getAuthorizers().put(ADMIN_WORKSPACE_AUTHORIZER, new GenericAuthorizer<CockpitProfile>(CockpitProfile.ADMIN_WORKSPACE));
+        final AdminCockpitAuthorizer<CockpitProfile> adminCockpitAuth = new AdminCockpitAuthorizer<CockpitProfile>();
+        final Authorizer<CockpitProfile> adminWorkspaceAuth = new OrAuthorizer<CockpitProfile>(
+                Arrays.asList(adminCockpitAuth, new GenericAuthorizer<CockpitProfile>(CockpitProfile.ADMIN_WORKSPACE)));
+
+        pac4jConf.getAuthorizers().put(ADMIN_AUTHORIZER, adminCockpitAuth);
+        pac4jConf.getAuthorizers().put(ADMIN_WORKSPACE_AUTHORIZER, adminWorkspaceAuth);
         pac4jConf.getAuthorizers().put(DEPLOY_ARTIFACT_AUTHORIZER, new GenericAuthorizer<CockpitProfile>(CockpitProfile.DEPLOY_ARTIFACT_PERMISSION));
         pac4jConf.getAuthorizers().put(LIFECYCLE_ARTIFACT_AUTHORIZER, new LifeCycleArtifactAuthorizer<CockpitProfile>());
 

@@ -557,7 +557,8 @@ public class WorkspaceResource {
     @DELETE
     @Path("/users/{id}")
     public void deleteUser(@NotEmpty @PathParam("id") String username) {
-        final boolean isAuthorized = this.profile.hasPermission(this.wsId, CockpitProfile.ADMIN_WORKSPACE);
+        final boolean isAuthorized = this.profile.hasPermission(this.wsId, CockpitProfile.ADMIN_WORKSPACE)
+                || this.profile.isAdmin();
         final boolean isDeletingHimself = this.profile.getId().equals(username);
         final boolean isLastMember = !DSL.using(jooq).fetchExists(USERS_WORKSPACES, USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)
             .and(USERS_WORKSPACES.USERNAME.ne(username)));
