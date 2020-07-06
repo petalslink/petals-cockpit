@@ -300,7 +300,9 @@ export namespace Workspaces {
     '[Workspaces] Fetch current user permissions';
   export class FetchWorkspaceUserPermissions implements Action {
     readonly type = FetchWorkspaceUserPermissionsType;
-    constructor(public readonly payload: { currentUserId: string }) {}
+    constructor(
+      public readonly payload: { workspaceId: string; currentUserId: string }
+    ) {}
   }
 
   export const FetchWorkspaceUserPermissionsSuccessType =
@@ -314,13 +316,6 @@ export namespace Workspaces {
     '[Workspaces] Fetch current user permissions error';
   export class FetchWorkspaceUserPermissionsError implements Action {
     readonly type = FetchWorkspaceUserPermissionsErrorType;
-    constructor() {}
-  }
-
-  export const CleanCurrentUserWorkspacePermissionsType =
-    '[Workspaces] Clean current user permissions';
-  export class CleanCurrentUserWorkspacePermissions implements Action {
-    readonly type = CleanCurrentUserWorkspacePermissionsType;
     constructor() {}
   }
 }
