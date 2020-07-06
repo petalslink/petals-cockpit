@@ -16,7 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { environment } from '@env/environment';
 import {
@@ -26,6 +26,7 @@ import {
 } from '@mocks/backend-mock';
 import { BackendUser } from '@mocks/users-mock';
 import * as helper from '@shared/helpers/mock.helper';
+import { IWorkspaceUserPermissionsBackend } from '@shared/services/workspaces.service';
 import { ICurrentUser } from '@shared/state/users.interface';
 import {
   ICurrentUserBackend,
@@ -157,5 +158,12 @@ export class UsersServiceMock extends UsersService {
     return this.responseAdmin(
       user ? helper.response(204) : helper.response(409)
     );
+  }
+
+  getPermissions(userId: string) {
+    const perms: {
+      permissions: { [wksId: string]: IWorkspaceUserPermissionsBackend };
+    } = { permissions: {} };
+    return of(perms);
   }
 }

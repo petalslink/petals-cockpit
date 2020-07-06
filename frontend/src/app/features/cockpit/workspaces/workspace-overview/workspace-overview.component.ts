@@ -51,8 +51,8 @@ import {
 import { IBusImport } from '@shared/services/buses.service';
 import { IStore } from '@shared/state/store.interface';
 import { Users } from '@shared/state/users.actions';
-import { IUserRow } from '@shared/state/users.interface';
-import { getCurrentUser } from '@shared/state/users.selectors';
+import { ICurrentUser, IUserRow } from '@shared/state/users.interface';
+import { getConnectedUser } from '@shared/state/users.selectors';
 import { SharedValidator } from '@shared/validators/shared.validator';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { IBusRow } from '@wks/state/buses/buses.interface';
@@ -131,11 +131,11 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
   // workspace users management
   users$: Observable<IWorkspaceUserRow[]>;
-  currentUserId: string;
   appUsers$: Observable<string[]>;
   filteredUsers$: Observable<string[]>;
   addUserFormGroup: FormGroup;
   usersFormGroup: FormGroup;
+  currentUser: ICurrentUser;
 
   displayedColumns: string[] = [
     'name',
@@ -191,14 +191,23 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     this.appUsers$ = this.store$.pipe(
       select(getUsersNotInCurrentWorkspace),
-      map(user => user.map(u => u.id).sort())
+      map(users => {
+        // TODO: we should not retrieve the cockpit users if the current user has not adminWorkspace
+        // See: https://gitlab.com/linagora/petals-cockpit/-/issues/692
+        if (!this.isAllowedAs('adminWorkspace')) {
+          this.addUserFormGroup.reset();
+          this.addUserFormGroup.disable();
+        }
+        return users.map(u => u.id).sort();
+      })
     );
 
     this.store$
       .pipe(
-        getCurrentUser,
+        select(getConnectedUser),
+        takeUntil(this.onDestroy$),
         tap(user => {
-          this.currentUserId = user.id;
+          this.currentUser = user;
         })
       )
       .subscribe();
@@ -219,7 +228,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       tap(users => {
         if (!this.isSavingUsersPermissions(users)) {
           this.isLastAdminRemaining = !users.some(
-            user => user.id !== this.currentUserId && user.adminWorkspace
+            user => user.id !== this.currentUser.id && user.adminWorkspace
           );
 
           this.usersPermissionsChanged = users.map(user => {
@@ -232,7 +241,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
           });
 
           this.updateUsersFormGroup(users);
-          this.usersFormGroup.enable();
         }
       })
     );
@@ -261,7 +269,6 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.createFormUpdateWorkspaceDetails();
-
     this.workspace$
       .pipe(
         takeUntil(this.onDestroy$),
@@ -356,6 +363,23 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
 
     if (this.busSelected) {
       this.store$.dispatch(new Buses.CancelSelect({ id: this.busSelected.id }));
+    }
+  }
+
+  /**
+   * Returns if the user is allowed to act as the permission given in parameter.
+   * Cockpit admins are allowed to act as workspace admins.
+   */
+  isAllowedAs(permissionId: keyof IWorkspaceUserPermissions) {
+    if (this.currentUser.workspacePermissions) {
+      if (permissionId === 'adminWorkspace') {
+        return (
+          this.currentUser.workspacePermissions[permissionId] ||
+          this.currentUser.isAdmin
+        );
+      } else {
+        return this.currentUser.workspacePermissions[permissionId];
+      }
     }
   }
 
@@ -550,12 +574,20 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     index: number
   ) {
     const userForm = this.usersFormArray.controls[index].value;
-    return usersStored.find(
-      user =>
-        user.id === userForm.id && user[permissionId] === userForm[permissionId]
-    )
-      ? 'primary'
-      : 'accent';
+    if (
+      this.isAllowedAs('adminWorkspace') &&
+      userForm.hasOwnProperty(permissionId)
+    ) {
+      return usersStored.find(
+        user =>
+          user.id === userForm.id &&
+          user[permissionId] === userForm[permissionId]
+      )
+        ? 'primary'
+        : 'accent';
+    } else {
+      return 'primary';
+    }
   }
 
   isUnchecked(
@@ -563,12 +595,17 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
     userForm: FormGroup,
     permissionId: keyof IWorkspaceUserPermissions
   ) {
-    return usersStored.find(
-      user =>
-        user.id === userForm.value.id &&
-        user[permissionId] &&
-        !userForm.value[permissionId]
-    );
+    if (
+      this.isAllowedAs('adminWorkspace') &&
+      userForm.value.hasOwnProperty(permissionId)
+    ) {
+      return usersStored.find(
+        user =>
+          user.id === userForm.value.id &&
+          user[permissionId] &&
+          !userForm.value[permissionId]
+      );
+    }
   }
 
   hasAnyUserChanged(): boolean {
@@ -588,7 +625,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
   }
 
   removeUser(id: string) {
-    const currentUserSelfRemoving = this.currentUserId === id;
+    const currentUserSelfRemoving = this.currentUser.id === id;
 
     if (currentUserSelfRemoving) {
       this.dialog
@@ -606,7 +643,7 @@ export class WorkspaceOverviewComponent implements OnInit, OnDestroy {
             if (confirm) {
               this.store$.dispatch(new Workspaces.DeleteUser({ id }));
               this.usersFormGroup.disable();
-            } else {
+            } else if (this.isAllowedAs('adminWorkspace')) {
               this.usersFormGroup.enable();
             }
           })

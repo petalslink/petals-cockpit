@@ -17,7 +17,7 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { delay, tap } from 'rxjs/operators';
+import { delay, map, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import {
@@ -32,11 +32,15 @@ import {
 import { BackendUser } from '@mocks/users-mock';
 import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
+import { Observable } from 'rxjs';
 import { SseActions, SseService } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 import { UsersService } from './users.service';
 import { UsersServiceMock } from './users.service.mock';
-import { WorkspacesServiceImpl } from './workspaces.service';
+import {
+  IWorkspaceUserPermissionsBackend,
+  WorkspacesServiceImpl,
+} from './workspaces.service';
 
 @Injectable()
 export class WorkspacesServiceMock extends WorkspacesServiceImpl {
@@ -132,6 +136,35 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
       tap(_ => {
         const user: BackendUser = BackendUser.get(userId);
         workspacesService.get(workspaceId).addUserWithoutPermission(user);
+      })
+    );
+  }
+
+  getUserPermissions(
+    userId: string,
+    wksId: string
+  ): Observable<{
+    permissions: {
+      [wksId: string]: IWorkspaceUserPermissionsBackend;
+    };
+  }> {
+    return helper.response(200).pipe(
+      delay(environment.mock.httpDelay),
+      map(_ => {
+        const userWithPermissions = workspacesService
+          .get(wksId)
+          .getUsers()
+          .find(user => user.id === userId);
+        const onlyPermissions: IWorkspaceUserPermissionsBackend = {
+          adminWorkspace: userWithPermissions.adminWorkspace,
+          deployArtifact: userWithPermissions.deployArtifact,
+          lifecycleArtifact: userWithPermissions.lifecycleArtifact,
+        };
+        return {
+          permissions: {
+            [wksId]: onlyPermissions,
+          },
+        };
       })
     );
   }

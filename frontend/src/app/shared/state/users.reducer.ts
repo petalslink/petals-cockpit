@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
 import {
   JsTable,
   mergeInto,
@@ -28,6 +29,7 @@ import {
   IUserNew,
   IUserSetup,
 } from '@shared/services/users.service';
+import { IWorkspaceUserPermissionsBackend } from '@shared/services/workspaces.service';
 import { Users } from './users.actions';
 import {
   IUserLDAP,
@@ -63,7 +65,10 @@ export namespace UsersReducer {
     | Users.ConnectSuccess
     | Users.Disconnect
     | Users.DisconnectError
-    | Users.Disconnected;
+    | Users.Disconnected
+    | Workspaces.FetchWorkspaceUserPermissionsSuccess
+    | Workspaces.UpdateWorkspaceUserPermissionsSuccess
+    | Workspaces.CleanCurrentUserWorkspacePermissions;
 
   export function reducer(
     table = usersTableFactory(),
@@ -144,6 +149,15 @@ export namespace UsersReducer {
       }
       case Users.DisconnectedType: {
         return usersTableFactory();
+      }
+      case Workspaces.FetchWorkspaceUserPermissionsSuccessType: {
+        return setWorkspacePermissions(table, action.payload);
+      }
+      case Workspaces.UpdateWorkspaceUserPermissionsSuccessType: {
+        return updateCurrentUserPermissionIfNeeded(table, action.payload);
+      }
+      case Workspaces.CleanCurrentUserWorkspacePermissionsType: {
+        return cleanWorkspacePermissions(table);
       }
       default:
         return table;
@@ -330,5 +344,33 @@ export namespace UsersReducer {
       ...table,
       isDisconnecting: false,
     };
+  }
+
+  function setWorkspacePermissions(
+    table: IUsersTable,
+    payload: IWorkspaceUserPermissionsBackend
+  ): IUsersTable {
+    return {
+      ...table,
+      connectedUser: {
+        ...table.connectedUser,
+        workspacePermissions: payload,
+      },
+    };
+  }
+
+  function cleanWorkspacePermissions(table: IUsersTable): IUsersTable {
+    const connectedUserWithouPermissions = { ...table.connectedUser };
+    delete connectedUserWithouPermissions.workspacePermissions;
+    return { ...table, connectedUser: connectedUserWithouPermissions };
+  }
+
+  function updateCurrentUserPermissionIfNeeded(
+    table: IUsersTable,
+    payload: { userId: string; permissions: IWorkspaceUserPermissionsBackend }
+  ) {
+    return table.connectedUser.id === payload.userId
+      ? setWorkspacePermissions(table, payload.permissions)
+      : table;
   }
 }
