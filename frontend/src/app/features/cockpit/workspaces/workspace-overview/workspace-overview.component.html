@@ -22,10 +22,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   >
     <mat-card fxFlex class="card-workspace-details">
       <mat-card-content *ngIf="!workspace.isEditDetailsMode; else workspaceDetailsEdit" class="workspace-details">
-        <mat-card-title class="light-bold">Short description</mat-card-title>
+        <mat-card-title class="light-bold">About {{ workspace.name }} </mat-card-title>
+        <span class="mat-body-2 margin-top-x1">Short description</span>
         <!-- Short description overview -->
         <div *ngIf="workspace.shortDescription; else noShortDescription" class="short-description">
-          <span fxFlex class="short-description-text">{{ workspace.shortDescription }}</span>
+          <span fxFlex class="short-description-text margin-top-x1 margin-bottom-x1">{{ workspace.shortDescription }}</span>
         </div>
         <ng-template #noShortDescription>
           <app-message
@@ -36,17 +37,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           ></app-message>
         </ng-template>
 
-        <mat-card-title class="light-bold margin-top-x2">Description</mat-card-title>
+        <span class="mat-body-2 ">Description</span>
         <!-- Description overview -->
         <div *ngIf="workspace.description; else noDescription" class="description">
-          <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text"></span>
+          <span fxFlex [innerHTML]="workspace.description | MarkdownToHtml" class="description-text margin-top-x1"></span>
         </div>
         <ng-template #noDescription>
           <app-message
             type="info"
             msg="This workspace doesn't have any description."
             [isClosable]="false"
-            class="info-no-description margin-bottom-x1"
+            class="info-no-description"
           ></app-message>
         </ng-template>
 
@@ -98,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
           (ngSubmit)="onSubmitWorkspaceDetails()"
           class="workspace-details-form"
         >
-          <mat-card-title class="light-bold">Workspace details</mat-card-title>
+          <mat-card-title class="light-bold"> {{ workspace.name }} details</mat-card-title>
           <mat-card-content class="workspace-details-edit">
             <!-- Edit workspace name -->
             <mat-form-field
