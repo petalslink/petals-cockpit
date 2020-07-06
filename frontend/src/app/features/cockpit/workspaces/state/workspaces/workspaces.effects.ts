@@ -149,6 +149,16 @@ export class WorkspacesEffects {
   @Effect()
   fetchWorkspace$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.Fetch>(Workspaces.FetchType),
+    withLatestFrom(this.store$.pipe(getCurrentUser)),
+    map(([action, currentUser]) => {
+      this.store$.dispatch(
+        new Workspaces.FetchWorkspaceUserPermissions({
+          workspaceId: action.payload.id,
+          currentUserId: currentUser.id,
+        })
+      );
+      return action;
+    }),
     switchMap(action =>
       this.sseService.watchWorkspaceRealTime(action.payload.id).pipe(
         catchError(err => {
@@ -179,7 +189,6 @@ export class WorkspacesEffects {
 
       return batchActions([
         new Workspaces.CleanWorkspace(),
-        new Workspaces.CleanCurrentUserWorkspacePermissions(),
         new Workspaces.FetchSuccess(data.workspace),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),
@@ -191,17 +200,6 @@ export class WorkspacesEffects {
         new Services.Fetched(toJsTable(data.services)),
         new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
       ]);
-    })
-  );
-
-  @Effect()
-  fetchWorkspaceSuccess$: Observable<Action> = this.actions$.pipe(
-    ofType<Workspaces.FetchSuccess>(Workspaces.FetchSuccessType),
-    withLatestFrom(this.store$.pipe(getCurrentUser)),
-    map(([_, currentUser]) => {
-      return new Workspaces.FetchWorkspaceUserPermissions({
-        currentUserId: currentUser.id,
-      });
     })
   );
 
@@ -383,17 +381,17 @@ export class WorkspacesEffects {
     ofType<Workspaces.FetchWorkspaceUserPermissions>(
       Workspaces.FetchWorkspaceUserPermissionsType
     ),
-    withLatestFrom(
-      this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
-    ),
-    mergeMap(([action, workspaceId]) =>
+    switchMap(action =>
       this.workspacesService
-        .getUserPermissions(action.payload.currentUserId, workspaceId)
+        .getUserPermissions(
+          action.payload.currentUserId,
+          action.payload.workspaceId
+        )
         .pipe(
           map(
             response =>
               new Workspaces.FetchWorkspaceUserPermissionsSuccess(
-                response.permissions[workspaceId]
+                response.permissions[action.payload.workspaceId]
               )
           ),
           catchError((err: HttpErrorResponse) => {
