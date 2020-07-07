@@ -1,3 +1,30 @@
+<a name="1.9.0"></a>
+# [1.9.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.8.0...v1.9.0) (2020-07-06)
+
+
+### Bug Fixes
+
+* **back:** admin cockpit is now allowed to do as workspace admin ([ba7528f](https://gitlab.com/linagora/petals-cockpit/commit/ba7528f009e70a52389d9084d9a3cb47910cb3df))
+* **frontend:** fix bug while reloading workspace list ([2a83bea](https://gitlab.com/linagora/petals-cockpit/commit/2a83bea556cce8945133653cf5e33292e95a6be4))
+* **frontend:** make bus import error notification more readable ([b0ef5d0](https://gitlab.com/linagora/petals-cockpit/commit/b0ef5d05153819aa81cb0f8447559084afc20f1f)), closes [#682](https://gitlab.com/linagora/petals-cockpit/issues/682)
+* **frontend:** make topology info message full size ([b834b80](https://gitlab.com/linagora/petals-cockpit/commit/b834b8013a8181af08ddfcfed9a35f73330bd0f9)), closes [#687](https://gitlab.com/linagora/petals-cockpit/issues/687)
+
+
+### Features
+
+* **backend:** prevent last admin workspace to leave ([90ad29c](https://gitlab.com/linagora/petals-cockpit/commit/90ad29c94bdf62f6bad46b9e3db4e3e6db09c71d)), closes [#680](https://gitlab.com/linagora/petals-cockpit/issues/680)
+* **frontend:** add element name on their overview page ([0f9ea01](https://gitlab.com/linagora/petals-cockpit/commit/0f9ea01ecd10752e9db43033422a6bbc724d5804)), closes [#684](https://gitlab.com/linagora/petals-cockpit/issues/684)
+* **frontend:** add led state to topology tree ([cc00f03](https://gitlab.com/linagora/petals-cockpit/commit/cc00f035c6efd527e5ff147da5a0bd3fd5f5ea2a)), closes [#665](https://gitlab.com/linagora/petals-cockpit/issues/665)
+* **frontend:** add tooltip to breadcrumbs 1s delay ([5678164](https://gitlab.com/linagora/petals-cockpit/commit/5678164c2036d240b631032d192b9c1577318e77))
+* **frontend:** authorize adminCockpit without adminWorkspace permission to do some actions on workspaces ([e5d2b16](https://gitlab.com/linagora/petals-cockpit/commit/e5d2b161200b110d4fe872b3ec7a68a93a890f57))
+* **frontend:** end of large breadcrumb elements are now hidden by three dots ([ab9f99b](https://gitlab.com/linagora/petals-cockpit/commit/ab9f99bdcf72ce03c25f595478bfbdfb76164426))
+* **frontend:** display breadcrumbs icons only when screen is large enough ([cb734d6](https://gitlab.com/linagora/petals-cockpit/commit/cb734d69ed4080da5fd182f55dac332c55ea0fa8))
+* **frontend:** restrict available action according to workspace administrator permission ([3056cfa](https://gitlab.com/linagora/petals-cockpit/commit/3056cfab1bc49a741651dbfc994798a04adc1ae3)), closes [#567](https://gitlab.com/linagora/petals-cockpit/issues/567)
+* **frontend:** should not leave workspace without admin remaining ([0b11812](https://gitlab.com/linagora/petals-cockpit/commit/0b1181224d09bfaa0a43c97165b267e931c383b2)), closes [#681](https://gitlab.com/linagora/petals-cockpit/issues/681)
+* **frontend:** upgraded breadcrumb look ([bf5706c](https://gitlab.com/linagora/petals-cockpit/commit/bf5706c519ed8f069babcbae436cfe8527d33434)), closes [#528](https://gitlab.com/linagora/petals-cockpit/issues/528)
+
+
+
 <a name="1.8.0"></a>
 # [1.8.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.7.0...v1.8.0) (2020-06-09)
 
