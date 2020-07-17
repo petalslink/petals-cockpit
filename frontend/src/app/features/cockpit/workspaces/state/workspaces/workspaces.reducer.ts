@@ -30,6 +30,7 @@ import {
   emptyJsTable,
   JsTable,
   mergeInto,
+  mergeOnly,
   putById,
   removeById,
   toJsTable,
@@ -239,7 +240,7 @@ export namespace WorkspacesReducer {
     );
 
     return {
-      ...mergeInto(table, wksUsersAsJsTable, workspaceRowFactory),
+      ...mergeOnly(table, wksUsersAsJsTable, workspaceRowFactory),
       isFetchingWorkspaces: false,
     };
   }
