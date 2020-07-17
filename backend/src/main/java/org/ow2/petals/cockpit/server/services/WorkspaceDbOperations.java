@@ -76,8 +76,8 @@ import org.ow2.petals.cockpit.server.resources.InterfacesResource.InterfaceFull;
 import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.ServicesResource.ServiceFull;
-import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
-import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -710,8 +710,8 @@ public class WorkspaceDbOperations {
         return ImmutableMap.copyOf(interfacesToReturn);
     }
 
-    public List<WorkspaceUser> getWorkspaceUsers(Configuration conf, long workspaceId) {
-        List<WorkspaceUser> result =  DSL.using(conf)
+    public List<WorkspaceResource.WorkspaceUser> getWorkspaceUsers(Configuration conf, long workspaceId) {
+        List<WorkspaceResource.WorkspaceUser> result =  DSL.using(conf)
                 .select(USERS.USERNAME, USERS.NAME, USERS.ADMIN,
                         USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION,
                         USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION,
@@ -719,8 +719,9 @@ public class WorkspaceDbOperations {
                 .from(USERS).join(USERS_WORKSPACES).on(USERS.USERNAME.eq(USERS_WORKSPACES.USERNAME))
                 .where(USERS_WORKSPACES.WORKSPACE_ID.eq(workspaceId))
                 .orderBy(USERS_WORKSPACES.USERNAME)
-                .fetch(record -> new WorkspaceUser(
+                .fetch(record -> new WorkspaceResource.WorkspaceUser(
                         record.get(USERS.USERNAME),
+                        record.get(USERS.NAME),
                         new PermissionsMin(record.get(USERS_WORKSPACES.ADMIN_WORKSPACE_PERMISSION),
                         record.get(USERS_WORKSPACES.DEPLOY_ARTIFACT_PERMISSION),
                         record.get(USERS_WORKSPACES.LIFECYCLE_ARTIFACT_PERMISSION))));

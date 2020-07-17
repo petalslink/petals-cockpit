@@ -50,13 +50,10 @@ import org.ow2.petals.cockpit.server.LdapConfigFactory;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitAuthenticator;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
-import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.services.LdapService;
 import org.pac4j.jax.rs.annotations.Pac4JSecurity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 @Singleton
 @Path("/users")
@@ -269,28 +266,6 @@ public class UsersResource {
             this.id = id;
             this.name = name;
             this.isAdmin = isAdmin;
-        }
-    }
-
-    public static class WorkspaceUser {
-
-        @NotEmpty
-        @JsonProperty
-        public final String id;
-
-        @Valid
-        @JsonUnwrapped
-        public final PermissionsMin wsPermissions;
-
-        public WorkspaceUser(@JsonProperty("id") String id, @JsonProperty("permissions") PermissionsMin wsPerm) {
-            this.id = id;
-            this.wsPermissions = wsPerm;
-        }
-
-        @JsonCreator
-        private WorkspaceUser() {
-            // jackson will inject values itself (because of @JsonUnwrapped)
-            this("", new PermissionsMin(false, false, false));
         }
     }
 }

@@ -18,7 +18,6 @@ package org.ow2.petals.cockpit.server.services;
 
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_COMPONENTS_CONTAINERS_ID;
 import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_CONTAINERS_BUSES_ID;
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.BUSES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -69,7 +67,6 @@ import org.ow2.petals.cockpit.server.db.generated.tables.records.ContainersRecor
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceassembliesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ServiceunitsRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.SharedlibrariesRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentFull;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
@@ -187,7 +184,8 @@ public class WorkspacesService {
             LOG.debug("New SSE client for workspace {}", wId);
 
             WorkspaceFullContent content = DSL.using(jooq).transactionResult(conf -> {
-                WorkspacesRecord ws = DSL.using(conf).selectFrom(WORKSPACES).where(WORKSPACES.ID.eq(wId)).fetchOne();
+                WorkspacesRecord ws = DSL.using(conf).select(WORKSPACES.ID, WORKSPACES.NAME).from(WORKSPACES)
+                        .where(WORKSPACES.ID.eq(wId)).fetchOneInto(WORKSPACES);
 
                 // this should never happen!
                 assert ws != null;
@@ -195,13 +193,9 @@ public class WorkspacesService {
                 WorkspaceContentBuilder c = WorkspaceContent.builder();
                 workspaceDb.fetchWorkspaceFromDatabase(conf, ws, c);
 
-                List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                        .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wId))
-                        .fetchInto(USERS);
-
                 DSL.using(conf).update(USERS).set(USERS.LAST_WORKSPACE, wId).where(USERS.USERNAME.eq(user)).execute();
 
-                return new WorkspaceFullContent(ws, wsUsers, c.build());
+                return new WorkspaceFullContent(ws, c.build());
             });
             assert content != null;
 

@@ -16,7 +16,6 @@
  */
 package org.ow2.petals.cockpit.server.resources;
 
-import static org.ow2.petals.cockpit.server.db.generated.Keys.FK_USERS_WORKSPACES_USERNAME;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.COMPONENTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.CONTAINERS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS;
@@ -62,6 +61,7 @@ import org.glassfish.jersey.media.sse.SseFeature;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.jooq.Configuration;
+import org.jooq.Record1;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.SQLStateClass;
 import org.jooq.impl.DSL;
@@ -70,15 +70,12 @@ import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitSecurityBundle;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.BusesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.ComponentsRecord;
-import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.WorkspacesRecord;
 import org.ow2.petals.cockpit.server.resources.ComponentsResource.ComponentMin;
 import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.ServiceAssembliesResource.ServiceAssemblyMin;
 import org.ow2.petals.cockpit.server.resources.SharedLibrariesResource.SharedLibraryMin;
-import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
-import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceContent.WorkspaceContentBuilder;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.Workspace;
 import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceMin;
@@ -208,10 +205,7 @@ public class WorkspaceResource {
             WorkspaceContentBuilder c = WorkspaceContent.builder();
             workspaceDb.fetchWorkspaceFromDatabase(conf, ws, c);
 
-            List<UsersRecord> wsUsers = DSL.using(conf).select().from(USERS).join(USERS_WORKSPACES)
-                    .onKey(FK_USERS_WORKSPACES_USERNAME).where(USERS_WORKSPACES.WORKSPACE_ID.eq(wsId)).fetchInto(USERS);
-
-            return new WorkspaceFullContent(ws, wsUsers, c.build());
+            return new WorkspaceFullContent(ws, c.build());
         });
     }
 
@@ -532,19 +526,28 @@ public class WorkspaceResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Pac4JSecurity(authorizers = CockpitSecurityBundle.ADMIN_WORKSPACE_AUTHORIZER)
-    public PermissionsMin addUsers(@Valid AddUser userToAdd) {
+    public WorkspaceUser addUsers(@Valid AddUser userToAdd) {
         try {
             final boolean isAlreadyInWorkspace = DSL.using(jooq).fetchExists(USERS_WORKSPACES,
-                USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(userToAdd.id)));
+                    USERS_WORKSPACES.WORKSPACE_ID.eq(wsId).and(USERS_WORKSPACES.USERNAME.eq(userToAdd.id)));
             if (isAlreadyInWorkspace) {
-              throw new WebApplicationException("User already exists in this workspace!", Status.CONFLICT);
+                throw new WebApplicationException("User already exists in this workspace!", Status.CONFLICT);
             }
 
             UsersWorkspacesRecord newUserWs = new UsersWorkspacesRecord(this.wsId, userToAdd.id, true, true, true);
             newUserWs.attach(jooq);
             newUserWs.insert();
 
-            return new PermissionsMin(newUserWs);
+            String name = DSL.using(jooq)
+                    .select(USERS.NAME)
+                    .from(USERS)
+                    .where(USERS.USERNAME.eq(userToAdd.id))
+                    .fetchOneInto(String.class);
+            if (name == null) {
+                throw new WebApplicationException("User " + userToAdd.id + " does not exist.");
+            }
+
+            return new WorkspaceUser(userToAdd.id, name, new PermissionsMin(newUserWs));
         } catch (DataAccessException e) {
             if (e.sqlStateClass().equals(SQLStateClass.C23_INTEGRITY_CONSTRAINT_VIOLATION)) {
                 throw new WebApplicationException(Status.CONFLICT);
@@ -944,33 +947,24 @@ public class WorkspaceResource {
 
         @Valid
         @JsonProperty
-        public final WorkspaceOverview workspace;
-
-        @Valid
-        @JsonProperty
-        public final ImmutableMap<String, UserMin> users;
+        public final WorkspaceMin workspace;
 
         @Valid
         @JsonUnwrapped
         public final WorkspaceContent content;
 
-        public WorkspaceFullContent(WorkspacesRecord ws, List<UsersRecord> users, WorkspaceContent content) {
-            this.users = users.stream().collect(ImmutableMap.toImmutableMap(UsersRecord::getUsername, UserMin::new));
-            List<String> wsUsernames = users.stream().map(UsersRecord::getUsername)
-                    .collect(ImmutableList.toImmutableList());
-            workspace = new WorkspaceOverview(ws.getId(), ws.getName(), ws.getShortDescription(), ws.getDescription(),
-                    wsUsernames);
+        public WorkspaceFullContent(WorkspacesRecord ws, WorkspaceContent content) {
+            workspace = new WorkspaceMin(ws.getId(), ws.getName());
             this.content = content;
         }
 
         @JsonCreator
         private WorkspaceFullContent() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            users = ImmutableMap.of();
             content = new WorkspaceContent(ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(), ImmutableMap.of(),
                     ImmutableMap.of());
-            workspace = new WorkspaceOverview(0, "", "", "", ImmutableList.of());
+            workspace = new WorkspaceMin(0, "");
         }
     }
 
@@ -1209,6 +1203,34 @@ public class WorkspaceResource {
 
         public SLDeployOverrides(@JsonProperty("sharedLibrary") @Nullable SharedLibraryIdentifier sharedLibrary) {
             this.sharedLibrary = sharedLibrary;
+        }
+    }
+
+    public static class WorkspaceUser {
+
+        @NotEmpty
+        @JsonProperty
+        public final String id;
+
+        @NotEmpty
+        @JsonProperty
+        public final String name;
+
+        @Valid
+        @JsonUnwrapped
+        public final PermissionsMin wsPermissions;
+
+        public WorkspaceUser(@JsonProperty("id") String id, @JsonProperty("name") String name,
+                @JsonProperty("permissions") PermissionsMin wsPerm) {
+            this.id = id;
+            this.name = name;
+            this.wsPermissions = wsPerm;
+        }
+
+        @JsonCreator
+        private WorkspaceUser() {
+            // jackson will inject values itself (because of @JsonUnwrapped)
+            this("", "", new PermissionsMin(false, false, false));
         }
     }
 

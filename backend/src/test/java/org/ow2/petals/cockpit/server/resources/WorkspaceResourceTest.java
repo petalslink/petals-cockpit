@@ -37,16 +37,15 @@ import org.ow2.petals.admin.endpoint.Endpoint;
 import org.ow2.petals.admin.topology.Domain;
 import org.ow2.petals.cockpit.server.bundles.security.CockpitProfile;
 import org.ow2.petals.cockpit.server.db.generated.tables.records.UsersWorkspacesRecord;
-import org.ow2.petals.cockpit.server.resources.PermissionsResource.PermissionsMin;
 import org.ow2.petals.cockpit.server.resources.UsersResource.UserMin;
-import org.ow2.petals.cockpit.server.resources.UsersResource.WorkspaceUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.AddUser;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.BusDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceDeleted;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceFullContent;
-import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverview;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceOverviewContent;
 import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUpdate;
+import org.ow2.petals.cockpit.server.resources.WorkspaceResource.WorkspaceUser;
+import org.ow2.petals.cockpit.server.resources.WorkspacesResource.WorkspaceMin;
 
 import com.google.common.collect.ImmutableList;
 
@@ -280,13 +279,16 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     @Test
-    public void getPermissionsWhenAddingUser() {
+    public void getUserInformationsWhenAddingUser() {
         addUser("user1");
 
-        PermissionsMin add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")), PermissionsMin.class);
-        assertThat(add.adminWorkspace).isTrue();
-        assertThat(add.deployArtifact).isTrue();
-        assertThat(add.lifecycleArtifact).isTrue();
+        WorkspaceUser add = resource.target("/workspaces/1/users").request().post(Entity.json(new AddUser("user1")),
+                WorkspaceUser.class);
+        assertThat(add.id).isEqualTo("user1");
+        assertThat(add.name).isEqualTo("user1");
+        assertThat(add.wsPermissions.adminWorkspace).isTrue();
+        assertThat(add.wsPermissions.deployArtifact).isTrue();
+        assertThat(add.wsPermissions.lifecycleArtifact).isTrue();
     }
 
     @Test
@@ -403,8 +405,7 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
     }
 
     private void assertContent(SoftAssertions a, WorkspaceFullContent content, Domain... buses) {
-        assertContentOverview(content.workspace);
-        assertUsers(content.users);
+        assertContentMin(content.workspace);
 
         assertWorkspaceContent(a, content.content, content.workspace.id, referenceEndpoints, buses);
     }
@@ -418,18 +419,17 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
         assertThat(u.name).isEqualTo("admin");
     }
 
-    private void assertContentOverview(WorkspaceOverview overview) {
-        assertThat(overview.id).isEqualTo(1);
-        assertThat(overview.name).isEqualTo("test");
-        assertThat(overview.users).containsExactlyInAnyOrder(ADMIN);
-        assertThat(overview.description).isEqualTo("");
+    private void assertContentMin(WorkspaceMin workspaceMin) {
+        assertThat(workspaceMin.id).isEqualTo(1);
+        assertThat(workspaceMin.name).isEqualTo("test");
     }
 
-    private void assertWorkspaceUsers(ImmutableList<WorkspaceUser> users) {
+    private void assertWorkspaceUsers(ImmutableList<WorkspaceResource.WorkspaceUser> users) {
         assertThat(users).hasSize(1);
-        WorkspaceUser u = users.iterator().next();
+        WorkspaceResource.WorkspaceUser u = users.iterator().next();
 
         assertThat(u.id).isEqualTo(ADMIN);
+        assertThat(u.name).isEqualTo(ADMIN);
         assertThat(u.wsPermissions.adminWorkspace).isTrue();
         assertThat(u.wsPermissions.deployArtifact).isTrue();
         assertThat(u.wsPermissions.lifecycleArtifact).isTrue();
