@@ -26,6 +26,7 @@ import {
   getCurrentComponent,
   IComponentWithSlsAndSus,
 } from '@feat/cockpit/workspaces/state/components/components.selectors';
+import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateNameToPossibleActionsComponent } from '@shared/helpers/component.helper';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { ComponentState } from '@shared/services/components.service';
@@ -49,9 +50,22 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
 
   parametersForm: FormGroup;
 
+  hasDeployArtifactPerm = false;
+
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.store$
+      .pipe(
+        select(getCurrentUserPermissions),
+        takeUntil(this.onDestroy$),
+        filter(permission => !!permission),
+        tap(permission => {
+          this.hasDeployArtifactPerm = permission.deployArtifact;
+        })
+      )
+      .subscribe();
+
     this.store$
       .pipe(
         select(getCurrentComponent),
@@ -64,7 +78,8 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
           this.component = component;
           if (
             (component.updateError !== '' || !component.isUpdating) &&
-            this.parametersForm
+            this.parametersForm &&
+            this.hasDeployArtifactPerm
           ) {
             this.parametersForm.enable();
           }
@@ -80,7 +95,10 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
             keysParameters.reduce(
               (acc, key) => ({
                 ...acc,
-                [key]: new FormControl(parameters[key]),
+                [key]: new FormControl({
+                  value: parameters[key],
+                  disabled: !this.hasDeployArtifactPerm,
+                }),
               }),
               {}
             )

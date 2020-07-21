@@ -42,6 +42,7 @@ import {
   styleUrls: ['./upload.component.scss'],
 })
 export class UploadComponent {
+  @Input() canDeployArtifact: boolean;
   @Input() title: string;
   @Input() message: string;
   @Input() acceptedFileType?: string;

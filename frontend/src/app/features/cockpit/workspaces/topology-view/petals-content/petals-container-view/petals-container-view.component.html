@@ -103,6 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       </mat-card>
 
       <app-artifacts-deployment
+        [canDeployArtifact]="hasDeployArtifactPerm"
         [container]="container$ | async"
         [componentsByName]="componentsOfCurrentContainerByName$ | async"
         [sharedLibrariesByNameAndVersion]="sharedLibrariesOfCurrentContainerByNameAndVersion$ | async"

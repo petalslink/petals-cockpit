@@ -43,6 +43,7 @@ import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libra
 import {
   IWorkspaceRow,
   IWorkspaces,
+  IWorkspaceUserPermissions,
   IWorkspaceUserRow,
 } from './workspaces.interface';
 
@@ -303,6 +304,13 @@ export function getCurrentWorkspaceUsers(
 ): Observable<IWorkspaceUserRow[]> {
   return store$.pipe(select(getCurrentWorkspaceUsersById));
 }
+
+export const getCurrentUserPermissions = createSelector(
+  (
+    state: IStore
+  ): { [permissionId in keyof IWorkspaceUserPermissions]: boolean } =>
+    getConnectedUser(state).workspacePermissions
+);
 
 export const getUsersNotInCurrentWorkspace = createSelector(
   getUsersAllIds,

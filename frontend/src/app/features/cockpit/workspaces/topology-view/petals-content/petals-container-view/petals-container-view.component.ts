@@ -36,6 +36,7 @@ import {
   containerNetworkOptions,
 } from './container-graph';
 
+import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { IContainerRow } from '@wks/state/containers/containers.interface';
 import {
   componentsOfCurrentContainerByName,
@@ -76,12 +77,25 @@ export class PetalsContainerViewComponent implements OnInit, OnDestroy {
   visNetworkData: NetworkData;
   visNetworkOptions: VisNetworkOptions = containerNetworkOptions;
 
+  hasDeployArtifactPerm = false;
+
   constructor(
     private store$: Store<IStore>,
     private visNetworkService: VisNetworkService
   ) {}
 
   ngOnInit() {
+    this.store$
+      .pipe(
+        select(getCurrentUserPermissions),
+        takeUntil(this.onDestroy$),
+        filter(permission => !!permission),
+        tap(permission => {
+          this.hasDeployArtifactPerm = permission.deployArtifact;
+        })
+      )
+      .subscribe();
+
     this.container$ = this.store$.pipe(select(getCurrentContainer));
 
     this.container$

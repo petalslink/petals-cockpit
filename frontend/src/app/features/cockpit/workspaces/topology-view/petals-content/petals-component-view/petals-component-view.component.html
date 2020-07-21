@@ -120,7 +120,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     type="button"
                     mat-raised-button
                     color="primary"
-                    [disabled]="component.isUpdating || parametersForm.pristine"
+                    [disabled]="!hasDeployArtifactPerm || component.isUpdating || parametersForm.pristine"
                     (click)="setParameters(component.id)"
                     class="btn-set-parameters-form text-upper"
                   >Set</button>
@@ -273,7 +273,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         </ng-template>
       </mat-card>
 
-      <app-su-deployment [component]="component"></app-su-deployment>
+      <app-su-deployment
+        [component]="component"
+        [canDeployArtifact]="hasDeployArtifactPerm"
+      ></app-su-deployment>
     </div>
   </div>
 </app-removable>

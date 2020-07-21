@@ -86,6 +86,8 @@ export class ArtifactsDeploymentComponent
 
   @Input() container: IContainerRow;
 
+  @Input() canDeployArtifact: boolean;
+
   @Input()
   componentsByName: {
     [name: string]: boolean;

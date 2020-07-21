@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       <button
         mat-raised-button
         color="primary"
-        [disabled]="(percentage < 100 && !error) || (selectedFileInformation && !isFileParsed)"
+        [disabled]="!canDeployArtifact || (percentage < 100 && !error) || (selectedFileInformation && !isFileParsed)"
         (click)="selectFile.click()"
         class="btn-choose-file text-upper"
       >
