@@ -1,11 +1,11 @@
 # Notes:
-# Branch front/* will run test-frontend
+# Branch front/* will run check-frontend, test-frontend-0, test-frontend-1, test-frontend-2
 # Branch back/* will run build-backend
 # Branch product/* will run build-backend, build-frontend, package-product
-# Branch full/* will run build-backend, test-frontend, build-frontend, e2e-product, package-product, chromium-cypress
-# Branch master will run build-backend, test-frontend, build-frontend, build-frontend-pages, package-product-master, pages, e2e-product, chromium-cypress
-# Other branches will run build-backend, test-frontend, build-frontend, e2e-product, package-product
-# Tags will run build-backend, build-frontend, release-product
+# Branch full/* will run build-backend, check-frontend, test-frontend-0, test-frontend-1, test-frontend-2, build-frontend, package-product
+# Branch master will run build-backend, check-frontend, test-frontend-0, test-frontend-1, test-frontend-2, build-frontend, build-frontend-pages,
+# package-product-master, pages, sonar-frontend, sonar-backend
+# Other branches will run build-backend, check-frontend, test-frontend-0, test-frontend-1, test-frontend-2, build-frontend, package-product
 
 # Runs tests and debug procedure detailed EOF
 
@@ -125,7 +125,6 @@ check-frontend:
   <<: *node-java-yarn
   stage: build
   except:
-    - tags
     # we don't want to check the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
@@ -136,11 +135,10 @@ check-frontend:
   tags:
     - docker
 
-test-frontend:
+test-frontend-0:
   <<: *node-java-yarn
   stage: build
   except:
-    - tags
     # we don't want to test the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
@@ -151,16 +149,6 @@ test-frontend:
     # e2e
     # tests protractor
     - time yarn run e2e:ci --port 4200 --webdriver-update false
-    # build the frontend ldap mode
-    - time yarn run build:ldap:ci
-    # serve the frontend
-    - nohup http-server --push-state --silent -p 4200 dist &
-    # save the PID as we run it in background
-    - echo $! > pid-nohup.txt
-    - sleep 5s
-    - time yarn cypress:e2e-ldap
-    - kill -9 $(cat pid-nohup.txt)
-    - rm pid-nohup.txt
     # build the frontend no ldap mode
     - time yarn run build:no-ldap:ci
     # serve the frontend
@@ -175,9 +163,52 @@ test-frontend:
     expire_in: 1 week
     paths:
       - frontend/coverage/lcov.info
-  # Protractor tests are unstable and may fail unexpectedly
-  # this workaround has to be removed once we stop relying on protractor
-  retry: 1
+  tags:
+    - docker
+
+
+test-frontend-1:
+  <<: *node-java-yarn
+  stage: build
+  except:
+    # we don't want to test the frontend in back/* and product/*
+    - /^back\/.*$/
+    - /^product\/.*$/
+  script:
+    - cd frontend
+    # build the frontend ldap mode
+    - time yarn run build:ldap:ci
+    # serve the frontend
+    - nohup http-server --push-state --silent -p 4200 dist &
+    # save the PID as we run it in background
+    - echo $! > pid-nohup.txt
+    - sleep 5s
+    - time yarn cypress:e2e-test-frontend-1
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
+  tags:
+    - docker
+
+
+test-frontend-2:
+  <<: *node-java-yarn
+  stage: build
+  except:
+    # we don't want to test the frontend in back/* and product/*
+    - /^back\/.*$/
+    - /^product\/.*$/
+  script:
+    - cd frontend
+    # build the frontend ldap mode
+    - time yarn run build:ldap:ci
+    # serve the frontend
+    - nohup http-server --push-state --silent -p 4200 dist &
+    # save the PID as we run it in background
+    - echo $! > pid-nohup.txt
+    - sleep 5s
+    - time yarn cypress:e2e-test-frontend-2
+    - kill -9 $(cat pid-nohup.txt)
+    - rm pid-nohup.txt
   tags:
     - docker
 
@@ -189,18 +220,19 @@ sonar-frontend:
   stage: report
   allow_failure: true
   dependencies:
-    - test-frontend
+    - test-frontend-0
   only:
     - master
   script:
     - cd frontend
     - yarn run sonar-scanner -Dsonar.host.url=$SONAR_HOST_URL
 
+
 build-frontend:
   <<: *node-java-yarn
   stage: build
   except:
-    # we don't want to build the frontend, only test it (with test-frontend) in front/*
+    # we don't want to build the frontend, only test it (with test-frontend-0, test-frontend-1 and test-frontend-2) in front/*
     - /^front\/.*$/
     # we don't want to build the frontend in back/*
     - /^back\/.*$/
@@ -254,18 +286,6 @@ build-frontend-pages:
     - docker
 
 
-release-product:
-  <<: *build-product
-  only:
-    - tags
-  artifacts:
-    name: petals-cockpit-$(cat version.txt)
-    paths:
-      - petals-cockpit-*
-  tags:
-    - docker
-
-
 package-product-master:
   <<: *build-product
   only:
@@ -283,8 +303,6 @@ package-product:
   except:
     # covered by package-product-master
     - master
-    # covered by release-product
-    - tags
     # we don't want to build the final product in front/* and back/*
     - /^front\/.*$/
     - /^back\/.*$/
