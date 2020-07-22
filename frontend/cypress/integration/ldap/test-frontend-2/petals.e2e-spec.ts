@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
-import { expectedInitializedWks0Tree } from '../../support/helper.const';
-import { MENU_DOM } from '../../support/menu.dom';
-import { MESSAGE_DOM } from '../../support/message.dom';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
-import { PETALS_DOM, PETALS_TREE_DOM } from '../../support/petals.dom';
-import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
+import { BREADCRUMB_DOM } from '../../../support/breadcrumb.dom';
+import { expectedInitializedWks0Tree } from '../../../support/helper.const';
+import { MENU_DOM } from '../../../support/menu.dom';
+import { MESSAGE_DOM } from '../../../support/message.dom';
+import { PETALS_COCKPIT_DOM } from '../../../support/petals-cockpit.dom';
+import { PETALS_DOM, PETALS_TREE_DOM } from '../../../support/petals.dom';
+import { WORKSPACES_LIST_DOM } from '../../../support/workspaces.dom';
 
 describe(`Petals`, () => {
   beforeEach(() => {

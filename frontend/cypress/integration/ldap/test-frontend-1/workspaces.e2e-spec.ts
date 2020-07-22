@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
-import { HEADER_DOM } from '../../support/header.dom';
-import { MENU_DOM } from '../../support/menu.dom';
+import { BREADCRUMB_DOM } from '../../../support/breadcrumb.dom';
+import { HEADER_DOM } from '../../../support/header.dom';
+import { MENU_DOM } from '../../../support/menu.dom';
 import {
   WORKSPACE_DELETED_DIALOG_DOM,
   WORKSPACE_DELETION_DIALOG_DOM,
   WORKSPACE_DOM,
-} from '../../support/workspace.dom';
+} from '../../../support/workspace.dom';
 import {
   WORKSPACES_CREATE_DOM,
   WORKSPACES_DOM,
   WORKSPACES_LIST_DOM,
-} from '../../support/workspaces.dom';
+} from '../../../support/workspaces.dom';
 
 describe(`Workspaces`, () => {
   beforeEach(() => {

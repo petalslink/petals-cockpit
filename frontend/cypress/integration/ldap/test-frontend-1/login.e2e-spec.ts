@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { LOGIN_DOM } from '../../support/login.dom';
-import { PETALS_COCKPIT_DOM } from './../../support/petals-cockpit.dom';
+import { LOGIN_DOM } from '../../../support/login.dom';
+import { PETALS_COCKPIT_DOM } from './../../../support/petals-cockpit.dom';
 
 describe(`Login`, () => {
   beforeEach(() => {

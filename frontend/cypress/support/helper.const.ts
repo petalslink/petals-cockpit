@@ -107,3 +107,48 @@ export const correctSetupToken = 'CORRECT_SETUP_TOKEN';
 export const goneSetupToken = 'GONE_SETUP_TOKEN';
 
 export const badSetupUser = 'BAD_SETUP_USER';
+
+export const expectedDefaultUserDetailsList = [
+  {
+    id: 'admin',
+    name: 'Administrator',
+    adminWorkspace: true,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: 'adminldap',
+    name: 'Administrator LDAP',
+    adminWorkspace: true,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: 'bescudie',
+    name: 'Bertrand ESCUDIE',
+    adminWorkspace: false,
+    deployArtifact: false,
+    lifecycleArtifact: false,
+  },
+  {
+    id: 'cchevalier',
+    name: 'Christophe CHEVALIER',
+    adminWorkspace: false,
+    deployArtifact: true,
+    lifecycleArtifact: false,
+  },
+  {
+    id: 'mrobert',
+    name: 'Maxime ROBERT',
+    adminWorkspace: false,
+    deployArtifact: true,
+    lifecycleArtifact: true,
+  },
+  {
+    id: 'vnoel',
+    name: 'Victor NOEL',
+    adminWorkspace: false,
+    deployArtifact: false,
+    lifecycleArtifact: true,
+  },
+];

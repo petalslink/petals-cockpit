@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { TOPOLOGY_DOM } from '../../support/topology.dom';
-import { WORKSPACE_OVERVIEW_DOM } from '../../support/workspace.dom';
+import { TOPOLOGY_DOM } from '../../../support/topology.dom';
+import { WORKSPACE_OVERVIEW_DOM } from '../../../support/workspace.dom';
 
 describe('Buses', () => {
   beforeEach(() => {

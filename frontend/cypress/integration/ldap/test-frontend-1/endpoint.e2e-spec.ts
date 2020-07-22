@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ENDPOINT_OVERVIEW_DOM } from '../../support/endpoint.dom';
-import { SERVICE_OVERVIEW_DOM } from '../../support/service.dom';
+import { ENDPOINT_OVERVIEW_DOM } from '../../../support/endpoint.dom';
+import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
 
 describe(`Endpoint`, () => {
   beforeEach(() => {

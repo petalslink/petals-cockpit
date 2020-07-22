@@ -19,11 +19,11 @@ import {
   ADD_EDIT_USER_DOM,
   ADD_LDAP_USER_DOM,
   ADMINISTRATION_DOM,
-} from '../../support/administration.dom';
-import { CONFIRM_DIALOG_DOM } from '../../support/confirm-modal.dom';
-import { MENU_DOM } from '../../support/menu.dom';
-import { MESSAGE_DOM } from '../../support/message.dom';
-import { PETALS_COCKPIT_DOM } from '../../support/petals-cockpit.dom';
+} from '../../../support/administration.dom';
+import { CONFIRM_DIALOG_DOM } from '../../../support/confirm-modal.dom';
+import { MENU_DOM } from '../../../support/menu.dom';
+import { MESSAGE_DOM } from '../../../support/message.dom';
+import { PETALS_COCKPIT_DOM } from '../../../support/petals-cockpit.dom';
 
 describe(`Administration`, () => {
   beforeEach(() => {
