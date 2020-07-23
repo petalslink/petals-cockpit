@@ -18,14 +18,14 @@
 import {
   COMPONENT_DOM,
   SERVICE_UNIT_DEPLOYMENT_DOM,
-} from '../../support/component.dom';
-import { expectedInitializedWks0Tree } from '../../support/helper.const';
-import { MESSAGE_DOM } from '../../support/message.dom';
-import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
+} from '../../../support/component.dom';
+import { expectedInitializedWks0Tree } from '../../../support/helper.const';
+import { MESSAGE_DOM } from '../../../support/message.dom';
+import { SERVICE_ASSEMBLY_DOM } from '../../../support/service-assembly.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
   UPLOAD_DOM,
-} from '../../support/upload.dom';
+} from '../../../support/upload.dom';
 
 describe('Component', () => {
   beforeEach(() => {

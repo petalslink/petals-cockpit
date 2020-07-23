@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { INTERFACE_OVERVIEW_DOM } from '../../support/interface.dom';
-import { SERVICE_OVERVIEW_DOM } from '../../support/service.dom';
+import { INTERFACE_OVERVIEW_DOM } from '../../../support/interface.dom';
+import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
 
 describe(`Interface`, () => {
   beforeEach(() => {

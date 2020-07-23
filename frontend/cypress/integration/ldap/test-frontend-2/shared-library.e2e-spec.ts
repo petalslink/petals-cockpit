@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { COMPONENT_DOM } from '../../support/component.dom';
-import { MESSAGE_DOM } from '../../support/message.dom';
-import { PETALS_TREE_DOM } from '../../support/petals.dom';
-import { SHARED_LIBRARY_DOM } from '../../support/shared-library.dom';
+import { COMPONENT_DOM } from '../../../support/component.dom';
+import { MESSAGE_DOM } from '../../../support/message.dom';
+import { PETALS_TREE_DOM } from '../../../support/petals.dom';
+import { SHARED_LIBRARY_DOM } from '../../../support/shared-library.dom';
 
 describe('Shared-library', () => {
   beforeEach(() => {

@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { COMPONENT_DOM } from '../../support/component.dom';
+import { COMPONENT_DOM } from '../../../support/component.dom';
 
-import { MESSAGE_DOM } from '../../support/message.dom';
-import { PETALS_TREE_DOM } from '../../support/petals.dom';
-import { SERVICE_ASSEMBLY_DOM } from '../../support/service-assembly.dom';
-import { SERVICE_UNITS_DOM } from '../../support/service-units.dom';
+import { MESSAGE_DOM } from '../../../support/message.dom';
+import { PETALS_TREE_DOM } from '../../../support/petals.dom';
+import { SERVICE_ASSEMBLY_DOM } from '../../../support/service-assembly.dom';
+import { SERVICE_UNITS_DOM } from '../../../support/service-units.dom';
 
 describe('Service-assembly', () => {
   beforeEach(() => {

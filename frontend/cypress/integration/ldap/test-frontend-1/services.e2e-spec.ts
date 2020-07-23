@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { BREADCRUMB_DOM } from '../../support/breadcrumb.dom';
-// import { COMPONENT_DOM } from '../../support/component.dom';
+import { BREADCRUMB_DOM } from '../../../support/breadcrumb.dom';
+// import { COMPONENT_DOM } from '../../../support/component.dom';
 import {
   expectedEndpointsTreeWks0,
   expectedInterfacesTreeWks0,
   expectedServicesTreeWks0,
-} from '../../support/helper.const';
-import { MENU_DOM } from '../../support/menu.dom';
-import { SERVICES_DOM, SERVICES_TREE_DOM } from '../../support/services.dom';
-import { WORKSPACES_LIST_DOM } from '../../support/workspaces.dom';
+} from '../../../support/helper.const';
+import { MENU_DOM } from '../../../support/menu.dom';
+import { SERVICES_DOM, SERVICES_TREE_DOM } from '../../../support/services.dom';
+import { WORKSPACES_LIST_DOM } from '../../../support/workspaces.dom';
 
 describe(`Services`, () => {
   beforeEach(() => {

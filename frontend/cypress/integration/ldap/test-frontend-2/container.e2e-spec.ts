@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ARTIFACT_DEPLOYMENT_DOM } from '../../support/container.dom';
+import { ARTIFACT_DEPLOYMENT_DOM } from '../../../support/container.dom';
 import {
   expectedInitializedWks0Tree,
   expectedInitializedWks1Tree,
-} from '../../support/helper.const';
-import { MENU_DOM } from '../../support/menu.dom';
+} from '../../../support/helper.const';
+import { MENU_DOM } from '../../../support/menu.dom';
 import {
   SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
   UPLOAD_DOM,
-} from '../../support/upload.dom';
-import { WORKSPACE_OVERVIEW_DOM } from '../../support/workspace.dom';
-import { WORKSPACES_CREATE_DOM } from '../../support/workspaces.dom';
+} from '../../../support/upload.dom';
+import { WORKSPACE_OVERVIEW_DOM } from '../../../support/workspace.dom';
+import { WORKSPACES_CREATE_DOM } from '../../../support/workspaces.dom';
 
 describe('Container', () => {
   beforeEach(() => {

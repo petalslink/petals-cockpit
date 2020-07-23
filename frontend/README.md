@@ -37,6 +37,8 @@ To execute "end-to-end" tests (against frontend mocks) via [cypress](https://www
 * run `yarn cypress open` for interactive mode
 * run `yarn cypress:e2e-ldap` for headless mode and ldap mode
 * run `yarn cypress:e2e-no-ldap` for headless mode and no ldap mode
+* run `yarn cypress:e2e-test-frontend1` for headless mode and ldap mode with first part of specs files
+* run `yarn cypress:e2e-test-frontend2` for headless mode and ldap mode with second part of specs files
 
 ## Further help
 
