@@ -28,7 +28,7 @@ import {
 } from '../../../support/upload.dom';
 
 describe('Component', () => {
-  beforeEach(() => {
+  it('should display read-only informations when deleted', () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
@@ -52,9 +52,7 @@ describe('Component', () => {
       `Cont 0`,
       `Comp 0`,
     ]);
-  });
 
-  it('should display read-only informations when deleted', () => {
     cy.getElementInPetalsTree(`component`, `Comp 2`).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
@@ -74,7 +72,65 @@ describe('Component', () => {
     cy.getElementInPetalsTree(`component`, `Comp 2`).should('not.exist');
   });
 
+  it('should be able to deploy service-unit with deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
+  });
+
+  it('should not be able to deploy service-unit without deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('bescudie', 'bescudie');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.get(UPLOAD_DOM.buttons.browse).should('not.be.enabled');
+  });
+
+  it('should be able to change parameters with deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy
+      .getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`)
+      .should('be.enabled');
+  });
+
+  it('should not be able to change parameters without deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('bescudie', 'bescudie');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy
+      .getParameterInLifecycleComponent(`httpThreadPoolSizeMax`, `10`)
+      .should('not.be.enabled');
+  });
+
   describe('Related Elements', () => {
+    beforeEach(() => {
+      cy.visit(`/login`);
+
+      cy.login('admin', 'admin');
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
+      cy
+        .get('app-sidebar')
+        .find('.btn-topology')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+    });
+
     it('should go to related shared library view when clicking a shared library button', () => {
       cy.getElementInPetalsTree(`component`, `Comp 2`).click();
 
@@ -160,6 +216,18 @@ describe('Component', () => {
 
   describe('Lifecycle', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+
+      cy.login('admin', 'admin');
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
+      cy
+        .get('app-sidebar')
+        .find('.btn-topology')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+
       cy.getElementInPetalsTree(`component`, `Comp 2`).click();
 
       cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
@@ -398,9 +466,29 @@ describe('Component', () => {
 
   describe('Service Unit Deployment', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+
+      cy.login('admin', 'admin');
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
+      cy
+        .get('app-sidebar')
+        .find('.btn-topology')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals`);
+
       cy.getElementInPetalsTree(`component`, `Comp 0`).click();
 
       cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp0`);
+
+      cy.expectBreadcrumbsToBe([
+        `Workspace 0`,
+        `Topology`,
+        `Bus 0`,
+        `Cont 0`,
+        `Comp 0`,
+      ]);
     });
 
     it(`should forbid service unit deployment when file is unreadable`, () => {
