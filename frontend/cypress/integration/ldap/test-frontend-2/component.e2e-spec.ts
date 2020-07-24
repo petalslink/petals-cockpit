@@ -677,7 +677,7 @@ describe('Component', () => {
 
       cy
         .get(UPLOAD_DOM.buttons.deploy, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .should('be.enabled')
         .click();
@@ -697,7 +697,7 @@ describe('Component', () => {
 
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, {
-          timeout: 15000,
+          timeout: 20000,
         })
         .should('not.be.visible');
 

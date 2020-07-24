@@ -380,7 +380,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -396,7 +396,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -433,7 +433,7 @@ describe('Container', () => {
 
       // check if default content of the deployment card is not visible
       cy
-        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 10000 })
+        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 15000 })
         .should('not.be.visible');
       cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
 
@@ -660,7 +660,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -676,7 +676,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -713,7 +713,7 @@ describe('Container', () => {
 
       // check if default content of the deployment card is not visible
       cy
-        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 10000 })
+        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 15000 })
         .should('not.be.visible');
       cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
 
@@ -871,7 +871,7 @@ describe('Container', () => {
 
       cy
         .get(ARTIFACT_DEPLOYMENT_DOM.formFields.compNameFormField, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .find(`mat-error`)
         .should('not.be.visible');
@@ -882,7 +882,7 @@ describe('Container', () => {
       cy.get(UPLOAD_DOM.buttons.deploy).should('be.enabled');
       cy
         .get(ARTIFACT_DEPLOYMENT_DOM.formFields.compNameFormField, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .find(`input[formcontrolname=name]`)
         .should('have.value', `petals-bc-sql`);
@@ -915,7 +915,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -931,7 +931,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
