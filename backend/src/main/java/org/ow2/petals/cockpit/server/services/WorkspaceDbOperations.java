@@ -35,12 +35,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.Nullable;
+import org.jooq.Condition;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -350,16 +352,10 @@ public class WorkspaceDbOperations {
                                 new ServiceFull(sr.into(SERVICES), sr.into(EDP_INSTANCES).getComponentId().toString()));
                     }
 
-                    for (Record edpr : ctx.select().from(ENDPOINTS)
-                            .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
-                            .join(COMPONENTS).onKey(Keys.FK_EDP_INSTANCES_COMPONENT_ID)
-                            .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
-                            .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
-                            .where(EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId())))
-                            .fetch()) {
-                        containerBuilder.addEndpoint(new EndpointFull(edpr.into(ENDPOINTS),
-                                edpr.into(EDP_INSTANCES).getComponentId()));
-                    }
+                    final Condition requestCondition = EDP_INSTANCES.CONTAINER_ID.eq(c.getId()).and(BUSES.WORKSPACE_ID.eq(w.getId()));
+                    Map<String, EndpointFull> endpointMap = getEndpointsFromDb(requestCondition, ctx);
+
+                    endpointMap.values().forEach(edp -> containerBuilder.addEndpoint(edp));
 
                     for (Record ir : ctx.select().from(INTERFACES)
                             .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
@@ -648,25 +644,42 @@ public class WorkspaceDbOperations {
 
     public ImmutableMap<String, EndpointFull> getWorkspaceEndpoints(Long workspaceId, Configuration conf) {
         final DSLContext ctx = DSL.using(conf);
+        final Condition requestCondition = BUSES.WORKSPACE_ID.eq(workspaceId);
+
+        return ImmutableMap.copyOf(getEndpointsFromDb(requestCondition, ctx));
+    }
+
+    private Map<String, EndpointFull> getEndpointsFromDb(Condition requestCondition, DSLContext ctx) {
+        List<Record> endpointsRecord = ctx.select().from(ENDPOINTS)
+                .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
+                .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+                .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+                .where(requestCondition)
+                .fetch();
+
         Map<String, EndpointFull> endpointsToReturn = new HashMap<String, EndpointFull>();
+        Set<Long> filteredEdps = new HashSet<>();
 
-        ctx.select().from(ENDPOINTS)
-        .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_ENDPOINT_ID)
-        .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
-        .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
-        .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
-            EndpointsRecord edprec = record.into(ENDPOINTS);
-            EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
+        endpointsRecord.stream()
+            .filter(edp -> filteredEdps.add(edp.get(ENDPOINTS.ID)))
+            .forEach(record -> {
+                EndpointsRecord edprec = record.into(ENDPOINTS);
+                EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
 
-            assert edprec != null && instrec != null;
-            final String endpointid = edprec.getId().toString();
-            assert endpointid != null;
+                assert edprec != null && instrec != null;
+                final Long endpointId = edprec.getId();
+                assert endpointId != null;
 
-            endpointsToReturn.put(endpointid,
-                    new EndpointFull(edprec, instrec.getComponentId()));
-        });
+                Set<Long> endpointInterfaces = endpointsRecord.stream()
+                        .filter(edp -> edp.into(EDP_INSTANCES).getEndpointId().equals(endpointId))
+                        .map(edp -> edp.into(EDP_INSTANCES).getInterfaceId())
+                        .collect(Collectors.toSet());
 
-        return ImmutableMap.copyOf(endpointsToReturn);
+                endpointsToReturn.put(endpointId.toString(),
+                        new EndpointFull(edprec, endpointInterfaces, instrec.getServiceId(), instrec.getComponentId()));
+            });
+
+        return endpointsToReturn;
     }
 
     public ImmutableMap<String, InterfaceFull> getWorkspaceInterfaces(Long workspaceId, Configuration conf) {
@@ -674,25 +687,25 @@ public class WorkspaceDbOperations {
         Map<String, InterfaceFull> interfacesToReturn = new HashMap<String, InterfaceFull>();
 
         ctx.select().from(INTERFACES)
-        .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
-        .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
-        .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
-        .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
-            InterfacesRecord itfrec = record.into(INTERFACES);
-            EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
+            .join(EDP_INSTANCES).onKey(Keys.FK_EDP_INSTANCES_INTERFACE_ID)
+            .join(CONTAINERS).onKey(Keys.FK_EDP_INSTANCES_CONTAINER_ID)
+            .join(BUSES).onKey(Keys.FK_CONTAINERS_BUSES_ID)
+            .where(BUSES.WORKSPACE_ID.eq(workspaceId)).forEach(record -> {
+                InterfacesRecord itfrec = record.into(INTERFACES);
+                EdpInstancesRecord instrec = record.into(EDP_INSTANCES);
 
-            assert itfrec != null && instrec != null;
-            final String interfaceid = itfrec.getId().toString();
-            assert interfaceid != null;
+                assert itfrec != null && instrec != null;
+                final String interfaceid = itfrec.getId().toString();
+                assert interfaceid != null;
 
-            if (interfacesToReturn.containsKey(interfaceid)) {
-                final InterfaceFull interfaceFull = interfacesToReturn.get(interfaceid);
-                assert interfaceFull != null;
-                interfaceFull.addComponent(instrec.getComponentId());
-            } else {
-                interfacesToReturn.put(interfaceid, new InterfaceFull(itfrec, instrec.getComponentId().toString()));
-            }
-        });
+                if (interfacesToReturn.containsKey(interfaceid)) {
+                    final InterfaceFull interfaceFull = interfacesToReturn.get(interfaceid);
+                    assert interfaceFull != null;
+                    interfaceFull.addComponent(instrec.getComponentId());
+                } else {
+                    interfacesToReturn.put(interfaceid, new InterfaceFull(itfrec, instrec.getComponentId().toString()));
+                }
+            });
 
         return ImmutableMap.copyOf(interfacesToReturn);
     }
