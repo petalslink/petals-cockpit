@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     <app-upload
       #deployServiceUnit
       acceptedFileType=".zip"
+      [canDeployArtifact]="canDeployArtifact"
       [title]="'Service Unit Deployment'"
       [message]="'Choose Service Unit:'"
       [uploadStatus]="serviceUnitUploadProgress"

@@ -65,6 +65,7 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private snackRef: MatSnackBarRef<SnackBarDeploymentProgressComponent>;
 
   @Input() component: IComponentRow;
+  @Input() canDeployArtifact: boolean;
 
   @ViewChild('deployServiceUnit') deployServiceUnit: UploadComponent;
 
@@ -83,8 +84,10 @@ export class SuDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (hasComponentIdChanged(changes.component)) {
-      this.deployServiceUnit.reset();
+    if (this.component && changes.component) {
+      if (hasComponentIdChanged(changes.component)) {
+        this.deployServiceUnit.reset();
+      }
     }
   }
 

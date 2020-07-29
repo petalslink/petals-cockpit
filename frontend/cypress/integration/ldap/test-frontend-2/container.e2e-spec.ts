@@ -29,7 +29,27 @@ import { WORKSPACE_OVERVIEW_DOM } from '../../../support/workspace.dom';
 import { WORKSPACES_CREATE_DOM } from '../../../support/workspaces.dom';
 
 describe('Container', () => {
-  beforeEach(() => {
+  it('should be able to deploy artifact with deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/containers/idCont2`);
+
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/containers/idCont2`);
+
+    cy.get(UPLOAD_DOM.buttons.browse).should('be.enabled');
+  });
+
+  it('should not be able to deploy artifact without deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/containers/idCont2`);
+
+    cy.login('bescudie', 'bescudie');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/containers/idCont2`);
+
+    cy.get(UPLOAD_DOM.buttons.browse).should('not.be.enabled');
+  });
+
+  it('should have the container details overview with system info and container reachabilities', () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
@@ -41,9 +61,6 @@ describe('Container', () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals`);
-  });
-
-  it('should have the container details overview with system info and container reachabilities', () => {
     cy.getElementInPetalsTree(`container`, `Cont 0`).click();
     cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Bus 0`, `Cont 0`]);
 
@@ -75,6 +92,17 @@ describe('Container', () => {
   });
 
   it('should have info message when no other containers exist in the bus', () => {
+    cy.visit(`/login`);
+
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy
+      .get('app-sidebar')
+      .find('.btn-topology')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals`);
     cy
       .get(MENU_DOM.buttons.toggleMenu)
       .should('be.visible')
@@ -134,6 +162,17 @@ describe('Container', () => {
   });
 
   it('should not have the container reachabilities and system info when unreachable container', () => {
+    cy.visit(`/login`);
+
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0`);
+
+    cy
+      .get('app-sidebar')
+      .find('.btn-topology')
+      .click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals`);
     cy
       .get(MENU_DOM.buttons.toggleMenu)
       .should('be.visible')
@@ -174,6 +213,17 @@ describe('Container', () => {
 
   describe('Artifact Deployment', () => {
     beforeEach(() => {
+      cy.visit(`/login`);
+
+      cy.login('admin', 'admin');
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
+      cy
+        .get('app-sidebar')
+        .find('.btn-topology')
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0/petals`);
       cy.getElementInPetalsTree(`container`, `Cont 0`).click();
       cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Bus 0`, `Cont 0`]);
 
@@ -330,7 +380,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -346,7 +396,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -383,7 +433,7 @@ describe('Container', () => {
 
       // check if default content of the deployment card is not visible
       cy
-        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 10000 })
+        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 15000 })
         .should('not.be.visible');
       cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
 
@@ -610,7 +660,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -626,7 +676,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
@@ -663,7 +713,7 @@ describe('Container', () => {
 
       // check if default content of the deployment card is not visible
       cy
-        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 10000 })
+        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 15000 })
         .should('not.be.visible');
       cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
 
@@ -821,7 +871,7 @@ describe('Container', () => {
 
       cy
         .get(ARTIFACT_DEPLOYMENT_DOM.formFields.compNameFormField, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .find(`mat-error`)
         .should('not.be.visible');
@@ -832,7 +882,7 @@ describe('Container', () => {
       cy.get(UPLOAD_DOM.buttons.deploy).should('be.enabled');
       cy
         .get(ARTIFACT_DEPLOYMENT_DOM.formFields.compNameFormField, {
-          timeout: 10000,
+          timeout: 15000,
         })
         .find(`input[formcontrolname=name]`)
         .should('have.value', `petals-bc-sql`);
@@ -865,7 +915,7 @@ describe('Container', () => {
       );
 
       cy
-        .get(UPLOAD_DOM.buttons.deploy, { timeout: 10000 })
+        .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
         .should('be.enabled')
         .click();
 
@@ -881,7 +931,7 @@ describe('Container', () => {
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)
         .should('be.visible');
       cy
-        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 15000 })
+        .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.texts.value, { timeout: 20000 })
         .should('not.be.visible');
       cy
         .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss)

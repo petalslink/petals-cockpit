@@ -57,7 +57,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             mat-raised-button
             type="button"
             color="primary"
-            [disabled]="!isAllowedAs('adminWorkspace')"
+            [disabled]="!isAllowedAsAdminWorkspace"
             (click)="editWorkspaceDetails(workspace.id)"
             class="btn-add-edit-workspace-details text-upper margin-right-x1"
           >
@@ -80,7 +80,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             mat-raised-button
             type="button"
             color="warn"
-            [disabled]="!isAllowedAs('adminWorkspace') || workspace.isRemoving || isRemoving"
+            [disabled]="!isAllowedAsAdminWorkspace || workspace.isRemoving || isRemoving"
             (click)="openDeletionDialog()"
             class="btn-delete-wks"
           >
@@ -441,7 +441,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               mat-raised-button
               type="button"
               color="primary"
-              [disabled]="!isAllowedAs('adminWorkspace')"
+              [disabled]="!isAllowedAsAdminWorkspace"
               (click)="editAttachBus()"
               class="btn-import-bus margin-right-x1 text-upper"
             >
@@ -488,7 +488,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               mat-raised-button
               type="button"
               color="accent"
-              [disabled]="!isAllowedAs('adminWorkspace')"
+              [disabled]="!isAllowedAsAdminWorkspace"
               (click)="editDetachBus()"
               class="btn-detach-bus text-upper"
             >
@@ -561,7 +561,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 required
                 formControlName="userSearchCtrl"
                 [matAutocomplete]="autocompleteUsers"
-                [appDisableControl]="!isAllowedAs('adminWorkspace')"
+                [appDisableControl]="!isAllowedAsAdminWorkspace"
               >
               <span matPrefix>
                 <mat-icon class="icon-x2">
@@ -583,7 +583,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             <button
               mat-raised-button
               color="primary"
-              [disabled]="!isAllowedAs('adminWorkspace') || addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
+              [disabled]="!isAllowedAsAdminWorkspace || addUserFormGroup.invalid || workspace.isAddingUserToWorkspace"
               (click)="addUser()"
               class="btn-add-user text-upper"
             >
@@ -680,7 +680,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                 class="cell-user-{{ permission.id }}-{{ user.value.id }}"
               >
                 <span
-                  *ngIf="isSavingUsersPermissions(users) && hasPermissionChanged(user.value.id, permission.id); else canCheck"
+                  *ngIf="isSavingUsersPermissions(users) && hasPermissionChanged(i, permission.id); else canCheck"
                   fxLayout="row"
                   fxLayoutAlign="start center"
                 >
@@ -692,7 +692,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                     [ngClass]="isUnchecked(users, user, permission.id) ? 'unchecked' : 'mat-checkbox-checked'"
                     [color]="getCheckBoxColor(users, permission.id, i)"
                     [formControlName]="permission.id"
-                    [appDisableControl]="!isAllowedAs('adminWorkspace')"
+                    [appDisableControl]="!isAllowedAsAdminWorkspace"
                     (change)="onUserPermissionChange(users, permission.id, i)"
                   ></mat-checkbox>
                 </ng-template>
@@ -724,7 +724,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   mat-icon-button
                   matTooltip="Delete"
                   matTooltipPosition="before"
-                  [disabled]="!isAllowedAs('adminWorkspace') || workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
+                  [disabled]="!isAllowedAsAdminWorkspace || workspace.isRemovingUserFromWorkspace || isSavingUsersPermissions(users)"
                   (click)="removeUser(user.value.id)"
                   class="action-delete"
                 >
