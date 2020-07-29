@@ -50,7 +50,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   type="button"
                   color="primary"
                   (click)="changeState(sa.id, possibleState.newStateAfterAction)"
-                  [disabled]="sa.isUpdatingState"
+                  [disabled]="!hasLifecycleArtifactPerm || sa.isUpdatingState"
                   class="btn-change-sa-state text-upper"
                 >
                   <mat-icon *ngIf="possibleState.actionName === 'Stop'">stop</mat-icon>

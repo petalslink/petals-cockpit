@@ -21,6 +21,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { ServiceAssemblies } from '@feat/cockpit/workspaces/state/service-assemblies/service-assemblies.actions';
 import { IServiceUnitRow } from '@feat/cockpit/workspaces/state/service-units/service-units.interface';
+import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateNameToPossibleActionsServiceAssembly } from '@shared/helpers/service-assembly.helper';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
@@ -29,7 +30,7 @@ import {
   getCurrentServiceAssembly,
   IServiceAssemblyWithSUsAndComponents,
 } from '@wks/state/service-assemblies/service-assemblies.selectors';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-service-assembly-view',
@@ -43,10 +44,22 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
   workspaceId$: Observable<string>;
 
   isDeleted = false;
+  hasLifecycleArtifactPerm = false;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.store$
+      .pipe(
+        select(getCurrentUserPermissions),
+        takeUntil(this.onDestroy$),
+        filter(permission => !!permission),
+        tap(permission => {
+          this.hasLifecycleArtifactPerm = permission.lifecycleArtifact;
+        })
+      )
+      .subscribe();
+
     this.serviceAssembly$ = this.store$.pipe(
       select(getCurrentServiceAssembly),
       takeUntil(this.onDestroy$),
