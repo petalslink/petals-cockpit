@@ -75,6 +75,15 @@ Cypress.Commands.add('expectBreadcrumbsToBe', elements => {
       .should('contain', elements[i]);
   }
 
+  if (elements[elements.length - 1] === 'Not Found') {
+    cy
+      .get(BREADCRUMB_DOM.texts.itemName)
+      .eq(2)
+      .find('div')
+      .should('have.class', 'breadcrumb-category');
+    return;
+  }
+
   if (elements.length === 2) {
     cy
       .get(BREADCRUMB_DOM.texts.itemName)

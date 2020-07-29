@@ -285,6 +285,20 @@ describe('Workspace', () => {
     cy.get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl).should('be.disabled');
   });
 
+  it('should show 404 view if not found element', () => {
+    cy.visit(`/login`);
+    cy.login('admin', 'admin');
+
+    cy.visit('/workspaces/idWks0/petals/service-units/XD');
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe('/workspaces/idWks0/petals/not-found');
+
+    cy.get('.not-found-404').should('be.visible');
+
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Topology`, `Not Found`]);
+  });
+
   describe('Menu', () => {
     beforeEach(() => {
       cy.visit(`/login`);
