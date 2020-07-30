@@ -19,9 +19,13 @@ import { COMPONENT_DOM } from '../../../support/component.dom';
 import { MESSAGE_DOM } from '../../../support/message.dom';
 import { PETALS_TREE_DOM } from '../../../support/petals.dom';
 import { SHARED_LIBRARY_DOM } from '../../../support/shared-library.dom';
+import {
+  SNACKBAR_DEPLOYMENT_PROGRESS_DOM,
+  UPLOAD_DOM,
+} from '../../../support/upload.dom';
 
 describe('Shared-library', () => {
-  beforeEach(() => {
+  it('should had shared library page loaded', () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
@@ -50,7 +54,89 @@ describe('Shared-library', () => {
     ]);
   });
 
+  it('should be able to unload service library with deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks0/petals/containers/idCont0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
+
+    cy.uploadFile(
+      'petals-sl-hsql-1.8.0.10.zip',
+      '.deploy-artifact input[type=file]'
+    );
+
+    cy
+      .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
+      .should('be.enabled')
+      .click();
+
+    cy
+      .get(UPLOAD_DOM.buttons.browse, { timeout: 10000 })
+      .should('not.be.enabled');
+
+    cy
+      .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss, {
+        timeout: 20000,
+      })
+      .should('not.be.visible');
+
+    cy.expectNotification(
+      'success',
+      'Shared Library Deployed',
+      `petals-sl-hsql has been successfully deployed`
+    );
+
+    cy
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
+      .contains('petals-sl-hsql')
+      .click({ force: true });
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl4`);
+    cy.get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn).should('be.enabled');
+  });
+
+  it('should not be able to unload service library without deployArtifact permission', () => {
+    cy.visit(`/workspaces/idWks0/petals/containers/idCont0`);
+    cy.login('cchevalier', 'cchevalier');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/containers/idCont0`);
+
+    cy.uploadFile(
+      'petals-sl-hsql-1.8.0.10.zip',
+      '.deploy-artifact input[type=file]'
+    );
+
+    cy
+      .get(UPLOAD_DOM.buttons.deploy, { timeout: 15000 })
+      .should('be.enabled')
+      .click();
+
+    cy
+      .get(UPLOAD_DOM.buttons.browse, { timeout: 10000 })
+      .should('not.be.enabled');
+
+    cy
+      .get(SNACKBAR_DEPLOYMENT_PROGRESS_DOM.buttons.dismiss, {
+        timeout: 20000,
+      })
+      .should('not.be.visible');
+
+    cy.expectNotification(
+      'success',
+      'Shared Library Deployed',
+      `petals-sl-hsql has been successfully deployed`
+    );
+
+    cy
+      .get(PETALS_TREE_DOM.buttons.workspaceElementBtn)
+      .contains('petals-sl-hsql')
+      .click({ force: true });
+
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl4`);
+    cy.get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn).should('not.be.enabled');
+  });
+
   it('should have shared-library details', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
     cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
 
     cy.get(SHARED_LIBRARY_DOM.texts.slName).should('contain', 'SL 0');
@@ -59,6 +145,9 @@ describe('Shared-library', () => {
   });
 
   it('should unload a shared-library', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
     // unload btn is disabled if started comp
     cy.get(SHARED_LIBRARY_DOM.buttons.unloadSlBtn).should('be.disabled');
 
@@ -86,6 +175,9 @@ describe('Shared-library', () => {
   });
 
   it('should show an info message when there is no related component', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
     // unload the component
     cy.getElementInPetalsTree(`component`, `Comp 2`).click();
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);
@@ -104,6 +196,10 @@ describe('Shared-library', () => {
   });
 
   it('should go to related component view when clicking a component button', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+
     cy
       .get(SHARED_LIBRARY_DOM.component('idComp2'))
       .find(SHARED_LIBRARY_DOM.buttons.componentBtn)
@@ -117,6 +213,9 @@ describe('Shared-library', () => {
   });
 
   it('should have component led state updated', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
     // check if the led is green
     cy
       .get(SHARED_LIBRARY_DOM.component('idComp2'))
@@ -142,6 +241,9 @@ describe('Shared-library', () => {
   });
 
   it('should display read-only informations when deleted', () => {
+    cy.visit(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/shared-libraries/idSl0`);
     // unload the component
     cy.getElementInPetalsTree(`component`, `Comp 2`).click();
     cy.expectLocationToBe(`/workspaces/idWks0/petals/components/idComp2`);

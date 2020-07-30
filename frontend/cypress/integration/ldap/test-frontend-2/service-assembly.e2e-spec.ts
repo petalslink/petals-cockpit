@@ -23,7 +23,7 @@ import { SERVICE_ASSEMBLY_DOM } from '../../../support/service-assembly.dom';
 import { SERVICE_UNITS_DOM } from '../../../support/service-units.dom';
 
 describe('Service-assembly', () => {
-  beforeEach(() => {
+  it('should had service assembly page loaded', () => {
     cy.visit(`/login`);
 
     cy.login('admin', 'admin');
@@ -51,7 +51,33 @@ describe('Service-assembly', () => {
     ]);
   });
 
+  it('should be able to update SA state with lifeCycleArtifact permission', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
+    cy
+      .get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop'))
+      .children()
+      .should('be.enabled');
+  });
+
+  it('should not be able to update SA state without lifeCycleArtifact permission', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('bescudie', 'bescudie');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
+    cy
+      .get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop'))
+      .children()
+      .should('not.be.enabled');
+  });
+
   it('should have all sa informations', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     cy.get(SERVICE_ASSEMBLY_DOM.texts.saName).should('contain', 'About SA 0');
     cy
       .get(SERVICE_ASSEMBLY_DOM.messages.saMessage)
@@ -72,6 +98,10 @@ describe('Service-assembly', () => {
   });
 
   it('should stop a sa and restart it', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
 
     cy.checkLifecycleState(SERVICE_ASSEMBLY_DOM.texts.saState, 'Stopped');
@@ -90,6 +120,10 @@ describe('Service-assembly', () => {
   });
 
   it('should unload a sa', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
 
@@ -100,6 +134,10 @@ describe('Service-assembly', () => {
   });
 
   it('should display read-only informations when deleted', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     // unload the sa
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('stop')).click();
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.actionState('unload')).click();
@@ -121,6 +159,10 @@ describe('Service-assembly', () => {
   });
 
   it('should go to related su view when clicking a service-unit button', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     cy.get(SERVICE_ASSEMBLY_DOM.buttons.serviceUnitBtn('idSu0')).click();
 
     // check if it's the right SU
@@ -129,6 +171,10 @@ describe('Service-assembly', () => {
   });
 
   it('should go to related component view when clicking a component button', () => {
+    cy.visit(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+    cy.login('admin', 'admin');
+    cy.expectLocationToBe(`/workspaces/idWks0/petals/service-assemblies/idSa0`);
+
     cy
       .get(SERVICE_ASSEMBLY_DOM.buttons.relatedComponentBtn('idSu0'))
       .should('have.class', 'comp-idComp0')

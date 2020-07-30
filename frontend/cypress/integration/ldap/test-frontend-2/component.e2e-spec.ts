@@ -116,6 +116,32 @@ describe('Component', () => {
       .should('not.be.enabled');
   });
 
+  it('should be able to update component state with lifeCycleArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('admin', 'admin');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy
+      .get(COMPONENT_DOM.buttons.actionState('stop'))
+      .children()
+      .should('be.enabled');
+  });
+
+  it('should not be able to update component state without lifeCycleArtifact permission', () => {
+    cy.visit(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy.login('bescudie', 'bescudie');
+
+    cy.expectLocationToBe(`/workspaces/idWks1/petals/components/idComp6`);
+
+    cy
+      .get(COMPONENT_DOM.buttons.actionState('stop'))
+      .children()
+      .should('be.disabled');
+  });
+
   describe('Related Elements', () => {
     beforeEach(() => {
       cy.visit(`/login`);
