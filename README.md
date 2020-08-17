@@ -95,6 +95,11 @@ $ cd frontend/
 $ yarn run proxy
 ```
 
+### Backend REST API
+
+Documentation about ressources served by the backend are available here : [https://linagora.gitlab.io/petals-cockpit/apidocs/](https://linagora.gitlab.io/petals-cockpit/apidocs/)
+
+
 ## Copyright and License
 
 Petals Cockpit is made by Linagora under the AGPLv3 license, see LICENSE.md.
