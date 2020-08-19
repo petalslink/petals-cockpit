@@ -23,8 +23,10 @@ import static org.ow2.petals.cockpit.server.db.generated.Tables.EDP_INSTANCES;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.ENDPOINTS;
 import static org.ow2.petals.cockpit.server.db.generated.Tables.USERS_WORKSPACES;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -148,22 +150,41 @@ public class EndpointsResource {
         public final EndpointMin endpoint;
 
         @NotNull
+        public final ImmutableSet<Long> interfacesIds;
+
+        @NotNull
+        @Min(1)
+        public final long serviceId;
+
+        @NotNull
         @Min(1)
         public final long componentId;
 
-        public EndpointFull(EndpointsRecord eDb, long componentId) {
-            this(new EndpointMin(eDb), componentId);
+        public EndpointFull(EndpointsRecord eDb, Set<Long> interfaces, long serviceId, long componentId) {
+            this(new EndpointMin(eDb), interfaces, serviceId, componentId);
         }
 
-        private EndpointFull(EndpointMin endpoint, long componentId) {
+        private EndpointFull(EndpointMin endpoint, Set<Long> interfaces, long serviceId, long componentId) {
             this.endpoint = endpoint;
+            this.interfacesIds = ImmutableSet.copyOf(interfaces);
+            this.serviceId = serviceId;
             this.componentId = componentId;
         }
 
         @JsonCreator
         private EndpointFull() {
             // jackson will inject values itself (because of @JsonUnwrapped)
-            this(new EndpointMin(0, ""), 0);
+            this(new EndpointMin(0, ""), Collections.emptySet(), 0, 0);
+        }
+
+        @JsonProperty
+        public Set<String> getInterfacesIds() {
+            return interfacesIds.stream().map(id -> Long.toString(id)).collect(Collectors.toSet());
+        }
+
+        @JsonProperty
+        public String getServiceId() {
+            return Long.toString(serviceId);
         }
 
         @JsonProperty
@@ -177,11 +198,13 @@ public class EndpointsResource {
             int result = 1;
             result = prime * result + (int) (componentId ^ (componentId >>> 32));
             result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
+            result = prime * result + ((interfacesIds == null) ? 0 : interfacesIds.hashCode());
+            result = prime * result + (int) (serviceId ^ (serviceId >>> 32));
             return result;
         }
 
         @Override
-        public boolean equals(@Nullable Object obj) {
+        public boolean equals(Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)
@@ -191,9 +214,17 @@ public class EndpointsResource {
             EndpointFull other = (EndpointFull) obj;
             if (componentId != other.componentId)
                 return false;
-            if (!endpoint.name.equals(other.endpoint.name))
+            if (endpoint == null) {
+                if (other.endpoint != null)
+                    return false;
+            } else if (!endpoint.equals(other.endpoint))
                 return false;
-            if (endpoint.id != other.endpoint.id)
+            if (interfacesIds == null) {
+                if (other.interfacesIds != null)
+                    return false;
+            } else if (!interfacesIds.equals(other.interfacesIds))
+                return false;
+            if (serviceId != other.serviceId)
                 return false;
             return true;
         }

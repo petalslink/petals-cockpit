@@ -985,6 +985,14 @@ public class AbstractCockpitResourceTest extends AbstractTest {
                     CONTAINERS.ID.like(compDb.getContainerId().toString()));
             assert contDb != null;
 
+            endpoint.getInterfacesIds().forEach(id -> {
+                assert resource.db().fetchAny(INTERFACES, INTERFACES.ID.like(id)) != null;
+            });
+
+            final ServicesRecord servDb = resource.db().fetchAny(SERVICES,
+                    SERVICES.ID.like(endpoint.getServiceId().toString()));
+            assert servDb != null;
+
             if (expectedEdp.getComponentName().equals(compDb.getName())
                     && expectedEdp.getContainerName().equals(contDb.getName()))
                 return true;
@@ -1028,16 +1036,25 @@ public class AbstractCockpitResourceTest extends AbstractTest {
     }
 
     protected void assertEquivalent(SoftAssertions a, EndpointFull endpoint, Endpoint expectedEdp) {
+        a.assertThat(endpoint.endpoint.name).isEqualTo(expectedEdp.getEndpointName());
+
         final ComponentsRecord compDb = resource.db().fetchAny(COMPONENTS,
                 COMPONENTS.ID.like(endpoint.getComponentId()));
-        a.assertThat(compDb).isNotNull();
+        a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
+
         final ContainersRecord contDb = resource.db().fetchOne(CONTAINERS,
                 CONTAINERS.ID.like(compDb.getContainerId().toString()));
-        a.assertThat(contDb).isNotNull();
-
-        a.assertThat(endpoint.endpoint.name).isEqualTo(expectedEdp.getEndpointName());
-        a.assertThat(compDb.getName()).isEqualTo(expectedEdp.getComponentName());
         a.assertThat(contDb.getName()).isEqualTo(expectedEdp.getContainerName());
+
+        final Set<String> interfacesNames = resource.db()
+                .selectFrom(INTERFACES)
+                .where(INTERFACES.ID.in(endpoint.getInterfacesIds()))
+                .fetchSet(INTERFACES.NAME);
+        a.assertThat(interfacesNames).containsExactlyInAnyOrderElementsOf(expectedEdp.getInterfaceNames());
+
+        final String serviceName = resource.db()
+                .fetchOne(SERVICES, SERVICES.ID.like(endpoint.getServiceId().toString())).get(SERVICES.NAME);
+        a.assertThat(serviceName).isEqualTo(expectedEdp.getServiceName());
     }
 
     private void assertEquivalent(SoftAssertions a, InterfaceFull interface_, Endpoint expectedEdp) {

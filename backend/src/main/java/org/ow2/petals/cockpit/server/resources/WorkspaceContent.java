@@ -332,7 +332,7 @@ public class WorkspaceContent implements WorkspaceEvent.Data {
             for (InterfaceFull itf : itfsToBuild.values()) {
                 String id = itf.interface_.getId();
                 itfs.put(id, itf);
-                endpoints.add(id);
+                interfaces.add(id);
             }
 
             return new ContainerFull(cDb, components, serviceAssemblies, sharedLibraries, services, endpoints,
