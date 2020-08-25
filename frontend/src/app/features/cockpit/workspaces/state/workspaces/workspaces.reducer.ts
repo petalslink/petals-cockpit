@@ -40,7 +40,9 @@ import { SseActions } from '@shared/services/sse.service';
 import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
+  IWorkspaceBackendCommon,
   IWorkspaceBackendDetails,
+  IWorkspaceUserBackend,
 } from '@shared/services/workspaces.service';
 import { Users } from '@shared/state/users.actions';
 import { Workspaces } from './workspaces.actions';
@@ -295,37 +297,13 @@ export namespace WorkspacesReducer {
 
   function fetchSuccess(
     table: IWorkspacesTable,
-    payload: IWorkspaceBackend
+    payload: IWorkspaceBackendCommon
   ): IWorkspacesTable {
-    const wksUsers: IWorkspaceDetails = {
-      ...payload,
-      users:
-        table.allIds.length > 0
-          ? toJsTable(
-              payload.users.reduce(
-                (users, user) => {
-                  const userWithoutName = {
-                    ...table.byId[payload.id].users.byId[user],
-                  };
-                  if (table.byId[payload.id].users.allIds.length === 0) {
-                    delete userWithoutName.name;
-                  }
-                  return {
-                    ...users,
-                    [user]: userWithoutName,
-                  };
-                },
-                <{ [id: string]: IWorkspaceUserRow }>{}
-              )
-            )
-          : emptyJsTable(),
-    };
-
     return {
-      ...(table.byId[wksUsers.id]
-        ? updateById(table, wksUsers.id, wksUsers)
-        : putById(table, wksUsers.id, wksUsers, workspaceRowFactory)),
-      selectedWorkspaceId: wksUsers.id,
+      ...(table.byId[payload.id]
+        ? updateById(table, payload.id, payload)
+        : putById(table, payload.id, payload, workspaceRowFactory)),
+      selectedWorkspaceId: payload.id,
       isFetchingWorkspace: false,
     };
   }
@@ -531,7 +509,7 @@ export namespace WorkspacesReducer {
 
   function addWorkspaceUserSuccess(
     table: IWorkspacesTable,
-    payload: { id: string; permissions: IWorkspaceUserPermissions }
+    payload: IWorkspaceUserBackend
   ): IWorkspacesTable {
     return updateById(table, table.selectedWorkspaceId, {
       isAddingUserToWorkspace: false,
@@ -539,7 +517,7 @@ export namespace WorkspacesReducer {
         ...putById(
           table.byId[table.selectedWorkspaceId].users,
           payload.id,
-          { ...payload.permissions },
+          payload,
           workspaceUserPermissionsFactory
         ),
       },

@@ -57,12 +57,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             mat-raised-button
             type="button"
             color="primary"
-            [disabled]="!isAllowedAsAdminWorkspace"
+            [disabled]="!workspace.description || !workspace.shortDescription || !isAllowedAsAdminWorkspace"
             (click)="editWorkspaceDetails(workspace.id)"
             class="btn-add-edit-workspace-details text-upper margin-right-x1"
           >
             <span
-              *ngIf="(workspace.description.length || workspace.shortDescription.length); else addWorkspaceDetails"
+              *ngIf="(workspace.description || workspace.shortDescription); else addWorkspaceDetails"
               fxLayout="row"
               fxLayoutAlign="start center"
             >

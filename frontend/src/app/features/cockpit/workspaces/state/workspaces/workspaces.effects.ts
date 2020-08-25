@@ -40,7 +40,6 @@ import { getErrorMessage } from '@shared/helpers/shared.helper';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { WorkspacesService } from '@shared/services/workspaces.service';
 import { IStore } from '@shared/state/store.interface';
-import { Users } from '@shared/state/users.actions';
 import { getCurrentUser } from '@shared/state/users.selectors';
 import { Buses } from '@wks/state/buses/buses.actions';
 import { Components } from '@wks/state/components/components.actions';
@@ -68,12 +67,7 @@ export class WorkspacesEffects {
   fetchWorkspaces$: Observable<Action> = this.actions$.pipe(
     ofType<Workspaces.FetchAll>(Workspaces.FetchAllType),
     switchMap(() => this.workspacesService.fetchWorkspaces()),
-    map(res =>
-      batchActions([
-        new Workspaces.FetchAllSuccess(res),
-        new Users.Fetched(toJsTable(res.users)),
-      ])
-    ),
+    map(res => new Workspaces.FetchAllSuccess(res)),
     catchError((err: HttpErrorResponse) => {
       if (environment.debug) {
         console.group();
@@ -308,13 +302,7 @@ export class WorkspacesEffects {
     ),
     mergeMap(([action, workspaceId]) =>
       this.workspacesService.addUser(workspaceId, action.payload.id).pipe(
-        map(
-          res =>
-            new Workspaces.AddWorkspaceUserSuccess({
-              id: action.payload.id,
-              permissions: res,
-            })
-        ),
+        map(res => new Workspaces.AddWorkspaceUserSuccess(res)),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();

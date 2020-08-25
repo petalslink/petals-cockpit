@@ -131,11 +131,23 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   }
 
   addUser(workspaceId: string, userId: string) {
-    return helper.response(204).pipe(
+    return helper.response(200).pipe(
       delay(environment.mock.httpDelay),
-      tap(_ => {
+      map(_ => {
         const user: BackendUser = BackendUser.get(userId);
-        workspacesService.get(workspaceId).addUserWithoutPermission(user);
+        const permissions: IWorkspaceUserPermissionsBackend = {
+          adminWorkspace: false,
+          deployArtifact: false,
+          lifecycleArtifact: false,
+        };
+        workspacesService
+          .get(workspaceId)
+          .addUserWithPermissions(user, permissions);
+        return {
+          id: user.id,
+          name: user.name,
+          ...permissions,
+        };
       })
     );
   }

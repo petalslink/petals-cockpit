@@ -42,6 +42,7 @@ export interface IWorkspaceUserPermissionsBackend {
 export interface IWorkspaceUserBackend
   extends IWorkspaceUserPermissionsBackend {
   id: string;
+  name: string;
 }
 
 export interface IWorkspaceBackend
@@ -85,7 +86,7 @@ export abstract class WorkspacesService {
   abstract addUser(
     workspaceId: string,
     userId: string
-  ): Observable<IWorkspaceUserPermissions>;
+  ): Observable<IWorkspaceUserBackend>;
 
   abstract getUserPermissions(
     userId: string,
@@ -158,7 +159,7 @@ export class WorkspacesServiceImpl extends WorkspacesService {
   }
 
   addUser(workspaceId: string, id: string) {
-    return this.http.post<IWorkspaceUserPermissions>(
+    return this.http.post<IWorkspaceUserBackend>(
       `${environment.urlBackend}/workspaces/${workspaceId}/users`,
       { id }
     );

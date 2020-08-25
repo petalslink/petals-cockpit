@@ -292,7 +292,7 @@ const getCurrentWorkspaceUsersById = createSelector(
         ...acc,
         {
           id: user.id,
-          name: usersById[user.id].name,
+          name: usersWks.byId[user.id].name,
           adminWorkspace: usersWks.byId[user.id].adminWorkspace,
           deployArtifact: usersWks.byId[user.id].deployArtifact,
           lifecycleArtifact: usersWks.byId[user.id].lifecycleArtifact,

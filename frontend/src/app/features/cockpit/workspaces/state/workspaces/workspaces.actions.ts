@@ -20,7 +20,9 @@ import { Action } from '@ngrx/store';
 import { IUserBackend } from '@shared/services/users.service';
 import {
   IWorkspaceBackend,
+  IWorkspaceBackendCommon,
   IWorkspaceBackendDetails,
+  IWorkspaceUserBackend,
   IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
 
@@ -97,7 +99,7 @@ export namespace Workspaces {
   export const FetchSuccessType = '[Workspaces] Fetch success';
   export class FetchSuccess implements Action {
     readonly type = FetchSuccessType;
-    constructor(public readonly payload: IWorkspaceBackend) {}
+    constructor(public readonly payload: IWorkspaceBackendCommon) {}
   }
 
   export const FetchDetailsType = '[Workspaces] Fetch details';
@@ -216,12 +218,7 @@ export namespace Workspaces {
   export const AddWorkspaceUserSuccessType = '[Workspaces] Add user success';
   export class AddWorkspaceUserSuccess implements Action {
     readonly type = AddWorkspaceUserSuccessType;
-    constructor(
-      public readonly payload: {
-        id: string;
-        permissions: IWorkspaceUserPermissions;
-      }
-    ) {}
+    constructor(public readonly payload: IWorkspaceUserBackend) {}
   }
 
   export const UpdateWorkspaceUserPermissionsType =

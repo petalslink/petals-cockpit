@@ -21,7 +21,9 @@ import flatMap from 'lodash-es/flatMap';
 import { IBusImport } from '@shared/services/buses.service';
 import {
   IWorkspaceBackend,
+  IWorkspaceBackendCommon,
   IWorkspaceBackendDetails,
+  IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
 
 import { IWorkspaceUserRow } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
@@ -107,13 +109,10 @@ export class Workspace {
     };
   }
 
-  getContent(): IWorkspaceBackend {
+  getContent(): IWorkspaceBackendCommon {
     return {
       id: this.id,
       name: this.name,
-      shortDescription: this.shortDescription,
-      description: this.description,
-      users: this.getUsersIds(),
     };
   }
 
@@ -196,13 +195,14 @@ export class Workspace {
     return Array.from(this.endpoints.values());
   }
 
-  addUserWithoutPermission(user: BackendUser) {
+  addUserWithPermissions(
+    user: BackendUser,
+    permissions: IWorkspaceUserPermissionsBackend
+  ) {
     const userWks = {
       id: user.id,
       name: user.name,
-      adminWorkspace: false,
-      deployArtifact: false,
-      lifecycleArtifact: false,
+      ...permissions,
       isSavingUserPermissions: false,
     };
     this.users.set(user.id, userWks);

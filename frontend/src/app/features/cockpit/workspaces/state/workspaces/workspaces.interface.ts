@@ -51,7 +51,6 @@ export interface IWorkspaceDetails
 
 // used within ws table
 export interface IWorkspaceUserRow extends IWorkspaceUserBackend {
-  name: string;
   isSavingUserPermissions: boolean;
 }
 
