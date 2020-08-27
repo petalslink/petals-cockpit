@@ -51,6 +51,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
   parametersForm: FormGroup;
 
   hasDeployArtifactPerm = false;
+  hasLifecycleArtifactPerm = false;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -62,6 +63,7 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
         filter(permission => !!permission),
         tap(permission => {
           this.hasDeployArtifactPerm = permission.deployArtifact;
+          this.hasLifecycleArtifactPerm = permission.lifecycleArtifact;
         })
       )
       .subscribe();

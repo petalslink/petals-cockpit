@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
                   mat-stroked-button
                   type="button"
                   color="primary"
-                  [disabled]="component.isUpdating || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
+                  [disabled]="!hasLifecycleArtifactPerm || component.isUpdating || ((possibleState.actionName === 'Unload' || possibleState.actionName === 'Uninstall') && component.serviceUnits.length > 0)"
                   (click)="changeState(possibleState.newStateAfterAction, component.id)"
                   class="btn-change-comp-state text-upper"
                 >

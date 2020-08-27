@@ -21,6 +21,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { IComponentRow } from '@feat/cockpit/workspaces/state/components/components.interface';
 import { SharedLibraries } from '@feat/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
+import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
 import { ComponentState } from '@shared/services/components.service';
 import { ESharedLibraryState } from '@shared/services/shared-libraries.service';
@@ -29,7 +30,7 @@ import {
   getCurrentSharedLibrary,
   ISharedLibraryWithComponents,
 } from '@wks/state/shared-libraries/shared-libraries.selectors';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-petals-shared-library-view',
@@ -43,10 +44,22 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
   workspaceId$: Observable<string>;
 
   isDeleted = false;
+  hasLifecycleArtifactPerm = false;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.store$
+      .pipe(
+        select(getCurrentUserPermissions),
+        takeUntil(this.onDestroy$),
+        filter(permission => !!permission),
+        tap(permission => {
+          this.hasLifecycleArtifactPerm = permission.lifecycleArtifact;
+        })
+      )
+      .subscribe();
+
     this.sharedLibrary$ = this.store$.pipe(
       select(getCurrentSharedLibrary),
       takeUntil(this.onDestroy$),

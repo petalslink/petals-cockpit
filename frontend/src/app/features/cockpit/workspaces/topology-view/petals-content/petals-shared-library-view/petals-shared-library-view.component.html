@@ -36,19 +36,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             fxLayoutAlign.gt-sm="start center"
           >
             <button
-              mat-raised-button
+              mat-stroked-button
+              type="button"
+              color="primary"
               (click)="unload(sl.id)"
-              [disabled]="sl.isFetchingDetails || sl.isUpdatingState || sl.components.length > 0"
-              class="btn-unload-sl color-primary text-upper margin-right-x1"
+              [disabled]="!hasLifecycleArtifactPerm || sl.isFetchingDetails || sl.isUpdatingState || sl.components.length > 0"
+              class="btn-unload-sl text-upper"
             >
               <mat-icon
-                *ngIf="sl.components.length > 0"
+                *ngIf="sl.components.length > 0 else canUnloadSl"
                 matTooltip="To unload a shared-library, all components that use it should be unloaded first"
                 matTooltipPosition="above"
               >
                 info
               </mat-icon>
-              <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
+              <ng-template #canUnloadSl>
+                <mat-icon *ngIf="sl.components.length === 0">remove_circle_outline</mat-icon>
+              </ng-template>
               <span>Unload</span>
             </button>
             <app-message type="error" [msg]="sl.errorChangeState" [isFullWidth]="true"></app-message>
