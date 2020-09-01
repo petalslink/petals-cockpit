@@ -139,6 +139,12 @@ export const getCurrentBreadcrumb = createSelector(
       ];
       if (url.endsWith('petals')) {
         return mainBreadcrumbs;
+      }
+      if (url.endsWith('not-found')) {
+        return mainBreadcrumbs.concat({
+          name: 'Not Found',
+          type: 'category',
+        });
       } else {
         const splitUrl = url.split('/');
         const currentItemId = splitUrl[splitUrl.length - 1];

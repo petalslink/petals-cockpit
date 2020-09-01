@@ -37,12 +37,17 @@ import { getCurrentContainer } from '@wks/state/containers/containers.selectors'
 import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
 import { ServiceUnits } from '@wks/state/service-units/service-units.actions';
 import { SharedLibraries } from '@wks/state/shared-libraries/shared-libraries.actions';
+import { NotificationsService } from 'angular2-notifications';
 
 @Injectable()
 export class PetalsByIdGuard implements CanActivateChild {
   private previousDestroyAction: Action;
 
-  constructor(private router: Router, private store$: Store<IStore>) {}
+  constructor(
+    private router: Router,
+    private store$: Store<IStore>,
+    private notifications: NotificationsService
+  ) {}
 
   canActivateChild(
     route: ActivatedRouteSnapshot,
@@ -130,6 +135,8 @@ export class PetalsByIdGuard implements CanActivateChild {
       first(),
       map(state => {
         if (!resourceState(state).byId[id]) {
+          this.notifications.error('Not found', id + ' does not exist!');
+
           if (destroyAction) {
             this.store$.dispatch(destroyAction);
           }
