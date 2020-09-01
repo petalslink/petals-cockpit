@@ -15,9 +15,98 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { IEndpointRow } from '@feat/cockpit/workspaces/state/endpoints/endpoints.interface';
+import { IInterfaceRow } from '@feat/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { IServiceRow } from '@feat/cockpit/workspaces/state/services/services.interface';
+import {
+  EServiceNodeType,
+  IServiceTreeNode,
+} from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
+
 export interface IQName {
   namespace: string;
   localpart: string;
+}
+
+export function createInterfaceNamespaceNode(
+  namespace: string,
+  path: number[]
+): IServiceTreeNode {
+  return {
+    type: EServiceNodeType.InterfaceNamespace,
+    id: undefined,
+    name: namespace,
+    isFolded: false,
+    svgIcon: 'namespace',
+    path: path,
+    children: [],
+  };
+}
+
+export function createServiceNamespaceNode(
+  namespace: string,
+  path: number[]
+): IServiceTreeNode {
+  return {
+    type: EServiceNodeType.ServiceNamespace,
+    id: undefined,
+    name: namespace,
+    isFolded: false,
+    svgIcon: 'namespace',
+    path: path,
+    children: [],
+  };
+}
+
+export function createInterfaceLocalpartNode(
+  itf: IInterfaceRow,
+  wksId: string,
+  path: number[]
+): IServiceTreeNode {
+  return {
+    type: EServiceNodeType.InterfaceLocalpart,
+    id: itf.id,
+    name: findNamespaceLocalpart(itf.name).localpart,
+    isFolded: false,
+    link: `/workspaces/${wksId}/services/interfaces/${itf.id}`,
+    svgIcon: 'interface',
+    path: path,
+    children: [],
+  };
+}
+
+export function createServiceLocalpartNode(
+  svc: IServiceRow,
+  wksId: string,
+  path: number[]
+): IServiceTreeNode {
+  return {
+    type: EServiceNodeType.ServiceLocalpart,
+    id: svc.id,
+    name: findNamespaceLocalpart(svc.name).localpart,
+    isFolded: false,
+    link: `/workspaces/${wksId}/services/services/${svc.id}`,
+    svgIcon: 'service',
+    path: path,
+    children: [],
+  };
+}
+
+export function createEndpointNode(
+  edp: IEndpointRow,
+  wksId: string,
+  path: number[]
+): IServiceTreeNode {
+  return {
+    type: EServiceNodeType.Endpoint,
+    id: edp.id,
+    name: edp.name,
+    isFolded: false,
+    link: `/workspaces/${wksId}/services/endpoints/${edp.id}`,
+    svgIcon: 'endpoint',
+    path: path,
+    children: [],
+  };
 }
 
 export function findNamespaceLocalpart(str: string): IQName {

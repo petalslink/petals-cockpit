@@ -16,9 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 <mat-sidenav-container fxLayout="column" fxFlex>
   <mat-sidenav fxLayout="column" mode="side" opened>
     <app-services-menu-view
-      [interfaces]="interfaces$ | async"
-      [services]="services$ | async"
-      [endpoints]="endpoints$ | async"
+      [servicesEndpointsTree$]="tree$"
       [workspaceId]="workspaceId$ | async"
     ></app-services-menu-view>
   </mat-sidenav>

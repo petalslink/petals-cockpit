@@ -17,7 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
   <div fxLayout="row" class="wrapper-search-services">
     <form [formGroup]="searchForm" fxFlex>
       <mat-form-field appearance="outline" fxFlex="280px">
-        <input appFocusInputIfLargeScreen matInput placeholder="Search by name" formControlName="search" class="search">
+        <input
+          appFocusInputIfLargeScreen
+          matInput
+          placeholder="Search by name"
+          formControlName="search"
+          class="search"
+        >
         <span matPrefix>
           <fa-icon icon="search" class="icon-x2"></fa-icon>
         </span>
@@ -35,9 +41,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     >
       <mat-spinner
         *ngIf="isFetchingServices$ | async; else default"
+        color="primary"
         [diameter]="24"
         [strokeWidth]="2"
-        color="primary"
       ></mat-spinner>
       <ng-template #default>
         <mat-icon>refresh</mat-icon>
@@ -45,50 +51,119 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
     </button>
   </div>
 
-  <div class="pnl-services-trees">
-    <mat-accordion displayMode="flat" [multi]="true">
-      <mat-expansion-panel fxLayout="column" class="exp-pnl-interfaces-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
-        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center">
-            <mat-icon class="margin-right-x1" color="primary" svgIcon="interface"></mat-icon>
-            <span class="text-upper pnl-title light-bold">Interface Names</span>
-          </div>
-        </mat-expansion-panel-header>
+  <app-message
+    *ngIf="search && !isMatchingSearch(servicesEndpointsTree$ | async)"
+    type="info"
+    msg="There is no match with &quot;{{ search }}&quot;."
+    (evtClose)="focusSearch()"
+    [isFullWidth]="true"
+    class="info no-match"
+  ></app-message>
 
-        <app-interfaces-list
-          [interfacesTree]="interfacesTree$ | async"
-          [search]="search"
-        ></app-interfaces-list>
+  <mat-tree [dataSource]="nestedDataSource" [treeControl]="nestedTreeControl" class="services-tree">
+    <!-- This is the template for the common part of any node -->
+    <ng-template #nodeInfo let-node="node">
+      <div
+        fxFlex="92"
+        fxLayout="row"
+        [routerLink]="node.link ? [node.link] : []"
+        class="element-info"
+      >
+        <button
+          fxFlexFill
+          fxLayout="row"
+          fxLayoutAlign="start center"
+          class="btn-node"
+        >
+          <span [matTooltip]="node.name">
+            <mat-icon
+              *ngIf="node.svgIcon"
+              fxFlex
+              mat-list-icon
+              color="primary"
+              [svgIcon]="node.svgIcon"
+              class="tree-icon-svg"
+            ></mat-icon>
+            <mat-icon
+              *ngIf="node.icon"
+              fxFlex
+              mat-list-icon
+              color="primary"
+              class="tree-icon"
+            >
+              {{ node.icon }}
+            </mat-icon>
+          </span>
+          <span
+            appColorSearchedLetters
+            [text]="node.name"
+            [search]="search"
+            [ngClass]="node.type.endsWith('namespace') === 'namespace' ? 'start-ellipsis' : 'ellipsis'"
+            classToApply="highlight"
+            class="service-element-name margin-left-x1"
+          ></span>
+        </button>
+      </div>
+    </ng-template>
 
-      </mat-expansion-panel>
-      <mat-expansion-panel fxLayout="column" class="exp-pnl-services-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
-        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center">
-            <mat-icon class="margin-right-x1" color="primary" svgIcon="service"></mat-icon>
-            <span class="text-upper pnl-title light-bold">Service Names</span>
-          </div>
-        </mat-expansion-panel-header>
+    <!-- mat-tree-node is used for ending nodes (without children) -->
+    <mat-tree-node
+      *matTreeNodeDef="let node"
+      [ngClass]="isMatchingSearch(node) ? 'tree-node-visible' : 'tree-node-hidden'"
+      class="cockpit-tree-node"
+    >
+      <div
+        fxFlex
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        [routerLink]="node.link ? [node.link] : []"
+        [routerLinkActive]="node.link ? 'selected-element' : ''"
+        class="tree-node-content service-element-node-{{ node.type.toLowerCase() }} service-element-node-{{ node.type.toLowerCase() + '-' + node.path.join('-') }}"
+      >
+        <ng-container
+          [ngTemplateOutlet]="nodeInfo"
+          [ngTemplateOutletContext]="{node:node}"
+        ></ng-container>
+      </div>
+    </mat-tree-node>
 
-        <app-services-list
-          [servicesTree]="servicesTree$ | async"
-          [search]="search"
-        ></app-services-list>
+    <!-- mat-nested-tree-node is used for branching nodes (with childrens) -->
+    <mat-nested-tree-node
+      *matTreeNodeDef="let node; when displayChild;"
+      [ngClass]="isMatchingSearch(node) ? 'tree-node-visible' : 'tree-node-hidden'"
+      class="cockpit-tree-node"
+    >
+      <div
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        [routerLink]="node.link ? [node.link] : []"
+        [routerLinkActive]="node.link ? 'selected-element' : ''"
+        class="tree-node-content service-element-node-{{ node.type.toLowerCase() }} service-element-node-{{ node.type.toLowerCase() + '-' + node.path.join('-') }}"
+      >
+        <ng-container
+          [ngTemplateOutlet]="nodeInfo"
+          [ngTemplateOutletContext]="{node:node}"
+        ></ng-container>
 
-      </mat-expansion-panel>
-      <mat-expansion-panel fxLayout="column" class="exp-pnl-endpoints-tree mat-elevation-z0" [hideToggle]="false" [expanded]="true">
-        <mat-expansion-panel-header fxLayout="row" collapsedHeight="32px" expandedHeight="40px">
-          <div fxLayout="row" fxLayoutAlign="center center">
-            <mat-icon class="margin-right-x1" color="primary" svgIcon="endpoint"></mat-icon>
-            <span class="text-upper pnl-title light-bold">Endpoint Names</span>
-          </div>
-        </mat-expansion-panel-header>
+        <button
+          fxFlex="8"
+          matTreeNodeToggle
+          fxLayoutAlign="center center"
+          mat-icon-button
+          disableRipple
+          (click)="toggleFold(node)"
+          [ngClass]="'btn-expandable-' + node.type.toLowerCase() + '-' + node.path.join('-')"
+          class="btn-expandable"
+        >
+          <mat-icon [ngClass]="{'rotate-90': !nestedTreeControl.isExpanded(node)}">
+            arrow_drop_down
+          </mat-icon>
+        </button>
+      </div>
 
-        <app-endpoints-list
-          [endpointsTree]="endpointsTree$ | async"
-          [search]="search"
-        ></app-endpoints-list>
-
-      </mat-expansion-panel>
-    </mat-accordion>
-  </div>
+      <div *ngIf="nestedTreeControl.isExpanded(node)" class="element-info">
+        <ng-container matTreeNodeOutlet></ng-container>
+      </div>
+    </mat-nested-tree-node>
+  </mat-tree>
 </div>

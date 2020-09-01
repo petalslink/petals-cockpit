@@ -27,13 +27,14 @@ export class Service {
   public readonly name: string;
   private readonly interfaces = new Map<string, Interface>();
   private readonly endpoints = new Map<string, Endpoint>();
+  public componentsIds: string[];
 
-  constructor(public cpt: number, private components: string[], name?: string) {
-    const i = cpt;
-    this.id = `idService${i}`;
+  constructor(id: string, private components: string[], name?: string) {
+    this.id = id;
     this.name =
       name ||
-      `{http://namespace-example.fr/service/technique/version/${i}.0}Localpart${i}`;
+      `{http://namespace-example.fr/service/technique/version/${id}.0}Localpart${id}`;
+    this.componentsIds = components;
   }
 
   toObj(): { [id: string]: IServiceBackendSSE } {
@@ -56,11 +57,10 @@ export class Service {
 
 export class Services {
   private readonly services = new Map<string, Service>();
-  protected cpt = 0;
   constructor() {}
 
-  create(components: string[], name?: string) {
-    const service = new Service(this.cpt++, components, name);
+  create(id: string, components: string[], name?: string) {
+    const service = new Service(id, components, name);
     this.services.set(service.id, service);
     return service;
   }

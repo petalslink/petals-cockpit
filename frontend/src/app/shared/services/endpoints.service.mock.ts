@@ -18,72 +18,40 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
+import flatMap from 'lodash-es/flatMap';
 import { EndpointsServiceImpl } from './endpoints.service';
+import { UsersService } from './users.service';
+import { UsersServiceMock } from './users.service.mock';
 
 @Injectable()
 export class EndpointsServiceMock extends EndpointsServiceImpl {
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private usersService: UsersService) {
     super(http);
   }
 
   getDetailsEndpoint(id: string) {
-    switch (id) {
-      case 'idEndpoint0': {
-        return helper.responseBody({
-          service: 'idService0',
-          interfaces: ['idInterface0', 'idInterface4'],
-        });
-      }
-      case 'idEndpoint1': {
-        return helper.responseBody({
-          service: 'idService1',
-          interfaces: ['idInterface1', 'idInterface2'],
-        });
-      }
-      case 'idEndpoint2': {
-        return helper.responseBody({
-          service: 'idService2',
-          interfaces: ['idInterface2'],
-        });
-      }
-      case 'idEndpoint3': {
-        return helper.responseBody({
-          service: 'idService3',
-          interfaces: ['idInterface3'],
-        });
-      }
-      case 'idEndpoint4': {
-        return helper.responseBody({
-          service: 'idService0',
-          interfaces: [
-            'idInterface0',
-            'idInterface1',
-            'idInterface2',
-            'idInterface3',
-            'idInterface4',
-          ],
-        });
-      }
-      case 'idEndpoint12': {
-        return helper.responseBody({
-          service: 'idService12',
-          interfaces: ['idInterface12'],
-        });
-      }
-      case 'idEndpoint13': {
-        return helper.responseBody({
-          service: 'idService13',
-          interfaces: ['idInterface13'],
-        });
-      }
-      // TODO: Need investigation to mock the requested operation
-      case 'idEndpointForbidden': {
-        return helper.errorBackend('Fordidden requested operation', 403);
-      }
-      default: {
-        return helper.errorBackend('Endpoint not found', 404);
-      }
+    const mock = this.usersService as UsersServiceMock;
+
+    if (id === 'idEndpointForbidden') {
+      return helper.errorBackend('Fordidden requested operation', 403);
     }
+
+    // a list of same Id endpoints
+    const endpoint = flatMap(
+      workspacesService.getWorkspaces(mock.getCurrentUser().id),
+      wks => wks.getEndpoints()
+    ).find(edp => edp.id === id);
+    // looking for the list with the desired endpoint id
+
+    if (endpoint === null) {
+      return helper.errorBackend('Endpoint not found', 404);
+    }
+
+    return helper.responseBody({
+      service: endpoint.serviceId,
+      interfaces: Array.from(endpoint.interfaces),
+    });
   }
 }

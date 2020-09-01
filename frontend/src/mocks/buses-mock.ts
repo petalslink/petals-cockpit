@@ -106,6 +106,13 @@ export class Bus extends BusBase {
     };
   }
 
+  getComponents() {
+    return this.getContainers()
+      .map(cont => cont.getComponents())
+      .reduce((prev, curr) => prev.concat(curr))
+      .map(comp => comp.id);
+  }
+
   getDetails(): IBusBackendDetails {
     return {};
   }

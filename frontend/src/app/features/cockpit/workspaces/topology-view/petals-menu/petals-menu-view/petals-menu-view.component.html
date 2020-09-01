@@ -37,9 +37,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
       matTreeNodePaddingIndent="20"
       *matTreeNodeDef="let wksElement"
       [routerLinkActive]="wksElement.link ? 'selected-element' : ''"
-      [routerLink]="wksElement.link ? [wksElement.link] : []"
       [ngClass]="wksElement.cssClass"
-      class="workspace-element-node"
+      class="workspace-element-node petals-tree-node"
     >
       <app-led
         *ngIf="wksElement.state"
@@ -48,7 +47,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
         [ngStyle]="{'margin-left.px': wksElement.level * -20 + 5}"
         class="workspace-element-state-led {{ wksElement.state.toLowerCase() }}"
       ></app-led>
-      <div class="element-info">
+      <div
+        fxFlex="92"
+        fxLayout="row"
+        [routerLink]="wksElement.link ? [wksElement.link] : []"
+        class="element-info"
+      >
         <div
           *ngIf="!wksElement.cssClass.includes('category') else category"
           fxFlexFill
@@ -87,7 +91,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
               [text]="wksElement.name"
               [search]="search"
               classToApply="highlight"
-              class="workspace-element-name tree-element-name"
+              class="workspace-element-name ellipsis"
             ></span>
 
             <fa-icon
@@ -114,14 +118,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
             [text]="wksElement.name"
             [search]="search"
             classToApply="highlight"
-            class="tree-category-name tree-element-name text-upper margin-left-x1"
+            class="tree-category-name ellipsis text-upper margin-left-x1"
           ></span>
         </button>
       </ng-template>
 
       <button
         *ngIf="wksElement.expandable"
-        fxFlex
+        fxFlex="8"
         fxLayoutAlign="end"
         mat-icon-button
         disableRipple

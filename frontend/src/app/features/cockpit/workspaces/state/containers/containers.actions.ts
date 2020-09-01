@@ -79,18 +79,6 @@ export namespace Containers {
       | 'shared-libraries';
   }
 
-  export const FoldType = '[Containers] Fold';
-  export class Fold implements Action {
-    readonly type = FoldType;
-    constructor(public readonly payload: FoldPayload) {}
-  }
-
-  export const UnfoldType = '[Containers] Unfold';
-  export class Unfold implements Action {
-    readonly type = UnfoldType;
-    constructor(public readonly payload: FoldPayload) {}
-  }
-
   export const ToggleFoldType = '[Containers] Toggle fold';
   export class ToggleFold implements Action {
     readonly type = ToggleFoldType;

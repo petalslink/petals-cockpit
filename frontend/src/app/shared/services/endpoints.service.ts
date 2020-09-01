@@ -20,18 +20,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { IEndpointsBackendCommon } from '@feat/cockpit/workspaces/state/endpoints/endpoints.interface';
 
-export interface IEndpointBackendSSECommon {
-  id: string;
-  name: string;
-  componentId: string;
+export interface IEndpointBackendSSE extends IEndpointsBackendCommon {
+  interfacesIds: string[];
 }
 
-export interface IEndpointBackendDetailsCommon {}
-
-export interface IEndpointBackendSSE extends IEndpointBackendSSECommon {}
-
-export interface IEndpointBackendDetails extends IEndpointBackendDetailsCommon {
+export interface IEndpointBackendDetails {
   service: string;
   interfaces: string[];
 }

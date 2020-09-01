@@ -27,13 +27,14 @@ export class Interface {
   public readonly name: string;
   private readonly services = new Map<string, Service>();
   private readonly endpoints = new Map<string, Endpoint>();
+  public componentsIds: string[];
 
-  constructor(public cpt: number, private components: string[], name?: string) {
-    const i = cpt;
-    this.id = `idInterface${i}`;
+  constructor(id: string, private components: string[], name?: string) {
+    this.id = id;
     this.name =
       name ||
-      `{http://namespace-example.fr/interface/technique/version/${i}.0}Interface-Localpart${i}`;
+      `{http://namespace-example.fr/interface/technique/version/${id}.0}Interface-Localpart${id}`;
+    this.componentsIds = components;
   }
 
   toObj(): { [id: string]: IInterfaceBackendSSE } {
@@ -41,7 +42,7 @@ export class Interface {
       [this.id]: {
         id: this.id,
         name: this.name,
-        components: Array.from(this.components),
+        components: this.components,
       },
     };
   }
@@ -56,11 +57,10 @@ export class Interface {
 
 export class Interfaces {
   private readonly interfaces = new Map<string, Interface>();
-  protected cpt = 0;
   constructor() {}
 
-  create(components: string[], name?: string) {
-    const itf = new Interface(this.cpt++, components, name);
+  create(id: string, components: string[], name?: string) {
+    const itf = new Interface(id, components, name);
     this.interfaces.set(itf.id, itf);
     return itf;
   }

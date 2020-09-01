@@ -67,18 +67,6 @@ export namespace Buses {
     ) {}
   }
 
-  export const FoldType = '[Buses] Fold';
-  export class Fold implements Action {
-    readonly type = FoldType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  export const UnfoldType = '[Buses] Unfold';
-  export class Unfold implements Action {
-    readonly type = UnfoldType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
   export const ToggleFoldType = '[Buses] Toggle fold';
   export class ToggleFold implements Action {
     readonly type = ToggleFoldType;
@@ -106,12 +94,6 @@ export namespace Buses {
   export const DetachErrorType = '[Buses] Detach error';
   export class DetachError implements Action {
     readonly type = DetachErrorType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  export const DetachSuccessType = '[Buses] Detach success';
-  export class DetachSuccess implements Action {
-    readonly type = DetachSuccessType;
     constructor(public readonly payload: { id: string }) {}
   }
 

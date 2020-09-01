@@ -23,7 +23,6 @@ import { NotificationsService } from 'angular2-notifications';
 import { Observable, of } from 'rxjs';
 import {
   catchError,
-  filter,
   map,
   mapTo,
   mergeMap,
@@ -180,20 +179,37 @@ export class WorkspacesEffects {
     ofType<SseActions.WorkspaceContent>(SseActions.WorkspaceContentType),
     map(action => {
       const data = action.payload;
-
       return batchActions([
         new Workspaces.CleanWorkspace(),
         new Workspaces.FetchSuccess(data.workspace),
         new Buses.Fetched(toJsTable(data.buses)),
         new Containers.Fetched(toJsTable(data.containers)),
         new Components.Fetched(toJsTable(data.components)),
-        new Endpoints.Fetched(toJsTable(data.endpoints)),
-        new Interfaces.Fetched(toJsTable(data.interfaces)),
         new ServiceAssemblies.Fetched(toJsTable(data.serviceAssemblies)),
         new ServiceUnits.Fetched(toJsTable(data.serviceUnits)),
-        new Services.Fetched(toJsTable(data.services)),
         new SharedLibraries.Fetched(toJsTable(data.sharedLibraries)),
+        new Interfaces.Fetched(toJsTable(data.interfaces)),
+        new Services.Fetched(toJsTable(data.services)),
+        new Endpoints.Fetched(toJsTable(data.endpoints)),
+        new Workspaces.BuildServiceTree(),
       ]);
+    })
+  );
+
+  @Effect()
+  buildServiceTree$: Observable<Action> = this.actions$.pipe(
+    ofType<Workspaces.BuildServiceTree>(Workspaces.BuildServiceTreeType),
+    withLatestFrom(
+      this.store$.pipe(
+        select(state => ({
+          services: state.services,
+          interfaces: state.interfaces,
+          endpoints: state.endpoints,
+        }))
+      )
+    ),
+    map(([action, serviceTree]) => {
+      return new Workspaces.BuildServiceTreeSuccess(serviceTree);
     })
   );
 
@@ -450,19 +466,10 @@ export class WorkspacesEffects {
   );
 
   @Effect()
-  unfoldCurrentElementParents$: Observable<Action> = this.actions$.pipe(
-    ofType<SetCurrentActions>(
-      Containers.SetCurrentType,
-      Components.SetCurrentType,
-      ServiceUnits.SetCurrentType,
-      ServiceAssemblies.SetCurrentType,
-      SharedLibraries.SetCurrentType
-    ),
-    filter(action => !!action.payload.id),
+  watchServicesUpdated$: Observable<Action> = this.actions$.pipe(
+    ofType<SseActions.ServicesUpdated>(SseActions.ServicesUpdatedType),
     withLatestFrom(this.store$),
-    map(([action, state]: [SetCurrentActions, IStore]) =>
-      batchActions(unfoldWithParents(action, state, false))
-    )
+    map(_ => new Workspaces.BuildServiceTree())
   );
 
   @Effect()
@@ -484,76 +491,14 @@ export class WorkspacesEffects {
             console.groupEnd();
           }
 
+          this.notifications.error(
+            `Services`,
+            `An error occurred while fetching services.`
+          );
+
           return of(new Workspaces.RefreshServicesError(action.payload));
         })
       )
     )
   );
-}
-
-type SetCurrentActions =
-  | Containers.SetCurrent
-  | Components.SetCurrent
-  | ServiceUnits.SetCurrent
-  | ServiceAssemblies.SetCurrent
-  | SharedLibraries.SetCurrent;
-
-function unfoldWithParents(
-  action: SetCurrentActions | Buses.SetCurrent,
-  state: IStore,
-  alsoCurrent = true
-): Action[] {
-  const id = action.payload.id;
-
-  switch (action.type) {
-    case Buses.SetCurrentType: {
-      return alsoCurrent ? [new Buses.Unfold({ id })] : [];
-    }
-
-    case Containers.SetCurrentType: {
-      return [
-        ...(alsoCurrent
-          ? [new Containers.Unfold({ id, type: 'container' })]
-          : []),
-        ...unfoldWithParents(
-          new Buses.SetCurrent({ id: state.containers.byId[id].busId }),
-          state
-        ),
-      ];
-    }
-
-    case Components.SetCurrentType: {
-      const cId = state.components.byId[id].containerId;
-      return [
-        ...(alsoCurrent ? [new Components.Unfold({ id })] : []),
-        new Containers.Unfold({ id: cId, type: 'components' }),
-        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
-      ];
-    }
-
-    case ServiceAssemblies.SetCurrentType: {
-      const cId = state.serviceAssemblies.byId[id].containerId;
-      return [
-        new Containers.Unfold({ id: cId, type: 'service-assemblies' }),
-        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
-      ];
-    }
-
-    case SharedLibraries.SetCurrentType: {
-      const cId = state.sharedLibraries.byId[id].containerId;
-      return [
-        new Containers.Unfold({ id: cId, type: 'shared-libraries' }),
-        ...unfoldWithParents(new Containers.SetCurrent({ id: cId }), state),
-      ];
-    }
-
-    case ServiceUnits.SetCurrentType: {
-      return unfoldWithParents(
-        new Components.SetCurrent({
-          id: state.serviceUnits.byId[id].componentId,
-        }),
-        state
-      );
-    }
-  }
 }

@@ -110,9 +110,7 @@ export namespace InterfacesReducer {
     table: IInterfacesTable,
     payload: JsTable<IInterfaceBackendSSE>
   ): IInterfacesTable {
-    return {
-      ...mergeInto(table, payload, interfaceRowFactory),
-    };
+    return { ...mergeInto(table, payload, interfaceRowFactory) };
   }
 
   function fetchDetails(table: IInterfacesTable, payload: { id: string }) {
@@ -153,12 +151,8 @@ export namespace InterfacesReducer {
 
   function interfaceBackendSseMapToInterfaceRowMap(ibsMap: {
     [key: string]: IInterfaceBackendSSE;
-  }): {
-    [key: string]: IInterfaceRow;
-  } {
-    const initialInterfaces: {
-      [key: string]: IInterfaceRow;
-    } = {};
+  }): { [key: string]: IInterfaceRow } {
+    const initialInterfaces: { [key: string]: IInterfaceRow } = {};
     const interfaces = Object.values(ibsMap).reduce(
       (previousValue, currentValue) => {
         previousValue[currentValue.id] = {

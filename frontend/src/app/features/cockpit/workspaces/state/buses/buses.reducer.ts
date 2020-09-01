@@ -22,7 +22,7 @@ import {
   removeById,
   updateById,
 } from '@shared/helpers/jstable.helper';
-import { fold, toggleFold, unfold } from '@shared/helpers/reducers.helper';
+import { toggleFold } from '@shared/helpers/reducers.helper';
 import {
   IBusBackendDetails,
   IBusBackendSSE,
@@ -44,13 +44,10 @@ export namespace BusesReducer {
     | Buses.FetchDetails
     | Buses.FetchDetailsError
     | Buses.FetchDetailsSuccess
-    | Buses.Fold
-    | Buses.Unfold
     | Buses.ToggleFold
     | Buses.CancelSelect
     | Buses.ToggleSelect
     | Buses.Detach
-    | Buses.DetachSuccess
     | Buses.DetachError
     | Buses.Detached
     // BUS IN PROGRESS
@@ -88,12 +85,6 @@ export namespace BusesReducer {
       case Buses.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
       }
-      case Buses.FoldType: {
-        return fold(table, action.payload);
-      }
-      case Buses.UnfoldType: {
-        return unfold(table, action.payload);
-      }
       case Buses.ToggleFoldType: {
         return toggleFold(table, action.payload);
       }
@@ -108,9 +99,6 @@ export namespace BusesReducer {
       }
       case Buses.DetachErrorType: {
         return detachError(table, action.payload);
-      }
-      case Buses.DetachSuccessType: {
-        return detachSuccess(table, action.payload);
       }
       case Buses.DetachedType: {
         return detached(table, action.payload);
@@ -210,15 +198,11 @@ export namespace BusesReducer {
     });
   }
 
-  function detachSuccess(
-    table: IBusesTable,
-    payload: { id: string }
-  ): IBusesTable {
-    return updateById(table, payload.id, { isDetaching: true });
-  }
-
   function detached(table: IBusesTable, payload: { id: string }) {
-    return removeById(table, payload.id);
+    return {
+      ...updateById(table, payload.id, { isDetaching: false }),
+      ...removeById(table, payload.id),
+    };
   }
 
   function detach(table: IBusesTable, payload: { id: string }) {

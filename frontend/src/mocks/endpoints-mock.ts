@@ -15,23 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Interface } from '@mocks/interfaces-mock';
-import { Service } from '@mocks/services-mock';
-import {
-  IEndpointBackendDetails,
-  IEndpointBackendSSE,
-} from '@shared/services/endpoints.service';
+import { IEndpointBackendSSE } from '@shared/services/endpoints.service';
 
 export class Endpoint {
   public readonly id: string;
   public readonly name: string;
-  private readonly service = Service;
-  private readonly interfaces = new Map<string, Interface>();
+  public interfaces: string[];
+  public serviceId: string;
+  public componentId: string;
 
-  constructor(public cpt: number, private componentId: string, name?: string) {
-    const i = cpt;
-    this.id = `idEndpoint${i}`;
-    this.name = name || `edpt-69f52660-test-19e9-a769-${i}`;
+  constructor(
+    id: string,
+    interfacesIds: string[],
+    serviceId: string,
+    componentId: string,
+    name?: string
+  ) {
+    this.id = id;
+    this.name = name || `edpt-69f52660-test-19e9-a769-${id}`;
+    this.interfaces = interfacesIds;
+    this.serviceId = serviceId;
+    this.componentId = componentId;
   }
 
   toObj(): { [id: string]: IEndpointBackendSSE } {
@@ -39,26 +43,32 @@ export class Endpoint {
       [this.id]: {
         id: this.id,
         name: this.name,
+        interfacesIds: this.interfaces,
+        serviceId: this.serviceId,
         componentId: this.componentId,
       },
-    };
-  }
-
-  getDetails(): IEndpointBackendDetails {
-    return {
-      service: this.service.toString(),
-      interfaces: Array.from(this.interfaces.keys()),
     };
   }
 }
 
 export class Endpoints {
   private readonly endpoints = new Map<string, Endpoint>();
-  protected cpt = 0;
   constructor() {}
 
-  create(componentId: string, name?: string) {
-    const endpoint = new Endpoint(this.cpt++, componentId, name);
+  create(
+    id: string,
+    interfacesIds: string[],
+    serviceId: string,
+    componentId: string,
+    name?: string
+  ) {
+    const endpoint = new Endpoint(
+      id,
+      interfacesIds,
+      serviceId,
+      componentId,
+      name
+    );
     this.endpoints.set(endpoint.id, endpoint);
     return endpoint;
   }

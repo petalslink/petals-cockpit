@@ -19,15 +19,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
+import { IServiceTreeNode } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 import { IStore } from '@shared/state/store.interface';
-import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
-import { getAllEndpoints } from '@wks/state/endpoints/endpoints.selectors';
-import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
-import { getAllInterfaces } from '@wks/state/interfaces/interfaces.selectors';
-import { IServiceRow } from '@wks/state/services/services.interface';
-import { getAllServices } from '@wks/state/services/services.selectors';
+import { getCurrentServiceTree } from '../state/workspaces/workspaces.selectors';
 
 @Component({
   selector: 'app-services-view',
@@ -38,9 +33,7 @@ export class ServicesViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
   workspaceId$: Observable<string>;
-  interfaces$: Observable<IInterfaceRow[]>;
-  endpoints$: Observable<IEndpointRow[]>;
-  services$: Observable<IServiceRow[]>;
+  tree$: Observable<IServiceTreeNode>;
 
   constructor(private store$: Store<IStore>) {}
 
@@ -49,20 +42,7 @@ export class ServicesViewComponent implements OnInit, OnDestroy {
       select(state => state.workspaces.selectedWorkspaceId)
     );
 
-    this.interfaces$ = this.store$.pipe(
-      select(getAllInterfaces),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.services$ = this.store$.pipe(
-      select(getAllServices),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.endpoints$ = this.store$.pipe(
-      select(getAllEndpoints),
-      takeUntil(this.onDestroy$)
-    );
+    this.tree$ = this.store$.pipe(select(getCurrentServiceTree));
   }
 
   ngOnDestroy() {

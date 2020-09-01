@@ -94,6 +94,14 @@ body .text-upper {
   text-overflow: ellipsis;
 }
 
+.start-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
+}
+
 .card-auto-size {
   margin: 0 0 auto 0;
 }
@@ -289,47 +297,43 @@ app-services-service-overview > .mat-list > .mat-list-item > .item-namespace {
   word-break: break-all;
 }
 
-// all items elements in petals and services menu view
-app-material-tree > .nav-list-tree > .item-list > .mat-list-item,
-app-material-tree
-  > .nav-list-tree
-  > .item-list
-  > .mat-list-item.mat-list-item-with-avatar {
-  height: 24px;
-
-  .item-content > .item-name {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .item-name {
-    display: inline-block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: clip;
-  }
-
-  .item-content > .arrow-size {
-    width: 14px;
-  }
-}
-
 // all items elements in petals and services menu view ref
 // TODO: Remove above classes when mat-tree fully integrated
 mat-tree {
-  .mat-tree-node {
+  .petals-tree-node,
+  .cockpit-tree-node {
     min-height: 24px;
     height: 24px;
     outline: none;
     border: none;
   }
 
-  .element-info {
-    width: 95%;
+  .selected-element:before,
+  .tree-node-content:before {
+    content: '';
+    min-height: 24px;
+    height: 24px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    transition: all 0.2s ease;
   }
 
-  .workspace-element-name {
+  .element-info:not(:first-child) {
+    padding-inline-start: 10px;
+  }
+
+  .btn-expandable {
+    height: 100%;
+    span {
+      line-height: 24px;
+      height: 100%;
+    }
+  }
+
+  .workspace-element-name,
+  .service-element-name {
     margin-left: 5px;
     font-size: 12px;
   }
@@ -362,10 +366,6 @@ mat-tree {
   .selected-element span {
     font-weight: bold;
   }
-
-  [class^='.btn-expandable'] {
-    width: 50px;
-  }
 }
 
 .rotate-minus-90 {
@@ -374,27 +374,10 @@ mat-tree {
   transform: rotate(-90deg);
 }
 
-// this is changed to make tests pass
-// overflow on parent makes content not visible
-app-services-menu-view {
-  .exp-pnl-interfaces-tree,
-  .exp-pnl-services-tree,
-  .exp-pnl-endpoints-tree {
-    overflow: hidden;
-  }
-}
-
-// use for all services trees component
-app-services-menu-view > .services-menu-view > .pnl-services-trees {
-  .mat-accordion > mat-expansion-panel > mat-expansion-panel-header {
-    padding: 10px 12px 10px 10px;
-  }
-  .mat-accordion
-    > mat-expansion-panel
-    > .mat-expansion-panel-content
-    > .mat-expansion-panel-body {
-    padding: 0;
-  }
+.rotate-90 {
+  -ms-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
 // all items elements in petals tree

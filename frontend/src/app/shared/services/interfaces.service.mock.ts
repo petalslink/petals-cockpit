@@ -18,78 +18,43 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { Endpoint } from '@mocks/endpoints-mock';
+import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
 import { InterfacesServiceImpl } from './interfaces.service';
+import { UsersService } from './users.service';
+import { UsersServiceMock } from './users.service.mock';
 
 @Injectable()
 export class InterfacesServiceMock extends InterfacesServiceImpl {
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, private usersService: UsersService) {
     super(http);
   }
 
   getDetailsInterface(id: string) {
-    switch (id) {
-      case 'idInterface0': {
-        return helper.responseBody({
-          services: ['idService0', 'idService4'],
-          endpoints: ['idEndpoint0', 'idEndpoint4'],
-        });
-      }
-      case 'idInterface1': {
-        return helper.responseBody({
-          services: ['idService1'],
-          endpoints: ['idEndpoint1', 'idEndpoint2'],
-        });
-      }
-      case 'idInterface2': {
-        return helper.responseBody({
-          services: ['idService2', 'idService3'],
-          endpoints: ['idEndpoint2'],
-        });
-      }
-      case 'idInterface3': {
-        return helper.responseBody({
-          services: ['idService3'],
-          endpoints: ['idEndpoint3'],
-        });
-      }
-      case 'idInterface4': {
-        return helper.responseBody({
-          services: [
-            'idService0',
-            'idService1',
-            'idService2',
-            'idService3',
-            'idService4',
-          ],
-          endpoints: [
-            'idEndpoint0',
-            'idEndpoint1',
-            'idEndpoint2',
-            'idEndpoint3',
-            'idEndpoint4',
-          ],
-        });
-      }
-      case 'idInterface12': {
-        return helper.responseBody({
-          services: ['idService12'],
-          endpoints: ['idEndpoint12'],
-        });
-      }
-      case 'idInterface13': {
-        return helper.responseBody({
-          services: ['idService13'],
-          endpoints: ['idEndpoint13'],
-        });
-      }
-      // TODO: Need investigation to mock the requested operation
-      case 'idInterfaceForbidden': {
-        return helper.errorBackend('Fordidden requested operation', 403);
-      }
-      default: {
-        return helper.errorBackend('Interface not found', 404);
-      }
+    const mock = this.usersService as UsersServiceMock;
+
+    if (id === 'idServiceForbidden') {
+      return helper.errorBackend('Fordidden requested operation', 403);
     }
+
+    const endpoints: Endpoint[] = workspacesService
+      .getWorkspaces(mock.getCurrentUser().id)
+      .map<Endpoint[]>(wks => wks.getEndpoints())
+      // find right workspace
+      .find(edpList =>
+        edpList.map(edp => edp.interfaces).some(intList => intList.includes(id))
+      )
+      // get right endpoints
+      .filter(edp => edp.interfaces.includes(id));
+
+    if (endpoints === []) {
+      return helper.errorBackend('Interface not found', 404);
+    }
+
+    return helper.responseBody({
+      services: endpoints.map(edp => edp.serviceId),
+      endpoints: endpoints.map(edp => edp.id),
+    });
   }
 }

@@ -38,7 +38,7 @@ import {
 
 @Injectable()
 export class UsersServiceMock extends UsersService {
-  private currentUser: ICurrentUser = null;
+  currentUser: ICurrentUser = null;
 
   constructor() {
     super();

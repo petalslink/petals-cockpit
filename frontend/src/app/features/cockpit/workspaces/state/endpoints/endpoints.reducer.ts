@@ -110,9 +110,7 @@ export namespace EndpointsReducer {
     table: IEndpointsTable,
     payload: JsTable<IEndpointBackendSSE>
   ): IEndpointsTable {
-    return {
-      ...mergeInto(table, payload, endpointRowFactory),
-    };
+    return { ...mergeInto(table, payload, endpointRowFactory) };
   }
 
   function fetchDetails(table: IEndpointsTable, payload: { id: string }) {
@@ -163,6 +161,7 @@ export namespace EndpointsReducer {
           ...currentValue,
           isFetchingDetails: false,
         };
+
         return previousValue;
       },
       initialEndpoints

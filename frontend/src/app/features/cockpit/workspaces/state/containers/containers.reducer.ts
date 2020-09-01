@@ -21,7 +21,7 @@ import {
   putAll,
   updateById,
 } from '@shared/helpers/jstable.helper';
-import { fold, toggleFold, unfold } from '@shared/helpers/reducers.helper';
+import { toggleFold } from '@shared/helpers/reducers.helper';
 import { IComponentBackendSSE } from '@shared/services/components.service';
 import {
   IContainerBackendDetails,
@@ -52,8 +52,6 @@ export namespace ContainersReducer {
     | Containers.FetchDetails
     | Containers.FetchDetailsError
     | Containers.FetchDetailsSuccess
-    | Containers.Fold
-    | Containers.Unfold
     | Containers.ToggleFold
     | Containers.DeployServiceAssembly
     | Containers.DeployServiceAssemblyError
@@ -95,20 +93,6 @@ export namespace ContainersReducer {
       }
       case Containers.FetchDetailsSuccessType: {
         return fetchDetailsSuccess(table, action.payload);
-      }
-      case Containers.FoldType: {
-        return fold<IContainerRow, IContainersTable>(
-          table,
-          action.payload,
-          getFoldProperty(action.payload)
-        );
-      }
-      case Containers.UnfoldType: {
-        return unfold<IContainerRow, IContainersTable>(
-          table,
-          action.payload,
-          getFoldProperty(action.payload)
-        );
       }
       case Containers.ToggleFoldType: {
         return toggleFold<IContainerRow, IContainersTable>(

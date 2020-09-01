@@ -25,11 +25,13 @@ import {
   catchError,
   filter,
   map,
+  mapTo,
   switchMap,
   withLatestFrom,
 } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
+import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
 import { batchActions } from '@shared/helpers/batch-actions.helper';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import { getErrorMessage } from '@shared/helpers/shared.helper';
@@ -61,7 +63,9 @@ export class BusesEffects {
   watchDeleted$: Observable<Action> = this.actions$.pipe(
     ofType<SseActions.BusDetached>(SseActions.BusDetachedType),
     withLatestFrom(this.store$),
-    filter(([action, state]) => !!state.buses.byId[action.payload.id]),
+    filter(
+      ([action, state]) => state.buses.byId[action.payload.id].isDetaching
+    ),
     map(([action, state]) => {
       const { id, reason, content } = action.payload;
       const bus = state.buses.byId[id];
@@ -72,10 +76,11 @@ export class BusesEffects {
         new Endpoints.Clean(),
         new Interfaces.Clean(),
         new Services.Clean(),
-        new Endpoints.Added(toJsTable(content.endpoints)),
         new Interfaces.Added(toJsTable(content.interfaces)),
         new Services.Added(toJsTable(content.services)),
-        new Buses.Detached({ id }),
+        new Endpoints.Added(toJsTable(content.endpoints)),
+        new Buses.Detached({ id: action.payload.id }),
+        new Workspaces.BuildServiceTree(),
       ]);
     })
   );
@@ -84,7 +89,7 @@ export class BusesEffects {
   watchImportOk$: Observable<Action> = this.actions$.pipe(
     ofType<SseActions.BusImportOk>(SseActions.BusImportOkType),
     withLatestFrom(this.store$),
-    map(([action, state]) => {
+    map(([action, _]) => {
       const data = action.payload;
       const buses = toJsTable(data.buses);
 
@@ -103,12 +108,13 @@ export class BusesEffects {
         new Buses.Added(buses),
         new Containers.Added(toJsTable(data.containers)),
         new Components.Added(toJsTable(data.components)),
-        new Endpoints.Added(toJsTable(data.endpoints)),
-        new Interfaces.Added(toJsTable(data.interfaces)),
-        new Services.Added(toJsTable(data.services)),
         new ServiceAssemblies.Added(toJsTable(data.serviceAssemblies)),
         new ServiceUnits.Added(toJsTable(data.serviceUnits)),
         new SharedLibraries.Added(toJsTable(data.sharedLibraries)),
+        new Interfaces.Added(toJsTable(data.interfaces)),
+        new Services.Added(toJsTable(data.services)),
+        new Endpoints.Added(toJsTable(data.endpoints)),
+        new Workspaces.BuildServiceTree(),
       ]);
     })
   );
@@ -141,15 +147,14 @@ export class BusesEffects {
     )
   );
 
-  @Effect()
-  detachBus$: Observable<Action> = this.actions$.pipe(
+  @Effect({ dispatch: false })
+  detachBus$: Observable<void> = this.actions$.pipe(
     ofType<Buses.Detach>(Buses.DetachType),
     withLatestFrom(
       this.store$.pipe(select(state => state.workspaces.selectedWorkspaceId))
     ),
     switchMap(([action, idWorkspace]) =>
       this.busesService.detachBus(idWorkspace, action.payload.id).pipe(
-        map(_ => new Buses.DetachSuccess(action.payload)),
         catchError((err: HttpErrorResponse) => {
           if (environment.debug) {
             console.group();
@@ -163,7 +168,8 @@ export class BusesEffects {
           return of(new Buses.DetachError(action.payload));
         })
       )
-    )
+    ),
+    mapTo(null)
   );
 
   // BUS IN PROGRESS

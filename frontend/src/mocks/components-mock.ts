@@ -56,7 +56,7 @@ export class Components {
 export const componentsService = new Components();
 
 export class Component {
-  private static cpt = 0;
+  static cpt = 0;
   public readonly id: string;
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();

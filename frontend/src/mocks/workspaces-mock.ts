@@ -18,6 +18,8 @@
 import assign from 'lodash-es/assign';
 import flatMap from 'lodash-es/flatMap';
 
+import { IWorkspaceUserRow } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { Component } from '@mocks/components-mock';
 import { IBusImport } from '@shared/services/buses.service';
 import {
   IWorkspaceBackend,
@@ -25,8 +27,8 @@ import {
   IWorkspaceBackendDetails,
   IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
-
-import { IWorkspaceUserRow } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { IInterfaceBackendSSECommon } from './../app/shared/services/interfaces.service';
+import { IServiceBackendSSECommon } from './../app/shared/services/services.service';
 import { validContainers } from './backend-mock';
 import {
   Bus,
@@ -52,9 +54,9 @@ export class Workspace {
   private readonly users = new Map<string, IWorkspaceUserRow>();
   private readonly buses = new Map<string, Bus>();
   private readonly busesInProgress = new Map<string, BusInProgress>();
-  private readonly interfaces = new Map<string, Interface>();
-  private readonly services = new Map<string, Service>();
-  private readonly endpoints = new Map<string, Endpoint>();
+  private interfaces: Interface[] = [];
+  private services: Service[] = [];
+  private endpoints: Endpoint[] = [];
 
   constructor(
     users: IWorkspaceUserRow[] = [
@@ -145,54 +147,107 @@ export class Workspace {
   }
 
   getInterfacesIds() {
-    return Array.from(this.interfaces.keys());
+    return this.interfaces.map(itf => itf.id);
   }
 
   getInterfaces() {
-    return Array.from(this.interfaces.values());
-  }
-
-  getMoreInterfaces(nbInterfaces: number) {
-    let i: number;
-    for (i = 0; i < nbInterfaces; i++) {
-      const interfaceI = interfacesService.create(['idComp0']);
-      this.interfaces.set(interfaceI.id, interfaceI);
-    }
-    return Array.from(this.interfaces.values());
+    return this.interfaces;
   }
 
   getServicesIds() {
-    return Array.from(this.services.keys());
+    return this.services.map(svc => svc.id);
   }
 
   getServices() {
-    return Array.from(this.services.values());
-  }
-
-  getMoreServices(nbServices: number) {
-    let i: number;
-    for (i = 0; i < nbServices; i++) {
-      const serviceI = servicesService.create(['idComp0']);
-      this.services.set(serviceI.id, serviceI);
-    }
-    return Array.from(this.services.values());
+    return this.services;
   }
 
   getEndpointsIds() {
-    return Array.from(this.endpoints.keys());
+    return this.endpoints.map(edp => edp.id);
   }
 
   getEndpoints() {
-    return Array.from(this.endpoints.values());
+    return this.endpoints;
   }
 
-  getMoreEndpoints(nbEndpoints: number) {
-    let i: number;
-    for (i = 0; i < nbEndpoints; i++) {
-      const endpointI = endpointsService.create('idComp0');
-      this.endpoints.set(endpointI.id, endpointI);
-    }
-    return Array.from(this.endpoints.values());
+  // create 3 endpoints, 2 services, 2 interfaces
+  getMoreServicesEndpoints() {
+    const lastEndpointId = Math.max(
+      ...this.endpoints.map(edp => parseInt(edp.id, 10))
+    );
+    const endpointId = lastEndpointId ? lastEndpointId + 1 : 1;
+
+    const lastServiceId = Math.max(
+      ...this.services.map(sv => parseInt(sv.id, 10))
+    );
+    const serviceId = lastServiceId ? lastServiceId + 1 : 1;
+
+    const lastinterfaceId = Math.max(
+      ...this.interfaces.map(itf => parseInt(itf.id, 10))
+    );
+    const interfaceId = lastinterfaceId ? lastinterfaceId + 1 : 1;
+
+    const lastComponentId = Component.cpt - 6;
+
+    const relationCouple3Endpoints = [
+      {
+        endpointId: endpointId,
+        interfaces: [interfaceId],
+        serviceId: serviceId,
+      },
+      {
+        endpointId: endpointId + 1,
+        interfaces: [interfaceId + 1],
+        serviceId: serviceId + 1,
+      },
+      {
+        endpointId: endpointId + 2,
+        interfaces: [interfaceId + 1],
+        serviceId: serviceId + 1,
+      },
+    ];
+
+    relationCouple3Endpoints.forEach(edp => {
+      edp.interfaces.forEach(idInt => {
+        this.interfaces.push(
+          interfacesService.create(
+            idInt.toString(),
+            ['idComp' + lastComponentId],
+            '{http://namespace-example.fr/service/technique/version/5.0}moreInterface' +
+              idInt
+          )
+        );
+      });
+    });
+
+    const service1 = servicesService.create(
+      serviceId.toString(),
+      ['idComp' + lastComponentId],
+      '{http://namespace-example.fr/service/metiers/version/7.0}moreService' +
+        serviceId
+    );
+
+    const service2 = servicesService.create(
+      (serviceId + 1).toString(),
+      ['idComp' + lastComponentId],
+      '{http://namespace-example.fr/service/metiers/version/8.0}moreService' +
+        serviceId +
+        1
+    );
+
+    this.services.push(service1);
+    this.services.push(service2);
+
+    relationCouple3Endpoints.forEach(edp => {
+      const endpointI = endpointsService.create(
+        edp.endpointId.toString(),
+        edp.interfaces.map(id => id.toString()),
+        edp.serviceId.toString(),
+        'idComp' + lastComponentId,
+        'moreEndpoint' + edp.endpointId
+      );
+      this.endpoints.push(endpointI);
+    });
   }
 
   addUserWithPermissions(
@@ -247,13 +302,8 @@ export class Workspace {
     );
     const serviceUnits = flatMap(components, c => c.getServiceUnits());
 
-    let interfaces = this.getInterfaces();
-    let services = this.getServices();
-    let endpoints = this.getEndpoints();
     if (this.buses.size > 1) {
-      interfaces = this.getMoreInterfaces(6);
-      services = this.getMoreServices(6);
-      endpoints = this.getMoreEndpoints(2);
+      this.getMoreServicesEndpoints();
     }
     const sharedLibraries = flatMap(containers, c => c.getSharedLibraries());
 
@@ -261,133 +311,65 @@ export class Workspace {
       buses: bus.toObj(),
       containers: toObj(containers),
       components: toObj(components),
-      endpoints: toObj(endpoints),
-      interfaces: toObj(interfaces),
+      endpoints: toObj(this.endpoints),
+      interfaces: toObj(this.interfaces),
       serviceAssemblies: toObj(serviceAssemblies),
       serviceUnits: toObj(serviceUnits),
-      services: toObj(services),
+      services: toObj(this.services),
       sharedLibraries: toObj(sharedLibraries),
     };
 
     return { id: bus.id, eventData };
   }
 
-  makeServicesForComp0() {
+  makeServices(servicesList: {
+    endpoints: {
+      id: string;
+      name: string;
+      interfacesIds: string[];
+      serviceId: string;
+      componentId: string;
+    }[];
+    interfaces: IInterfaceBackendSSECommon[];
+    services: IServiceBackendSSECommon[];
+  }) {
     const interfaces = new Map<string, Interface>();
     const services = new Map<string, Service>();
     const endpoints = new Map<string, Endpoint>();
 
-    const newInterface1 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart97'
-    );
-    interfaces.set(newInterface1.id, newInterface1);
+    if (!servicesList) {
+      return this.makeEventData(interfaces, services, endpoints);
+    }
 
-    const newInterface2 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart97'
-    );
-    interfaces.set(newInterface2.id, newInterface2);
+    servicesList.interfaces.forEach(itf => {
+      const newInterface = interfacesService.create(
+        itf.id,
+        itf.components,
+        itf.name
+      );
+      interfaces.set(newInterface.id, newInterface);
+    });
 
-    const newService1 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/1.0}Localpart97'
-    );
-    services.set(newService1.id, newService1);
+    servicesList.services.forEach(serv => {
+      const newService = servicesService.create(
+        serv.id,
+        serv.components,
+        serv.name
+      );
+      services.set(newService.id, newService);
+    });
 
-    const newService2 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/2.0}Localpart97'
-    );
-    services.set(newService2.id, newService2);
+    servicesList.endpoints.forEach(edp => {
+      const newEndpoint = endpointsService.create(
+        edp.id,
+        edp.interfacesIds,
+        edp.serviceId,
+        edp.componentId,
+        edp.name
+      );
+      endpoints.set(newEndpoint.id, newEndpoint);
+    });
 
-    const newEndpoint = endpointsService.create(
-      'idComp1',
-      'edpt-13f82663-test-91i4-a147-3'
-    );
-    endpoints.set(newEndpoint.id, newEndpoint);
-
-    const newEndpoint1 = endpointsService.create(
-      'idComp1',
-      'edpt-13f82663-test-91i4-a147-1'
-    );
-    endpoints.set(newEndpoint1.id, newEndpoint1);
-
-    return this.makeEventData(interfaces, services, endpoints);
-  }
-
-  makeServicesForComp1() {
-    const interfaces = new Map<string, Interface>();
-    const services = new Map<string, Service>();
-    const endpoints = new Map<string, Endpoint>();
-
-    const newInterface1 = interfacesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart98'
-    );
-    interfaces.set(newInterface1.id, newInterface1);
-
-    const newInterface2 = interfacesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart99'
-    );
-    interfaces.set(newInterface2.id, newInterface2);
-
-    const newInterface3 = interfacesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/interface/technique/environmental/region/pays/international/version/1.0}Interface-Localpart96'
-    );
-    interfaces.set(newInterface3.id, newInterface3);
-
-    const newInterface4 = interfacesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/interface/technique/global/region/pays/international/version/1.0}Interface-Localpart97'
-    );
-    interfaces.set(newInterface4.id, newInterface4);
-
-    const newService1 = servicesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart98'
-    );
-    services.set(newService1.id, newService1);
-
-    const newService2 = servicesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart99'
-    );
-    services.set(newService2.id, newService2);
-
-    const newService3 = servicesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/service/technique/environmental/region/pays/international/version/1.0}Localpart96'
-    );
-    services.set(newService3.id, newService3);
-
-    const newService4 = servicesService.create(
-      ['idComp1'],
-      '{http://namespace-example.fr/service/technique/global/region/pays/international/version/1.0}Localpart97'
-    );
-    services.set(newService4.id, newService4);
-
-    const newEndpoint1 = endpointsService.create(
-      'idComp1',
-      'edpt-13f82663-test-91i4-a147-2'
-    );
-    endpoints.set(newEndpoint1.id, newEndpoint1);
-
-    const newEndpoint2 = endpointsService.create(
-      'idComp1',
-      'edpt-13f82663-test-91i4-a147-3'
-    );
-    endpoints.set(newEndpoint2.id, newEndpoint2);
-
-    return this.makeEventData(interfaces, services, endpoints);
-  }
-
-  makeServicesForComp2() {
-    const interfaces = new Map<string, Interface>();
-    const services = new Map<string, Service>();
-    const endpoints = new Map<string, Endpoint>();
     return this.makeEventData(interfaces, services, endpoints);
   }
 
@@ -413,130 +395,80 @@ export class Workspace {
     }
   }
 
-  addInterfaces() {
-    const interface0 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0'
-    );
-    const interface1 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart1'
-    );
-    const interface2 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart2'
-    );
-    const interface3 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart3'
-    );
-    const interface4 = interfacesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart4'
-    );
-    const interface5 = interfacesService.create(
-      ['idComp6'],
-      '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart0'
-    );
-    const interface6 = interfacesService.create(
-      ['idComp6'],
-      '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart1'
-    );
+  addEndpointsServices(servicesList: {
+    endpoints: {
+      id: string;
+      name: string;
+      interfacesIds: string[];
+      serviceId: string;
+      componentId: string;
+    }[];
+    interfaces: IInterfaceBackendSSECommon[];
+    services: IServiceBackendSSECommon[];
+  }) {
+    servicesList.interfaces.forEach(itf => {
+      const newInterface = interfacesService.create(
+        itf.id,
+        itf.components,
+        itf.name
+      );
+      this.interfaces.push(newInterface);
+    });
 
-    if (this.id === 'idWks1') {
-      this.interfaces.set(interface5.id, interface5);
-      this.interfaces.set(interface6.id, interface6);
-    } else {
-      this.interfaces.set(interface0.id, interface0);
-      this.interfaces.set(interface1.id, interface1);
-      this.interfaces.set(interface2.id, interface2);
-      this.interfaces.set(interface3.id, interface3);
-      this.interfaces.set(interface4.id, interface4);
-    }
+    servicesList.services.forEach(serv => {
+      const newService = servicesService.create(
+        serv.id,
+        serv.components,
+        serv.name
+      );
+      this.services.push(newService);
+    });
+
+    servicesList.endpoints.forEach(edp => {
+      const newEndpoint = endpointsService.create(
+        edp.id,
+        edp.interfacesIds,
+        edp.serviceId,
+        edp.componentId,
+        edp.name
+      );
+      this.endpoints.push(newEndpoint);
+    });
   }
 
-  addEndpoints() {
-    const endpoint0 = endpointsService.create(
-      'idComp0',
-      'edpt-89p82661-test-31o4-l391-00'
-    );
-    const endpoint1 = endpointsService.create(
-      'idComp0',
-      'edpt-89p82661-test-31o4-l391-01'
-    );
-    const endpoint2 = endpointsService.create(
-      'idComp0',
-      'edpt-89p82661-test-31o4-l391-02'
-    );
-    const endpoint3 = endpointsService.create(
-      'idComp0',
-      'edpt-89p82661-test-31o4-l391-03'
-    );
-    const endpoint4 = endpointsService.create(
-      'idComp0',
-      'edpt-89p82661-test-31o4-l391-04'
-    );
-    const endpoint5 = endpointsService.create(
-      'idComp6',
-      'edpt-89p82661-test-31o4-l391-05'
-    );
-    const endpoint6 = endpointsService.create(
-      'idComp6',
-      'edpt-89p82661-test-31o4-l391-06'
-    );
+  refreshServices() {
+    this.interfaces = [];
+    this.services = [];
+    this.endpoints = [];
 
-    if (this.id === 'idWks1') {
-      this.endpoints.set(endpoint5.id, endpoint5);
-      this.endpoints.set(endpoint6.id, endpoint6);
-    } else {
-      this.endpoints.set(endpoint0.id, endpoint0);
-      this.endpoints.set(endpoint1.id, endpoint1);
-      this.endpoints.set(endpoint2.id, endpoint2);
-      this.endpoints.set(endpoint3.id, endpoint3);
-      this.endpoints.set(endpoint4.id, endpoint4);
-    }
-  }
+    Object.values(refreshedServices.interfaces).forEach(int => {
+      const refreshedInterface = interfacesService.create(
+        int.id,
+        int.components,
+        int.name
+      );
+      this.interfaces.push(refreshedInterface);
+    });
 
-  addServices() {
-    const service0 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/1.0}Localpart0'
-    );
-    const service1 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/1.0}Localpart1'
-    );
-    const service2 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/2.0}Localpart2'
-    );
-    const service3 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/3.0}Localpart3'
-    );
-    const service4 = servicesService.create(
-      ['idComp0'],
-      '{http://namespace-example.fr/service/technique/version/3.0}Localpart4'
-    );
-    const service5 = servicesService.create(
-      ['idComp6'],
-      '{http://namespace-example.fr/service/metiers/version/1.0}Localpart0'
-    );
-    const service6 = servicesService.create(
-      ['idComp6'],
-      '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1'
-    );
+    Object.values(refreshedServices.services).forEach(serv => {
+      const refreshedService = servicesService.create(
+        serv.id,
+        serv.components,
+        serv.name
+      );
+      this.services.push(refreshedService);
+    });
 
-    if (this.id === 'idWks1') {
-      this.services.set(service5.id, service5);
-      this.services.set(service6.id, service6);
-    } else {
-      this.services.set(service0.id, service0);
-      this.services.set(service1.id, service1);
-      this.services.set(service2.id, service2);
-      this.services.set(service3.id, service3);
-      this.services.set(service4.id, service4);
-    }
+    Object.values(refreshedServices.endpoints).forEach(edp => {
+      const refreshedEndpoint = endpointsService.create(
+        edp.id,
+        edp.interfacesIds,
+        edp.serviceId,
+        edp.componentId,
+        edp.name
+      );
+      this.endpoints.push(refreshedEndpoint);
+    });
   }
 
   tryAddBus(importData: IBusImport): { id: string; eventData: any } {
@@ -636,7 +568,8 @@ export class Workspaces {
     this.workspaces.delete(id);
   }
 
-  getRefreshedServices() {
+  getRefreshedServices(workspaceId: string) {
+    this.workspaces.get(workspaceId).refreshServices();
     return refreshedServices;
   }
 }
@@ -648,10 +581,113 @@ ws0.shortDescription = 'This is short description for the Workspace 0.';
 ws0.description =
   'You can import a bus from the container **192.168.0.1:7700** to get a mock bus.';
 
-// add 5 interfaces, 5 services and 2 endpoints
-ws0.addInterfaces();
-ws0.addServices();
-ws0.addEndpoints();
+// add 4 interfaces, 5 services and 6 endpoints
+export const initializedServicesForWks0 = {
+  endpoints: [
+    {
+      id: '1',
+      name: 'edpt-89p82661-test-31o4-l391-00',
+      interfacesIds: ['1', '2'],
+      serviceId: '1',
+      componentId: 'idComp0',
+    },
+    {
+      id: '2',
+      name: 'edpt-89p82661-test-31o4-l391-01',
+      interfacesIds: ['1'],
+      serviceId: '2',
+      componentId: 'idComp0',
+    },
+    {
+      id: '3',
+      name: 'edpt-89p82661-test-31o4-l391-02',
+      interfacesIds: ['2'],
+      serviceId: '3',
+      componentId: 'idComp0',
+    },
+    {
+      id: '4',
+      name: 'edpt-89p82661-test-31o4-l391-03',
+      interfacesIds: ['3'],
+      serviceId: '4',
+      componentId: 'idComp0',
+    },
+    {
+      id: '5',
+      name: 'edpt-89p82661-test-31o4-l391-04',
+      interfacesIds: ['3'],
+      serviceId: '4',
+      componentId: 'idComp0',
+    },
+    {
+      id: '6',
+      name: 'edpt-89p82661-test-31o4-l391-05',
+      interfacesIds: ['4'],
+      serviceId: '5',
+      componentId: 'idComp0',
+    },
+  ],
+  interfaces: [
+    {
+      id: '1',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0',
+      components: ['idComp0'],
+    },
+    {
+      id: '2',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart1',
+      components: ['idComp0'],
+    },
+    {
+      id: '3',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart2',
+      components: ['idComp0'],
+    },
+    {
+      id: '4',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart3',
+      components: ['idComp0'],
+    },
+  ],
+  services: [
+    {
+      id: '1',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}Localpart0',
+      components: ['idComp0'],
+    },
+    {
+      id: '2',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}Localpart1',
+      components: ['idComp0'],
+    },
+    {
+      id: '3',
+      name:
+        '{http://namespace-example.fr/service/technique/version/2.0}Localpart2',
+      components: ['idComp0'],
+    },
+    {
+      id: '4',
+      name:
+        '{http://namespace-example.fr/service/technique/version/3.0}Localpart3',
+      components: ['idComp0'],
+    },
+    {
+      id: '5',
+      name:
+        '{http://namespace-example.fr/service/technique/version/3.0}Localpart4',
+      components: ['idComp0'],
+    },
+  ],
+};
+
+ws0.addEndpointsServices(initializedServicesForWks0);
 
 const ws1 = workspacesService.create([
   {
@@ -704,56 +740,250 @@ const ws1 = workspacesService.create([
   },
 ]);
 
-// add 2 interfaces, 2 services and 2 endpoints
-ws1.addInterfaces();
-ws1.addServices();
-ws1.addEndpoints();
+// add 2 interfaces, 2 services and 3 endpoints
+const initializedServicesForWks1 = {
+  endpoints: [
+    {
+      id: '7',
+      name: 'edpt-89p82661-test-31o4-l391-05',
+      interfacesIds: ['5'],
+      serviceId: '6',
+      componentId: 'idComp6',
+    },
+    {
+      id: '8',
+      name: 'edpt-89p82661-test-31o4-l391-06',
+      interfacesIds: ['6'],
+      serviceId: '7',
+      componentId: 'idComp6',
+    },
+  ],
+  interfaces: [
+    {
+      id: '5',
+      name:
+        '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart0',
+      components: ['idComp6'],
+    },
+    {
+      id: '6',
+      name:
+        '{http://namespace-example.fr/interface/metiers/version/1.0}Interface-Localpart1',
+      components: ['idComp6'],
+    },
+  ],
+  services: [
+    {
+      id: '6',
+      name:
+        '{http://namespace-example.fr/service/metiers/version/1.0}Localpart0',
+      components: ['idComp6'],
+    },
+    {
+      id: '7',
+      name:
+        '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1',
+      components: ['idComp6'],
+    },
+  ],
+};
+ws1.addEndpointsServices(initializedServicesForWks1);
 
+// add 2 endpoints, 2 interfaces, 2 services
 const refreshedServices = {
   endpoints: {
-    refreshedEndpoint0: {
-      id: 'refreshedEndpoint0',
-      name: 'edpt-89p82661-refr-31o4-l391-00',
+    '2': {
+      id: '2',
+      name: 'edpt-89p82661-test-31o4-l391-00',
+      interfacesIds: ['1'],
+      serviceId: '2',
       componentId: 'idComp0',
     },
-    refreshedEndpoint1: {
-      id: 'refreshedEndpoint1',
+    '10': {
+      id: '10',
+      interfacesIds: ['7'],
+      serviceId: '8',
+      name: 'edpt-89p82661-refr-31o4-l391-10',
+      componentId: 'idComp0',
+    },
+    '11': {
+      id: '11',
+      interfacesIds: ['8'],
+      serviceId: '9',
       name: 'edpt-89p82661-refr-31o4-l391-01',
       componentId: 'idComp0',
     },
   },
   interfaces: {
-    refreshedInterface0: {
-      id: 'refreshedInterface0',
+    '1': {
+      id: '1',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0',
+      components: ['idComp0'],
+    },
+    '7': {
+      id: '7',
       name:
         '{http://namespace-example.fr/interface/technique/version/1.0}Interface-LocalpartRefreshed0',
       components: ['idComp0'],
     },
-    refreshedInterface1: {
-      id: 'refreshedInterface1',
+    '8': {
+      id: '8',
       name:
         '{http://namespace-example.fr/interface/technique/version/1.0}Interface-LocalpartRefreshed1',
       components: ['idComp0'],
     },
   },
   services: {
-    idService1: {
-      id: 'idService1',
+    '2': {
+      id: '2',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}Localpart1',
+      components: ['idComp0'],
+    },
+    '8': {
+      id: '8',
       name:
         '{http://namespace-example.fr/service/metiers/version/1.0}Localpart1',
       components: ['idComp0'],
     },
-    refreshedService0: {
-      id: 'refreshedService0',
+    '9': {
+      id: '9',
       name:
         '{http://namespace-example.fr/service/technique/version/1.0}LocalpartRefreshed0',
       components: ['idComp0'],
     },
-    refreshedService1: {
-      id: 'refreshedService1',
+  },
+};
+
+export const servicesForComp0 = {
+  endpoints: [
+    {
+      id: '12',
+      name: 'edpt-13f82663-test-91i4-a147-3',
+      interfacesIds: ['9'],
+      serviceId: '11',
+      componentId: 'idComp0',
+    },
+    {
+      id: '13',
+      name: 'edpt-13f82663-test-91i4-a147-3',
+      interfacesIds: ['10'],
+      serviceId: '12',
+      componentId: 'idComp0',
+    },
+    {
+      id: '14',
+      name: 'edpt-13f82663-test-91i4-a111-2',
+      interfacesIds: ['10'],
+      serviceId: '13',
+      componentId: 'idComp0',
+    },
+  ],
+  interfaces: [
+    {
+      id: '9',
       name:
-        '{http://namespace-example.fr/service/technique/version/1.0}LocalpartRefreshed1',
+        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart97',
       components: ['idComp0'],
     },
-  },
+    {
+      id: '10',
+      name:
+        '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart97',
+      components: ['idComp0'],
+    },
+  ],
+  services: [
+    {
+      id: '11',
+      name:
+        '{http://namespace-example.fr/service/technique/version/1.0}Localpart97',
+      components: ['idComp0'],
+    },
+    {
+      id: '12',
+      name:
+        '{http://namespace-example.fr/service/technique/version/2.0}Localpart97',
+      components: ['idComp0'],
+    },
+    {
+      id: '13',
+      name:
+        '{http://namespace-example.fr/service/technique/version/3.0}Localpart97',
+      components: ['idComp0'],
+    },
+  ],
+};
+
+export const servicesForComp1 = {
+  endpoints: [
+    {
+      id: '15',
+      name: 'edpt-13f82663-test-91i4-a147-2',
+      interfacesIds: ['11'],
+      serviceId: '14',
+      componentId: 'idComp1',
+    },
+    {
+      id: '16',
+      name: 'edpt-13f82663-test-91i4-a147-3',
+      interfacesIds: ['12'],
+      serviceId: '15',
+      componentId: 'idComp1',
+    },
+    {
+      id: '17',
+      name: 'edpt-13f82663-test-91i4-a112-2',
+      interfacesIds: ['13'],
+      serviceId: '16',
+      componentId: 'idComp1',
+    },
+  ],
+  interfaces: [
+    {
+      id: '11',
+      name:
+        '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart98',
+      components: ['idComp1'],
+    },
+    {
+      id: '12',
+      name:
+        '{http://namespace-example.fr/interface/technique/environmental/international/version/1.0}Interface-Localpart99',
+      components: ['idComp1'],
+    },
+    {
+      id: '13',
+      name:
+        '{http://namespace-example.fr/interface/technique/environmental/region/pays/international/version/1.0}Interface-Localpart96',
+      components: ['idComp1'],
+    },
+    {
+      id: '14',
+      name:
+        '{http://namespace-example.fr/interface/technique/global/region/pays/international/version/1.0}Interface-Localpart97',
+      components: ['idComp1'],
+    },
+  ],
+  services: [
+    {
+      id: '14',
+      name:
+        '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart98',
+      components: ['idComp1'],
+    },
+    {
+      id: '15',
+      name:
+        '{http://namespace-example.fr/service/technique/environmental/international/version/1.0}Localpart99',
+      components: ['idComp1'],
+    },
+    {
+      id: '16',
+      name:
+        '{http://namespace-example.fr/service/technique/environmental/region/pays/international/version/1.0}Localpart96',
+      components: ['idComp1'],
+    },
+  ],
 };

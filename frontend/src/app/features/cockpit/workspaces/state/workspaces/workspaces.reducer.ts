@@ -16,6 +16,8 @@
  */
 
 import {
+  EServiceNodeType,
+  IServiceTreeNode,
   IWorkspaceDetails,
   IWorkspaceRow,
   IWorkspacesTable,
@@ -27,6 +29,18 @@ import {
 } from './workspaces.interface';
 
 import {
+  IEndpointRow,
+  IEndpointsTable,
+} from '@feat/cockpit/workspaces/state/endpoints/endpoints.interface';
+import {
+  IInterfaceRow,
+  IInterfacesTable,
+} from '@feat/cockpit/workspaces/state/interfaces/interfaces.interface';
+import {
+  IServiceRow,
+  IServicesTable,
+} from '@feat/cockpit/workspaces/state/services/services.interface';
+import {
   emptyJsTable,
   JsTable,
   mergeInto,
@@ -36,6 +50,14 @@ import {
   toJsTable,
   updateById,
 } from '@shared/helpers/jstable.helper';
+import {
+  createEndpointNode,
+  createInterfaceLocalpartNode,
+  createInterfaceNamespaceNode,
+  createServiceLocalpartNode,
+  createServiceNamespaceNode,
+  findNamespaceLocalpart,
+} from '@shared/helpers/services-list.helper';
 import { SseActions } from '@shared/services/sse.service';
 import { IUserBackend } from '@shared/services/users.service';
 import {
@@ -49,6 +71,8 @@ import { Workspaces } from './workspaces.actions';
 
 export namespace WorkspacesReducer {
   type All =
+    | Workspaces.BuildServiceTreeSuccess
+    | Workspaces.ToggleServiceTreeFold
     | Workspaces.FetchAll
     | Workspaces.FetchAllError
     | Workspaces.FetchAllSuccess
@@ -83,6 +107,7 @@ export namespace WorkspacesReducer {
     | Workspaces.DeleteUserError
     | Workspaces.DeleteUserSuccess
     | Workspaces.RefreshServices
+    | Workspaces.RefreshServicesError
     | SseActions.ServicesUpdated
     | Users.Disconnected;
 
@@ -91,6 +116,12 @@ export namespace WorkspacesReducer {
     action: All
   ): IWorkspacesTable {
     switch (action.type) {
+      case Workspaces.BuildServiceTreeSuccessType: {
+        return buildServiceTreeSuccess(table, action.payload);
+      }
+      case Workspaces.ToggleServiceTreeFoldType: {
+        return toggleServiceTreeFold(table, action.payload);
+      }
       case Workspaces.FetchAllType: {
         return fetchAll(table);
       }
@@ -193,6 +224,9 @@ export namespace WorkspacesReducer {
       case Workspaces.RefreshServicesType: {
         return refreshServices(table);
       }
+      case Workspaces.RefreshServicesErrorType: {
+        return refreshServicesError(table);
+      }
       case SseActions.ServicesUpdatedType: {
         return servicesUpdated(table);
       }
@@ -201,6 +235,212 @@ export namespace WorkspacesReducer {
       }
       default:
         return table;
+    }
+  }
+
+  function groupInterfacesByNamespace(
+    interfaces: IInterfaceRow[]
+  ): Map<string, IInterfaceRow[]> {
+    const itfByNamespace = new Map();
+
+    interfaces.forEach((itf: IInterfaceRow) => {
+      const namespace: string = findNamespaceLocalpart(itf.name).namespace;
+      if (!itfByNamespace.has(namespace)) {
+        itfByNamespace.set(namespace, [itf]);
+      } else {
+        itfByNamespace.set(namespace, [...itfByNamespace.get(namespace), itf]);
+      }
+    });
+
+    return itfByNamespace;
+  }
+
+  function groupServicesByInterface(
+    endpointsById: IEndpointRow[]
+  ): Map<string, string[]> {
+    const serviceByInterface = new Map();
+
+    endpointsById.forEach((edp: IEndpointRow) => {
+      edp.interfacesIds.forEach((interfaceId: string) => {
+        if (!serviceByInterface.has(interfaceId)) {
+          serviceByInterface.set(interfaceId, [edp.serviceId]);
+        } else if (
+          !serviceByInterface.get(interfaceId).includes(edp.serviceId)
+        ) {
+          serviceByInterface.get(interfaceId).push(edp.serviceId);
+        }
+      });
+    });
+
+    return serviceByInterface;
+  }
+
+  function groupServicesByNamespace(
+    servicesIds: string[],
+    serviceById: {
+      readonly [id: string]: IServiceRow & {
+        id: string;
+      };
+    }
+  ): Map<string, IServiceRow[]> {
+    const servicesByNamespace = new Map();
+
+    servicesIds
+      .map(serviceId => serviceById[serviceId])
+      .forEach((service: IServiceRow) => {
+        const namespace: string = findNamespaceLocalpart(service.name)
+          .namespace;
+        if (!servicesByNamespace.has(namespace)) {
+          servicesByNamespace.set(namespace, [service]);
+        } else {
+          servicesByNamespace.set(namespace, [
+            ...servicesByNamespace.get(namespace),
+            service,
+          ]);
+        }
+      });
+
+    return servicesByNamespace;
+  }
+
+  function groupEndpointByServices(
+    endpointsById: IEndpointRow[]
+  ): Map<string, IEndpointRow[]> {
+    const endpointByServices = new Map();
+
+    endpointsById.forEach((edp: IEndpointRow) => {
+      if (!endpointByServices.has(edp.serviceId)) {
+        endpointByServices.set(edp.serviceId, [edp]);
+      } else {
+        endpointByServices.set(edp.serviceId, [
+          ...endpointByServices.get(edp.serviceId),
+          edp,
+        ]);
+      }
+    });
+
+    return endpointByServices;
+  }
+
+  function buildServiceTreeSuccess(
+    table: IWorkspacesTable,
+    payload: {
+      interfaces: IInterfacesTable;
+      services: IServicesTable;
+      endpoints: IEndpointsTable;
+    }
+  ): IWorkspacesTable {
+    const endpointByServices = groupEndpointByServices(
+      Object.values(payload.endpoints.byId)
+    );
+
+    const treeRoot: IServiceTreeNode = {
+      type: EServiceNodeType.Root,
+      id: '',
+      name: '',
+      isFolded: false,
+      path: [],
+      children: [],
+    };
+
+    let path = [0];
+    groupInterfacesByNamespace(Object.values(payload.interfaces.byId)).forEach(
+      (interfaceLocalparts, interfaceNamespace) => {
+        const itfNamespaceNode: IServiceTreeNode = createInterfaceNamespaceNode(
+          interfaceNamespace,
+          path.slice(0, 1)
+        );
+        treeRoot.children = [...treeRoot.children, itfNamespaceNode];
+
+        path.push(0);
+        interfaceLocalparts.forEach((localpart: IInterfaceRow) => {
+          const itfNode: IServiceTreeNode = createInterfaceLocalpartNode(
+            localpart,
+            table.selectedWorkspaceId,
+            path.slice(0, 2)
+          );
+          itfNamespaceNode.children = [...itfNamespaceNode.children, itfNode];
+
+          path.push(0);
+          groupServicesByNamespace(
+            groupServicesByInterface(Object.values(payload.endpoints.byId)).get(
+              localpart.id
+            ),
+            payload.services.byId
+          ).forEach((services, serviceNamespace) => {
+            const servNamespaceNode: IServiceTreeNode = createServiceNamespaceNode(
+              serviceNamespace,
+              path.slice(0, 3)
+            );
+            itfNode.children = [...itfNode.children, servNamespaceNode];
+
+            path.push(0);
+            services.forEach((service: IServiceRow) => {
+              const servNode: IServiceTreeNode = createServiceLocalpartNode(
+                service,
+                table.selectedWorkspaceId,
+                path.slice(0, 4)
+              );
+              servNamespaceNode.children = [
+                ...servNamespaceNode.children,
+                servNode,
+              ];
+
+              path.push(0);
+              endpointByServices
+                .get(service.id)
+                .forEach((endpoint: IEndpointRow) => {
+                  const endpointNode: IServiceTreeNode = createEndpointNode(
+                    endpoint,
+                    table.selectedWorkspaceId,
+                    path.slice(0, 5)
+                  );
+                  servNode.children = [...servNode.children, endpointNode];
+                  path = path.slice(0, 5);
+                  path[4]++;
+                });
+              path = path.slice(0, 4);
+              path[3]++;
+            });
+            path = path.slice(0, 3);
+            path[2]++;
+          });
+          path = path.slice(0, 2);
+          path[1]++;
+        });
+        path = path.slice(0, 1);
+        path[0]++;
+      }
+    );
+    return { ...table, tree: treeRoot };
+  }
+
+  function toggleServiceTreeFold(
+    table: IWorkspacesTable,
+    payload: { path: number[] }
+  ): IWorkspacesTable {
+    return { ...table, tree: recursiveToggler(table.tree, payload.path) };
+  }
+
+  function recursiveToggler(
+    node: IServiceTreeNode,
+    path: number[]
+  ): IServiceTreeNode {
+    if (path.length === 0) {
+      return {
+        ...node,
+        isFolded: !node.isFolded,
+      };
+    } else {
+      const newChildrens = node.children.slice();
+      newChildrens[path[0]] = recursiveToggler(
+        node.children[path[0]],
+        path.slice(1)
+      );
+      return {
+        ...node,
+        children: newChildrens,
+      };
     }
   }
 
@@ -606,6 +846,10 @@ export namespace WorkspacesReducer {
 
   function refreshServices(table: IWorkspacesTable) {
     return { ...table, isFetchingServices: true };
+  }
+
+  function refreshServicesError(table: IWorkspacesTable) {
+    return { ...table, isFetchingServices: false };
   }
 
   function servicesUpdated(table: IWorkspacesTable) {

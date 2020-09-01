@@ -227,7 +227,9 @@ export class WorkspacesServiceMock extends WorkspacesServiceImpl {
   }
 
   refreshServices(workspaceId: string) {
-    const refreshedServices = workspacesService.getRefreshedServices();
+    const refreshedServices = workspacesService.getRefreshedServices(
+      workspaceId
+    );
     return helper.response(204).pipe(
       tap(_ => {
         setTimeout(() => {

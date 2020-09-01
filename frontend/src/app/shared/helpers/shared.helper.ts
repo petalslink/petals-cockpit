@@ -154,3 +154,12 @@ export function streamHttpProgressAndSuccess<T, U>(
     ),
   };
 }
+
+// tree equals should compare without isFolded to prevent slow binding
+export function replacerStringify(key: string, value: any) {
+  if (key === 'isFolded') {
+    return undefined;
+  }
+
+  return value;
+}

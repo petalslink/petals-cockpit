@@ -69,18 +69,6 @@ export namespace Components {
     ) {}
   }
 
-  export const FoldType = '[Components] Fold';
-  export class Fold implements Action {
-    readonly type = FoldType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
-  export const UnfoldType = '[Components] Unfold';
-  export class Unfold implements Action {
-    readonly type = UnfoldType;
-    constructor(public readonly payload: { id: string }) {}
-  }
-
   export const ToggleFoldType = '[Components] Toggle fold';
   export class ToggleFold implements Action {
     readonly type = ToggleFoldType;

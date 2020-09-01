@@ -23,7 +23,11 @@ import pickBy from 'lodash-es/pickBy';
 import { environment } from '@env/environment';
 import { componentsService } from '@mocks/components-mock';
 import { deployMockAndTriggerSse } from '@mocks/utils';
-import { workspacesService } from '@mocks/workspaces-mock';
+import {
+  servicesForComp0,
+  servicesForComp1,
+  workspacesService,
+} from '@mocks/workspaces-mock';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import * as helper from '@shared/helpers/mock.helper';
 import { tap } from 'rxjs/operators';
@@ -77,7 +81,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
           if (_workspaceId === 'idWks0' && componentId === 'idComp0') {
             const servicesUpdate = workspacesService
               .get(_workspaceId)
-              .makeServicesForComp0();
+              .makeServices(servicesForComp0);
 
             setTimeout(
               () =>
@@ -92,7 +96,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
           if (_workspaceId === 'idWks0' && componentId === 'idComp1') {
             const servicesUpdate1 = workspacesService
               .get(_workspaceId)
-              .makeServicesForComp1();
+              .makeServices(servicesForComp1);
 
             setTimeout(
               () =>
@@ -107,7 +111,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
           if (_workspaceId === 'idWks0' && componentId === 'idComp2') {
             const servicesUpdate2 = workspacesService
               .get(_workspaceId)
-              .makeServicesForComp2();
+              .makeServices(null);
 
             setTimeout(
               () =>

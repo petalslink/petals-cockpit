@@ -23,6 +23,30 @@ import {
   IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
 
+export enum EServiceNodeType {
+  Root = 'root',
+  InterfaceNamespace = 'interface-namespace',
+  InterfaceLocalpart = 'interface-localpart',
+  ServiceNamespace = 'service-namespace',
+  ServiceLocalpart = 'service-localpart',
+  Endpoint = 'endpoint',
+}
+
+export interface IServiceTreeNode {
+  type: EServiceNodeType;
+  id?: string | undefined;
+  name?: string | undefined;
+  isFolded: boolean;
+  link?: string;
+  svgIcon?: string;
+  path: number[];
+  children: IServiceTreeNode[];
+}
+
+export interface IWorkspacesServiceTree {
+  tree: IServiceTreeNode;
+}
+
 export interface IWorkspaceUI {
   // from UI
   isRemoving: boolean;
@@ -57,6 +81,21 @@ export interface IWorkspaceUserRow extends IWorkspaceUserBackend {
 export interface IWorkspaceUserPermissions
   extends IWorkspaceUserPermissionsBackend {}
 
+export function workspaceServiceTreeNodeFactory(
+  serviceTreeNode: IServiceTreeNode
+): IServiceTreeNode {
+  return {
+    type: serviceTreeNode.type,
+    id: null,
+    name: null,
+    isFolded: false,
+    link: null,
+    svgIcon: null,
+    path: [],
+    children: [],
+  };
+}
+
 export function workspaceUserPermissionsFactory(): IWorkspaceUserPermissions {
   return {
     adminWorkspace: false,
@@ -69,8 +108,8 @@ export function workspaceRowFactory(): IWorkspaceRow {
   return {
     id: null,
     name: null,
-    shortDescription: undefined,
-    description: undefined,
+    shortDescription: null,
+    description: null,
     isRemoving: false,
     isFetchingDetails: false,
     isUpdatingDetails: false,
@@ -101,6 +140,7 @@ export interface IWorkspacesCommon {
 
 export interface IWorkspacesTable
   extends IWorkspacesCommon,
+    IWorkspacesServiceTree,
     JsTable<IWorkspaceRow> {}
 
 export interface IWorkspaces extends IWorkspacesCommon {
@@ -119,5 +159,6 @@ export function workspacesTableFactory(): IWorkspacesTable {
     searchPetals: '',
     searchServices: '',
     createWksError: '',
+    tree: null,
   };
 }

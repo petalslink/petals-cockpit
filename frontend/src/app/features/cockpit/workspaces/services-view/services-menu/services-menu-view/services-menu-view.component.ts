@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { NestedTreeControl } from '@angular/cdk/tree';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -22,23 +23,16 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { select, Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
+import { filter, map, takeUntil, tap } from 'rxjs/operators';
 
-import { FormBuilder, FormGroup } from '@angular/forms';
 import { Workspaces } from '@feat/cockpit/workspaces/state/workspaces/workspaces.actions';
-import { TreeElement } from '@shared/components/material-tree/material-tree.component';
+import { IServiceTreeNode } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
+import { replacerStringify } from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
-import { Endpoints } from '@wks/state/endpoints/endpoints.actions';
-import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
-import { getCurrentEndpointTree } from '@wks/state/endpoints/endpoints.selectors';
-import { Interfaces } from '@wks/state/interfaces/interfaces.actions';
-import { IInterfaceRow } from '@wks/state/interfaces/interfaces.interface';
-import { getCurrentInterfaceTree } from '@wks/state/interfaces/interfaces.selectors';
-import { Services } from '@wks/state/services/services.actions';
-import { IServiceRow } from '@wks/state/services/services.interface';
-import { getCurrentServiceTree } from '@wks/state/services/services.selectors';
-import { debounceTime, map, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-services-menu-view',
@@ -49,39 +43,46 @@ import { debounceTime, map, takeUntil, tap } from 'rxjs/operators';
 export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject<void>();
 
-  interfacesTree$: Observable<TreeElement<any>[]>;
-  servicesTree$: Observable<TreeElement<any>[]>;
-  endpointsTree$: Observable<TreeElement<any>[]>;
-
   isFetchingServices$: Observable<boolean>;
 
+  @Input() servicesEndpointsTree$: Observable<IServiceTreeNode>;
   @Input() workspaceId: string;
-  @Input() interfaces: IInterfaceRow[];
-  @Input() services: IServiceRow[];
-  @Input() endpoints: IEndpointRow[];
+
+  nestedTreeControl: NestedTreeControl<IServiceTreeNode>;
+  nestedDataSource: MatTreeNestedDataSource<IServiceTreeNode>;
 
   searchForm: FormGroup;
   search = '';
 
+  private _focusSearchInput$ = new Subject<boolean>();
+  focusSearchInput$ = this._focusSearchInput$.asObservable();
+
   constructor(private fb: FormBuilder, private store$: Store<IStore>) {}
 
   ngOnInit() {
+    this.nestedTreeControl = new NestedTreeControl<IServiceTreeNode>(
+      this._getChildren
+    );
+
+    this.nestedDataSource = new MatTreeNestedDataSource();
+
+    this.servicesEndpointsTree$
+      .pipe(
+        takeUntil(this.onDestroy$),
+        filter(
+          tree =>
+            !!tree &&
+            JSON.stringify(tree.children, replacerStringify) !==
+              JSON.stringify(this.nestedDataSource.data, replacerStringify)
+        ),
+        tap(tree => {
+          this.nestedDataSource.data = tree.children;
+          this.nestedTreeControl.dataNodes = tree.children;
+        })
+      )
+      .subscribe();
+
     this.searchForm = this.fb.group({ search: '' });
-
-    this.interfacesTree$ = this.store$.pipe(
-      select(getCurrentInterfaceTree),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.servicesTree$ = this.store$.pipe(
-      select(getCurrentServiceTree),
-      takeUntil(this.onDestroy$)
-    );
-
-    this.endpointsTree$ = this.store$.pipe(
-      select(getCurrentEndpointTree),
-      takeUntil(this.onDestroy$)
-    );
 
     this.isFetchingServices$ = this.store$.pipe(
       select(state => state.workspaces.isFetchingServices)
@@ -89,7 +90,6 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
 
     this.searchForm.valueChanges
       .pipe(
-        debounceTime(300),
         map(value => value.search),
         tap(search =>
           this.store$.dispatch(new Workspaces.SetServicesSearch({ search }))
@@ -113,15 +113,39 @@ export class ServicesMenuViewComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onDestroy$.next();
     this.onDestroy$.complete();
+  }
 
-    this.store$.dispatch(new Interfaces.Clean());
-    this.store$.dispatch(new Services.Clean());
-    this.store$.dispatch(new Endpoints.Clean());
+  private _getChildren = (node: IServiceTreeNode) => node.children;
+
+  displayChild = (_: number, node: IServiceTreeNode) => {
+    !node.isFolded
+      ? this.nestedTreeControl.expand(node)
+      : this.nestedTreeControl.collapse(node);
+    return !!node.children && node.children.length > 0;
+  };
+
+  toggleFold(node: IServiceTreeNode) {
+    this.store$.dispatch(
+      new Workspaces.ToggleServiceTreeFold({ path: node.path })
+    );
+  }
+
+  isMatchingSearch(node: IServiceTreeNode): boolean {
+    return (
+      this.search === '' ||
+      node.name.toLowerCase().includes(this.search.toLowerCase()) ||
+      node.children.some(child => this.isMatchingSearch(child))
+    );
   }
 
   refreshServices() {
     this.store$.dispatch(
       new Workspaces.RefreshServices({ id: this.workspaceId })
     );
+  }
+
+  focusSearch() {
+    this.store$.dispatch(new Workspaces.SetServicesSearch({ search: '' }));
+    this._focusSearchInput$.next(true);
   }
 }

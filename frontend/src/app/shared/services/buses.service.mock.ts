@@ -33,6 +33,9 @@ import { busesService } from '@mocks/buses-mock';
 import { workspacesService } from '@mocks/workspaces-mock';
 import * as helper from '@shared/helpers/mock.helper';
 import { BusesServiceImpl, IBusImport } from '@shared/services/buses.service';
+import { IEndpointBackendSSE } from '@shared/services/endpoints.service';
+import { IInterfaceBackendSSE } from '@shared/services/interfaces.service';
+import { IServiceBackendSSE } from '@shared/services/services.service';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { SseServiceMock } from '@shared/services/sse.service.mock';
 import { UsersService } from '@shared/services/users.service';
@@ -147,8 +150,77 @@ export class BusesServiceMock extends BusesServiceImpl {
   }
 
   detachBus(_idWorkspace: string, id: string) {
+    const mock = this.userService as UsersServiceMock;
+
     if (this.importWillCancel) {
       return helper.response(204);
+    }
+
+    const affectedWorkspace = workspacesService.get(_idWorkspace);
+
+    const removedComponentsList = affectedWorkspace
+      .getBuses()
+      .find(buss => buss.id === id)
+      .getComponents();
+
+    let contentLeft: {
+      endpoints: {
+        [id: string]: IEndpointBackendSSE;
+      };
+      interfaces: { [id: string]: IInterfaceBackendSSE };
+      services: { [id: string]: IServiceBackendSSE };
+    };
+    if (affectedWorkspace.getBuses().length === 1) {
+      contentLeft = { endpoints: {}, interfaces: {}, services: {} };
+    } else {
+      affectedWorkspace
+        .getEndpoints()
+        // hacking because added endpoints will only have one comp
+        .filter(edp => removedComponentsList.includes(edp.componentId))
+        .forEach(
+          edp =>
+            delete affectedWorkspace.getEndpoints()[
+              affectedWorkspace.getEndpoints().indexOf(edp)
+            ]
+        );
+
+      affectedWorkspace
+        .getInterfaces()
+        .filter(itf =>
+          // hacking because added interfaces will only have one comp
+          removedComponentsList.includes(itf.componentsIds[0])
+        )
+        .forEach(
+          itf =>
+            delete affectedWorkspace.getInterfaces()[
+              affectedWorkspace.getInterfaces().indexOf(itf)
+            ]
+        );
+
+      affectedWorkspace
+        .getServices()
+        .filter(serv =>
+          // hacking because added services will only have one comp
+          removedComponentsList.includes(serv.componentsIds[0])
+        )
+        .forEach(
+          serv =>
+            delete affectedWorkspace.getServices()[
+              affectedWorkspace.getServices().indexOf(serv)
+            ]
+        );
+
+      contentLeft = {
+        endpoints: affectedWorkspace
+          .getEndpoints()
+          .reduce((acc, curr) => ({ ...acc, ...curr.toObj() }), {}),
+        interfaces: affectedWorkspace
+          .getInterfaces()
+          .reduce((acc, curr) => ({ ...acc, ...curr.toObj() }), {}),
+        services: affectedWorkspace
+          .getServices()
+          .reduce((acc, curr) => ({ ...acc, ...curr.toObj() }), {}),
+      };
     }
 
     return helper.response(204).pipe(
@@ -160,102 +232,8 @@ export class BusesServiceMock extends BusesServiceImpl {
               SseActions.BusDetachedSse,
               {
                 id,
-                reason: `Bus detached by ${
-                  (this.userService as UsersServiceMock).getCurrentUser().id
-                }`,
-                content: {
-                  endpoints: {
-                    idEndpoint0: {
-                      id: 'idEndpoint0',
-                      name: 'edpt-89p82661-test-31o4-l391-00',
-                      componentId: 'idComp0',
-                    },
-                    idEndpoint1: {
-                      id: 'idEndpoint1',
-                      name: 'edpt-89p82661-test-31o4-l391-01',
-                      componentId: 'idComp0',
-                    },
-                    idEndpoint2: {
-                      id: 'idEndpoint2',
-                      name: 'edpt-89p82661-test-31o4-l391-02',
-                      componentId: 'idComp0',
-                    },
-                    idEndpoint3: {
-                      id: 'idEndpoint3',
-                      name: 'edpt-89p82661-test-31o4-l391-03',
-                      componentId: 'idComp0',
-                    },
-                    idEndpoint4: {
-                      id: 'idEndpoint4',
-                      name: 'edpt-89p82661-test-31o4-l391-04',
-                      componentId: 'idComp0',
-                    },
-                  },
-                  interfaces: {
-                    idInterface0: {
-                      id: 'idInterface0',
-                      name:
-                        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart0',
-                      components: ['idComp0'],
-                    },
-                    idInterface1: {
-                      id: 'idInterface1',
-                      name:
-                        '{http://namespace-example.fr/interface/technique/version/1.0}Interface-Localpart1',
-                      components: ['idComp0'],
-                    },
-                    idInterface2: {
-                      id: 'idInterface2',
-                      name:
-                        '{http://namespace-example.fr/interface/technique/version/2.0}Interface-Localpart2',
-                      components: ['idComp0'],
-                    },
-                    idInterface3: {
-                      id: 'idInterface3',
-                      name:
-                        '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart3',
-                      components: ['idComp0'],
-                    },
-                    idInterface4: {
-                      id: 'idInterface4',
-                      name:
-                        '{http://namespace-example.fr/interface/technique/version/3.0}Interface-Localpart4',
-                      components: ['idComp0'],
-                    },
-                  },
-                  services: {
-                    idService0: {
-                      id: 'idService0',
-                      name:
-                        '{http://namespace-example.fr/service/technique/version/1.0}Localpart0',
-                      components: ['idComp0'],
-                    },
-                    idService1: {
-                      id: 'idService1',
-                      name:
-                        '{http://namespace-example.fr/service/technique/version/1.0}Localpart1',
-                      components: ['idComp0'],
-                    },
-                    idService2: {
-                      id: 'idService2',
-                      name:
-                        '{http://namespace-example.fr/service/technique/version/2.0}Localpart2',
-                      components: ['idComp0'],
-                    },
-                    idService3: {
-                      id: 'idService3',
-                      name:
-                        '{http://namespace-example.fr/service/technique/version/3.0}Localpart3',
-                      components: ['idComp0'],
-                    },
-                    idService4: {
-                      id: 'idService4',
-                      name:
-                        '{http://namespace-example.fr/service/technique/version/3.0}Localpart4',
-                      components: ['idComp0'],
-                    },
-                  },
-                },
+                reason: `Bus detached by ${mock.getCurrentUser().id}`,
+                content: contentLeft,
               }
             ),
           environment.mock.sseDelay

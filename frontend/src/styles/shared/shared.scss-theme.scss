@@ -31,34 +31,6 @@
     border-right-color: mat-color($mat-grey, 300);
   }
 
-  // all items elements in petals tree
-  app-material-tree > .nav-list-tree > .item-list {
-    .item-localpart,
-    .item-name {
-      .mat-list-item-content:hover {
-        background-color: mat-color($primary, 50);
-      }
-    }
-
-    // customize active elements
-    .active-link,
-    .active-link:hover {
-      .mat-list-item-content {
-        background-color: mat-color($primary, 50);
-        border-left-color: mat-color($primary, 600);
-        color: mat-color($primary, 600);
-        &:hover {
-          color: mat-color($primary, 800);
-        }
-      }
-    }
-
-    .item-namespace:hover,
-    .item-namespace:focus {
-      background: none;
-    }
-  }
-
   // all items elements in petals tree ref
   // TODO: Remove above classes when mat-tree fully integrated
   mat-tree {
@@ -67,45 +39,43 @@
     }
 
     .selected-element,
-    mat-tree-node:hover {
+    .selected-element:before,
+    mat-tree-node.petals-tree-node:hover:not(.item-namespace) {
       background-color: mat-color($primary, 50);
+    }
 
+    .selected-element,
+    mat-tree-node.petals-tree-node:hover {
       button,
       span,
       mat-icon {
         color: mat-color($primary, 600);
       }
     }
-  }
 
-  // use in all administration component
-  .user-management-page > .user-management-panels {
-    .pnl-add-user
-      > mat-expansion-panel
-      > mat-expansion-panel-header.mat-expanded,
-    .pnl-list-users
-      > .mat-accordion
-      > mat-expansion-panel
-      > mat-expansion-panel-header.mat-expanded {
-      background-color: mat-color($accent, 500);
-    }
-  }
-
-  // use for all services trees component
-  app-services-menu-view > .services-menu-view > .pnl-services-trees {
-    .mat-accordion > mat-expansion-panel > mat-expansion-panel-header {
-      color: mat-color($mat-grey, 900);
-      background-color: mat-color($mat-grey, 50);
-      &:hover {
-        color: mat-color($primary, 700);
-        background-color: mat-color($mat-grey, 200);
+    .tree-node-content:not(.service-element-node-interface-namespace):not(.service-element-node-service-namespace):hover {
+      button,
+      span,
+      mat-icon {
+        color: mat-color($primary, 600);
       }
     }
-    .mat-accordion
-      > mat-expansion-panel
-      > mat-expansion-panel-header.mat-expanded {
-      color: mat-color($primary, 700);
-      background-color: mat-color($mat-grey, 200);
+
+    .tree-node-content:not(.service-element-node-interface-namespace):not(.service-element-node-service-namespace):hover:before {
+      background-color: mat-color($primary, 50);
+    }
+
+    // use in all administration component
+    .user-management-page > .user-management-panels {
+      .pnl-add-user
+        > mat-expansion-panel
+        > mat-expansion-panel-header.mat-expanded,
+      .pnl-list-users
+        > .mat-accordion
+        > mat-expansion-panel
+        > mat-expansion-panel-header.mat-expanded {
+        background-color: mat-color($accent, 500);
+      }
     }
   }
 }

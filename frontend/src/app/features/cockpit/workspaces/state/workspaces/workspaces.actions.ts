@@ -26,9 +26,38 @@ import {
   IWorkspaceUserPermissionsBackend,
 } from '@shared/services/workspaces.service';
 
+import { IEndpointsTable } from '@feat/cockpit/workspaces/state/endpoints/endpoints.interface';
+import { IInterfacesTable } from '@feat/cockpit/workspaces/state/interfaces/interfaces.interface';
+import { IServicesTable } from '@feat/cockpit/workspaces/state/services/services.interface';
 import { IWorkspaceUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.interface';
 
 export namespace Workspaces {
+  export const BuildServiceTreeType = '[Workspaces] Build service tree';
+  export class BuildServiceTree implements Action {
+    readonly type = BuildServiceTreeType;
+    constructor() {}
+  }
+
+  export const BuildServiceTreeSuccessType =
+    '[Workspaces] Build service tree success';
+  export class BuildServiceTreeSuccess implements Action {
+    readonly type = BuildServiceTreeSuccessType;
+    constructor(
+      public readonly payload: {
+        interfaces: IInterfacesTable;
+        services: IServicesTable;
+        endpoints: IEndpointsTable;
+      }
+    ) {}
+  }
+
+  export const ToggleServiceTreeFoldType =
+    '[Workspaces] Toggle service tree fold';
+  export class ToggleServiceTreeFold implements Action {
+    readonly type = ToggleServiceTreeFoldType;
+    constructor(public readonly payload: { path: number[] }) {}
+  }
+
   export const CleanWorkspaceType = '[Workspaces] Clean workspace';
   export class CleanWorkspace implements Action {
     readonly type = CleanWorkspaceType;

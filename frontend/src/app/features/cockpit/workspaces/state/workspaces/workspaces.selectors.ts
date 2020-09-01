@@ -352,7 +352,7 @@ export interface TreeElement {
 }
 
 export interface WorkspaceElement {
-  id: string;
+  id?: string;
   type: WorkspaceElementType;
   name: string;
   link?: string;
@@ -368,6 +368,8 @@ export interface WorkspaceElement {
 export interface WorkspaceElementFlatNode
   extends TreeElement,
     WorkspaceElement {}
+
+export interface WorkspaceElementNestedNode extends WorkspaceElement {}
 
 export const currentWorkspaceTree = createSelector(
   getSelectedWorkspaceId,
@@ -516,15 +518,24 @@ export const getCurrentWorkspaceTreeFiltered = createSelector(
     const escaped = escapeStringRegexp(search);
 
     return tree
-      .map(e => filterElement(escaped.toLowerCase(), e))
+      .map(e => filterTreeElement<WorkspaceElement>(escaped.toLowerCase(), e))
       .filter(e => e !== null);
   }
 );
 
-function filterElement(
-  filter: string,
-  element: WorkspaceElement
-): WorkspaceElement {
+export const getCurrentServiceTree = createSelector(
+  (state: IStore) => (!!state.workspaces.tree ? state.workspaces.tree : null)
+);
+
+// -----------------------------------------------------------
+
+function filterTreeElement<
+  E extends {
+    name: string;
+    isFolded?: boolean;
+    children?: E[];
+  }
+>(filter: string, element: E): E {
   if (
     element.name
       .toLowerCase()
@@ -536,17 +547,17 @@ function filterElement(
     return null;
   } else {
     const es = element.children
-      .map(e => filterElement(filter, e))
+      .map(e => filterTreeElement(filter, e))
       .filter(e => e !== null);
 
     if (es.length === 0) {
       return null;
     } else {
       return {
-        ...element,
-        isFolded: false,
+        ...(element as object),
+        isFolded: element.isFolded,
         children: es,
-      };
+      } as E;
     }
   }
 }

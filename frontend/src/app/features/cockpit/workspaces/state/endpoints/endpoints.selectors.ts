@@ -17,14 +17,13 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { TreeElement } from '@shared/components/material-tree/material-tree.component';
 import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { IStore } from '@shared/state/store.interface';
 import { getBusesById } from '@wks/state/buses/buses.selectors';
 import { getContainersById } from '@wks/state/containers/containers.selectors';
 import {
-  IEndpoint,
   IEndpointRow,
+  IEndpointUI,
 } from '@wks/state/endpoints/endpoints.interface';
 import {
   IInterfaceRow,
@@ -36,16 +35,14 @@ import {
   IServiceRowWithQName,
 } from '@wks/state/services/services.interface';
 import { getServicesById } from '@wks/state/services/services.selectors';
-import {
-  getSelectedWorkspaceId,
-  getServicesSearch,
-} from '@wks/state/workspaces/workspaces.selectors';
 import { IBusRow } from '../buses/buses.interface';
 import { IComponentRow } from '../components/components.interface';
 import { getComponentsById } from '../components/components.selectors';
 import { IContainerRow } from '../containers/containers.interface';
 
-export interface IEndpointOverview extends IEndpoint {
+export interface IEndpointOverview extends IEndpointUI {
+  id: string;
+  name: string;
   service: IServiceRowWithQName;
   interfaces: IInterfaceRowWithQName[];
   bus: IBusRow;
@@ -131,7 +128,8 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
       }
 
       return {
-        ...endpoint,
+        id: endpoint.id,
+        name: endpoint.name,
         component: comp,
         container: cont,
         bus: bus,
@@ -148,41 +146,10 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
             localpart: intMap.get(id).local,
           };
         }),
+        isFetchingDetails: false,
       };
     } else {
       return undefined;
     }
-  }
-);
-
-export const getCurrentEndpointTree = createSelector(
-  getSelectedWorkspaceId,
-  getEndpointsAllIds,
-  getEndpointsById,
-  getServicesSearch,
-  (
-    selectedWorkspaceId,
-    endpointsAllIds,
-    endpointsByIds,
-    servicesSearch
-  ): TreeElement<any>[] => {
-    const baseUrl = `/workspaces/${selectedWorkspaceId}/services/endpoints`;
-
-    const servicesSearchLower = servicesSearch.toLowerCase();
-
-    const endpoints = endpointsAllIds
-      .map(id => ({ name: endpointsByIds[id].name, id }))
-      .filter(
-        endpoint =>
-          endpoint.name.toLowerCase().indexOf(servicesSearchLower) !== -1
-      );
-
-    return endpoints.map(edp => ({
-      name: edp.name,
-      isFolded: false,
-      cssClass: `item-edpName`,
-      link: `${baseUrl}/${edp.id}`,
-      children: [],
-    }));
   }
 );

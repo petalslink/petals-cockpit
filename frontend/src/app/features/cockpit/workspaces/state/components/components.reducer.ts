@@ -22,7 +22,7 @@ import {
   removeById,
   updateById,
 } from '@shared/helpers/jstable.helper';
-import { fold, toggleFold, unfold } from '@shared/helpers/reducers.helper';
+import { toggleFold } from '@shared/helpers/reducers.helper';
 import {
   ComponentState,
   IComponentBackendDetails,
@@ -55,8 +55,6 @@ export namespace ComponentsReducer {
     | Components.SetParametersError
     | Components.SetParametersSuccess
     | Components.Removed
-    | Components.Fold
-    | Components.Unfold
     | Components.ToggleFold
     | Components.DeployServiceUnit
     | Components.DeployServiceUnitError
@@ -109,12 +107,6 @@ export namespace ComponentsReducer {
       }
       case Components.SetParametersSuccessType: {
         return setParametersSuccess(table, action.payload);
-      }
-      case Components.FoldType: {
-        return fold(table, action.payload);
-      }
-      case Components.UnfoldType: {
-        return unfold(table, action.payload);
       }
       case Components.ToggleFoldType: {
         return toggleFold(table, action.payload);

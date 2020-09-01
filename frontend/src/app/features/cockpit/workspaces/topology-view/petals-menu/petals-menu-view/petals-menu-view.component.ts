@@ -35,7 +35,10 @@ import {
 import { Buses } from '@feat/cockpit/workspaces/state/buses/buses.actions';
 import { Components } from '@feat/cockpit/workspaces/state/components/components.actions';
 import { Containers } from '@feat/cockpit/workspaces/state/containers/containers.actions';
-import { stateToLedColor } from '@shared/helpers/shared.helper';
+import {
+  replacerStringify,
+  stateToLedColor,
+} from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
 import {
@@ -92,7 +95,9 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
     this.tree$
       .pipe(
         filter(
-          tree => JSON.stringify(tree) !== JSON.stringify(this.dataSource.data)
+          tree =>
+            JSON.stringify(tree, replacerStringify) !==
+            JSON.stringify(this.dataSource.data, replacerStringify)
         ),
         tap(tree => {
           this.dataSource.data = tree;
@@ -127,6 +132,10 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
             emitEvent: false,
           });
           this.search = searchPetals;
+
+          if (this.search) {
+            this.treeControl.expandAll();
+          }
         })
       )
       .subscribe();
@@ -164,6 +173,8 @@ export class PetalsMenuViewComponent implements OnInit, OnDestroy {
 
   toggleFold(node: WorkspaceElementFlatNode) {
     if (node.expandable) {
+      this.treeControl.toggle(node);
+
       switch (node.type) {
         case WorkspaceElementType.BUS:
           this.store$.dispatch(new Buses.ToggleFold({ id: node.id }));

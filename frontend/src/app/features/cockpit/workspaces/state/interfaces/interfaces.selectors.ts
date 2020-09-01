@@ -17,11 +17,7 @@
 
 import { createSelector } from '@ngrx/store';
 
-import { TreeElement } from '@shared/components/material-tree/material-tree.component';
-import {
-  findNamespaceLocalpart,
-  groupByNamespace,
-} from '@shared/helpers/services-list.helper';
+import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { IStore } from '@shared/state/store.interface';
 import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
 import { getEndpointsById } from '@wks/state/endpoints/endpoints.selectors';
@@ -34,10 +30,6 @@ import {
   IServiceRowWithQName,
 } from '@wks/state/services/services.interface';
 import { getServicesById } from '@wks/state/services/services.selectors';
-import {
-  getSelectedWorkspaceId,
-  getServicesSearch,
-} from '@wks/state/workspaces/workspaces.selectors';
 
 export interface IInterfaceOverview extends IInterface {
   services: IServiceRowWithQName[];
@@ -102,7 +94,10 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
       const interfaceWithNspLocalpart = findNamespaceLocalpart(_interface.name);
 
       return {
-        ..._interface,
+        id: _interface.id,
+        name: _interface.name,
+        components: _interface.components,
+        isFetchingDetails: _interface.isFetchingDetails,
         namespace: interfaceWithNspLocalpart.namespace,
         localpart: interfaceWithNspLocalpart.localpart,
         services: filteredInterfaceServices.map(id => {
@@ -122,53 +117,5 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
     } else {
       return undefined;
     }
-  }
-);
-
-export const getCurrentInterfaceTree = createSelector(
-  getSelectedWorkspaceId,
-  getInterfacesAllIds,
-  getInterfacesById,
-  getServicesSearch,
-  (
-    selectedWorkspaceId,
-    interfacesAllIds,
-    interfacesByIds,
-    servicesSearch
-  ): TreeElement<any>[] => {
-    const baseUrl = `/workspaces/${selectedWorkspaceId}/services/interfaces`;
-
-    const servicesSearchLower = servicesSearch.toLowerCase();
-
-    const interfacesWithNspLocalpart = interfacesAllIds
-      .map(id => ({
-        ...findNamespaceLocalpart(interfacesByIds[id].name),
-        id,
-      }))
-      .filter(
-        interfaceWithNspLocalpart =>
-          interfaceWithNspLocalpart.namespace
-            .toLowerCase()
-            .indexOf(servicesSearchLower) !== -1 ||
-          interfaceWithNspLocalpart.localpart
-            .toLowerCase()
-            .indexOf(servicesSearchLower) !== -1
-      );
-
-    const groupedByNamespace = groupByNamespace(interfacesWithNspLocalpart);
-
-    return groupedByNamespace.map(nspWithLocalparts => ({
-      name: nspWithLocalparts.namespace,
-      isFolded: false,
-      cssClass: `item-namespace`,
-      link: ``,
-      children: nspWithLocalparts.localparts.map(localpart => ({
-        name: localpart.name,
-        isFolded: false,
-        cssClass: `item-localpart`,
-        link: `${baseUrl}/${localpart.id}`,
-        children: [],
-      })),
-    }));
   }
 );

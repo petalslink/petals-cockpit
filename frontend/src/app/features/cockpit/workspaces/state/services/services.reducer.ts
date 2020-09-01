@@ -107,9 +107,7 @@ export namespace ServicesReducer {
     table: IServicesTable,
     payload: JsTable<IServiceBackendSSE>
   ): IServicesTable {
-    return {
-      ...mergeInto(table, payload, serviceRowFactory),
-    };
+    return { ...mergeInto(table, payload, serviceRowFactory) };
   }
 
   function fetchDetails(table: IServicesTable, payload: { id: string }) {
@@ -148,12 +146,8 @@ export namespace ServicesReducer {
 
   function serviceBackendSseMapToserviceRowMap(sbsMap: {
     [key: string]: IServiceBackendSSE;
-  }): {
-    [key: string]: IServiceRow;
-  } {
-    const initialServices: {
-      [key: string]: IServiceRow;
-    } = {};
+  }): { [key: string]: IServiceRow } {
+    const initialServices: { [key: string]: IServiceRow } = {};
     const services = Object.values(sbsMap).reduce(
       (previousValue, currentValue) => {
         previousValue[currentValue.id] = {
