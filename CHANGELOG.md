@@ -1,3 +1,21 @@
+<a name="1.10.0"></a>
+# [1.10.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.9.0...v1.10.0) (2020-09-03)
+
+
+### Bug Fixes
+
+* **frontend:** fix workspace descriptions alignment when they are empty ([f191018](https://gitlab.com/linagora/petals-cockpit/commit/f191018f7f3b4c7c8094d881a0f1af4cea6c0d38)), closes [#694](https://gitlab.com/linagora/petals-cockpit/issues/694)
+* **frontend:** fix no up to date workspace list on workspace deletion ([84652a2](https://gitlab.com/linagora/petals-cockpit/commit/84652a2869dae50953eade6afe6b5745b718dc9c)), closes [#695](https://gitlab.com/linagora/petals-cockpit/issues/695)
+
+
+### Features
+
+* **backend:** change workspace content to get services relations ([8894bfa](https://gitlab.com/linagora/petals-cockpit/commit/8894bfafa8ca96fb5f98f541689a988ba3a0acc3)), closes [#562](https://gitlab.com/linagora/petals-cockpit/issues/562)
+* **frontend:** add breadcrumb for not found topology elements ([d6d4627](https://gitlab.com/linagora/petals-cockpit/commit/d6d4627ff851b460b8bf5737c4a23297d991519a))
+* **frontend:** restrict available action according to deploy artifact permission ([7e3ce59](https://gitlab.com/linagora/petals-cockpit/commit/7e3ce5968f681604742e547ca5c8f9c832a599d3)), closes [#568](https://gitlab.com/linagora/petals-cockpit/issues/568)
+
+
+
 <a name="1.9.0"></a>
 # [1.9.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.8.0...v1.9.0) (2020-07-06)
 
