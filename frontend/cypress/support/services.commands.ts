@@ -21,45 +21,47 @@ import { MENU_DOM } from './menu.dom';
 import { SERVICES_TREE_DOM } from './services.dom';
 import { WORKSPACES_LIST_DOM } from './workspaces.dom';
 
-Cypress.Commands.add('expectInterfacesTreeToBe', tree => {
-  cy
-    .get(SERVICES_TREE_DOM.expPanel.expPanelInterfaces)
-    .should('have.class', 'mat-expanded');
-
-  const interfacesNames = cy.get(SERVICES_TREE_DOM.texts.interfacesNames);
-  interfacesNames.should('have.length', tree.length);
-  interfacesNames.each((_, index) => cy.contains(tree[index]));
-});
-
-Cypress.Commands.add('expectServicesTreeToBe', tree => {
-  cy
-    .get(SERVICES_TREE_DOM.expPanel.expPanelServices)
-    .should('have.class', 'mat-expanded');
-
-  const servicesNames = cy.get(SERVICES_TREE_DOM.texts.servicesNames);
-  servicesNames.should('have.length', tree.length);
-  servicesNames.each((_, index) => cy.contains(tree[index]));
-});
-
-Cypress.Commands.add('expectEndpointsTreeToBe', tree => {
-  cy
-    .get(SERVICES_TREE_DOM.expPanel.expPanelEndpoints)
-    .should('have.class', 'mat-expanded');
-
-  const endpointsNames = cy.get(SERVICES_TREE_DOM.texts.endpointsNames);
-  endpointsNames.should('have.length', tree.length);
-  endpointsNames.each((_, index) => cy.contains(tree[index]));
-});
-
-Cypress.Commands.add('clickElementInTree', (expPanel, name) => {
+Cypress.Commands.add('clickElementInTree', (serviceType, path) => {
   // Type can be: namespace, localpart, endpoint, interface
   // Visibility bugged: we force the action to click to disables waiting for actionability
-  return cy
-    .get(`.item-name`)
-    .parents(`.${expPanel}`)
-    .contains(name)
-    .click({ force: true });
+  return (
+    cy
+      .get(`.service-element-node-${serviceType}-${path}`)
+      // should take the first one if there are several elements
+      .eq(0)
+      .click()
+  );
 });
+
+Cypress.Commands.add(
+  'expectServicesTreeToBe',
+  (tree: { elementName: string }[], filtered?: string) => {
+    filtered = 'filtered';
+    if (!filtered) {
+      cy
+        .get(SERVICES_TREE_DOM.texts.treeElementsName)
+        .should('have.length', tree.length);
+
+      cy.get(SERVICES_TREE_DOM.allNodes).each((elm, index) => {
+        cy
+          .wrap(elm)
+          .find(SERVICES_TREE_DOM.texts.treeElementsName)
+          .contains(tree[index].elementName);
+      });
+    } else {
+      cy
+        .get(SERVICES_TREE_DOM.treeNodeVisible)
+        .should('have.length', tree.length);
+
+      cy.get(SERVICES_TREE_DOM.treeNodeVisible).each((elm, index) => {
+        cy
+          .wrap(elm)
+          .find(SERVICES_TREE_DOM.texts.treeElementsName)
+          .contains(tree[index].elementName);
+      });
+    }
+  }
+);
 
 Cypress.Commands.add('triggerSSEForComp', (name, id) => {
   cy

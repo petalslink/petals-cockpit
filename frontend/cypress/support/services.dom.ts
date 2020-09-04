@@ -17,9 +17,6 @@
 
 // base selector
 const bs = `app-services-menu-view`;
-const bsTreeInterfaces = `app-interfaces-list`;
-const bsTreeServices = `app-services-list`;
-const bsTreeEndpoints = `app-endpoints-list`;
 
 export const SERVICES_DOM = {
   inputs: { search: `${bs} input[formcontrolname="search"]` },
@@ -28,20 +25,17 @@ export const SERVICES_DOM = {
 };
 
 export const SERVICES_TREE_DOM = {
-  expPanel: {
-    expPanelInterfaces: `${bs} .exp-pnl-interfaces-tree`,
-    expPanelServices: `${bs} .exp-pnl-services-tree`,
-    expPanelEndpoints: `${bs} .exp-pnl-endpoints-tree`,
-  },
-  navTree: {
-    navTreeInterfaces: `${bsTreeInterfaces} .nav-list-tree`,
-    navTreeServices: `${bsTreeServices} .nav-list-tree`,
-    navTreeEndpoints: `${bsTreeEndpoints} .nav-list-tree`,
+  navTree: { navTreeServices: `${bs} mat-tree.services-tree` },
+  allNodes: `.cockpit-tree-node`,
+  treeNodeVisible: `.tree-node-visible`,
+  treeNodeHidden: `.tree-node-hidden`,
+  buttons: {
+    elementBtn: `${bs} .btn-node`,
+    expandableBtn: (type: string, path: string) =>
+      `.btn-expandable-${type}-${path}`,
   },
   texts: {
-    title: `${bs} .pnl-title`,
-    interfacesNames: `${bsTreeInterfaces} .item-name`,
-    servicesNames: `${bsTreeServices} .item-name`,
-    endpointsNames: `${bsTreeEndpoints} .item-name`,
+    treeElementsName: `.service-element-name`,
+    itemsHighlights: `${bs} .highlight`,
   },
 };

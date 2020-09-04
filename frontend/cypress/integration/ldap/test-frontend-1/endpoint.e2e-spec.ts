@@ -16,6 +16,7 @@
  */
 
 import { ENDPOINT_OVERVIEW_DOM } from '../../../support/endpoint.dom';
+import { PETALS_TREE_DOM } from '../../../support/petals.dom';
 import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
 
 describe(`Endpoint`, () => {
@@ -36,10 +37,7 @@ describe(`Endpoint`, () => {
   });
 
   it(`should contain the endpoint details overview with service and interfaces`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-00`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-0-0`);
 
     // 1) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 2 Interfaces
     cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
@@ -54,66 +52,17 @@ describe(`Endpoint`, () => {
       .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
       .contains(`http://namespace-example.fr/service/technique/version/1.0`);
 
-    cy.expectEdpInterfacesListToBe(
-      expectedInterfacesLocalpartsNamespacesOfEdp0
-    );
-
-    // 2) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 2 Interfaces
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-01`
-    );
-
-    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/idEndpoint1`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.componentName).contains(`Comp 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart).contains(`Localpart1`);
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
-      .contains(`http://namespace-example.fr/service/technique/version/1.0`);
-
-    cy.expectEdpInterfacesListToBe(
-      expectedInterfacesLocalpartsNamespacesOfEdp1
-    );
-
-    // 3) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 1 Interface
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-02`
-    );
-
-    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/idEndpoint2`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.componentName).contains(`Comp 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart).contains(`Localpart2`);
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
-      .contains(`http://namespace-example.fr/service/technique/version/2.0`);
-
     cy.expectEdpInterfacesListToBe([
-      `Interface-Localpart2`,
-      `http://namespace-example.fr/interface/technique/version/2.0`,
+      `Interface-Localpart0`,
+      `http://namespace-example.fr/interface/technique/version/1.0`,
+      `Interface-Localpart1`,
+      `http://namespace-example.fr/interface/technique/version/1.0`,
     ]);
 
-    // 4) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 1 Interface
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-03`
-    );
+    // 2) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 2 Interfaces
+    cy.clickElementInTree(`endpoint`, `1-0-0-0-0`);
 
-    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/idEndpoint3`);
+    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/4`);
 
     cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
 
@@ -128,47 +77,20 @@ describe(`Endpoint`, () => {
       .contains(`http://namespace-example.fr/service/technique/version/3.0`);
 
     cy.expectEdpInterfacesListToBe([
-      `Interface-Localpart3`,
-      `http://namespace-example.fr/interface/technique/version/3.0`,
+      `Interface-Localpart2`,
+      `http://namespace-example.fr/interface/technique/version/2.0`,
     ]);
-
-    // 5) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 5 Interfaces
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-04`
-    );
-
-    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/idEndpoint4`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.componentName).contains(`Comp 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart).contains(`Localpart0`);
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
-      .contains(`http://namespace-example.fr/service/technique/version/1.0`);
-
-    cy.expectEdpInterfacesListToBe(
-      expectedInterfacesLocalpartsNamespacesOfEdp4
-    );
   });
 
   it(`should go to details of Service from the view of a selected Endpoint`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-00`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
       .get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart)
-      .contains(`Localpart0`)
+      .contains(`Localpart1`)
       .click();
 
-    cy.expectLocationToBe(`/workspaces/idWks0/services/services/idService0`);
+    cy.expectLocationToBe(`/workspaces/idWks0/services/services/2`);
 
     cy
       .get(SERVICE_OVERVIEW_DOM.texts.aboutService)
@@ -177,22 +99,17 @@ describe(`Endpoint`, () => {
   });
 
   it(`should go to details of Interface from the view of a selected Endpoint`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-04`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
       .get(ENDPOINT_OVERVIEW_DOM.texts.interfacesLocalparts)
-      .contains(`Interface-Localpart4`)
+      .contains(`Interface-Localpart0`)
       .click();
 
-    cy.expectLocationToBe(
-      `/workspaces/idWks0/services/interfaces/idInterface4`
-    );
+    cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
   });
 
-  it(`should open the 404 page if the endpoint doesn't exists`, () => {
+  it(`should open the 404 page if the endpoint doesn't exist`, () => {
     cy.visit(`/workspaces/idWks0/services/endpoints/unknownIdEndpoint`);
 
     // We authenticate again because we are in an environment e2e prod and
@@ -205,10 +122,7 @@ describe(`Endpoint`, () => {
   });
 
   it(`should go to details of Bus from the view of a selected Endpoint`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-00`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
       .get(ENDPOINT_OVERVIEW_DOM.listItem.itemBus)
@@ -222,7 +136,10 @@ describe(`Endpoint`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/petals/buses/idBus0`);
 
-    // TODO: use '.should('be.visible')' to checking elements in topology view
+    cy
+      .get(PETALS_TREE_DOM.allNodes)
+      .contains('Bus 0')
+      .should('be.visible');
 
     cy.expectMessageToBe(
       `.info-no-bus-description`,
@@ -232,10 +149,7 @@ describe(`Endpoint`, () => {
   });
 
   it(`should go to details of Container from the view of a selected Endpoint`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-00`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
       .get(ENDPOINT_OVERVIEW_DOM.listItem.itemContainer)
@@ -253,10 +167,7 @@ describe(`Endpoint`, () => {
   });
 
   it(`should go to details of Component from the view of a selected Endpoint`, () => {
-    cy.clickElementInTree(
-      `exp-pnl-endpoints-tree`,
-      `edpt-89p82661-test-31o4-l391-00`
-    );
+    cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
       .get(ENDPOINT_OVERVIEW_DOM.listItem.itemComponent)
@@ -272,31 +183,4 @@ describe(`Endpoint`, () => {
 
     cy.get(`.card-component-lifecycle`).should('be.visible');
   });
-
-  const expectedInterfacesLocalpartsNamespacesOfEdp0 = [
-    `Interface-Localpart0`,
-    `http://namespace-example.fr/interface/technique/version/1.0`,
-    `Interface-Localpart4`,
-    `http://namespace-example.fr/interface/technique/version/3.0`,
-  ];
-
-  const expectedInterfacesLocalpartsNamespacesOfEdp1 = [
-    `Interface-Localpart1`,
-    `http://namespace-example.fr/interface/technique/version/1.0`,
-    `Interface-Localpart2`,
-    `http://namespace-example.fr/interface/technique/version/2.0`,
-  ];
-
-  const expectedInterfacesLocalpartsNamespacesOfEdp4 = [
-    `Interface-Localpart0`,
-    `http://namespace-example.fr/interface/technique/version/1.0`,
-    `Interface-Localpart1`,
-    `http://namespace-example.fr/interface/technique/version/1.0`,
-    `Interface-Localpart2`,
-    `http://namespace-example.fr/interface/technique/version/2.0`,
-    `Interface-Localpart3`,
-    `http://namespace-example.fr/interface/technique/version/3.0`,
-    `Interface-Localpart4`,
-    `http://namespace-example.fr/interface/technique/version/3.0`,
-  ];
 });

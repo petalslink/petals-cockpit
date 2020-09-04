@@ -19,22 +19,22 @@
 const bs = `app-petals-menu-view`;
 
 export const PETALS_DOM = {
-  inputs: { search: `${bs} input[formcontrolname="search"]` },
+  inputs: { search: `input[formcontrolname="search"]` },
   buttons: { addBus: `${bs} .btn-add-bus` },
 };
 
 export const PETALS_TREE_DOM = {
   navTree: { navTreePetals: `${bs} .mat-tree` },
-  allNodes: `${bs} .workspace-element-node`,
+  allNodes: `.petals-tree-node`,
   buttons: {
     workspaceElementBtn: `${bs} .btn-node`,
     // type = bus, container, component, serviceassembly, serviceunit, sharedlibrary, compcategory, sacategory, slcategory
     expandableBtn: (type: string, elementId: string) =>
-      `${bs} .btn-expandable-${type}-${elementId}`,
+      `.btn-expandable-${type}-${elementId}`,
   },
   texts: {
-    treeElementsName: `.tree-element-name`,
-    workspaceElementsName: `${bs} .workspace-element-name`,
+    // should get all elements even categories
+    treeElementsName: `.workspace-element-name, .tree-category-name`,
     categoriesName: `${bs} .tree-category-name`,
     itemsHighlights: `${bs} .highlight`,
   },

@@ -18,34 +18,48 @@
 // This file gathers the contents shared between the test files.
 // It avoids duplicating the code in multiple files.
 
-export const expectedInterfacesTreeWks0 = [
-  `http://namespace-example.fr/interface/technique/version/1.0`,
-  `Interface-Localpart0`,
-  `Interface-Localpart1`,
-  `http://namespace-example.fr/interface/technique/version/2.0`,
-  `Interface-Localpart2`,
-  `http://namespace-example.fr/interface/technique/version/3.0`,
-  `Interface-Localpart3`,
-  `Interface-Localpart4`,
-];
-
-export const expectedServicesTreeWks0 = [
-  `http://namespace-example.fr/service/technique/version/1.0`,
-  `Localpart0`,
-  `Localpart1`,
-  `http://namespace-example.fr/service/technique/version/2.0`,
-  `Localpart2`,
-  `http://namespace-example.fr/service/technique/version/3.0`,
-  `Localpart3`,
-  `Localpart4`,
-];
-
-export const expectedEndpointsTreeWks0 = [
-  `edpt-89p82661-test-31o4-l391-00`,
-  `edpt-89p82661-test-31o4-l391-01`,
-  `edpt-89p82661-test-31o4-l391-02`,
-  `edpt-89p82661-test-31o4-l391-03`,
-  `edpt-89p82661-test-31o4-l391-04`,
+export const expectedInitializedWks0ServiceTree = [
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/1.0`,
+  },
+  { elementName: `Interface-Localpart0` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/1.0`,
+  },
+  { elementName: `Localpart0` },
+  { elementName: `edpt-89p82661-test-31o4-l391-00` },
+  { elementName: `Localpart1` },
+  { elementName: `edpt-89p82661-test-31o4-l391-01` },
+  { elementName: `Interface-Localpart1` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/1.0`,
+  },
+  { elementName: `Localpart0` },
+  { elementName: `edpt-89p82661-test-31o4-l391-00` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/2.0`,
+  },
+  { elementName: `Localpart2` },
+  { elementName: `edpt-89p82661-test-31o4-l391-02` },
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/2.0`,
+  },
+  { elementName: `Interface-Localpart2` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/3.0`,
+  },
+  { elementName: `Localpart3` },
+  { elementName: `edpt-89p82661-test-31o4-l391-03` },
+  { elementName: `edpt-89p82661-test-31o4-l391-04` },
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/3.0`,
+  },
+  { elementName: `Interface-Localpart3` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/3.0`,
+  },
+  { elementName: `Localpart4` },
+  { elementName: `edpt-89p82661-test-31o4-l391-05` },
 ];
 
 export const expectedInitializedWks0Tree = [
@@ -100,6 +114,62 @@ export const expectedInitializedWks1Tree = [
   { elementName: `Shared Libraries` },
   { elementName: `SL 2` },
   { elementName: `Cont 3`, unreachable: true },
+];
+
+export const expectedWks0ServiceTreeAdded = [
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/1.0`,
+  },
+  { elementName: `Interface-Localpart0` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/1.0`,
+  },
+  { elementName: `Localpart0` },
+  { elementName: `edpt-89p82661-test-31o4-l391-00` },
+  { elementName: `Localpart1` },
+  { elementName: `edpt-89p82661-test-31o4-l391-01` },
+  { elementName: `Interface-Localpart1` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/1.0`,
+  },
+  { elementName: `Localpart0` },
+  { elementName: `edpt-89p82661-test-31o4-l391-00` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/2.0`,
+  },
+  { elementName: `Localpart2` },
+  { elementName: `edpt-89p82661-test-31o4-l391-02` },
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/2.0`,
+  },
+  { elementName: `Interface-Localpart2` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/3.0`,
+  },
+  { elementName: `Localpart3` },
+  { elementName: `edpt-89p82661-test-31o4-l391-03` },
+  { elementName: `edpt-89p82661-test-31o4-l391-04` },
+  {
+    elementName: `http://namespace-example.fr/interface/technique/version/3.0`,
+  },
+  { elementName: `Interface-Localpart3` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/3.0`,
+  },
+  { elementName: `Localpart4` },
+  { elementName: `edpt-89p82661-test-31o4-l391-05` },
+  {
+    elementName: `http://namespace-example.fr/service/technique/version/5.0`,
+  },
+  { elementName: `moreInterface5` },
+  { elementName: `http://namespace-example.fr/service/metiers/version/7.0` },
+  { elementName: `moreService6` },
+  { elementName: `moreEndpoint7` },
+  { elementName: `moreInterface6` },
+  { elementName: `http://namespace-example.fr/service/metiers/version/8.0` },
+  { elementName: `moreService61` },
+  { elementName: `moreEndpoint8` },
+  { elementName: `moreEndpoint9` },
 ];
 
 export const correctSetupToken = 'CORRECT_SETUP_TOKEN';

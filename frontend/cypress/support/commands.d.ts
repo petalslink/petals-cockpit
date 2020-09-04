@@ -117,10 +117,11 @@ declare namespace Cypress {
     expectHighlightedElementToBe(tree: string[]): any;
 
     // services.commands
-    expectInterfacesTreeToBe(tree: string[]): any;
-    expectServicesTreeToBe(tree: string[]): any;
-    expectEndpointsTreeToBe(tree: string[]): any;
-    clickElementInTree(expPanel: string, name: string): any;
+    expectServicesTreeToBe(
+      tree: { elementName: string }[],
+      filtred?: string
+    ): any;
+    clickElementInTree(serviceType: string, id: string): any;
     triggerSSEForComp(name: string, id: string): any;
     triggerSSEForWks(name: string, id: string): any;
 
