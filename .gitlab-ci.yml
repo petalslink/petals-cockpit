@@ -6,6 +6,7 @@
 # Branch master will run build-backend, check-frontend, test-frontend-0, test-frontend-1, test-frontend-2, build-frontend, build-frontend-pages,
 # package-product-master, pages, sonar-frontend, sonar-backend
 # Other branches will run build-backend, check-frontend, test-frontend-0, test-frontend-1, test-frontend-2, build-frontend, package-product
+# Tags will run build-backend, build-frontend, release-product
 
 # Runs tests and debug procedure detailed EOF
 
@@ -128,6 +129,8 @@ check-frontend:
     # we don't want to check the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
+    # no tests on tags
+    - tags
   script:
     - cd frontend
     # copyright and lint
@@ -142,6 +145,8 @@ test-frontend-0:
     # we don't want to test the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
+    # no tests on tags
+    - tags
   script:
     - cd frontend
     # unit tests
@@ -174,6 +179,8 @@ test-frontend-1:
     # we don't want to test the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
+    # no tests on tags
+    - tags
   script:
     - cd frontend
     # build the frontend ldap mode
@@ -197,6 +204,8 @@ test-frontend-2:
     # we don't want to test the frontend in back/* and product/*
     - /^back\/.*$/
     - /^product\/.*$/
+    # no tests on tags
+    - tags
   script:
     - cd frontend
     # build the frontend ldap mode
@@ -286,6 +295,19 @@ build-frontend-pages:
     - docker
 
 
+# build the product for release tags, the artifact has no expiration
+release-product:
+  <<: *build-product
+  only:
+    - tags
+  artifacts:
+    name: petals-cockpit-$(cat version.txt)
+    paths:
+      - petals-cockpit-*
+  tags:
+    - docker
+
+
 package-product-master:
   <<: *build-product
   only:
@@ -303,6 +325,8 @@ package-product:
   except:
     # covered by package-product-master
     - master
+    # covered by release-product
+    - tags
     # we don't want to build the final product in front/* and back/*
     - /^front\/.*$/
     - /^back\/.*$/
