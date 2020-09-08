@@ -62,6 +62,7 @@ import { ConfirmMessageDialogComponent } from './components/confirm-message-dial
 import { GenerateIconComponent } from './components/generate-icon/generate-icon.component';
 import { LedComponent } from './components/led/led.component';
 import { LoadingComponent } from './components/loading/loading.component';
+import { LocationPetalsButtonComponent } from './components/location-petals-button/location-petals-button.component';
 import { MaterialTreeComponent } from './components/material-tree/material-tree.component';
 import { MenuComponent } from './components/menu/menu.component';
 import { MessageComponent } from './components/message/message.component';
@@ -205,6 +206,7 @@ export const declarations = [
   NotFound404Component,
   LedComponent,
   LoadingComponent,
+  LocationPetalsButtonComponent,
   FocusInputDirective,
   FocusInputIfLargeScreenDirective,
   MessageComponent,

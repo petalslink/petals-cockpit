@@ -1,0 +1,41 @@
+<!-- Copyright (C) 2017-2020 Linagora
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
+
+<button
+  color="primary"
+  mat-stroked-button
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  [matTooltip]="'Go to ' + name"
+  class="location-content margin-right-x1"
+>
+  <mat-icon
+    *ngIf="svgIcon"
+    mat-list-icon
+    color="primary"
+    [svgIcon]="svgIcon"
+    class="location-svg-icon margin-right-x1"
+  ></mat-icon>
+  <mat-icon
+    *ngIf="icon"
+    mat-list-icon
+    color="primary"
+    class="location-icon margin-right-x1"
+  >{{ icon }}</mat-icon>
+
+  <mat-icon class="go-icon">search</mat-icon>
+
+  <span class="location-name">{{ name }}</span>
+</button>
