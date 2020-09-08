@@ -39,7 +39,7 @@ import {
   IWorkspaces,
 } from '@wks/state/workspaces/workspaces.interface';
 import {
-  getCurrentBreadcrumb,
+  getCurrentBreadcrumbs,
   getCurrentUserWorkspaces,
   getCurrentWorkspace,
   IBreadcrumb,
@@ -59,7 +59,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   isFetchingWorkspace$: Observable<boolean>;
   isLargeScreen$: Observable<boolean>;
 
-  breadcrumbList: IBreadcrumb[];
+  breadcrumbList$: Observable<IBreadcrumb[]>;
 
   constructor(
     private store$: Store<IStore>,
@@ -108,13 +108,10 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           url: this.router.url,
         }),
         tap((evt: NavigationEnd) => {
-          this.store$
-            .pipe(
-              select(getCurrentBreadcrumb, evt.url),
-              take(1),
-              tap(breadcrumbList => (this.breadcrumbList = breadcrumbList))
-            )
-            .subscribe();
+          this.breadcrumbList$ = this.store$.pipe(
+            select(getCurrentBreadcrumbs, evt.url),
+            take(1)
+          );
         })
       )
       .subscribe();
@@ -146,11 +143,26 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
         </div>
         <mat-dialog-content>
           <div fxLayout="column" fxFlexFill>
-              <p>This workspace was deleted, <b>click on OK</b> to go back to the workspaces list.</p>
+            <p>
+              This workspace was deleted, <b>click on OK</b> to go back to the
+              workspaces list.
+            </p>
           </div>
         </mat-dialog-content>
-        <mat-dialog-actions class="margin-top-x1" fxLayout="row" fxLayoutAlign="end center">
-          <button mat-raised-button matDialogClose (click)="close()" color="primary" class="text-upper">Ok</button>
+        <mat-dialog-actions
+          class="margin-top-x1"
+          fxLayout="row"
+          fxLayoutAlign="end center"
+        >
+          <button
+            mat-raised-button
+            matDialogClose
+            (click)="close()"
+            color="primary"
+            class="text-upper"
+          >
+            Ok
+          </button>
         </mat-dialog-actions>
       </div>
     </div>

@@ -20,6 +20,7 @@ import { createSelector } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { escapeStringRegexp } from '@shared/helpers/shared.helper';
 import { IStore } from '@shared/state/store.interface';
 import { IUserRow } from '@shared/state/users.interface';
@@ -34,10 +35,13 @@ import { IComponentRow } from '@wks/state/components/components.interface';
 import { getComponentsById } from '@wks/state/components/components.selectors';
 import { IContainerRow } from '@wks/state/containers/containers.interface';
 import { getContainersById } from '@wks/state/containers/containers.selectors';
+import { getEndpointsById } from '@wks/state/endpoints/endpoints.selectors';
+import { getInterfacesById } from '@wks/state/interfaces/interfaces.selectors';
 import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
 import { getServiceAssembliesById } from '@wks/state/service-assemblies/service-assemblies.selectors';
 import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
 import { getServiceUnitsById } from '@wks/state/service-units/service-units.selectors';
+import { getServicesById } from '@wks/state/services/services.selectors';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 import { getSharedLibrariesById } from '@wks/state/shared-libraries/shared-libraries.selectors';
 import {
@@ -90,11 +94,28 @@ export interface IBreadcrumb {
   id?: string;
   name: string;
   type: string;
+  viewType?: 'petals' | 'services';
   svgIcon?: string;
   icon?: string;
 }
 
-export const getCurrentBreadcrumb = createSelector(
+export const getWorkspaceBreadcrumbs = createSelector(
+  (state: IStore) => getCurrentWorkspace(state),
+  (currentWorkspace: IWorkspaceRow, url: string): IBreadcrumb[] => {
+    if (url.endsWith('/workspaces/' + currentWorkspace.id)) {
+      return [
+        {
+          id: currentWorkspace.id,
+          name: currentWorkspace.name,
+          type: 'workspaces',
+          icon: 'folder',
+        },
+      ];
+    }
+  }
+);
+
+export const getTopologyBreadcrumbs = createSelector(
   (state: IStore) => getCurrentWorkspace(state),
   getBusesById,
   getContainersById,
@@ -112,19 +133,10 @@ export const getCurrentBreadcrumb = createSelector(
     allSl: any,
     url: string
   ): IBreadcrumb[] => {
-    if (url.endsWith('/workspaces/' + currentWorkspace.id)) {
-      return [
-        {
-          id: currentWorkspace.id,
-          name: currentWorkspace.name,
-          type: 'workspaces',
-          icon: 'folder',
-        },
-      ];
-    }
-
-    // topology breadcrumbs
     if (url.includes('/workspaces/' + currentWorkspace.id + '/petals')) {
+      const splitUrl = url.split('/');
+      const currentItemId = splitUrl[splitUrl.length - 1];
+
       const mainBreadcrumbs: IBreadcrumb[] = [
         {
           id: currentWorkspace.id,
@@ -135,133 +147,163 @@ export const getCurrentBreadcrumb = createSelector(
         {
           name: 'Topology',
           type: 'category',
+          viewType: 'petals',
         },
       ];
+
       if (url.endsWith('petals')) {
         return mainBreadcrumbs;
       }
+
       if (url.endsWith('not-found')) {
         return mainBreadcrumbs.concat({
           name: 'Not Found',
           type: 'category',
+          viewType: 'petals',
         });
-      } else {
-        const splitUrl = url.split('/');
-        const currentItemId = splitUrl[splitUrl.length - 1];
+      }
 
-        if (url.includes('petals/buses')) {
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allBuses[currentItemId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-        } else if (url.includes('petals/containers')) {
-          mainBreadcrumbs.push({
-            id: allBuses[allCont[currentItemId].busId].id,
-            name: allBuses[allCont[currentItemId].busId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allCont[currentItemId].name,
-            type: 'containers',
-            icon: `dns`,
-          });
-        } else if (url.includes('petals/components')) {
-          mainBreadcrumbs.push({
-            id: allBuses[allCont[allComp[currentItemId].containerId].busId].id,
-            name:
-              allBuses[allCont[allComp[currentItemId].containerId].busId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-          mainBreadcrumbs.push({
-            id: allCont[allComp[currentItemId].containerId].id,
-            name: allCont[allComp[currentItemId].containerId].name,
-            type: 'containers',
-            icon: `dns`,
-          });
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allComp[currentItemId].name,
-            type: 'components',
-            svgIcon: `component`,
-          });
-        } else if (url.includes('petals/service-units')) {
-          mainBreadcrumbs.push({
-            id: allBuses[allCont[allSu[currentItemId].containerId].busId].id,
-            name:
-              allBuses[allCont[allSu[currentItemId].containerId].busId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-          mainBreadcrumbs.push({
-            id: allCont[allSu[currentItemId].containerId].id,
-            name: allCont[allSu[currentItemId].containerId].name,
-            type: 'containers',
-            icon: `dns`,
-          });
-          mainBreadcrumbs.push({
-            id: allComp[allSu[currentItemId].componentId].id,
-            name: allComp[allSu[currentItemId].componentId].name,
-            type: 'components',
-            svgIcon: `component`,
-          });
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allSu[currentItemId].name,
-            type: 'service-units',
-            svgIcon: `su`,
-          });
-        } else if (url.includes('petals/service-assemblies')) {
-          mainBreadcrumbs.push({
-            id: allBuses[allCont[allSa[currentItemId].containerId].busId].id,
-            name:
-              allBuses[allCont[allSa[currentItemId].containerId].busId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-          mainBreadcrumbs.push({
-            id: allCont[allSa[currentItemId].containerId].id,
-            name: allCont[allSa[currentItemId].containerId].name,
-            type: 'containers',
-            icon: `dns`,
-          });
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allSa[currentItemId].name,
-            type: 'service-assemblies',
-            svgIcon: `sa`,
-          });
-        } else if (url.includes('petals/shared-libraries')) {
-          mainBreadcrumbs.push({
-            id: allBuses[allCont[allSl[currentItemId].containerId].busId].id,
-            name:
-              allBuses[allCont[allSl[currentItemId].containerId].busId].name,
-            type: 'buses',
-            svgIcon: `bus`,
-          });
-          mainBreadcrumbs.push({
-            id: allCont[allSl[currentItemId].containerId].id,
-            name: allCont[allSl[currentItemId].containerId].name,
-            type: 'containers',
-            icon: `dns`,
-          });
-          return mainBreadcrumbs.concat({
-            id: currentItemId,
-            name: allSl[currentItemId].name,
-            type: 'shared-libraries',
-            svgIcon: `sl`,
-          });
-        }
+      if (url.includes('petals/buses')) {
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allBuses[currentItemId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+      } else if (url.includes('petals/containers')) {
+        mainBreadcrumbs.push({
+          id: allBuses[allCont[currentItemId].busId].id,
+          name: allBuses[allCont[currentItemId].busId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allCont[currentItemId].name,
+          type: 'containers',
+          viewType: 'petals',
+          icon: `dns`,
+        });
+      } else if (url.includes('petals/components')) {
+        mainBreadcrumbs.push({
+          id: allBuses[allCont[allComp[currentItemId].containerId].busId].id,
+          name:
+            allBuses[allCont[allComp[currentItemId].containerId].busId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+        mainBreadcrumbs.push({
+          id: allCont[allComp[currentItemId].containerId].id,
+          name: allCont[allComp[currentItemId].containerId].name,
+          type: 'containers',
+          viewType: 'petals',
+          icon: `dns`,
+        });
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allComp[currentItemId].name,
+          type: 'components',
+          viewType: 'petals',
+          svgIcon: `component`,
+        });
+      } else if (url.includes('petals/service-units')) {
+        mainBreadcrumbs.push({
+          id: allBuses[allCont[allSu[currentItemId].containerId].busId].id,
+          name: allBuses[allCont[allSu[currentItemId].containerId].busId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+        mainBreadcrumbs.push({
+          id: allCont[allSu[currentItemId].containerId].id,
+          name: allCont[allSu[currentItemId].containerId].name,
+          type: 'containers',
+          viewType: 'petals',
+          icon: `dns`,
+        });
+        mainBreadcrumbs.push({
+          id: allComp[allSu[currentItemId].componentId].id,
+          name: allComp[allSu[currentItemId].componentId].name,
+          type: 'components',
+          viewType: 'petals',
+          svgIcon: `component`,
+        });
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allSu[currentItemId].name,
+          type: 'service-units',
+          viewType: 'petals',
+          svgIcon: `su`,
+        });
+      } else if (url.includes('petals/service-assemblies')) {
+        mainBreadcrumbs.push({
+          id: allBuses[allCont[allSa[currentItemId].containerId].busId].id,
+          name: allBuses[allCont[allSa[currentItemId].containerId].busId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+        mainBreadcrumbs.push({
+          id: allCont[allSa[currentItemId].containerId].id,
+          name: allCont[allSa[currentItemId].containerId].name,
+          type: 'containers',
+          viewType: 'petals',
+          icon: `dns`,
+        });
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allSa[currentItemId].name,
+          type: 'service-assemblies',
+          viewType: 'petals',
+          svgIcon: `sa`,
+        });
+      } else if (url.includes('petals/shared-libraries')) {
+        mainBreadcrumbs.push({
+          id: allBuses[allCont[allSl[currentItemId].containerId].busId].id,
+          name: allBuses[allCont[allSl[currentItemId].containerId].busId].name,
+          type: 'buses',
+          viewType: 'petals',
+          svgIcon: `bus`,
+        });
+        mainBreadcrumbs.push({
+          id: allCont[allSl[currentItemId].containerId].id,
+          name: allCont[allSl[currentItemId].containerId].name,
+          type: 'containers',
+          viewType: 'petals',
+          icon: `dns`,
+        });
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allSl[currentItemId].name,
+          type: 'shared-libraries',
+          viewType: 'petals',
+          svgIcon: `sl`,
+        });
       }
     }
+  }
+);
 
-    // services breadcrumbs
+export const getServicesBreadcrumbs = createSelector(
+  (state: IStore) => getCurrentWorkspace(state),
+  getInterfacesById,
+  getServicesById,
+  getEndpointsById,
+  (
+    currentWorkspace: IWorkspaceRow,
+    allInterfaces: any,
+    allServices: any,
+    allEndpoints: any,
+    url: string
+  ): IBreadcrumb[] => {
     if (url.includes('/workspaces/' + currentWorkspace.id + '/services')) {
-      return [
+      const splitUrl = url.split('/');
+      const currentItemId = splitUrl[splitUrl.length - 1];
+
+      const mainBreadcrumbs: IBreadcrumb[] = [
         {
           id: currentWorkspace.id,
           name: currentWorkspace.name,
@@ -271,9 +313,61 @@ export const getCurrentBreadcrumb = createSelector(
         {
           name: 'Service',
           type: 'category',
+          viewType: 'services',
         },
       ];
+
+      if (url.endsWith('services')) {
+        return mainBreadcrumbs;
+      }
+
+      if (url.endsWith('not-found')) {
+        return mainBreadcrumbs.concat({
+          name: 'Not Found',
+          type: 'category',
+          viewType: 'services',
+        });
+      }
+
+      if (url.includes('services/interfaces')) {
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: findNamespaceLocalpart(allInterfaces[currentItemId].name)
+            .namespace,
+          type: 'interfaces',
+          viewType: 'services',
+          svgIcon: 'interface',
+        });
+      } else if (url.includes('services/services')) {
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: findNamespaceLocalpart(allServices[currentItemId].name)
+            .namespace,
+          type: 'services',
+          viewType: 'services',
+          svgIcon: 'service',
+        });
+      } else if (url.includes('services/endpoints')) {
+        return mainBreadcrumbs.concat({
+          id: currentItemId,
+          name: allEndpoints[currentItemId].name,
+          type: 'endpoints',
+          viewType: 'services',
+          svgIcon: 'endpoint',
+        });
+      }
     }
+  }
+);
+
+export const getCurrentBreadcrumbs = createSelector(
+  (state: IStore) => state,
+  (state: IStore, url: string): IBreadcrumb[] => {
+    return (
+      getWorkspaceBreadcrumbs(state, url) ||
+      getTopologyBreadcrumbs(state, url) ||
+      getServicesBreadcrumbs(state, url)
+    );
   }
 );
 
