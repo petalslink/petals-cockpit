@@ -15,34 +15,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
 import {
-  getCurrentEndpointServiceInterfaces,
+  getCurrentEndpointOverview,
   IEndpointOverview,
 } from '@wks/state/endpoints/endpoints.selectors';
+import { filter, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-services-endpoint-view',
   templateUrl: './services-endpoint-view.component.html',
   styleUrls: ['./services-endpoint-view.component.scss'],
 })
-export class ServicesEndpointViewComponent implements OnInit {
+export class ServicesEndpointViewComponent implements OnInit, OnDestroy {
+  private onDestroy$ = new Subject<void>();
+
   endpoint$: Observable<IEndpointOverview>;
   workspaceId$: Observable<string>;
+
+  isDeleted = false;
 
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.endpoint$ = this.store$.pipe(
-      select(getCurrentEndpointServiceInterfaces)
+      select(getCurrentEndpointOverview),
+      takeUntil(this.onDestroy$),
+      filter(edp => {
+        this.isDeleted = edp === undefined;
+        return !this.isDeleted;
+      })
     );
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
+    this.onDestroy$.complete();
   }
 }

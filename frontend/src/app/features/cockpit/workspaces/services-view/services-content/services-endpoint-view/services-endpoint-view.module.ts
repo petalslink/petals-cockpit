@@ -21,7 +21,6 @@ import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 import { ServicesEndpointViewRoutingModule } from './services-endpoint-view-routing.module';
 
-import { ServicesEndpointOverviewComponent } from '@feat/cockpit/workspaces/services-view/services-content/services-endpoint-view/services-enpoint-overview/services-endpoint-overview.component';
 import { ServicesEndpointViewComponent } from './services-endpoint-view.component';
 
 @NgModule({
@@ -30,9 +29,6 @@ import { ServicesEndpointViewComponent } from './services-endpoint-view.componen
     ServicesEndpointViewRoutingModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    ServicesEndpointViewComponent,
-    ServicesEndpointOverviewComponent,
-  ],
+  declarations: [ServicesEndpointViewComponent],
 })
 export class ServicesEndpointViewModule {}

@@ -13,13 +13,116 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="endpoint$" deletedMessage="This endpoint has been removed" #we>
-
-  <app-services-endpoint-overview
-    *appWorkspaceElementTab="'Overview'"
-    [endpoint]="we.resource"
-    [workspaceId]="workspaceId$ | async"
+<app-removable
+  [isHoverVisible]="isDeleted"
+  [message]="'This endpoint has been removed'"
+>
+  <div
     fxFlexFill
-  ></app-services-endpoint-overview>
+    fxLayout="column"
+    class="wrapper-content"
+  >
+    <div
+      *ngIf="endpoint$ | async as edp"
+      fxLayout="column"
+      fxLayoutGap="20px"
+      class="content"
+    >
+      <mat-card fxFlex class="card-related-elements">
+        <mat-card-title class="light-bold title-related-elements">Related Elements</mat-card-title>
+        <mat-card-content>
 
-</app-workspace-element>
+          <!-- interfaces -->
+          <button
+            *ngFor="let interface of edp.interfaces"
+            mat-button
+            fxLayoutAlign="start center"
+            fxLayout="row"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'interfaces', interface.id]"
+            [ngClass]="'interface-content-' + interface.id.toLowerCase()"
+            class="interface-btn related-element-btn"
+          >
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Interface Localpart'"
+              [svgIcon]="'interface'"
+              class="margin-right-x1 localpart-icon-svg"
+            ></mat-icon>
+            <span class="interface-localpart margin-right-x2">{{ interface.localpart }}</span>
+
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Interface Namespace'"
+              [svgIcon]="'namespace'"
+              class="margin-right-x1 namespace-icon-svg"
+            ></mat-icon>
+            <span class="interface-namespace">{{ interface.namespace }}</span>
+          </button>
+
+          <mat-divider [inset]="true" class="margin-top-x1 margin-bottom-x1 related-elements-divider"></mat-divider>
+
+          <!-- service -->
+          <button
+            mat-button
+            fxLayoutAlign="start center"
+            fxLayout="row"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'services', edp.service.id]"
+            class="service-btn related-element-btn"
+          >
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [svgIcon]="'service'"
+              [matTooltip]="'Service Localpart'"
+              class="margin-right-x1 localpart-icon-svg"
+            ></mat-icon>
+            <span class="service-localpart margin-right-x2">{{ edp.service.localpart }}</span>
+
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Service Namespace'"
+              [svgIcon]="'namespace'"
+              class="margin-right-x1 namespace-icon-svg"
+            ></mat-icon>
+            <span class="service-namespace">{{ edp.service.namespace }}</span>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex class="card-edp-details">
+        <mat-card-title class="light-bold title-edp-details">Endpoint details</mat-card-title>
+        <span class="mat-body-2">Location</span>
+        <div fxLayoutAlign="start center" class="margin-top-x1">
+
+          <!-- Bus -->
+          <app-location-petals-button
+            [name]="edp.bus.name"
+            [svgIcon]="'bus'"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'buses', edp.bus.id]"
+            class="bus-button"
+          ></app-location-petals-button>
+
+          <!-- Cont -->
+          <app-location-petals-button
+            [name]="edp.container.name"
+            [icon]="'dns'"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'containers', edp.container.id]"
+            class="container-button"
+          ></app-location-petals-button>
+
+          <!-- Comp -->
+          <app-location-petals-button
+            [name]="edp.component.name"
+            [svgIcon]="'component'"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'petals', 'components', edp.component.id]"
+            class="component-button"
+          ></app-location-petals-button>
+
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</app-removable>
