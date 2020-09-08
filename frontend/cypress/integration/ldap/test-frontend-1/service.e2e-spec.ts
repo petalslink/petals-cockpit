@@ -45,10 +45,6 @@ describe(`Service`, () => {
     ]);
 
     // 1) expect to have 1 Service namespace, 1 Interface, 1 Endpoints
-    cy.expectServiceNamespaceToBe(
-      `http://namespace-example.fr/service/technique/version/1.0`
-    );
-
     cy.expectInterfacesListToBe([
       `Interface-Localpart0`,
       `http://namespace-example.fr/interface/technique/version/1.0`,
@@ -63,9 +59,10 @@ describe(`Service`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/services/4`);
 
-    cy.expectServiceNamespaceToBe(
-      `http://namespace-example.fr/service/technique/version/3.0`
-    );
+    // TODO: Test name with breadcrumb
+    // cy.expectServiceNamespaceToBe(
+    //   `http://namespace-example.fr/service/technique/version/3.0`
+    // );
 
     cy.expectInterfacesListToBe([
       `Interface-Localpart2`,
@@ -82,9 +79,14 @@ describe(`Service`, () => {
     cy.clickElementInTree(`service-localpart`, `0-0-0-0`);
 
     cy
-      .get(SERVICE_OVERVIEW_DOM.navList.navListInterfaces)
-      .contains(`Interface-Localpart0`)
-      .click();
+      .get(SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaceLocalpart('1'))
+      .contains(`Interface-Localpart0`);
+
+    cy
+      .get(SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaceNamespace('1'))
+      .contains(`http://namespace-example.fr/interface/technique/version/1.0`);
+
+    cy.get(SERVICE_OVERVIEW_DOM.buttons.interfaceBtn('1')).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
 
@@ -98,9 +100,9 @@ describe(`Service`, () => {
     cy.clickElementInTree(`service-localpart`, `0-0-0-0`);
 
     cy
-      .get(SERVICE_OVERVIEW_DOM.navList.navListEndpoints)
-      .contains(`edpt-89p82661-test-31o4-l391-00`)
-      .click();
+      .get(SERVICE_OVERVIEW_DOM.texts.details.endpoint('1'))
+      .contains('edpt-89p82661-test-31o4-l391-00');
+    cy.get(SERVICE_OVERVIEW_DOM.buttons.endpointBtn('1')).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/1`);
   });

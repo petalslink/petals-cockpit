@@ -22,25 +22,23 @@ export const SERVICE_DOM = {};
 
 export const SERVICE_OVERVIEW_DOM = {
   texts: {
-    serviceOverviewDetails: `${bsServiceOverview} .card-service-details`,
-    aboutService: `${bsServiceOverview} .about-service`,
-    serviceNamespace: `${bsServiceOverview} .item-service-content .item-namespace`,
-    interfacesLocalparts: `${bsServiceOverview} .item-interface-content .item-localpart`,
-    interfacesNamespaces: `${bsServiceOverview} .item-interface-content .item-namespace`,
-    endpointsNames: `${bsServiceOverview} .item-endpoint-content .item-name`,
+    relatedElements: {
+      interfaces: `${bsServiceOverview} .interface-btn`,
+      interfaceLocalpart: (intId: string) =>
+        `${bsServiceOverview} .interface-content-${intId} .interface-localpart`,
+      interfaceNamespace: (intId: string) =>
+        `${bsServiceOverview} .interface-content-${intId} .interface-namespace`,
+    },
+    details: {
+      endpoints: `${bsServiceOverview} .endpoint-button .location-name`,
+      endpoint: (edpId: string) =>
+        `${bsServiceOverview} .endpoint-button.endpoint-${edpId}`,
+    },
   },
-  navList: {
-    navListInterfaces: `${bsServiceOverview} .nav-list-service-interfaces`,
-    navListEndpoints: `${bsServiceOverview} .nav-list-service-endpoints`,
-  },
-  listItem: {
-    itemServices: `${bsServiceOverview} .item-service-content`,
-    itemInterfaces: `${bsServiceOverview} .item-interface-content`,
-    itemEndpoints: `${bsServiceOverview} .item-endpoint-content`,
-  },
-  avatars: {
-    imgService: `${bsServiceOverview} .img-card-service`,
-    imgInterface: `${bsServiceOverview} .img-card-interface`,
-    imgEndpoint: `${bsServiceOverview} .img-card-endpoint`,
+  buttons: {
+    interfaceBtn: (intId: string) =>
+      `${bsServiceOverview} .interface-content-${intId}`,
+    endpointBtn: (edpId: string) =>
+      `${bsServiceOverview} .endpoint-button.endpoint-${edpId} button`,
   },
 };

@@ -17,17 +17,17 @@
 
 import { SERVICE_OVERVIEW_DOM } from './service.dom';
 
-Cypress.Commands.add('expectServiceNamespaceToBe', serviceNamespace => {
-  cy
-    .get(SERVICE_OVERVIEW_DOM.texts.serviceNamespace)
-    .contains(serviceNamespace);
-});
+// Cypress.Commands.add('expectServiceNamespaceToBe', serviceNamespace => {
+//   cy
+//     .get(SERVICE_OVERVIEW_DOM.texts.serviceNamespace)
+//     .contains(serviceNamespace);
+// });
 
 Cypress.Commands.add(
   'expectInterfacesListToBe',
   listInterfacesLocalpartsNamespace => {
     const listItemInterfaces = cy.get(
-      SERVICE_OVERVIEW_DOM.listItem.itemInterfaces
+      SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaces
     );
 
     listItemInterfaces.should(
@@ -43,7 +43,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('expectEndpointsListToBe', list => {
-  const endpointsNames = cy.get(SERVICE_OVERVIEW_DOM.texts.endpointsNames);
+  const endpointsNames = cy.get(SERVICE_OVERVIEW_DOM.texts.details.endpoints);
 
   endpointsNames.should('have.length', list.length);
   endpointsNames.each(($item, index) => cy.wrap($item).contains(list[index]));
