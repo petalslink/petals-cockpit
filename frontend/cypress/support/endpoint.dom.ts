@@ -16,36 +16,31 @@
  */
 
 // base selector
-const bsEndpointOverview = `app-services-endpoint-overview`;
-
-export const ENDPOINT_DOM = {};
+const bsEndpointView = `app-services-endpoint-view`;
 
 export const ENDPOINT_OVERVIEW_DOM = {
   texts: {
-    endpointOverviewDetails: `${bsEndpointOverview} .card-endpoint-details`,
-    busName: `${bsEndpointOverview} .item-endpoint-bus .bus-name`,
-    containerName: `${bsEndpointOverview} .item-endpoint-container .container-name`,
-    componentName: `${bsEndpointOverview} .item-endpoint-component .component-name`,
-    serviceLocalpart: `${bsEndpointOverview} .item-service-content .item-localpart`,
-    serviceNamespace: `${bsEndpointOverview} .item-service-content .item-namespace`,
-    interfacesLocalparts: `${bsEndpointOverview} .item-interface-content .item-localpart`,
-    interfacesNamespaces: `${bsEndpointOverview} .item-interface-content .item-namespace`,
+    relatedElements: {
+      interfaces: `${bsEndpointView} .interface-btn`,
+      interfaceLocalpart: (intId: string) =>
+        `${bsEndpointView} .interface-content-${intId} .interface-localpart`,
+      interfaceNamespace: (intId: string) =>
+        `${bsEndpointView} .interface-content-${intId} .interface-namespace`,
+      serviceLocalpart: `${bsEndpointView} .service-localpart`,
+      serviceNamespace: `${bsEndpointView} .service-namespace`,
+    },
+    details: {
+      busName: `${bsEndpointView} .bus-button .location-name`,
+      contName: `${bsEndpointView} .container-button .location-name`,
+      compName: `${bsEndpointView} .component-button .location-name`,
+    },
   },
-  navList: {
-    navListEndpointLocation: `${bsEndpointOverview} .nav-list-endpoint-location`,
-    navListService: `${bsEndpointOverview} .nav-list-endpoint-service`,
-    navListInterfaces: `${bsEndpointOverview} .nav-list-endpoint-interfaces`,
-  },
-  listItem: {
-    itemBus: `${bsEndpointOverview} .item-endpoint-bus`,
-    itemContainer: `${bsEndpointOverview} .item-endpoint-container`,
-    itemComponent: `${bsEndpointOverview} .item-endpoint-component`,
-    itemInterfaces: `${bsEndpointOverview} .item-interface-content`,
-    itemService: `${bsEndpointOverview} .item-service-content`,
-  },
-  avatars: {
-    imgInterface: `${bsEndpointOverview} .img-card-interface`,
-    imgService: `${bsEndpointOverview} .img-card-service`,
-    imgEndpoint: `${bsEndpointOverview} .img-card-endpoint`,
+  buttons: {
+    interfaceBtn: (intId: string) =>
+      `${bsEndpointView} .interface-content-${intId}`,
+    serviceBtn: `${bsEndpointView} .service-btn`,
+    busBtn: `${bsEndpointView} .bus-button button`,
+    contBtn: `${bsEndpointView} .container-button button`,
+    compBtn: `${bsEndpointView} .component-button button`,
   },
 };

@@ -46,45 +46,58 @@ describe(`Endpoint`, () => {
       `edpt-89p82661-test-31o4-l391-00`,
     ]);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.busName).contains(`Bus 0`);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.contName).contains(`Cont 0`);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.componentName).contains(`Comp 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart).contains(`Localpart0`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.compName).contains(`Comp 0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
+      .get(ENDPOINT_OVERVIEW_DOM.texts.relatedElements.serviceLocalpart)
+      .contains(`Localpart0`);
+
+    cy
+      .get(ENDPOINT_OVERVIEW_DOM.texts.relatedElements.serviceNamespace)
       .contains(`http://namespace-example.fr/service/technique/version/1.0`);
 
     cy.expectEdpInterfacesListToBe([
-      `Interface-Localpart0`,
-      `http://namespace-example.fr/interface/technique/version/1.0`,
-      `Interface-Localpart1`,
-      `http://namespace-example.fr/interface/technique/version/1.0`,
+      {
+        localpart: 'Interface-Localpart0',
+        namespace:
+          'http://namespace-example.fr/interface/technique/version/1.0',
+      },
+      {
+        localpart: 'Interface-Localpart1',
+        namespace:
+          'http://namespace-example.fr/interface/technique/version/1.0',
+      },
     ]);
 
-    // 2) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 2 Interfaces
+    // 2) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 1 Interfaces
     cy.clickElementInTree(`endpoint`, `1-0-0-0-0`);
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/4`);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.busName).contains(`Bus 0`);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.contName).contains(`Cont 0`);
 
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.componentName).contains(`Comp 0`);
-
-    cy.get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart).contains(`Localpart3`);
+    cy.get(ENDPOINT_OVERVIEW_DOM.texts.details.compName).contains(`Comp 0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceNamespace)
+      .get(ENDPOINT_OVERVIEW_DOM.texts.relatedElements.serviceLocalpart)
+      .contains(`Localpart3`);
+
+    cy
+      .get(ENDPOINT_OVERVIEW_DOM.texts.relatedElements.serviceNamespace)
       .contains(`http://namespace-example.fr/service/technique/version/3.0`);
 
     cy.expectEdpInterfacesListToBe([
-      `Interface-Localpart2`,
-      `http://namespace-example.fr/interface/technique/version/2.0`,
+      {
+        localpart: 'Interface-Localpart2',
+        namespace:
+          'http://namespace-example.fr/interface/technique/version/2.0',
+      },
     ]);
   });
 
@@ -92,7 +105,7 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.serviceLocalpart)
+      .get(ENDPOINT_OVERVIEW_DOM.buttons.serviceBtn)
       .contains(`Localpart1`)
       .click();
 
@@ -108,7 +121,7 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.interfacesLocalparts)
+      .get(ENDPOINT_OVERVIEW_DOM.buttons.interfaceBtn('1'))
       .contains(`Interface-Localpart0`)
       .click();
 
@@ -131,12 +144,7 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.listItem.itemBus)
-      .find(`mat-icon[svgIcon="bus"]`)
-      .should('be.visible');
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.busName)
+      .get(ENDPOINT_OVERVIEW_DOM.buttons.busBtn)
       .contains(`Bus 0`)
       .click();
 
@@ -158,12 +166,7 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.listItem.itemContainer)
-      .contains(`dns`)
-      .should('be.visible');
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.containerName)
+      .get(ENDPOINT_OVERVIEW_DOM.buttons.contBtn)
       .contains(`Cont 0`)
       .click();
 
@@ -176,12 +179,7 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-1-0`);
 
     cy
-      .get(ENDPOINT_OVERVIEW_DOM.listItem.itemComponent)
-      .find(`mat-icon[svgIcon="component"]`)
-      .should('be.visible');
-
-    cy
-      .get(ENDPOINT_OVERVIEW_DOM.texts.componentName)
+      .get(ENDPOINT_OVERVIEW_DOM.buttons.compBtn)
       .contains(`Comp 0`)
       .click();
 

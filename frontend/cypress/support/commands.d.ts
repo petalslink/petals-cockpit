@@ -146,7 +146,7 @@ declare namespace Cypress {
 
     // endpoint.commands
     expectEdpInterfacesListToBe(
-      listInterfacesLocalpartsNamespaces: string[]
+      interfacesList: { localpart: string; namespace: string }[]
     ): any;
 
     // helper.commands

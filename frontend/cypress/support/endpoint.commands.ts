@@ -22,21 +22,20 @@ Cypress.Commands.add('getNameInEndpointLocation', (classe, name) => {
   return cy.get(`.${classe}`).contains(name);
 });
 
-Cypress.Commands.add(
-  'expectEdpInterfacesListToBe',
-  listInterfacesLocalpartsNamespaces => {
-    const listItemInterfaces = cy.get(
-      ENDPOINT_OVERVIEW_DOM.listItem.itemInterfaces
-    );
+Cypress.Commands.add('expectEdpInterfacesListToBe', interfacesList => {
+  const listItemInterfaces = cy.get(
+    ENDPOINT_OVERVIEW_DOM.texts.relatedElements.interfaces
+  );
 
-    listItemInterfaces.should(
-      'have.length',
-      listInterfacesLocalpartsNamespaces.length / 2
-    );
-    listItemInterfaces.each(($item, index) => {
-      const item = cy.wrap($item);
-      item.should('contain', listInterfacesLocalpartsNamespaces[index * 2]);
-      item.should('contain', listInterfacesLocalpartsNamespaces[index * 2 + 1]);
-    });
-  }
-);
+  listItemInterfaces.should('have.length', interfacesList.length);
+
+  listItemInterfaces.each(($item, index) => {
+    const item = cy.wrap($item);
+    item
+      .get('.interface-localpart')
+      .should('contain', interfacesList[index].localpart);
+    item
+      .get('.interface-namespace')
+      .should('contain', interfacesList[index].namespace);
+  });
+});
