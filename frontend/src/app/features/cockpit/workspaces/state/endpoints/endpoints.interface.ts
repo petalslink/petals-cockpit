@@ -35,8 +35,6 @@ export interface IEndpointRowWithoutDetails
 
 interface IEndpointsCommon {
   selectedEndpointId: string;
-  selectedEndpointService: string;
-  selectedEndpointInterfaces: string[];
 }
 
 export interface IEndpointsTable
@@ -58,7 +56,5 @@ export function endpointsTableFactory(): IEndpointsTable {
   return {
     ...emptyJsTable<IEndpointRow>(),
     selectedEndpointId: '',
-    selectedEndpointService: '',
-    selectedEndpointInterfaces: [],
   };
 }

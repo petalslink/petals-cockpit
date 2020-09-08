@@ -128,8 +128,6 @@ export namespace EndpointsReducer {
         isFetchingDetails: false,
       }),
       selectedEndpointId: payload.id,
-      selectedEndpointService: payload.data.service,
-      selectedEndpointInterfaces: payload.data.interfaces,
     };
   }
 

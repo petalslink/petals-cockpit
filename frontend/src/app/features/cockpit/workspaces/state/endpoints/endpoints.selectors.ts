@@ -58,14 +58,6 @@ export function getEndpointsAllIds(state: IStore) {
   return state.endpoints.allIds;
 }
 
-export function getEndpointService(state: IStore) {
-  return state.endpoints.selectedEndpointService;
-}
-
-export function getEndpointInterfaces(state: IStore) {
-  return state.endpoints.selectedEndpointInterfaces;
-}
-
 export function getSelectedEndpointId(state: IStore) {
   return state.endpoints.selectedEndpointId;
 }
@@ -84,10 +76,8 @@ export const getAllEndpoints = createSelector(
   }
 );
 
-export const getCurrentEndpointServiceInterfaces = createSelector(
+export const getCurrentEndpointOverview = createSelector(
   getSelectedEndpoint,
-  getEndpointService,
-  getEndpointInterfaces,
   getServicesById,
   getInterfacesById,
   getComponentsById,
@@ -95,8 +85,6 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
   getBusesById,
   (
     endpoint,
-    endpointService,
-    endpointInterfaces,
     servicesByIds,
     interfacesByIds,
     componentsByIds,
@@ -104,8 +92,8 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
     busesByIds
   ): IEndpointOverview => {
     if (endpoint) {
-      const svc = servicesByIds[endpointService]
-        ? servicesByIds[endpointService]
+      const svc = servicesByIds[endpoint.serviceId]
+        ? servicesByIds[endpoint.serviceId]
         : ({} as IServiceRow);
       const comp = componentsByIds[endpoint.componentId]
         ? componentsByIds[endpoint.componentId]
@@ -116,16 +104,14 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
       const bus = busesByIds[cont.busId]
         ? busesByIds[cont.busId]
         : ({} as IBusRow);
-      const qNameSvc = findNamespaceLocalpart(svc.name);
-      const intMap = new Map<string, { nsp: string; local: string }>();
-      const filteredEndpointInterfaces = endpointInterfaces.filter(
-        id => interfacesByIds[id]
-      );
 
-      for (const id of filteredEndpointInterfaces) {
+      const qNameSvc = findNamespaceLocalpart(svc.name);
+
+      const intMap = new Map<string, { nsp: string; local: string }>();
+      endpoint.interfacesIds.filter(id => interfacesByIds[id]).forEach(id => {
         const qName = findNamespaceLocalpart(interfacesByIds[id].name);
         intMap.set(id, { nsp: qName.namespace, local: qName.localpart });
-      }
+      });
 
       return {
         id: endpoint.id,
@@ -138,7 +124,7 @@ export const getCurrentEndpointServiceInterfaces = createSelector(
           namespace: qNameSvc.namespace,
           localpart: qNameSvc.localpart,
         },
-        interfaces: filteredEndpointInterfaces.map(id => {
+        interfaces: endpoint.interfacesIds.map(id => {
           const itf = interfacesByIds[id] as IInterfaceRow;
           return {
             ...itf,
