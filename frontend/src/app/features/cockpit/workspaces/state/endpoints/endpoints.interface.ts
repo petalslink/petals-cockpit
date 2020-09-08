@@ -28,7 +28,9 @@ export interface IEndpointUI {
   // for UI
   isFetchingDetails: boolean;
 }
+
 export interface IEndpointRow extends IEndpointUI, IEndpointBackendSSE {}
+
 export interface IEndpointRowWithoutDetails
   extends IEndpointUI,
     IEndpointBackendSSE {}

@@ -69,7 +69,7 @@ export const getAllServices = createSelector(
   }
 );
 
-export const getCurrentServiceInterfacesEndpoints = createSelector(
+export const getCurrentServiceOverview = createSelector(
   getSelectedService,
   getServiceInterfaces,
   getServiceEndpoints,

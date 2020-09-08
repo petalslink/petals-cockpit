@@ -20,7 +20,6 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '@shared/shared.module';
 import { WorkspaceSharedModule } from '@wks/workspace/workspace-shared.module';
 
-import { ServicesServiceOverviewComponent } from '@feat/cockpit/workspaces/services-view/services-content/services-service-view/services-service-overview/services-service-overview.component';
 import { ServicesServiceViewRoutingModule } from './services-service-view-routing.module';
 import { ServicesServiceViewComponent } from './services-service-view.component';
 
@@ -30,9 +29,6 @@ import { ServicesServiceViewComponent } from './services-service-view.component'
     ServicesServiceViewRoutingModule,
     WorkspaceSharedModule,
   ],
-  declarations: [
-    ServicesServiceViewComponent,
-    ServicesServiceOverviewComponent,
-  ],
+  declarations: [ServicesServiceViewComponent],
 })
 export class ServicesServiceViewModule {}

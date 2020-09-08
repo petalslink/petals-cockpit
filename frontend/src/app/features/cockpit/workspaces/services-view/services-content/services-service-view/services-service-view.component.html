@@ -13,13 +13,70 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="service$" deletedMessage="This service has been removed" #we>
-
-  <app-services-service-overview
-    *appWorkspaceElementTab="'Overview'"
-    [service]="we.resource"
-    [workspaceId]="workspaceId$ | async"
+<app-removable
+  [isHoverVisible]="isDeleted"
+  [message]="'This service has been removed'"
+>
+  <div
     fxFlexFill
-  ></app-services-service-overview>
+    fxLayout="column"
+    class="wrapper-content"
+  >
+    <div
+      *ngIf="service$ | async as service"
+      fxLayout="column"
+      fxLayoutGap="20px"
+      class="content"
+    >
+      <mat-card fxFlex class="card-related-elements">
+        <mat-card-title class="light-bold title-related-elements">Related Elements</mat-card-title>
+        <mat-card-content>
 
-</app-workspace-element>
+          <!-- interfaces -->
+          <button
+            *ngFor="let interface of service.interfaces"
+            mat-button
+            fxLayoutAlign="start center"
+            fxLayout="row"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'interfaces', interface.id]"
+            [ngClass]="'interface-content-' + interface.id.toLowerCase()"
+            class="interface-btn related-element-btn"
+          >
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Interface Localpart'"
+              [svgIcon]="'interface'"
+              class="margin-right-x1 localpart-icon-svg"
+            ></mat-icon>
+            <span class="interface-localpart margin-right-x2">{{ interface.localpart }}</span>
+
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Interface Namespace'"
+              [svgIcon]="'namespace'"
+              class="margin-right-x1 namespace-icon-svg"
+            ></mat-icon>
+            <span class="interface-namespace">{{ interface.namespace }}</span>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex class="card-service-details">
+        <mat-card-title class="light-bold title-service-details">Endpoint details</mat-card-title>
+        <div fxLayout="column" fxLayoutGap="10px" fxLayoutAlign="start start" class="margin-top-x1">
+          <ng-container *ngFor="let endpoint of service.endpoints">
+            <app-location-petals-button
+              [name]="endpoint.name"
+              [svgIcon]="'endpoint'"
+              [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'endpoints', endpoint.id]"
+              [ngClass]="'endpoint-' + endpoint.id.toLowerCase()"
+              class="endpoint-button"
+            ></app-location-petals-button>
+          </ng-container>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</app-removable>

@@ -47,6 +47,7 @@
 @import 'app/features/cockpit/workspaces/topology-view/petals-content/petals-service-assembly-view/petals-service-assembly-view.component.scss-theme.scss';
 @import 'app/features/cockpit/workspaces/services-view/services-menu/services-menu-view/services-menu-view.component.scss-theme';
 @import 'app/features/cockpit/workspaces/services-view/services-content/services-endpoint-view/services-endpoint-view.component.scss-theme.scss';
+@import 'app/features/cockpit/workspaces/services-view/services-content/services-service-view/services-service-view.component.scss-theme.scss';
 @import 'app/features/cockpit/workspaces/header/breadcrumb/breadcrumb.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace-overview/workspace-overview.component.scss-theme';
 @import 'app/features/cockpit/workspaces/workspace-element/workspace-element.component.scss-theme';
@@ -68,6 +69,7 @@
   @include custom-container-view-theme($theme);
   @include custom-services-menu-theme($theme);
   @include custom-services-endpoint-theme($theme);
+  @include custom-services-service-theme($theme);
   @include custom-services-unit-view-theme($theme);
   @include custom-shared-theme($theme);
   @include custom-sidebar-theme($theme);
