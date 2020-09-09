@@ -25,21 +25,21 @@ import {
   IBusInProgressBackend,
 } from '@shared/services/buses.service';
 import {
-  ComponentState,
+  EComponentState,
   IComponentBackendSSE,
 } from '@shared/services/components.service';
 import { IContainerBackendSSE } from '@shared/services/containers.service';
 import { IEndpointBackendSSE } from '@shared/services/endpoints.service';
 import { IInterfaceBackendSSE } from '@shared/services/interfaces.service';
 import {
+  EServiceAssemblyState,
   IServiceAssemblyBackendSSE,
-  ServiceAssemblyState,
 } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
 import { IServiceBackendSSE } from '@shared/services/services.service';
 import {
+  ESharedLibraryState,
   ISharedLibraryBackendSSE,
-  SharedLibraryState,
 } from '@shared/services/shared-libraries.service';
 import { IWorkspaceBackend } from '@shared/services/workspaces.service';
 
@@ -117,7 +117,7 @@ export namespace SseActions {
   export class SaStateChange implements Action {
     readonly type = SaStateChangeType;
     constructor(
-      public readonly payload: { id: string; state: ServiceAssemblyState }
+      public readonly payload: { id: string; state: EServiceAssemblyState }
     ) {}
   }
 
@@ -126,7 +126,7 @@ export namespace SseActions {
   export class ComponentStateChange implements Action {
     readonly type = ComponentStateChangeType;
     constructor(
-      public readonly payload: { id: string; state: ComponentState }
+      public readonly payload: { id: string; state: EComponentState }
     ) {}
   }
 
@@ -194,7 +194,7 @@ export namespace SseActions {
   export class SlStateChange implements Action {
     readonly type = SlStateChangeType;
     constructor(
-      public readonly payload: { id: string; state: SharedLibraryState }
+      public readonly payload: { id: string; state: ESharedLibraryState }
     ) {}
   }
 

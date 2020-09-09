@@ -23,7 +23,7 @@ import { IComponentRow } from '@feat/cockpit/workspaces/state/components/compone
 import { SharedLibraries } from '@feat/cockpit/workspaces/state/shared-libraries/shared-libraries.actions';
 import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
-import { ComponentState } from '@shared/services/components.service';
+import { EComponentState } from '@shared/services/components.service';
 import { ESharedLibraryState } from '@shared/services/shared-libraries.service';
 import { IStore } from '@shared/state/store.interface';
 import {
@@ -92,7 +92,7 @@ export class PetalsSharedLibraryViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  getLedColorFromState(state: ComponentState) {
+  getLedColorFromState(state: EComponentState) {
     return stateToLedColor(state);
   }
 }

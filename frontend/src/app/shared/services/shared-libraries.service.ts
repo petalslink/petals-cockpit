@@ -26,8 +26,6 @@ export enum ESharedLibraryState {
   Unloaded = 'Unloaded',
 }
 
-export type SharedLibraryState = keyof typeof ESharedLibraryState;
-
 export interface ISharedLibraryBackendSSECommon {
   id: string;
   name: string;
@@ -51,10 +49,10 @@ export abstract class SharedLibrariesService {
   abstract putState(
     workspaceId: string,
     id: string,
-    state: SharedLibraryState
+    state: ESharedLibraryState
   ): Observable<{
     id: string;
-    state: SharedLibraryState;
+    state: ESharedLibraryState;
   }>;
 }
 
@@ -70,10 +68,10 @@ export class SharedLibrariesServiceImpl extends SharedLibrariesService {
     );
   }
 
-  putState(workspaceId: string, id: string, state: SharedLibraryState) {
+  putState(workspaceId: string, id: string, state: ESharedLibraryState) {
     return this.http.put<{
       id: string;
-      state: SharedLibraryState;
+      state: ESharedLibraryState;
     }>(
       `${
         environment.urlBackend

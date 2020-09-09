@@ -19,9 +19,9 @@ import { Action } from '@ngrx/store';
 
 import { JsTable } from '@shared/helpers/jstable.helper';
 import {
+  ESharedLibraryState,
   ISharedLibraryBackendDetails,
   ISharedLibraryBackendSSE,
-  SharedLibraryState,
 } from '@shared/services/shared-libraries.service';
 import { ISharedLibraryRow } from '@wks/state/shared-libraries/shared-libraries.interface';
 
@@ -72,7 +72,7 @@ export namespace SharedLibraries {
   export class ChangeState implements Action {
     readonly type = ChangeStateType;
     constructor(
-      public readonly payload: { id: string; state: SharedLibraryState }
+      public readonly payload: { id: string; state: ESharedLibraryState }
     ) {}
   }
 

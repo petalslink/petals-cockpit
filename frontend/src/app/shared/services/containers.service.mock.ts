@@ -23,6 +23,7 @@ import { deployMockAndTriggerSse } from '@mocks/utils';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import * as helper from '@shared/helpers/mock.helper';
 import { loadJbiFilesContentFromZip } from '@shared/helpers/zip.helper';
+import { EComponentState } from '@shared/services/components.service';
 import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { SseActions, SseService } from '@shared/services/sse.service';
 import { ISharedLibrarySimplified } from '@wks/state/shared-libraries/shared-libraries.interface';
@@ -62,7 +63,7 @@ export class ContainersServiceMock extends ContainersServiceImpl {
         addResourceToMock: () => {
           const components = containersService
             .get(containerId)
-            .addComponent('Loaded', name)
+            .addComponent(EComponentState.Loaded, name)
             .toObj();
 
           return {

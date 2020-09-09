@@ -20,7 +20,7 @@ import { Action } from '@ngrx/store';
 import { JsTable } from '@shared/helpers/jstable.helper';
 import { ICorrelationId } from '@shared/interfaces/correlation-id.interface';
 import {
-  ComponentState,
+  EComponentState,
   IComponentBackendDetails,
   IComponentBackendSSE,
 } from '@shared/services/components.service';
@@ -81,7 +81,7 @@ export namespace Components {
     constructor(
       public readonly payload: {
         id: string;
-        state: ComponentState;
+        state: EComponentState;
       }
     ) {}
   }
@@ -96,7 +96,7 @@ export namespace Components {
   export class ChangeStateSuccess implements Action {
     readonly type = ChangeStateSuccessType;
     constructor(
-      public readonly payload: { id: string; state: ComponentState }
+      public readonly payload: { id: string; state: EComponentState }
     ) {}
   }
 

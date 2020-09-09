@@ -17,14 +17,14 @@
 
 import { Component, componentsService } from '@mocks/components-mock';
 import { ServiceUnit } from '@mocks/service-units-mock';
-import { ComponentState } from '@shared/services/components.service';
+import { EComponentState } from '@shared/services/components.service';
 import {
   IContainerBackendDetails,
   IContainerBackendSSE,
 } from '@shared/services/containers.service';
 import {
+  EServiceAssemblyState,
   IServiceAssemblyBackendSSE,
-  ServiceAssemblyState,
 } from '@shared/services/service-assemblies.service';
 import { IServiceUnitBackendSSE } from '@shared/services/service-units.service';
 import { Bus } from './buses-mock';
@@ -75,16 +75,16 @@ export class Container {
     }
 
     // by default add 2 components each with an SU
-    const c1 = this.addComponent('Started');
-    this.addServiceUnit(c1, 'Started');
-    const c2 = this.addComponent('Started');
-    this.addServiceUnit(c2, 'Started');
+    const c1 = this.addComponent(EComponentState.Started);
+    this.addServiceUnit(c1, EServiceAssemblyState.Started);
+    const c2 = this.addComponent(EComponentState.Started);
+    this.addServiceUnit(c2, EServiceAssemblyState.Started);
 
     // and also a default service assembly
-    this.addServiceAssembly('Started');
+    this.addServiceAssembly(EServiceAssemblyState.Started);
 
     const sl = this.addSharedLibrary();
-    const c3 = this.addComponent('Started', undefined, sl);
+    const c3 = this.addComponent(EComponentState.Started, undefined, sl);
     sl.registerComponent(c3);
   }
 
@@ -100,7 +100,11 @@ export class Container {
     return Array.from(this.sharedLibraries.values());
   }
 
-  addComponent(state?: ComponentState, name?: string, ...sls: SharedLibrary[]) {
+  addComponent(
+    state: EComponentState = EComponentState.Loaded,
+    name?: string,
+    ...sls: SharedLibrary[]
+  ) {
     const component = componentsService.create(this, name, state, ...sls);
     this.components.set(component.id, component);
 
@@ -114,7 +118,7 @@ export class Container {
   }
 
   addServiceAssembly(
-    state?: ServiceAssemblyState,
+    state: EServiceAssemblyState = EServiceAssemblyState.Shutdown,
     name?: string
   ): [
     { [id: string]: IServiceAssemblyBackendSSE },
@@ -152,7 +156,7 @@ export class Container {
 
   addServiceUnit(
     component: Component,
-    state?: ServiceAssemblyState,
+    state: EServiceAssemblyState = EServiceAssemblyState.Shutdown,
     name?: string
   ): [ServiceAssembly, ServiceUnit] {
     const serviceAssembly = serviceAssembliesService.create(
@@ -188,9 +192,7 @@ export class Container {
         id: this.id,
         name: this.name,
         busId: this.bus.id,
-        isReachable: this.isReachable,
-        // if the container is unreachable, we don't have access
-        // to its components, SAs and SLs
+        isReachable: this.isReachable, // to its components, SAs and SLs // if the container is unreachable, we don't have access
         components: this.isReachable ? components : [],
         serviceAssemblies: this.isReachable ? serviceAssemblies : [],
         sharedLibraries: this.isReachable ? sharedLibraries : [],

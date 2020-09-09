@@ -27,7 +27,6 @@ import { SseServiceMock } from '@shared/services/sse.service.mock';
 import {
   EServiceAssemblyState,
   ServiceAssembliesServiceImpl,
-  ServiceAssemblyState,
 } from './service-assemblies.service';
 
 @Injectable()
@@ -47,7 +46,7 @@ export class ServiceAssembliesServiceMock extends ServiceAssembliesServiceImpl {
   putState(
     _workspaceId: string,
     serviceAssemblyId: string,
-    newState: ServiceAssemblyState
+    newState: EServiceAssemblyState
   ) {
     const serviceAssembly = serviceAssembliesService.get(serviceAssemblyId);
     if (newState === EServiceAssemblyState.Unloaded) {

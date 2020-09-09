@@ -23,9 +23,9 @@ import {
   updateById,
 } from '@shared/helpers/jstable.helper';
 import {
+  EServiceAssemblyState,
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
-  ServiceAssemblyState,
 } from '@shared/services/service-assemblies.service';
 import { ServiceAssemblies } from '@wks/state/service-assemblies/service-assemblies.actions';
 import { Workspaces } from '@wks/state/workspaces/workspaces.actions';
@@ -169,7 +169,7 @@ export namespace ServiceAssembliesReducer {
 
   function changeStateSuccess(
     table: IServiceAssembliesTable,
-    payload: { id: string; state: ServiceAssemblyState }
+    payload: { id: string; state: EServiceAssemblyState }
   ) {
     return updateById(table, payload.id, {
       isUpdatingState: false,

@@ -30,12 +30,9 @@ import {
 } from '@mocks/workspaces-mock';
 import { toJsTable } from '@shared/helpers/jstable.helper';
 import * as helper from '@shared/helpers/mock.helper';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { tap } from 'rxjs/operators';
-import {
-  ComponentsServiceImpl,
-  ComponentState,
-  EComponentState,
-} from './components.service';
+import { ComponentsServiceImpl, EComponentState } from './components.service';
 import { SseActions, SseService } from './sse.service';
 import { SseServiceMock } from './sse.service.mock';
 
@@ -51,7 +48,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
     return helper.responseBody(detailsComponent);
   }
 
-  putState(_workspaceId: string, componentId: string, state: ComponentState) {
+  putState(_workspaceId: string, componentId: string, state: EComponentState) {
     const component = componentsService.get(componentId);
 
     if (state === EComponentState.Unloaded) {
@@ -190,7 +187,7 @@ export class ComponentsServiceMock extends ComponentsServiceImpl {
             serviceUnit,
           ] = component.container.addServiceUnit(
             component,
-            'Shutdown',
+            EServiceAssemblyState.Shutdown,
             serviceUnitName
           );
 

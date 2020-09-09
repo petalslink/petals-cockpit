@@ -29,7 +29,7 @@ import {
 import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateNameToPossibleActionsComponent } from '@shared/helpers/component.helper';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
-import { ComponentState } from '@shared/services/components.service';
+import { EComponentState } from '@shared/services/components.service';
 import { IStore } from '@shared/state/store.interface';
 import { Components } from '@wks/state/components/components.actions';
 import { IServiceUnitRow } from '@wks/state/service-units/service-units.interface';
@@ -127,15 +127,15 @@ export class PetalsComponentViewComponent implements OnInit, OnDestroy {
     return su.id;
   }
 
-  getLedColorFromState(state: ComponentState) {
+  getLedColorFromState(state: EComponentState) {
     return stateToLedColor(state);
   }
 
-  getPossibleStateActions(state: ComponentState) {
+  getPossibleStateActions(state: EComponentState) {
     return stateNameToPossibleActionsComponent(state);
   }
 
-  changeState(state: ComponentState, compId: string) {
+  changeState(state: EComponentState, compId: string) {
     this.parametersForm.disable();
 
     this.store$.dispatch(

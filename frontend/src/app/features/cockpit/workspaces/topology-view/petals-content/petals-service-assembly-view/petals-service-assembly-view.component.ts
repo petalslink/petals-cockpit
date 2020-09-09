@@ -24,7 +24,7 @@ import { IServiceUnitRow } from '@feat/cockpit/workspaces/state/service-units/se
 import { getCurrentUserPermissions } from '@feat/cockpit/workspaces/state/workspaces/workspaces.selectors';
 import { stateNameToPossibleActionsServiceAssembly } from '@shared/helpers/service-assembly.helper';
 import { stateToLedColor } from '@shared/helpers/shared.helper';
-import { ServiceAssemblyState } from '@shared/services/service-assemblies.service';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceAssembly,
@@ -78,11 +78,11 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
     return su.id;
   }
 
-  getLedColorFromState(state: ServiceAssemblyState) {
+  getLedColorFromState(state: EServiceAssemblyState) {
     return stateToLedColor(state);
   }
 
-  getPossibleStateActions(state: ServiceAssemblyState) {
+  getPossibleStateActions(state: EServiceAssemblyState) {
     return stateNameToPossibleActionsServiceAssembly(state);
   }
 
@@ -90,7 +90,7 @@ export class PetalsServiceAssemblyViewComponent implements OnInit, OnDestroy {
     return item.newStateAction;
   }
 
-  changeState(saId: string, state: ServiceAssemblyState) {
+  changeState(saId: string, state: EServiceAssemblyState) {
     this.store$.dispatch(
       new ServiceAssemblies.ChangeState({
         id: saId,

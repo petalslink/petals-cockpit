@@ -35,20 +35,16 @@ export enum EComponentState {
   Unknown = 'Unknown',
 }
 
-export type ComponentState = keyof typeof EComponentState;
-
 export enum EComponentType {
   BC = 'BC',
   SE = 'SE',
 }
 
-export type ComponentType = keyof typeof EComponentType;
-
 export interface IComponentBackendSSECommon {
   id: string;
   name: string;
-  state: ComponentState;
-  type: ComponentType;
+  state: EComponentState;
+  type: EComponentType;
   containerId: string;
 }
 
@@ -73,10 +69,10 @@ export abstract class ComponentsService {
   abstract putState(
     workspaceId: string,
     componentId: string,
-    state: ComponentState
+    state: EComponentState
   ): Observable<{
     id: string;
-    state: ComponentState;
+    state: EComponentState;
   }>;
 
   abstract setParameters(
@@ -113,10 +109,10 @@ export class ComponentsServiceImpl extends ComponentsService {
     );
   }
 
-  putState(workspaceId: string, componentId: string, state: ComponentState) {
+  putState(workspaceId: string, componentId: string, state: EComponentState) {
     return this.http.put<{
       id: string;
-      state: ComponentState;
+      state: EComponentState;
     }>(
       `${
         environment.urlBackend

@@ -16,7 +16,7 @@
  */
 
 import {
-  ComponentState,
+  EComponentState,
   EComponentType,
   IComponentBackendDetails,
   IComponentBackendSSE,
@@ -33,7 +33,7 @@ export class Components {
   create(
     container: Container,
     name?: string,
-    state?: ComponentState,
+    state?: EComponentState,
     ...sls: SharedLibrary[]
   ) {
     const component = new Component(container, name, state, ...sls);
@@ -63,14 +63,14 @@ export class Component {
   private readonly sharedLibraries = new Map<string, SharedLibrary>();
 
   public readonly name: string;
-  public state: ComponentState;
+  public state: EComponentState;
   public installParameters: { [key: string]: string };
   public runtimeParameters: { [key: string]: string };
 
   constructor(
     container: Container,
     name?: string,
-    state: ComponentState = 'Loaded',
+    state: EComponentState = EComponentState.Loaded,
     ...sls: SharedLibrary[]
   ) {
     const i = Component.cpt++;
@@ -114,7 +114,7 @@ export class Component {
   }
 
   getDetails(): IComponentBackendDetails {
-    if (this.state === 'Loaded') {
+    if (this.state === EComponentState.Loaded) {
       return {
         parameters: { ...this.installParameters, ...this.runtimeParameters },
       };

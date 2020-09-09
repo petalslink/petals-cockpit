@@ -1,4 +1,3 @@
-import { ServiceAssemblyState } from './../../../../../../shared/services/service-assemblies.service';
 /**
  * Copyright (C) 2017-2020 Linagora
  *
@@ -21,6 +20,7 @@ import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { stateToLedColor } from '@shared/helpers/shared.helper';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceUnit,
@@ -46,7 +46,7 @@ export class PetalsServiceUnitViewComponent implements OnInit {
     );
   }
 
-  getLedColorFromState(state: ServiceAssemblyState) {
+  getLedColorFromState(state: EServiceAssemblyState) {
     return stateToLedColor(state);
   }
 }

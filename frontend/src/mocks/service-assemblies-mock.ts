@@ -16,9 +16,9 @@
  */
 
 import {
+  EServiceAssemblyState,
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
-  ServiceAssemblyState,
 } from '@shared/services/service-assemblies.service';
 import { Component } from './components-mock';
 import { Container } from './containers-mock';
@@ -29,7 +29,7 @@ class ServiceAssemblies {
 
   constructor() {}
 
-  create(container: Container, name?: string, state?: ServiceAssemblyState) {
+  create(container: Container, name?: string, state?: EServiceAssemblyState) {
     const sa = new ServiceAssembly(container, name, state);
     this.serviceAssemblies.set(sa.id, sa);
     return sa;
@@ -51,7 +51,7 @@ export const serviceAssembliesService = new ServiceAssemblies();
 export class ServiceAssembly {
   private static cpt = 0;
   public readonly id: string;
-  public state: ServiceAssemblyState;
+  public state: EServiceAssemblyState;
   public readonly name: string;
   public readonly container: Container;
   private readonly serviceUnits = new Map<string, ServiceUnit>();
@@ -59,7 +59,7 @@ export class ServiceAssembly {
   constructor(
     container: Container,
     name?: string,
-    state: ServiceAssemblyState = 'Shutdown'
+    state: EServiceAssemblyState = EServiceAssemblyState.Shutdown
   ) {
     const i = ServiceAssembly.cpt++;
     this.id = `idSa${i}`;

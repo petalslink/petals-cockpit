@@ -19,14 +19,11 @@
  * @param state : the state you want to get the possible actions from. For example : 'Started'
  * @returns the possible new actions according to the state
  */
-import {
-  ComponentState,
-  EComponentState,
-} from '@shared/services/components.service';
+import { EComponentState } from '@shared/services/components.service';
 
 export function stateNameToPossibleActionsComponent(
-  state: ComponentState
-): { actionName: string; newStateAfterAction: ComponentState }[] {
+  state: EComponentState
+): { actionName: string; newStateAfterAction: EComponentState }[] {
   switch (state) {
     case EComponentState.Shutdown:
       return [

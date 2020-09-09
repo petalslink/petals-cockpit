@@ -26,7 +26,6 @@ import { SseServiceMock } from '@shared/services/sse.service.mock';
 import {
   ESharedLibraryState,
   SharedLibrariesServiceImpl,
-  SharedLibraryState,
 } from './shared-libraries.service';
 
 @Injectable()
@@ -41,7 +40,7 @@ export class SharedLibrariesServiceMock extends SharedLibrariesServiceImpl {
     return helper.responseBody(details);
   }
 
-  putState(_workspaceId: string, id: string, state: SharedLibraryState) {
+  putState(_workspaceId: string, id: string, state: ESharedLibraryState) {
     if (state === ESharedLibraryState.Unloaded) {
       sharedLibrariesService.remove(id);
     }

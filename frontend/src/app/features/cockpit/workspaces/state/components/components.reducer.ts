@@ -24,7 +24,7 @@ import {
 } from '@shared/helpers/jstable.helper';
 import { toggleFold } from '@shared/helpers/reducers.helper';
 import {
-  ComponentState,
+  EComponentState,
   IComponentBackendDetails,
   IComponentBackendSSE,
 } from '@shared/services/components.service';
@@ -212,7 +212,7 @@ export namespace ComponentsReducer {
     table: IComponentsTable,
     payload: {
       id: string;
-      state: ComponentState;
+      state: EComponentState;
     }
   ) {
     return updateById(table, payload.id, {

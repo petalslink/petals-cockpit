@@ -19,9 +19,9 @@ import { Action } from '@ngrx/store';
 
 import { JsTable } from '@shared/helpers/jstable.helper';
 import {
+  EServiceAssemblyState,
   IServiceAssemblyBackendDetails,
   IServiceAssemblyBackendSSE,
-  ServiceAssemblyState,
 } from '@shared/services/service-assemblies.service';
 import { IServiceAssemblyRow } from '@wks/state/service-assemblies/service-assemblies.interface';
 
@@ -75,7 +75,7 @@ export namespace ServiceAssemblies {
     constructor(
       public readonly payload: {
         id: string;
-        state: ServiceAssemblyState;
+        state: EServiceAssemblyState;
       }
     ) {}
   }
@@ -93,7 +93,7 @@ export namespace ServiceAssemblies {
   export class ChangeStateSuccess implements Action {
     readonly type = ChangeStateSuccessType;
     constructor(
-      public readonly payload: { id: string; state: ServiceAssemblyState }
+      public readonly payload: { id: string; state: EServiceAssemblyState }
     ) {}
   }
 

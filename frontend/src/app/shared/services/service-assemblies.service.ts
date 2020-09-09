@@ -29,13 +29,11 @@ export enum EServiceAssemblyState {
   Unknown = 'Unknown',
 }
 
-export type ServiceAssemblyState = keyof typeof EServiceAssemblyState;
-
 export interface IServiceAssemblyBackendSSECommon {
   id: string;
   name: string;
   containerId: string;
-  state: ServiceAssemblyState;
+  state: EServiceAssemblyState;
 }
 
 export interface IServiceAssemblyBackendDetailsCommon {}
@@ -56,10 +54,10 @@ export abstract class ServiceAssembliesService {
   abstract putState(
     workspaceId: string,
     serviceAssemblyId: string,
-    newState: ServiceAssemblyState
+    newState: EServiceAssemblyState
   ): Observable<{
     id: string;
-    state: ServiceAssemblyState;
+    state: EServiceAssemblyState;
   }>;
 }
 
@@ -78,11 +76,11 @@ export class ServiceAssembliesServiceImpl extends ServiceAssembliesService {
   putState(
     workspaceId: string,
     serviceAssemblyId: string,
-    newState: ServiceAssemblyState
+    newState: EServiceAssemblyState
   ) {
     return this.http.put<{
       id: string;
-      state: ServiceAssemblyState;
+      state: EServiceAssemblyState;
     }>(
       `${
         environment.urlBackend

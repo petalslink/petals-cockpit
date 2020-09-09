@@ -19,14 +19,11 @@
  * @param state : The state you want to get the possible actions from. For example : 'Started'
  * @returns The possible new actions according to the state
  */
-import {
-  EServiceAssemblyState,
-  ServiceAssemblyState,
-} from '@shared/services/service-assemblies.service';
+import { EServiceAssemblyState } from '@shared/services/service-assemblies.service';
 
 export function stateNameToPossibleActionsServiceAssembly(
-  state: ServiceAssemblyState
-): { actionName: string; newStateAfterAction: ServiceAssemblyState }[] {
+  state: EServiceAssemblyState
+): { actionName: string; newStateAfterAction: EServiceAssemblyState }[] {
   switch (state) {
     case EServiceAssemblyState.Shutdown:
       return [
