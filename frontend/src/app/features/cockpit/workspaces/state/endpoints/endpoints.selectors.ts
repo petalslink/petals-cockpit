@@ -26,6 +26,7 @@ import {
   IEndpointRow,
   IEndpointUI,
 } from '@wks/state/endpoints/endpoints.interface';
+import { IEndpointOverview } from '@wks/state/endpoints/endpoints.selectors';
 import {
   IInterfaceRow,
   IInterfaceRowWithQName,
@@ -102,18 +103,10 @@ export const getEndpointOverview = createSelector(
   ): IEndpointOverview => {
     const endpoint = endpointById[endpointId];
     if (endpointById[endpointId]) {
-      const svc = servicesById[endpoint.serviceId]
-        ? servicesById[endpoint.serviceId]
-        : ({} as IServiceRow);
-      const comp = componentsById[endpoint.componentId]
-        ? componentsById[endpoint.componentId]
-        : ({} as IComponentRow);
-      const cont = containersById[comp.containerId]
-        ? containersById[comp.containerId]
-        : ({} as IContainerRow);
-      const bus = busesById[cont.busId]
-        ? busesById[cont.busId]
-        : ({} as IBusRow);
+      const svc: IServiceRow = servicesById[endpoint.serviceId] || null;
+      const comp: IComponentRow = componentsById[endpoint.componentId] || null;
+      const cont: IContainerRow = containersById[comp.containerId] || null;
+      const bus: IBusRow = busesById[cont.busId] || null;
 
       const qNameSvc = findNamespaceLocalpart(svc.name);
 

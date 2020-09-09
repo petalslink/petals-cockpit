@@ -19,11 +19,13 @@ import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { IInterfaceRowWithQName } from '@feat/cockpit/workspaces/state/interfaces/interfaces.interface';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentInterfaceServicesEndpoints,
   IInterfaceOverview,
 } from '@wks/state/interfaces/interfaces.selectors';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-services-interface-view',
@@ -34,15 +36,36 @@ export class ServicesInterfaceViewComponent implements OnInit {
   interface$: Observable<IInterfaceOverview>;
   workspaceId$: Observable<string>;
 
+  isDeleted = false;
+
+  displayedColumns: String[] = [
+    'actions',
+    'name',
+    'interfaces',
+    'component',
+    'container',
+    'bus',
+  ];
+
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.interface$ = this.store$.pipe(
-      select(getCurrentInterfaceServicesEndpoints)
+      select(getCurrentInterfaceServicesEndpoints),
+      filter(itf => {
+        this.isDeleted = itf === undefined;
+        return !this.isDeleted;
+      })
     );
+    // this.interface$.subscribe(data => {
+    //   console.log(data);
+    // });
 
     this.workspaceId$ = this.store$.pipe(
       select(state => state.workspaces.selectedWorkspaceId)
     );
+  }
+  renderInterfacesList(interfaces: IInterfaceRowWithQName[]): string {
+    return interfaces.map(int => int.localpart).join('<br />');
   }
 }

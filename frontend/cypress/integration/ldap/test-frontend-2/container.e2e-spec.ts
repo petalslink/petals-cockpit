@@ -498,7 +498,10 @@ describe('Container', () => {
       );
 
       // check if default content of the deployment card is not visible
-      cy.get(UPLOAD_DOM.texts.defaultCardContentMsg).should('not.be.visible');
+      cy
+        .get(UPLOAD_DOM.texts.defaultCardContentMsg, { timeout: 5000 })
+        .should('not.be.visible');
+
       cy.get(UPLOAD_DOM.buttons.browse).should('not.be.visible');
 
       // check the new content of the deployment card with the new shared-library deployment form

@@ -19,8 +19,11 @@ import { createSelector } from '@ngrx/store';
 
 import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { IStore } from '@shared/state/store.interface';
-import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
 import { getEndpointsById } from '@wks/state/endpoints/endpoints.selectors';
+import {
+  getEndpointOverview,
+  IEndpointOverview,
+} from '@wks/state/endpoints/endpoints.selectors';
 import {
   IInterface,
   IInterfaceRow,
@@ -33,7 +36,7 @@ import { getServicesById } from '@wks/state/services/services.selectors';
 
 export interface IInterfaceOverview extends IInterface {
   services: IServiceRowWithQName[];
-  endpoints: IEndpointRow[];
+  endpoints: IEndpointOverview[];
   namespace: string;
   localpart: string;
 }
@@ -74,12 +77,14 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
   getInterfaceEndpoints,
   getServicesById,
   getEndpointsById,
+  (state: IStore) => state,
   (
     _interface,
     interfaceServices,
     interfaceEndpoints,
     servicesByIds,
-    endpointsByIds
+    endpointsByIds,
+    state
   ): IInterfaceOverview => {
     if (_interface) {
       const serviceMap = new Map<string, { nsp: string; local: string }>();
@@ -111,7 +116,7 @@ export const getCurrentInterfaceServicesEndpoints = createSelector(
         endpoints: interfaceEndpoints
           .filter(id => endpointsByIds[id])
           .map(id => {
-            return endpointsByIds[id] as IEndpointRow;
+            return getEndpointOverview(state, id) as IEndpointOverview;
           }),
       };
     } else {

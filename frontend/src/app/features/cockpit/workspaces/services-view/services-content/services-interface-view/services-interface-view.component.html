@@ -13,13 +13,156 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. -->
 
-<app-workspace-element [resourceObservable]="interface$" deletedMessage="This service has been removed" #we>
-
-  <app-services-interface-overview
-    *appWorkspaceElementTab="'Overview'"
-    [interface]="we.resource"
-    [workspaceId]="workspaceId$ | async"
+<app-removable
+  [isHoverVisible]="isDeleted"
+  [message]="'This interface has been removed'"
+>
+  <div
     fxFlexFill
-  ></app-services-interface-overview>
+    fxLayout="column"
+    class="wrapper-content"
+  >
+    <div
+      *ngIf="interface$ | async as interface"
+      fxLayout="column"
+      fxLayoutGap="20px"
+      class="content"
+    >
+      <mat-card fxFlex class="card-related-elements">
+        <mat-card-title class="light-bold title-related-elements">Related Elements</mat-card-title>
+        <mat-card-content>
 
-</app-workspace-element>
+          <!-- services -->
+          <button
+            *ngFor="let service of interface.services"
+            mat-button
+            fxLayoutAlign="start center"
+            fxLayout="row"
+            [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'services', service.id]"
+            [ngClass]="'service-content-' + service.id.toLowerCase()"
+            class="service-btn related-element-btn"
+          >
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Service Localpart'"
+              [svgIcon]="'service'"
+              class="margin-right-x1 localpart-icon-svg"
+            ></mat-icon>
+            <span class="service-localpart margin-right-x2">{{ service.localpart }}</span>
+
+            <mat-icon
+              mat-list-icon
+              color="primary"
+              [matTooltip]="'Service Namespace'"
+              [svgIcon]="'namespace'"
+              class="margin-right-x1 namespace-icon-svg"
+            ></mat-icon>
+            <span class="service-namespace">{{ service.namespace }}</span>
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card fxFlex class="card-service-details">
+        <mat-card-title class="light-bold title-service-details">Endpoint details</mat-card-title>
+        <table mat-table [dataSource]="interface.endpoints" class="endpoints-table">
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let endpoint" class="endpoint-action">
+              <button
+                mat-icon-button
+                [matTooltip]="'Go to ' + endpoint.name"
+                [routerLink]="['/workspaces', (workspaceId$ | async), 'services', 'endpoints', endpoint.id]"
+              >
+                <mat-icon class="go-icon" color="primary">search</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>
+              <div fxLayoutAlign="start center" class="name-header-container">
+                <mat-icon color="primary" svgIcon="endpoint" class="margin-right-x1"></mat-icon>
+                <span class="endpoint-name">Name</span>
+              </div>
+            </th>
+            <td mat-cell *matCellDef="let endpoint" class="endpoint-name">{{ endpoint.name }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="interfaces">
+            <th mat-header-cell *matHeaderCellDef>
+              <div fxLayoutAlign="start center" class="interfaces-header-container">
+                <mat-icon color="primary" svgIcon="interface" class="margin-right-x1"></mat-icon>
+                <span>Interfaces</span>
+              </div>
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let endpoint"
+              [innerHtml]="renderInterfacesList(endpoint.interfaces)"
+              class="endpoint-interfaces"
+            ></td>
+          </ng-container>
+
+          <ng-container matColumnDef="component">
+            <th mat-header-cell *matHeaderCellDef>
+              <div fxLayoutAlign="start center" class="component-header-container">
+                <mat-icon color="primary" svgIcon="component" class="margin-right-x1"></mat-icon>
+                <span>Component</span>
+              </div>
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let endpoint"
+              class="endpoint-component"
+            >
+              {{ endpoint.component.name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="container">
+            <th mat-header-cell *matHeaderCellDef>
+              <div fxLayoutAlign="start center" class="container-header-container">
+                <mat-icon color="primary" class="margin-right-x1">dns</mat-icon>
+                <span>Container</span>
+              </div>
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let endpoint"
+              class="endpoint-container"
+            >
+              {{ endpoint.container.name }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="bus">
+            <th mat-header-cell *matHeaderCellDef>
+              <div fxLayoutAlign="start center" class="bus-header-container">
+                <mat-icon color="primary" svgIcon="bus" class="margin-right-x1"></mat-icon>
+                <span>Bus</span>
+              </div>
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let endpoint"
+              class="endpoint-bus"
+            >
+              {{ endpoint.bus.name }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let endpoint; columns: displayedColumns;"
+            class="endpoint-rows"
+            [ngClass]="'endpoint-' + endpoint.id"
+          ></tr>
+        </table>
+      </mat-card>
+
+    </div>
+  </div>
+</app-removable>
+
