@@ -15,36 +15,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { select, Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 
+import { IInterfaceRowWithQName } from '@feat/cockpit/workspaces/state/interfaces/interfaces.interface';
 import { IStore } from '@shared/state/store.interface';
 import {
   getCurrentServiceOverview,
   IServiceOverview,
 } from '@wks/state/services/services.selectors';
-import { filter, takeUntil } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-services-service-view',
   templateUrl: './services-service-view.component.html',
   styleUrls: ['./services-service-view.component.scss'],
 })
-export class ServicesServiceViewComponent implements OnInit, OnDestroy {
-  private onDestroy$ = new Subject<void>();
-
+export class ServicesServiceViewComponent implements OnInit {
   service$: Observable<IServiceOverview>;
   workspaceId$: Observable<string>;
 
   isDeleted = false;
 
+  displayedColumns: String[] = [
+    'actions',
+    'name',
+    'interfaces',
+    'component',
+    'container',
+    'bus',
+  ];
   constructor(private store$: Store<IStore>) {}
 
   ngOnInit() {
     this.service$ = this.store$.pipe(
       select(getCurrentServiceOverview),
-      takeUntil(this.onDestroy$),
       filter(service => {
         this.isDeleted = service === undefined;
         return !this.isDeleted;
@@ -56,8 +62,7 @@ export class ServicesServiceViewComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy() {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+  renderInterfacesList(interfaces: IInterfaceRowWithQName[]): string {
+    return interfaces.map(int => int.localpart).join('<br />');
   }
 }

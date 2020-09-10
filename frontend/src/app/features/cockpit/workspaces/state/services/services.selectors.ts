@@ -19,8 +19,10 @@ import { createSelector } from '@ngrx/store';
 
 import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { IStore } from '@shared/state/store.interface';
-import { IEndpointRow } from '@wks/state/endpoints/endpoints.interface';
-import { getEndpointsById } from '@wks/state/endpoints/endpoints.selectors';
+import {
+  getEndpointOverview,
+  IEndpointOverview,
+} from '@wks/state/endpoints/endpoints.selectors';
 import {
   IInterfaceRow,
   IInterfaceRowWithQName,
@@ -30,7 +32,7 @@ import { IService, IServiceRow } from '@wks/state/services/services.interface';
 
 export interface IServiceOverview extends IService {
   interfaces: IInterfaceRowWithQName[];
-  endpoints: IEndpointRow[];
+  endpoints: IEndpointOverview[];
   namespace: string;
   localpart: string;
 }
@@ -70,17 +72,17 @@ export const getAllServices = createSelector(
 );
 
 export const getCurrentServiceOverview = createSelector(
+  (state: IStore) => state,
   getSelectedService,
   getServiceInterfaces,
   getServiceEndpoints,
   getInterfacesById,
-  getEndpointsById,
   (
+    state,
     service,
     serviceInterfaces,
     serviceEndpoints,
-    interfacesByIds,
-    endpointsByIds
+    interfacesByIds
   ): IServiceOverview => {
     if (service) {
       const intMap = new Map<string, { nsp: string; local: string }>();
@@ -109,8 +111,8 @@ export const getCurrentServiceOverview = createSelector(
             localpart: intMap.get(id).local,
           };
         }),
-        endpoints: serviceEndpoints.filter(id => endpointsByIds[id]).map(id => {
-          return endpointsByIds[id] as IEndpointRow;
+        endpoints: serviceEndpoints.map(id => {
+          return getEndpointOverview(state, id) as IEndpointOverview;
         }),
       };
     } else {

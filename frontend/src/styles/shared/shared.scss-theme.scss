@@ -64,18 +64,23 @@
     .tree-node-content:not(.service-element-node-interface-namespace):not(.service-element-node-service-namespace):hover:before {
       background-color: mat-color($primary, 50);
     }
+  }
 
-    // use in all administration component
-    .user-management-page > .user-management-panels {
-      .pnl-add-user
-        > mat-expansion-panel
-        > mat-expansion-panel-header.mat-expanded,
-      .pnl-list-users
-        > .mat-accordion
-        > mat-expansion-panel
-        > mat-expansion-panel-header.mat-expanded {
-        background-color: mat-color($accent, 500);
-      }
+  // use in all administration component
+  .user-management-page > .user-management-panels {
+    .pnl-add-user
+      > mat-expansion-panel
+      > mat-expansion-panel-header.mat-expanded,
+    .pnl-list-users
+      > .mat-accordion
+      > mat-expansion-panel
+      > mat-expansion-panel-header.mat-expanded {
+      background-color: mat-color($accent, 500);
     }
+  }
+
+  // use in all material tables
+  .mat-row:hover {
+    background-color: mat-color($mat-grey, 200);
   }
 }
