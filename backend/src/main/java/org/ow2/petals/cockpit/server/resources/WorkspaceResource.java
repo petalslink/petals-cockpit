@@ -534,7 +534,7 @@ public class WorkspaceResource {
                 throw new WebApplicationException("User already exists in this workspace!", Status.CONFLICT);
             }
 
-            UsersWorkspacesRecord newUserWs = new UsersWorkspacesRecord(this.wsId, userToAdd.id, true, true, true);
+            UsersWorkspacesRecord newUserWs = new UsersWorkspacesRecord(this.wsId, userToAdd.id, false, false, false);
             newUserWs.attach(jooq);
             newUserWs.insert();
 
