@@ -21,7 +21,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { IStore } from '@shared/state/store.interface';
 import {
-  getCurrentEndpointOverview,
+  getSelectedEndpointOverview,
   IEndpointOverview,
 } from '@wks/state/endpoints/endpoints.selectors';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -43,7 +43,7 @@ export class ServicesEndpointViewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.endpoint$ = this.store$.pipe(
-      select(getCurrentEndpointOverview),
+      select(getSelectedEndpointOverview),
       takeUntil(this.onDestroy$),
       filter(edp => {
         this.isDeleted = edp === undefined;

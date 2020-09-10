@@ -17,6 +17,7 @@
 
 import { createSelector } from '@ngrx/store';
 
+import { JsTable } from '@shared/helpers/jstable.helper';
 import { findNamespaceLocalpart } from '@shared/helpers/services-list.helper';
 import { IStore } from '@shared/state/store.interface';
 import { getBusesById } from '@wks/state/buses/buses.selectors';
@@ -76,40 +77,49 @@ export const getAllEndpoints = createSelector(
   }
 );
 
-export const getCurrentEndpointOverview = createSelector(
-  getSelectedEndpoint,
+export const getSelectedEndpointOverview = createSelector(
+  state => state,
+  (state: IStore): IEndpointOverview => {
+    return getEndpointOverview(state, state.endpoints.selectedEndpointId);
+  }
+);
+
+export const getEndpointOverview = createSelector(
+  getEndpointsById,
   getServicesById,
   getInterfacesById,
   getComponentsById,
   getContainersById,
   getBusesById,
   (
-    endpoint,
-    servicesByIds,
-    interfacesByIds,
-    componentsByIds,
-    containersByIds,
-    busesByIds
+    endpointById: JsTable<IEndpointRow>['byId'],
+    servicesById: JsTable<IServiceRow>['byId'],
+    interfacesById: JsTable<IInterfaceRow>['byId'],
+    componentsById: JsTable<IComponentRow>['byId'],
+    containersById: JsTable<IContainerRow>['byId'],
+    busesById: JsTable<IBusRow>['byId'],
+    endpointId: string
   ): IEndpointOverview => {
-    if (endpoint) {
-      const svc = servicesByIds[endpoint.serviceId]
-        ? servicesByIds[endpoint.serviceId]
+    const endpoint = endpointById[endpointId];
+    if (endpointById[endpointId]) {
+      const svc = servicesById[endpoint.serviceId]
+        ? servicesById[endpoint.serviceId]
         : ({} as IServiceRow);
-      const comp = componentsByIds[endpoint.componentId]
-        ? componentsByIds[endpoint.componentId]
+      const comp = componentsById[endpoint.componentId]
+        ? componentsById[endpoint.componentId]
         : ({} as IComponentRow);
-      const cont = containersByIds[comp.containerId]
-        ? containersByIds[comp.containerId]
+      const cont = containersById[comp.containerId]
+        ? containersById[comp.containerId]
         : ({} as IContainerRow);
-      const bus = busesByIds[cont.busId]
-        ? busesByIds[cont.busId]
+      const bus = busesById[cont.busId]
+        ? busesById[cont.busId]
         : ({} as IBusRow);
 
       const qNameSvc = findNamespaceLocalpart(svc.name);
 
       const intMap = new Map<string, { nsp: string; local: string }>();
-      endpoint.interfacesIds.filter(id => interfacesByIds[id]).forEach(id => {
-        const qName = findNamespaceLocalpart(interfacesByIds[id].name);
+      endpoint.interfacesIds.filter(id => interfacesById[id]).forEach(id => {
+        const qName = findNamespaceLocalpart(interfacesById[id].name);
         intMap.set(id, { nsp: qName.namespace, local: qName.localpart });
       });
 
@@ -125,7 +135,7 @@ export const getCurrentEndpointOverview = createSelector(
           localpart: qNameSvc.localpart,
         },
         interfaces: endpoint.interfacesIds.map(id => {
-          const itf = interfacesByIds[id] as IInterfaceRow;
+          const itf = interfacesById[id] as IInterfaceRow;
           return {
             ...itf,
             namespace: intMap.get(id).nsp,
@@ -135,7 +145,7 @@ export const getCurrentEndpointOverview = createSelector(
         isFetchingDetails: false,
       };
     } else {
-      return undefined;
+      return null;
     }
   }
 );
