@@ -759,6 +759,76 @@ describe('Workspace', () => {
         .should('be.visible');
     });
 
+    it('should reset workspace details if changing workspaces', () => {
+      cy
+        .get(BREADCRUMB_DOM.texts.itemName)
+        .eq(0)
+        .should('contain', `Workspace 0`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
+        .should('contain', `This is short description for the Workspace 0.`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
+        .should(
+          'contain',
+          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+        );
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.buttons.addEditWorkspaceDetails)
+        .should('be.visible')
+        .click();
+
+      cy.get(WORKSPACE_OVERVIEW_DOM.inputs.workspaceName).type('bla bla bla');
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.shortDescriptionTextarea)
+        .type(`bla bla bla`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.textArea.descriptionTextarea)
+        .type(`bla bla bla`);
+
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 1`)
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks1`);
+
+      cy
+        .get(MENU_DOM.buttons.toggleMenu)
+        .should('be.visible')
+        .click();
+
+      cy
+        .get(MENU_DOM.links.itemsWksNames)
+        .find(MENU_DOM.texts.wksNames)
+        .contains(`Workspace 0`)
+        .click();
+
+      cy.expectLocationToBe(`/workspaces/idWks0`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.shortDescription)
+        .should('contain', `This is short description for the Workspace 0.`);
+
+      cy
+        .get(WORKSPACE_OVERVIEW_DOM.texts.description)
+        .should(
+          'contain',
+          `You can import a bus from the container 192.168.0.1:7700 to get a mock bus.`
+        );
+    });
+
     it('should update workspace name', () => {
       cy
         .get(BREADCRUMB_DOM.texts.itemName)
