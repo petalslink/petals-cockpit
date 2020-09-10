@@ -286,9 +286,9 @@ public class WorkspaceResourceTest extends AbstractDefaultWorkspaceResourceTest 
                 WorkspaceUser.class);
         assertThat(add.id).isEqualTo("user1");
         assertThat(add.name).isEqualTo("user1");
-        assertThat(add.wsPermissions.adminWorkspace).isTrue();
-        assertThat(add.wsPermissions.deployArtifact).isTrue();
-        assertThat(add.wsPermissions.lifecycleArtifact).isTrue();
+        assertThat(add.wsPermissions.adminWorkspace).isFalse();
+        assertThat(add.wsPermissions.deployArtifact).isFalse();
+        assertThat(add.wsPermissions.lifecycleArtifact).isFalse();
     }
 
     @Test
