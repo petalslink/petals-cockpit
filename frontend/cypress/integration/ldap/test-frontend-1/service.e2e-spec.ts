@@ -38,6 +38,12 @@ describe(`Service`, () => {
   it(`should contain the service details overview with interfaces and endpoints`, () => {
     cy.clickElementInTree(`service-localpart`, `0-0-0-0`);
 
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Service`,
+      `http://namespace-example.fr/service/technique/version/1.0`,
+    ]);
+
     // 1) expect to have 1 Service namespace, 1 Interface, 1 Endpoints
     cy.expectServiceNamespaceToBe(
       `http://namespace-example.fr/service/technique/version/1.0`

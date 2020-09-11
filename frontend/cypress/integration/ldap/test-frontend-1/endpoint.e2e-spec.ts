@@ -40,6 +40,12 @@ describe(`Endpoint`, () => {
     cy.clickElementInTree(`endpoint`, `0-0-0-0-0`);
 
     // 1) expect to have 1 Bus, 1 Container, 1 Component, 1 Service, 2 Interfaces
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Service`,
+      `edpt-89p82661-test-31o4-l391-00`,
+    ]);
+
     cy.get(ENDPOINT_OVERVIEW_DOM.texts.busName).contains(`Bus 0`);
 
     cy.get(ENDPOINT_OVERVIEW_DOM.texts.containerName).contains(`Cont 0`);

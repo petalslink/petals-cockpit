@@ -40,6 +40,12 @@ describe(`Interface`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
 
     // 1) expect to have 1 Interface namespace, 2 Services, 2 Endpoints
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Service`,
+      `http://namespace-example.fr/interface/technique/version/1.0`,
+    ]);
+
     cy.expectInterfaceNamespaceToBe(
       `http://namespace-example.fr/interface/technique/version/1.0`
     );
