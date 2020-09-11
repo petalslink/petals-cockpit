@@ -16,7 +16,7 @@
  */
 
 import { INTERFACE_OVERVIEW_DOM } from '../../../support/interface.dom';
-import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
+import { SERVICE_VIEW_DOM } from '../../../support/service.dom';
 
 describe(`Service`, () => {
   beforeEach(() => {
@@ -52,41 +52,33 @@ describe(`Service`, () => {
       `http://namespace-example.fr/interface/technique/version/1.0`,
     ]);
 
-    cy.expectEndpointsListToBe([`edpt-89p82661-test-31o4-l391-00`]);
+    cy.expectEndpointsListToBe(service1EndpointsList);
 
     // 2) expect to have 1 Service namespace, 1 Interface, 2 Endpoints
     cy.clickElementInTree(`service-localpart`, `1-0-0-0`);
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/services/4`);
 
-    // TODO: Test name with breadcrumb
-    // cy.expectServiceNamespaceToBe(
-    //   `http://namespace-example.fr/service/technique/version/3.0`
-    // );
-
     cy.expectInterfacesListToBe([
       `Interface-Localpart2`,
       `http://namespace-example.fr/interface/technique/version/2.0`,
     ]);
 
-    cy.expectEndpointsListToBe([
-      `edpt-89p82661-test-31o4-l391-03`,
-      `edpt-89p82661-test-31o4-l391-04`,
-    ]);
+    cy.expectEndpointsListToBe(service4EndpointsList);
   });
 
   it(`should go to details of Interface from the view of a selected Service`, () => {
     cy.clickElementInTree(`service-localpart`, `0-0-0-0`);
 
     cy
-      .get(SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaceLocalpart('1'))
+      .get(SERVICE_VIEW_DOM.texts.relatedElements.interfaceLocalpart('1'))
       .contains(`Interface-Localpart0`);
 
     cy
-      .get(SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaceNamespace('1'))
+      .get(SERVICE_VIEW_DOM.texts.relatedElements.interfaceNamespace('1'))
       .contains(`http://namespace-example.fr/interface/technique/version/1.0`);
 
-    cy.get(SERVICE_OVERVIEW_DOM.buttons.interfaceBtn('1')).click();
+    cy.get(SERVICE_VIEW_DOM.buttons.interfaceBtn('1')).click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
 
@@ -99,10 +91,16 @@ describe(`Service`, () => {
   it(`should go to details of Endpoint from the view of a selected Service`, () => {
     cy.clickElementInTree(`service-localpart`, `0-0-0-0`);
 
+    cy.get(SERVICE_VIEW_DOM.texts.details.endpoint('1')).should('exist');
     cy
-      .get(SERVICE_OVERVIEW_DOM.texts.details.endpoint('1'))
+      .get(SERVICE_VIEW_DOM.texts.details.endpoint('1'))
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointName)
       .contains('edpt-89p82661-test-31o4-l391-00');
-    cy.get(SERVICE_OVERVIEW_DOM.buttons.endpointBtn('1')).click();
+
+    cy
+      .get(SERVICE_VIEW_DOM.texts.details.endpoint('1'))
+      .find(SERVICE_VIEW_DOM.buttons.endpointBtn)
+      .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/1`);
   });
@@ -119,3 +117,30 @@ describe(`Service`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/services/not-found`);
   });
 });
+
+export const service1EndpointsList = [
+  {
+    name: 'edpt-89p82661-test-31o4-l391-00',
+    interfaces: ['Interface-Localpart0', 'Interface-Localpart1'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+];
+
+export const service4EndpointsList = [
+  {
+    name: 'edpt-89p82661-test-31o4-l391-03',
+    interfaces: ['Interface-Localpart2'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+  {
+    name: 'edpt-89p82661-test-31o4-l391-04',
+    interfaces: ['Interface-Localpart2'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+];

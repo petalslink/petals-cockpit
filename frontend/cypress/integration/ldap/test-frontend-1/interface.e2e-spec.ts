@@ -16,7 +16,6 @@
  */
 
 import { INTERFACE_OVERVIEW_DOM } from '../../../support/interface.dom';
-import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
 
 describe(`Interface`, () => {
   beforeEach(() => {
@@ -82,10 +81,11 @@ describe(`Interface`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/services/1`);
 
-    cy
-      .get(SERVICE_OVERVIEW_DOM.texts.aboutService)
-      .contains(`http://namespace-example.fr/service/technique/version/1.0`)
-      .should('be.visible');
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Service`,
+      `http://namespace-example.fr/service/technique/version/1.0`,
+    ]);
   });
 
   it(`should go to details of Endpoint from the view of a selected Interface`, () => {

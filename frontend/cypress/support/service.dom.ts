@@ -16,29 +16,32 @@
  */
 
 // base selector
-const bsServiceOverview = `app-services-service-overview`;
+const bsServiceView = `app-services-service-view`;
 
 export const SERVICE_DOM = {};
 
-export const SERVICE_OVERVIEW_DOM = {
+export const SERVICE_VIEW_DOM = {
   texts: {
     relatedElements: {
-      interfaces: `${bsServiceOverview} .interface-btn`,
+      interfaces: `${bsServiceView} .interface-btn`,
       interfaceLocalpart: (intId: string) =>
-        `${bsServiceOverview} .interface-content-${intId} .interface-localpart`,
+        `${bsServiceView} .interface-content-${intId} .interface-localpart`,
       interfaceNamespace: (intId: string) =>
-        `${bsServiceOverview} .interface-content-${intId} .interface-namespace`,
+        `${bsServiceView} .interface-content-${intId} .interface-namespace`,
     },
     details: {
-      endpoints: `${bsServiceOverview} .endpoint-button .location-name`,
-      endpoint: (edpId: string) =>
-        `${bsServiceOverview} .endpoint-button.endpoint-${edpId}`,
+      endpoints: `${bsServiceView} tr.endpoint-rows`,
+      endpoint: (edpId: string) => `${bsServiceView} tr.endpoint-${edpId}`,
+      endpointName: `.endpoint-name`,
+      endpointComponent: `.endpoint-component`,
+      endpointInterfaces: `.endpoint-interfaces`,
+      endpointContainer: `.endpoint-container`,
+      endpointBus: `.endpoint-bus`,
     },
   },
   buttons: {
     interfaceBtn: (intId: string) =>
-      `${bsServiceOverview} .interface-content-${intId}`,
-    endpointBtn: (edpId: string) =>
-      `${bsServiceOverview} .endpoint-button.endpoint-${edpId} button`,
+      `${bsServiceView} .interface-content-${intId}`,
+    endpointBtn: `.endpoint-action button`,
   },
 };

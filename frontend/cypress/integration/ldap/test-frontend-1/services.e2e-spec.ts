@@ -189,10 +189,6 @@ describe(`Services`, () => {
 
     cy.clickElementInTree(`service-localpart`, `0-1-1-0`);
 
-    cy.expectServiceNamespaceToBe(
-      `http://namespace-example.fr/service/technique/version/2.0`
-    );
-
     cy
       .get(SERVICES_DOM.refreshBtn)
       .should('be.enabled')
@@ -204,7 +200,7 @@ describe(`Services`, () => {
     cy.get(SERVICES_DOM.refreshBtn).should('be.enabled');
 
     cy
-      .get('app-workspace-element')
+      .get('app-message .msg-details')
       .should('contain', 'This service has been removed');
   });
 
@@ -237,7 +233,7 @@ describe(`Services`, () => {
     cy.get(SERVICES_DOM.refreshBtn).should('be.enabled');
 
     cy
-      .get('app-workspace-element')
+      .get('app-message .msg-details')
       .should('not.contain', 'This service has been removed');
   });
 

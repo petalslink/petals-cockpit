@@ -15,19 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { SERVICE_OVERVIEW_DOM } from './service.dom';
-
-// Cypress.Commands.add('expectServiceNamespaceToBe', serviceNamespace => {
-//   cy
-//     .get(SERVICE_OVERVIEW_DOM.texts.serviceNamespace)
-//     .contains(serviceNamespace);
-// });
+import { SERVICE_VIEW_DOM } from './service.dom';
 
 Cypress.Commands.add(
   'expectInterfacesListToBe',
   listInterfacesLocalpartsNamespace => {
     const listItemInterfaces = cy.get(
-      SERVICE_OVERVIEW_DOM.texts.relatedElements.interfaces
+      SERVICE_VIEW_DOM.texts.relatedElements.interfaces
     );
 
     listItemInterfaces.should(
@@ -43,8 +37,36 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('expectEndpointsListToBe', list => {
-  const endpointsNames = cy.get(SERVICE_OVERVIEW_DOM.texts.details.endpoints);
+  const endpointsNames = cy.get(SERVICE_VIEW_DOM.texts.details.endpoints);
 
   endpointsNames.should('have.length', list.length);
-  endpointsNames.each(($item, index) => cy.wrap($item).contains(list[index]));
+  endpointsNames.each(($endpoint, endpointIndex) => {
+    const modelEdp = list[endpointIndex];
+    cy
+      .wrap($endpoint)
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointName)
+      .contains(modelEdp.name);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointInterfaces)
+      .each(($interface, interfaceIndex) => {
+        cy.wrap($interface).contains(modelEdp.interfaces[interfaceIndex]);
+      });
+
+    cy
+      .wrap($endpoint)
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointComponent)
+      .contains(modelEdp.component);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointContainer)
+      .contains(modelEdp.container);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + SERVICE_VIEW_DOM.texts.details.endpointBus)
+      .contains(modelEdp.bus);
+  });
 });

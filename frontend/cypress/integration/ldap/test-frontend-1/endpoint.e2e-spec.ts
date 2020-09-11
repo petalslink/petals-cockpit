@@ -17,7 +17,6 @@
 
 import { ENDPOINT_OVERVIEW_DOM } from '../../../support/endpoint.dom';
 import { PETALS_TREE_DOM } from '../../../support/petals.dom';
-import { SERVICE_OVERVIEW_DOM } from '../../../support/service.dom';
 
 describe(`Endpoint`, () => {
   beforeEach(() => {
@@ -111,10 +110,11 @@ describe(`Endpoint`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/services/2`);
 
-    cy
-      .get(SERVICE_OVERVIEW_DOM.texts.aboutService)
-      .contains(`http://namespace-example.fr/service/technique/version/1.0`)
-      .should('be.visible');
+    cy.expectBreadcrumbsToBe([
+      `Workspace 0`,
+      `Service`,
+      `http://namespace-example.fr/service/technique/version/1.0`,
+    ]);
   });
 
   it(`should go to details of Interface from the view of a selected Endpoint`, () => {
