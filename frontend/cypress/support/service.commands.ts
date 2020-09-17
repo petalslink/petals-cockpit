@@ -36,7 +36,7 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('expectEndpointsListToBe', list => {
+Cypress.Commands.add('expectEndpointsSvcListToBe', list => {
   const endpointsNames = cy.get(SERVICE_VIEW_DOM.texts.details.endpoints);
 
   endpointsNames.should('have.length', list.length);

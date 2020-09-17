@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { INTERFACE_OVERVIEW_DOM } from '../../../support/interface.dom';
+import { INTERFACE_VIEW_DOM } from '../../../support/interface.dom';
 import { SERVICE_VIEW_DOM } from '../../../support/service.dom';
 
 describe(`Service`, () => {
@@ -52,7 +52,7 @@ describe(`Service`, () => {
       `http://namespace-example.fr/interface/technique/version/1.0`,
     ]);
 
-    cy.expectEndpointsListToBe(service1EndpointsList);
+    cy.expectEndpointsSvcListToBe(service1EndpointsList);
 
     // 2) expect to have 1 Service namespace, 1 Interface, 2 Endpoints
     cy.clickElementInTree(`service-localpart`, `1-0-0-0`);
@@ -64,7 +64,7 @@ describe(`Service`, () => {
       `http://namespace-example.fr/interface/technique/version/2.0`,
     ]);
 
-    cy.expectEndpointsListToBe(service4EndpointsList);
+    cy.expectEndpointsSvcListToBe(service4EndpointsList);
   });
 
   it(`should go to details of Interface from the view of a selected Service`, () => {
@@ -83,8 +83,8 @@ describe(`Service`, () => {
     cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
 
     cy
-      .get(INTERFACE_OVERVIEW_DOM.texts.aboutInterface)
-      .contains(`http://namespace-example.fr/interface/technique/version/1.0`)
+      .get(INTERFACE_VIEW_DOM.texts.relatedElements.serviceNamespace('1'))
+      .contains(`http://namespace-example.fr/service/technique/version/1.0`)
       .should('be.visible');
   });
 
@@ -106,7 +106,7 @@ describe(`Service`, () => {
   });
 
   it(`should open the 404 page if the service doesn't exists`, () => {
-    cy.visit(`/workspaces/idWks0/services/endpoints/unknownIdService`);
+    cy.visit(`/workspaces/idWks0/services/services/unknownIdService`);
 
     // We authenticate again because we are in an environment e2e prod and
     // when changing the url manually, it reloads the application through the login page.

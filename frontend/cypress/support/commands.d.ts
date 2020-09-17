@@ -141,7 +141,17 @@ declare namespace Cypress {
 
     // service.commands
     expectInterfacesListToBe(listInterfacesLocalpartsNamespace: string[]): any;
-    expectEndpointsListToBe(
+    expectEndpointsSvcListToBe(
+      endpointsList: {
+        name: string;
+        interfaces: string[];
+        component: string;
+        container: string;
+        bus: string;
+      }[]
+    ): any;
+
+    expectEndpointsItfListToBe(
       endpointsList: {
         name: string;
         interfaces: string[];

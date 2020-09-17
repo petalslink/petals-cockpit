@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { INTERFACE_OVERVIEW_DOM } from '../../../support/interface.dom';
+import { INTERFACE_VIEW_DOM } from '../../../support/interface.dom';
+import { SERVICE_VIEW_DOM } from './../../../support/service.dom';
 
 describe(`Interface`, () => {
   beforeEach(() => {
@@ -31,9 +32,10 @@ describe(`Interface`, () => {
       .click();
 
     cy.expectLocationToBe(`/workspaces/idWks0/services`);
+    cy.expectBreadcrumbsToBe([`Workspace 0`, `Service`]);
   });
 
-  it(`should contain the interface details overview with interfaces and endpoints`, () => {
+  it(`should contain the service details overview with interfaces and endpoints`, () => {
     cy.clickElementInTree(`interface-localpart`, `0-0`);
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/1`);
@@ -45,62 +47,68 @@ describe(`Interface`, () => {
       `http://namespace-example.fr/interface/technique/version/1.0`,
     ]);
 
-    cy.expectInterfaceNamespaceToBe(
-      `http://namespace-example.fr/interface/technique/version/1.0`
-    );
+    cy.expectServicesListToBe([
+      `Localpart0`,
+      `http://namespace-example.fr/service/technique/version/1.0`,
+      `Localpart1`,
+      `http://namespace-example.fr/service/technique/version/1.0`,
+    ]);
 
-    cy.expectServicesListToBe(
-      expectedServicesLocalpartsNamespacesOfInterfaceLocalpart1
-    );
+    cy.expectEndpointsItfListToBe(interface1EndpointsList);
 
-    cy.expectItfEndpointsListToBe(expectedEndpointsOfInterfaceLocalpart1);
+    //  // 2) expect to have 1 Service namespace, 1 Interface, 2 Endpoints
+    cy.clickElementInTree(`interface-localpart`, `2-0`);
 
-    // 2) expect to have 1 Interface namespace, 1 Service, 2 Endpoints
-    cy.clickElementInTree(`interface-localpart`, `0-1`);
+    cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/4`);
 
-    cy.expectLocationToBe(`/workspaces/idWks0/services/interfaces/2`);
+    cy.expectServicesListToBe([
+      `Localpart4`,
+      `http://namespace-example.fr/service/technique/version/3.0`,
+    ]);
 
-    cy.expectInterfaceNamespaceToBe(
-      `http://namespace-example.fr/interface/technique/version/1.0`
-    );
-
-    cy.expectServicesListToBe(
-      expectedServicesLocalpartsNamespacesOfInterfaceLocalpart2
-    );
-
-    cy.expectItfEndpointsListToBe(expectedEndpointsOfInterfaceLocalpart2);
+    cy.expectEndpointsItfListToBe(interface4EndpointsList);
   });
 
   it(`should go to details of Service from the view of a selected Interface`, () => {
-    cy.clickElementInTree(`interface-localpart`, `0-1`);
+    cy.clickElementInTree(`interface-localpart`, `2-0`);
 
     cy
-      .get(INTERFACE_OVERVIEW_DOM.navList.navListServices)
-      .contains(`Localpart0`)
-      .click();
+      .get(INTERFACE_VIEW_DOM.texts.relatedElements.serviceLocalpart('5'))
+      .contains(`Localpart4`);
 
-    cy.expectLocationToBe(`/workspaces/idWks0/services/services/1`);
+    cy
+      .get(INTERFACE_VIEW_DOM.texts.relatedElements.serviceNamespace('5'))
+      .contains(`http://namespace-example.fr/service/technique/version/3.0`);
 
-    cy.expectBreadcrumbsToBe([
-      `Workspace 0`,
-      `Service`,
-      `http://namespace-example.fr/service/technique/version/1.0`,
-    ]);
+    cy.get(INTERFACE_VIEW_DOM.buttons.serviceBtn('5')).click();
+
+    cy.expectLocationToBe(`/workspaces/idWks0/services/services/5`);
+
+    cy
+      .get(SERVICE_VIEW_DOM.texts.relatedElements.interfaceNamespace('4'))
+      .contains(`http://namespace-example.fr/interface/technique/version/3.0`)
+      .should('be.visible');
   });
 
   it(`should go to details of Endpoint from the view of a selected Interface`, () => {
-    cy.clickElementInTree(`interface-localpart`, `0-1`);
+    cy.clickElementInTree(`interface-localpart`, `2-0`);
+
+    cy.get(INTERFACE_VIEW_DOM.texts.details.endpoint('6')).should('exist');
+    cy
+      .get(INTERFACE_VIEW_DOM.texts.details.endpoint('6'))
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointName)
+      .contains('edpt-89p82661-test-31o4-l391-05');
 
     cy
-      .get(INTERFACE_OVERVIEW_DOM.navList.navListEndpoints)
-      .contains(`edpt-89p82661-test-31o4-l391-00`)
+      .get(INTERFACE_VIEW_DOM.texts.details.endpoint('6'))
+      .find(INTERFACE_VIEW_DOM.buttons.endpointBtn)
       .click();
 
-    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/1`);
+    cy.expectLocationToBe(`/workspaces/idWks0/services/endpoints/6`);
   });
 
   it(`should open the 404 page if the interface doesn't exists`, () => {
-    cy.visit(`/workspaces/idWks0/services/interfaces/unknownIdInterface`);
+    cy.visit(`/workspaces/idWks0/services/interfaces/unknownIdInterfaces`);
 
     // We authenticate again because we are in an environment e2e prod and
     // when changing the url manually, it reloads the application through the login page.
@@ -110,42 +118,31 @@ describe(`Interface`, () => {
 
     cy.expectLocationToBe(`/workspaces/idWks0/services/not-found`);
   });
-
-  it(`should display a component icon for each Endpoint from the view of a selected Interface`, () => {
-    cy.clickElementInTree(`interface-localpart`, `0-1`);
-
-    cy
-      .get(INTERFACE_OVERVIEW_DOM.listItem.itemEndpoints)
-      .find(`mat-icon[svgIcon="component"]`)
-      .should('exist')
-      .and('have.length', 2);
-  });
-
-  // ---------------------------- Interface Localpart 1 ---------------------------- //
-
-  const expectedServicesLocalpartsNamespacesOfInterfaceLocalpart1 = [
-    `Localpart0`,
-    `http://namespace-example.fr/service/technique/version/1.0`,
-    `Localpart1`,
-    `http://namespace-example.fr/service/technique/version/1.0`,
-  ];
-
-  const expectedEndpointsOfInterfaceLocalpart1 = [
-    `edpt-89p82661-test-31o4-l391-00`,
-    `edpt-89p82661-test-31o4-l391-01`,
-  ];
-
-  // ---------------------------- Interface Localpart 2 ---------------------------- //
-
-  const expectedServicesLocalpartsNamespacesOfInterfaceLocalpart2 = [
-    `Localpart0`,
-    `http://namespace-example.fr/service/technique/version/1.0`,
-    `Localpart2`,
-    `http://namespace-example.fr/service/technique/version/2.0`,
-  ];
-
-  const expectedEndpointsOfInterfaceLocalpart2 = [
-    `edpt-89p82661-test-31o4-l391-00`,
-    `edpt-89p82661-test-31o4-l391-02`,
-  ];
 });
+
+export const interface1EndpointsList = [
+  {
+    name: 'edpt-89p82661-test-31o4-l391-00',
+    interfaces: ['Interface-Localpart0', 'Interface-Localpart1'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+  {
+    name: 'edpt-89p82661-test-31o4-l391-01',
+    interfaces: ['Interface-Localpart0'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+];
+
+export const interface4EndpointsList = [
+  {
+    name: 'edpt-89p82661-test-31o4-l391-05',
+    interfaces: ['Interface-Localpart3'],
+    component: 'Comp 0',
+    container: 'Cont 0',
+    bus: 'Bus 0',
+  },
+];

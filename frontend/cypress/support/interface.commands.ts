@@ -15,19 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { INTERFACE_OVERVIEW_DOM } from './interface.dom';
-
-Cypress.Commands.add('expectInterfaceNamespaceToBe', interfaceNamespace => {
-  cy
-    .get(INTERFACE_OVERVIEW_DOM.texts.interfaceNamespace)
-    .contains(interfaceNamespace);
-});
+import { INTERFACE_VIEW_DOM } from './interface.dom';
 
 Cypress.Commands.add(
   'expectServicesListToBe',
   listServicesLocalpartsNamespace => {
     const listItemServices = cy.get(
-      INTERFACE_OVERVIEW_DOM.listItem.itemServices
+      INTERFACE_VIEW_DOM.texts.relatedElements.services
     );
 
     listItemServices.should(
@@ -42,9 +36,37 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('expectItfEndpointsListToBe', list => {
-  const endpointsNames = cy.get(INTERFACE_OVERVIEW_DOM.texts.endpointsNames);
+Cypress.Commands.add('expectEndpointsItfListToBe', list => {
+  const endpointsNames = cy.get(INTERFACE_VIEW_DOM.texts.details.endpoints);
 
   endpointsNames.should('have.length', list.length);
-  endpointsNames.each(($item, index) => cy.wrap($item).contains(list[index]));
+  endpointsNames.each(($endpoint, endpointIndex) => {
+    const modelEdp = list[endpointIndex];
+    cy
+      .wrap($endpoint)
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointName)
+      .contains(modelEdp.name);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointInterfaces)
+      .each(($interface, interfaceIndex) => {
+        cy.wrap($interface).contains(modelEdp.interfaces[interfaceIndex]);
+      });
+
+    cy
+      .wrap($endpoint)
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointComponent)
+      .contains(modelEdp.component);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointContainer)
+      .contains(modelEdp.container);
+
+    cy
+      .wrap($endpoint)
+      .find('>' + INTERFACE_VIEW_DOM.texts.details.endpointBus)
+      .contains(modelEdp.bus);
+  });
 });
