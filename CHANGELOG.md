@@ -1,3 +1,22 @@
+<a name="1.11.0"></a>
+# [1.11.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.10.0...v1.11.0) (2020-09-18)
+
+
+### Bug Fixes
+
+* **backend:** new workspace user has now no permission ([2c2a623](https://gitlab.com/linagora/petals-cockpit/commit/2c2a623d84af02bbc6259bd1dee271f18b855dce)), closes [#563](https://gitlab.com/linagora/petals-cockpit/issues/563)
+
+### Features
+
+* **backend:** return workspace users with their name ([6faa995](https://gitlab.com/linagora/petals-cockpit/commit/6faa99578a13739bfc4a25bc72825dedd1b71f01))
+* **frontend:** add endpoints list to service view ([569b784](https://gitlab.com/linagora/petals-cockpit/commit/569b784d7ab96cf0165c5be1939427ee052663d5)), closes [#602](https://gitlab.com/linagora/petals-cockpit/issues/602)
+* **frontend:** add services breadcrumbs ([e800edc](https://gitlab.com/linagora/petals-cockpit/commit/e800edc3c677fa07657bde8999874106cc152504)), closes [#704](https://gitlab.com/linagora/petals-cockpit/issues/704) [#592](https://gitlab.com/linagora/petals-cockpit/issues/592)
+* **frontend:** refactor endpoint view ([2132421](https://gitlab.com/linagora/petals-cockpit/commit/21324215f82ff2def9a1bab01bfb6190ad90d961)), closes [#598](https://gitlab.com/linagora/petals-cockpit/issues/598)
+* **frontend:** refactor interface view ([6131a2d](https://gitlab.com/linagora/petals-cockpit/commit/6131a2d5fea3a7154ad60f0a87381427f3907178)), closes [#600](https://gitlab.com/linagora/petals-cockpit/issues/600)
+* **frontend:** refactor service view ([2aa8fb7](https://gitlab.com/linagora/petals-cockpit/commit/2aa8fb7d2cd1eb17a9477adb47e44b297432931c)), closes [#607](https://gitlab.com/linagora/petals-cockpit/issues/607)
+
+
+
 <a name="1.10.0"></a>
 # [1.10.0](https://gitlab.com/linagora/petals-cockpit/compare/v1.9.0...v1.10.0) (2020-09-03)
 

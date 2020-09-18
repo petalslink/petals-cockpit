@@ -1,7 +1,7 @@
 {
   "name": "petals-cockpit",
-  "version": "1.11.0-alpha",
-  "license": "MIT",
+  "version": "1.11.0",
+  "license": "AGPL-3.0-only",
   "scripts": {
     "ng": "ng",
     "proxy": "ng serve --proxy-config proxy.conf.json -c dev-nomock",

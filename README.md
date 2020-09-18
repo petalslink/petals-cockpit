@@ -1,3 +1,5 @@
+**Development of Petals Cockpit is now stopped, you can still download released versions or fork the repository.**
+
 # Petals Cockpit
 Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora.gitlab.io/petals-cockpit)
 - Username: admin
@@ -8,7 +10,7 @@ Running demo (mock) [https://linagora.gitlab.io/petals-cockpit](https://linagora
 ### Running the pre-compiled JAR
 
 1. Download the latest compiled petals-cockpit:
- - [Version 1.10.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v1.10.0/download?job=release-product)
+ - [Version 1.11.0](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/v1.11.0/download?job=release-product)
  - [Version Latest](https://gitlab.com/linagora/petals-cockpit/builds/artifacts/master/download?job=package-product-master)
 2. Unpack it and go into the directory
 3. Run Petals Cockpit:
@@ -20,10 +22,10 @@ $ ./petals-cockpit.sh
 
 *from root folder*
 
-**Build:**  
+**Build:**
 `docker build -t petals-cockpit .`
 
-**Run:**  
+**Run:**
 `docker run -p 3600:8484 -it petals-cockpit`
 
 For the first run, remember to take a look at the terminal, where you should find an URL with a user setup token.
