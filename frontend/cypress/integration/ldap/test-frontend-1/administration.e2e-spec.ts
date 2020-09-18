@@ -771,7 +771,8 @@ describe(`Administration`, () => {
       cy
         .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
-        .contains(
+        .and(
+          'contain',
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
       cy.get(CONFIRM_DIALOG_DOM.buttons.confirm).click();
@@ -813,7 +814,8 @@ describe(`Administration`, () => {
       cy
         .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
-        .contains(
+        .and(
+          'contain',
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
       cy.get(CONFIRM_DIALOG_DOM.buttons.cancel).click();
@@ -1178,7 +1180,8 @@ describe(`Administration`, () => {
       cy
         .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
-        .contains(
+        .and(
+          'contain',
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
       cy.get(CONFIRM_DIALOG_DOM.buttons.confirm).click();
@@ -1215,7 +1218,8 @@ describe(`Administration`, () => {
       cy
         .get(CONFIRM_DIALOG_DOM.text.message)
         .should('be.visible')
-        .contains(
+        .and(
+          'contain',
           'You will no longer be admin.\nYou will be redirected to the workspaces selection page.'
         );
       cy.get(CONFIRM_DIALOG_DOM.buttons.cancel).click();

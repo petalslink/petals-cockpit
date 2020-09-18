@@ -532,7 +532,7 @@ describe('Workspace', () => {
         .and('be.visible');
 
       // close menu
-      cy.get(`.cdk-overlay-container`).click(600, 600);
+      cy.get(`body`).type(`{esc}`);
 
       // expect to have the menu closed
       cy

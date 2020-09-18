@@ -182,10 +182,8 @@ describe('Users', () => {
     cy
       .get(WORKSPACE_OVERVIEW_DOM.inputs.userSearchCtrl)
       .click()
-      .type(userToAdd);
-
-    // remove focus to create error
-    cy.get(WORKSPACE_OVERVIEW_DOM.buttons.addUserInWorkspace).focus();
+      .type(userToAdd)
+      .blur();
 
     cy
       .get(WORKSPACE_OVERVIEW_DOM.formFields.addUserFormField)
@@ -311,7 +309,8 @@ describe('Users', () => {
     cy
       .get(CONFIRM_DIALOG_DOM.text.message)
       .should('be.visible')
-      .contains(
+      .and(
+        'contain',
         'You will no longer be member of this workspace.\nYou will be redirected to the workspaces selection page.'
       );
 
@@ -366,9 +365,11 @@ describe('Users', () => {
     cy
       .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('bescudie'))
       .should('not.be.checked')
-      .click({
-        force: true,
-      })
+      .parent()
+      .click();
+
+    cy
+      .get(WORKSPACE_OVERVIEW_DOM.table.cells.userAdminWorkspace('bescudie'))
       .should('be.checked');
 
     // Current user leave workspace should be still disabled if change is not save.
